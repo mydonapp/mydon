@@ -1,22 +1,32 @@
 import { Transaction } from '../transactions.entity';
 
 export interface MappedTransaction<T> {
-  amount: number;
+  creditAmount: number;
+  debitAmount: number;
   description: string;
   transactionDate: Date;
   raw: T;
 }
 
 export abstract class StatementMapper<T> {
-  constructor(protected statement: T[], protected accountId: string) {}
+  protected statement: T[];
+
+  constructor(protected fileContent: string, protected accountId: string) {}
 
   protected abstract mapStatement(): Promise<MappedTransaction<T>[]>;
 
-  async convertStatement(): Promise<Transaction[]> {
+  protected abstract parseStatement(fileContent: string): Promise<T[]>;
+
+  public async convertStatement(): Promise<Transaction[]> {
+    if (!this.statement) {
+      this.statement = await this.parseStatement(this.fileContent);
+    }
+
     const mappedStatement = await this.mapStatement();
     return mappedStatement.map((transaction) => {
       const newTransaction = Transaction.create({
-        amount: transaction.amount,
+        creditAmount: transaction.creditAmount,
+        debitAmount: transaction.debitAmount,
         description: transaction.description,
         creditAccountId: this.getCreditAccountId(transaction),
         debitAccountId: this.getDebitAccountId(transaction),

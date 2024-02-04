@@ -9,7 +9,11 @@ import {
 export class CreateTransactionDto {
   @IsNumber()
   @IsPositive()
-  amount: number;
+  creditAmount: number;
+
+  @IsNumber()
+  @IsPositive()
+  debitAmount: number;
 
   @IsString()
   description: string;

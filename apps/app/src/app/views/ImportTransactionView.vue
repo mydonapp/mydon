@@ -73,6 +73,7 @@
               <th>Credit Account</th>
               <th>Debit Account</th>
               <th>Amount</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -101,10 +102,11 @@
                 <select
                   class="select select-bordered w-full max-w-xs"
                   v-model="transaction.creditAccountId"
+                  @change="onAccountChange(transaction, 'credit')"
                 >
                   <option :value="undefined">Select Account</option>
                   <option
-                    v-for="account in accounts"
+                    v-for="account in allAccounts"
                     :key="account.id"
                     :value="account.id"
                   >
@@ -119,7 +121,7 @@
                 >
                   <option :value="undefined">Select Account</option>
                   <option
-                    v-for="account in accounts"
+                    v-for="account in allAccounts"
                     :key="account.id"
                     :value="account.id"
                   >
@@ -128,12 +130,31 @@
                 </select>
               </td>
               <td>
-                <input
-                  type="number"
-                  placeholder="Enter an amount"
-                  class="input w-full select-bordered"
-                  v-model="transaction.amount"
-                />
+                <div v-if="isEqualCurrency(transaction)">
+                  <input
+                    type="number"
+                    placeholder="Enter an amount"
+                    class="input w-full select-bordered"
+                    v-model="transaction.amount"
+                  />
+                </div>
+                <div v-else class="flex flex-row gap-4">
+                  <input
+                    type="number"
+                    placeholder="Enter an amount"
+                    class="input w-full select-bordered"
+                    v-model="transaction.creditAmount"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Enter an amount"
+                    class="input w-full select-bordered"
+                    v-model="transaction.debitAmount"
+                  />
+                </div>
+              </td>
+              <td>
+                <label @click="deleteTransaction(transaction.id)">Delete</label>
               </td>
             </tr>
           </tbody>
@@ -167,6 +188,16 @@ const { mutate } = useMutation({
   },
 });
 
+const { mutate: deleteTransactionMutation } = useMutation({
+  mutationFn: async (id: string) =>
+    await useFetch(`http://localhost:3000/v1/transactions/${id}`, {
+      method: 'DELETE',
+    }).json(),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+  },
+});
+
 const importTransactions = async () => {
   var input = document.querySelector('input[type="file"]');
   var data = new FormData();
@@ -178,11 +209,64 @@ const importTransactions = async () => {
   mutate(data);
 };
 
+const deleteTransaction = async (id: string) => {
+  await deleteTransactionMutation(id);
+};
+
 const { accounts } = useAccounts();
 
-const assetsAccounts = computed(
-  () => accounts?.value?.filter((account) => account.type === 'ASSETS') || []
-);
+const assetsAccounts = computed(() => accounts?.value?.assets?.accounts || []);
+const allAccounts = computed(() => [
+  ...(accounts?.value?.assets?.accounts || []),
+  ...(accounts?.value?.liabilities?.accounts || []),
+  ...(accounts?.value?.income?.accounts || []),
+  ...(accounts?.value?.expense?.accounts || []),
+]);
+
+const isEqualCurrency = (transaction) => {
+  const debitCurrency = allAccounts.value.find(
+    (account) => account.id === transaction.debitAccountId
+  )?.currency;
+  const creditCurrency = allAccounts.value.find(
+    (account) => account.id === transaction.creditAccountId
+  )?.currency;
+
+  if (!debitCurrency || !creditCurrency) return true;
+
+  return debitCurrency === creditCurrency;
+};
+
+const onAccountChange = async (transaction, type: 'credit' | 'debit') => {
+  const isEqual = isEqualCurrency(transaction);
+
+  if (isEqual) {
+    return;
+  }
+
+  if (type === 'credit') {
+    transaction.creditAmount = await getCurrencyAmount(
+      transaction.debitAmount,
+      allAccounts.value.find(
+        (account) => account.id === transaction.debitAccountId
+      )?.currency,
+      allAccounts.value.find(
+        (account) => account.id === transaction.creditAccountId
+      )?.currency,
+      transaction.transactionDate
+    );
+  } else {
+    transaction.debitAmount = await getCurrencyAmount(
+      transaction.creditAmount,
+      allAccounts.value.find(
+        (account) => account.id === transaction.creditAccountId
+      )?.currency,
+      allAccounts.value.find(
+        (account) => account.id === transaction.debitAccountId
+      )?.currency,
+      transaction.transactionDate
+    );
+  }
+};
 
 const {
   isPending,
@@ -211,7 +295,9 @@ watchEffect(() => {
           description: transaction.description,
           creditAccountId: transaction.creditAccountId || undefined,
           debitAccountId: transaction.debitAccountId || undefined,
-          amount: transaction.amount,
+          creditAmount: transaction.creditAmount,
+          debitAmount: transaction.debitAmount,
+          amount: transaction.creditAmount,
           selected: selectAll,
           transactionDate: transaction.transactionDate,
         };
@@ -232,21 +318,59 @@ watch(
   }
 );
 
+const getCurrencyAmount = async (
+  amount: number,
+  from: string,
+  to: string,
+  date: string
+) => {
+  const { data } = await useFetch<any>(
+    `http://localhost:3000/v1/currency/convert?from=${from}&to=${to}&amount=${amount}&date=${date}`
+  ).json();
+
+  return data.value;
+};
+
 const { mutateAsync: updateDraftMutate } = useMutation({
-  mutationFn: async (transaction: any) =>
-    await useFetch(`http://localhost:3000/v1/transactions/${transaction.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        description: transaction.description,
-        creditAccountId: transaction.creditAccountId,
-        debitAccountId: transaction.debitAccountId,
-        amount: parseFloat(transaction.amount),
-        draft: false,
-      }),
-    }),
+  mutationFn: async (transaction: any) => {
+    const getAmount = (transaction) => {
+      const debitCurrency = allAccounts.value.find(
+        (account) => account.id === transaction.debitAccountId
+      )?.currency;
+      const creditCurrency = allAccounts.value.find(
+        (account) => account.id === transaction.creditAccountId
+      )?.currency;
+
+      if (debitCurrency === creditCurrency) {
+        return {
+          creditAmount: parseFloat(transaction.amount),
+          debitAmount: parseFloat(transaction.amount),
+        };
+      } else {
+        return {
+          creditAmount: parseFloat(transaction.creditAmount),
+          debitAmount: parseFloat(transaction.debitAmount),
+        };
+      }
+    };
+
+    return await useFetch(
+      `http://localhost:3000/v1/transactions/${transaction.id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: transaction.description,
+          creditAccountId: transaction.creditAccountId,
+          debitAccountId: transaction.debitAccountId,
+          ...getAmount(transaction),
+          draft: false,
+        }),
+      }
+    );
+  },
 });
 
 const updateDraft = async () => {

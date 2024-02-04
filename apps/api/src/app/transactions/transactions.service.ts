@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
 import { Transaction } from './transactions.entity';
-import {
-  Statement,
-  StatementMapperFactory,
-} from './statementMapper/statment-mapper.factory';
 
 @Injectable()
 export class TransactionsService {
@@ -25,7 +22,8 @@ export class TransactionsService {
   }
 
   createTransaction(options: {
-    amount: number;
+    creditAmount: number;
+    debitAmount: number;
     description: string;
     creditAccountId: string;
     debitAccountId: string;
@@ -35,10 +33,15 @@ export class TransactionsService {
     return this.transactionRepository.save(transaction);
   }
 
+  deleteTransaction(id: string) {
+    return this.transactionRepository.delete(id);
+  }
+
   async patchTransaction(
     id: string,
     options: {
-      amount?: number;
+      creditAmount?: number;
+      debitAmount?: number;
       description?: string;
       creditAccountId?: string;
       debitAccountId?: string;
@@ -49,8 +52,11 @@ export class TransactionsService {
       where: { id },
     });
 
-    if (options.amount) {
-      transaction.amount = options.amount;
+    if (options.creditAmount) {
+      transaction.creditAmount = options.creditAmount;
+    }
+    if (options.debitAmount) {
+      transaction.debitAmount = options.debitAmount;
     }
     if (options.description) {
       transaction.description = options.description;
@@ -69,12 +75,12 @@ export class TransactionsService {
   }
 
   async importStatement(
-    csv: Statement[],
+    fileContent: string,
     statementIssuer: string,
     accountId: string
   ) {
     const mapper = StatementMapperFactory.create(
-      csv,
+      fileContent,
       statementIssuer,
       accountId
     );

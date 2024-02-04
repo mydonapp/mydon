@@ -11,7 +11,12 @@ export class PatchTransactionDto {
   @IsNumber()
   @IsPositive()
   @IsOptional()
-  amount?: number;
+  debitAmount?: number;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  creditAmount?: number;
 
   @IsString()
   @IsOptional()

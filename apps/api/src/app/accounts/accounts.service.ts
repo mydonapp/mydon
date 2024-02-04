@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Account, AccountType } from './accounts.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ForexService } from '../shared/forex/forex.service';
 
 @Injectable()
 export class AccountsService {
   constructor(
     @InjectRepository(Account)
-    private accountsRepository: Repository<Account>
+    private accountsRepository: Repository<Account>,
+    private forexService: ForexService
   ) {}
 
   async findAll() {
@@ -23,8 +25,63 @@ export class AccountsService {
         creditBalance: creditBalance,
         debitBalance: account.debitBalance,
         balance: account.balance,
+        currency: account.currency,
       };
     });
+  }
+
+  async mapAccountsToGrouped(accounts: Account[], accountType: AccountType) {
+    const result = (
+      await Promise.all(
+        accounts
+          .filter((account) => account.type === accountType)
+          .map(async (account) => {
+            const creditBalance =
+              account.creditBalance + account.openingBalance;
+
+            return {
+              id: account.id,
+              name: account.name,
+              type: account.type,
+              creditBalance: creditBalance,
+              debitBalance: account.debitBalance,
+              balance: account.balance,
+              currency: account.currency,
+              balanceMainCurrency: await this.forexService.convertCurrency(
+                account.balance,
+                account.currency,
+                'CHF',
+                new Date()
+              ),
+            };
+          })
+      )
+    ).sort((a, b) => b.balanceMainCurrency - a.balanceMainCurrency);
+
+    return {
+      accounts: result,
+      total: result.reduce(
+        (acc, account) => acc + account.balanceMainCurrency,
+        0
+      ),
+    };
+  }
+
+  async findAllGroupedByAccountType() {
+    const result = await this.accountsRepository.find();
+
+    const grouped = {
+      assets: await this.mapAccountsToGrouped(result, AccountType.ASSETS),
+      liabilities: await this.mapAccountsToGrouped(
+        result,
+        AccountType.LIABILITIES
+      ),
+      equity: await this.mapAccountsToGrouped(result, AccountType.EQUITY),
+      income: await this.mapAccountsToGrouped(result, AccountType.INCOME),
+      expense: await this.mapAccountsToGrouped(result, AccountType.EXPENSE),
+    };
+
+    return grouped;
   }
 
   async test() {

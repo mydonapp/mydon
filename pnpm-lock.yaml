@@ -27,7 +27,7 @@ dependencies:
     specifier: ^10.7.2
     version: 10.7.2(vue@3.3.4)
   axios:
-    specifier: ^1.0.0
+    specifier: ^1.6.7
     version: 1.6.7
   class-transformer:
     specifier: ^0.5.1

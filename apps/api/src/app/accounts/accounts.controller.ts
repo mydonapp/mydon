@@ -8,7 +8,7 @@ export class AccountsController {
 
   @Get()
   async findAll() {
-    const result = await this.accountsService.findAll();
+    const result = await this.accountsService.findAllGroupedByAccountType();
     return result;
   }
 

@@ -16,6 +16,13 @@ export enum AccountType {
   EXPENSE = 'EXPENSE',
 }
 
+export enum Currency {
+  CHF = 'CHF',
+  EUR = 'EUR',
+  USD = 'USD',
+  KRW = 'KRW',
+}
+
 @Entity('accounts')
 export class Account {
   @PrimaryGeneratedColumn('uuid')
@@ -30,6 +37,9 @@ export class Account {
   @Column({ enum: AccountType, type: 'enum' })
   type: AccountType;
 
+  @Column({ enum: Currency, type: 'enum', default: Currency.CHF })
+  currency: Currency;
+
   @OneToMany(() => Transaction, (transaction) => transaction.creditAccount)
   creditTransactions: Transaction[];
 
@@ -38,7 +48,7 @@ export class Account {
 
   @VirtualColumn({
     query: (alias) =>
-      `SELECT COALESCE(SUM(amount), 0) FROM "transactions" WHERE "creditAccountId" = ${alias}.id`,
+      `SELECT COALESCE(SUM("creditAmount"), 0) FROM "transactions" WHERE "creditAccountId" = ${alias}.id`,
     type: 'decimal',
     transformer: new ColumnDecimalTransformer(),
   })
@@ -46,7 +56,7 @@ export class Account {
 
   @VirtualColumn({
     query: (alias) =>
-      `SELECT COALESCE(SUM(amount), 0) FROM "transactions" WHERE "debitAccountId" = ${alias}.id`,
+      `SELECT COALESCE(SUM("debitAmount"), 0) FROM "transactions" WHERE "debitAccountId" = ${alias}.id`,
     type: 'decimal',
     transformer: new ColumnDecimalTransformer(),
   })

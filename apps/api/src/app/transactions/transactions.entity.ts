@@ -11,7 +11,8 @@ import {
 import { Account } from '../accounts/accounts.entity';
 
 export interface CreateTransaction {
-  amount: number;
+  creditAmount: number;
+  debitAmount: number;
   description: string;
   creditAccountId: string;
   debitAccountId: string;
@@ -26,7 +27,15 @@ export class Transaction {
   id: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  amount: number;
+  creditAmount: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  debitAmount: number;
 
   @Column({ default: '' })
   description: string;
@@ -79,7 +88,7 @@ export class Transaction {
       }
     }
 
-    if (this.amount < 0) {
+    if (this.creditAmount < 0 || this.debitAmount < 0) {
       throw new Error('Amount must be greater or equal than 0');
     }
   }
@@ -87,7 +96,8 @@ export class Transaction {
   public static create(props: CreateTransaction): Transaction {
     console.log(props);
     const transaction = new Transaction();
-    transaction.amount = props.amount;
+    transaction.creditAmount = props.creditAmount;
+    transaction.debitAmount = props.debitAmount;
     transaction.description = props.description;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     transaction.creditAccount = props.creditAccountId as any;

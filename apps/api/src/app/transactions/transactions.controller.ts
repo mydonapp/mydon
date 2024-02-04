@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -12,15 +13,18 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { parse } from 'csv-parse/sync';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { ImportStatementDto } from './dtos/import-statenment.dto';
 import { PatchTransactionDto } from './dtos/patch-transaction.dto';
 import { TransactionsService } from './transactions.service';
+import { ForexService } from '../shared/forex/forex.service';
 
 @Controller()
 export class TransactionsController {
-  constructor(private transactionsService: TransactionsService) {}
+  constructor(
+    private transactionsService: TransactionsService,
+    private forexService: ForexService
+  ) {}
 
   @Get('v1/transactions')
   async findAll(@Query('filter') filter: string) {
@@ -29,7 +33,8 @@ export class TransactionsController {
     return result.map((transaction) => {
       return {
         id: transaction.id,
-        amount: transaction.amount,
+        creditAmount: transaction.creditAmount,
+        debitAmount: transaction.debitAmount,
         description: transaction.description,
         creditAccountId: transaction.creditAccount,
         debitAccountId: transaction.debitAccount,
@@ -42,7 +47,8 @@ export class TransactionsController {
   @Post('v1/transactions')
   createTransaction(@Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionsService.createTransaction({
-      amount: createTransactionDto.amount,
+      creditAmount: createTransactionDto.creditAmount,
+      debitAmount: createTransactionDto.debitAmount,
       creditAccountId: createTransactionDto.creditAccountId,
       debitAccountId: createTransactionDto.debitAccountId,
       transactionDate: createTransactionDto.transactionDate,
@@ -57,12 +63,18 @@ export class TransactionsController {
     @Body() patchTransactionDto: PatchTransactionDto
   ) {
     return this.transactionsService.patchTransaction(id, {
-      amount: patchTransactionDto.amount,
+      creditAmount: patchTransactionDto.creditAmount,
+      debitAmount: patchTransactionDto.debitAmount,
       creditAccountId: patchTransactionDto.creditAccountId,
       debitAccountId: patchTransactionDto.debitAccountId,
       draft: patchTransactionDto.draft,
       description: patchTransactionDto.description,
     });
+  }
+
+  @Delete('v1/transactions/:id')
+  deleteTransaction(@Param('id') id: string) {
+    return this.transactionsService.deleteTransaction(id);
   }
 
   @Post('v1/statements/import')
@@ -83,16 +95,22 @@ export class TransactionsController {
     file: Express.Multer.File,
     @Body() body: ImportStatementDto
   ) {
-    const rawRecords = await parse(file.buffer.toString(), {
-      cast: true,
-      columns: true,
-      skip_empty_lines: true,
-      bom: true,
-    });
     return this.transactionsService.importStatement(
-      rawRecords,
+      file.buffer.toString(),
       body.statementIssuer,
       body.accountId
+    );
+  }
+
+  @Get('v1/currency/convert')
+  convertAmount(
+    @Query() query: { amount: number; from: string; to: string; date: string }
+  ) {
+    return this.forexService.convertCurrency(
+      query.amount,
+      query.from,
+      query.to,
+      new Date(query.date)
     );
   }
 }

@@ -1,23 +1,20 @@
 import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 import { parse } from 'csv-parse/sync';
 
-export interface SwisscardStatement {
-  'Transaction date': string;
-  Description: string;
-  'Card number': string;
-  Currency: string;
+export interface WiseStatement {
+  Date: string;
   Amount: number;
-  'Debit/Credit': 'Debit' | 'Credit';
-  Status: string;
-  Category: string;
+  Description: string;
+  'Exchange To Amount': string;
+  Currency: string;
 }
 
-interface SwisscardStatementResponse extends SwisscardStatement {
-  issuer: 'SWISSCARD';
+interface WiseStatementResponse extends WiseStatement {
+  issuer: 'WISE';
 }
 
-export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement> {
-  protected async parseStatement(): Promise<SwisscardStatement[]> {
+export class WiseStatementMapper extends StatementMapper<WiseStatement> {
+  protected async parseStatement(): Promise<WiseStatement[]> {
     return await parse(this.fileContent, {
       cast: true,
       columns: true,
@@ -27,16 +24,16 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
   }
 
   protected mapStatement(): Promise<
-    MappedTransaction<SwisscardStatementResponse>[]
+    MappedTransaction<WiseStatementResponse>[]
   > {
-    const mappedStatement: MappedTransaction<SwisscardStatementResponse>[] = [];
+    const mappedStatement: MappedTransaction<WiseStatementResponse>[] = [];
     for (const transaction of this.statement) {
       // For now we just add posted transactions as well
       // if (transaction.Status !== 'Posted') {
       //   continue;
       // }
 
-      const dmy = transaction['Transaction date'].split('.');
+      const dmy = transaction.Date.split('-');
 
       mappedStatement.push({
         creditAmount: Math.abs(transaction.Amount),
@@ -49,7 +46,7 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
         ),
         raw: {
           ...transaction,
-          issuer: 'SWISSCARD',
+          issuer: 'WISE',
         },
       });
     }
@@ -58,16 +55,16 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
   }
 
   protected getCreditAccountIdFromStatement(
-    transaction: MappedTransaction<SwisscardStatementResponse>
+    transaction: MappedTransaction<WiseStatementResponse>
   ): string {
-    if (transaction.raw['Debit/Credit'] === 'Credit') {
+    if (transaction.raw.Amount >= 0) {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
-    transaction: MappedTransaction<SwisscardStatementResponse>
+    transaction: MappedTransaction<WiseStatementResponse>
   ): string {
-    if (transaction.raw['Debit/Credit'] === 'Debit') {
+    if (transaction.raw.Amount < 0) {
       return this.accountId;
     }
   }

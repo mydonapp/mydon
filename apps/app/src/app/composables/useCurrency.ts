@@ -1,24 +1,37 @@
-export const useCurrency = () => {
-  const country = 'CH';
+import { ref } from 'vue';
+import { usePrivacy } from './usePrivacy';
 
-  const getCurrency = () => {
-    switch (country) {
-      case 'CH':
+export const useCurrency = () => {
+  const getCurrency = (currency: string) => {
+    switch (currency) {
+      case 'CHF':
         return 'CHF';
-      // case 'DE':
-      //   return 'EUR';
-      // case 'FR':
-      //   return 'EUR';
+      case 'EUR':
+        return 'EUR';
+      case 'USD':
+        return 'USD';
+      case 'KRW':
+        return 'KRW';
       default:
         return 'CHF';
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat(country, {
-      style: 'currency',
-      currency: getCurrency(),
-    }).format(value);
+  const formatCurrency = (value: number, currency: string): string => {
+    const { isPrivate } = usePrivacy();
+    const result = ref('');
+
+    if (isPrivate.value) {
+      result.value = '***';
+      // return result;
+    } else {
+      result.value = new Intl.NumberFormat('CH', {
+        style: 'currency',
+        currency: getCurrency(currency),
+      }).format(value);
+    }
+
+    return result.value;
   };
 
   return { formatCurrency };
