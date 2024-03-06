@@ -18,6 +18,11 @@ const router = createRouter({
           name: 'Accounts',
         },
         {
+          path: '/accounts/:id',
+          component: () => import('../views/AccountView.vue'),
+          name: 'Account',
+        },
+        {
           path: '/import',
           component: () => import('../views/ImportTransactionView.vue'),
           name: 'Import',

@@ -7,4 +7,4 @@ services:
     environment:
       POSTGRES_PASSWORD: mysecretpassword
     ports:
-      - 5500:5432
+      - 6500:5432

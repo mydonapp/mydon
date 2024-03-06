@@ -42,14 +42,14 @@
         <h2 class="text-xl mb-2">Assets</h2>
         <ul class="menu bg-base-200 w-full rounded-box">
           <li v-for="account in accounts.assets.accounts" :key="account.id">
-            <a
+            <router-link :to="{ name: 'Account', params: { id: account.id } }"
               >{{ account.name
               }}<span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-success' : 'badge-error'
                 }`"
                 >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></a
+              ></router-link
             >
           </li>
           <li>
@@ -72,14 +72,14 @@
             v-for="account in accounts.liabilities.accounts"
             :key="account.id"
           >
-            <a
+            <router-link :to="{ name: 'Account', params: { id: account.id } }"
               >{{ account.name
               }}<span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-error' : 'badge-success'
                 }`"
                 >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></a
+              ></router-link
             >
           </li>
           <li>
@@ -101,14 +101,14 @@
         <h2>Income</h2>
         <ul class="menu bg-base-200 w-full rounded-box">
           <li v-for="account in accounts.income.accounts" :key="account.id">
-            <a
+            <router-link :to="{ name: 'Account', params: { id: account.id } }"
               >{{ account.name
               }}<span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-success' : 'badge-error'
                 }`"
                 >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></a
+              ></router-link
             >
           </li>
           <li>
@@ -128,14 +128,14 @@
         <h2>Expenses</h2>
         <ul class="menu bg-base-200 w-full rounded-box">
           <li v-for="account in accounts.expense.accounts" :key="account.id">
-            <a
+            <router-link :to="{ name: 'Account', params: { id: account.id } }"
               >{{ account.name
               }}<span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-error' : 'badge-success'
                 }`"
                 >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></a
+              ></router-link
             >
           </li>
           <li>
@@ -196,6 +196,60 @@
         Add
       </button>
     </div>
+    <div>
+      <input
+        type="text"
+        placeholder="Enter a description"
+        class="input w-full select-bordered"
+        v-model="transactionDate"
+      />
+
+      <input
+        type="text"
+        placeholder="Enter a description"
+        class="input w-full select-bordered"
+        v-model="transactionDescription"
+      />
+
+      <select
+        class="select select-bordered w-full max-w-xs"
+        v-model="creditAccountId"
+      >
+        <option :value="undefined">Select Account</option>
+        <option
+          v-for="account in allAccounts"
+          :key="account.id"
+          :value="account.id"
+        >
+          {{ account.name }}
+        </option>
+      </select>
+
+      <select
+        class="select select-bordered w-full max-w-xs"
+        v-model="debitAccountId"
+      >
+        <option :value="undefined">Select Account</option>
+        <option
+          v-for="account in allAccounts"
+          :key="account.id"
+          :value="account.id"
+        >
+          {{ account.name }}
+        </option>
+      </select>
+      <div>
+        <input
+          type="number"
+          placeholder="Enter an amount"
+          class="input w-full select-bordered"
+          v-model="transactionAmount"
+        />
+      </div>
+      <button class="btn btn-primary max-w-xs mt-6" @click="createTransaction">
+        Create Transaction
+      </button>
+    </div>
   </div>
 </template>
 
@@ -204,6 +258,8 @@ import { computed, ref } from 'vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useCurrency } from '../composables/useCurrency';
 import { usePrivacy } from '../composables/usePrivacy';
+import { useMutation } from '@tanstack/vue-query';
+import { useFetch } from '@vueuse/core';
 
 const { formatCurrency } = useCurrency();
 
@@ -214,6 +270,19 @@ const { isPrivate, togglePrivacy } = usePrivacy();
 const name = ref('');
 const openingBalance = ref(0);
 const accountType = ref('ASSETS');
+
+const transactionDescription = ref('');
+const creditAccountId = ref();
+const debitAccountId = ref();
+const transactionDate = ref(new Date().toISOString());
+const transactionAmount = ref(0);
+
+const allAccounts = computed(() => [
+  ...(accounts?.value?.assets?.accounts || []),
+  ...(accounts?.value?.liabilities?.accounts || []),
+  ...(accounts?.value?.income?.accounts || []),
+  ...(accounts?.value?.expense?.accounts || []),
+]);
 
 const addAccount = () => {
   createAccount({
@@ -226,44 +295,46 @@ const addAccount = () => {
   accountType.value = 'ASSETS';
 };
 
-// const assetsAccounts = computed(
-//   () =>
-//     accounts.value
-//       ?.filter((account) => account.type === 'ASSETS')
-//       .sort((a, b) => b.balance - a.balance) || []
-// );
-// const liabilitiesAccounts = computed(
-//   () =>
-//     accounts.value
-//       ?.filter((account) => account.type === 'LIABILITIES')
-//       .sort((a, b) => b.balance - a.balance) || []
-// );
-// const incomeAccounts = computed(
-//   () =>
-//     accounts.value
-//       ?.filter((account) => account.type === 'INCOME')
-//       .sort((a, b) => b.balance - a.balance) || []
-// );
-// const expensesAccounts = computed(
-//   () =>
-//     accounts.value
-//       ?.filter((account) => account.type === 'EXPENSE')
-//       .sort((a, b) => b.balance - a.balance) || []
-// );
+const createTransaction = async () => {
+  await createTransactionMutation({
+    creditAmount: transactionAmount.value,
+    debitAmount: transactionAmount.value,
+    description: transactionDescription.value,
+    creditAccountId: creditAccountId.value,
+    debitAccountId: debitAccountId.value,
+    transactionDate: transactionDate.value,
+  });
 
-// const assetsTotal = computed(() =>
-//   assetsAccounts.value.reduce((acc, account) => acc + account.balance, 0)
-// );
+  transactionDescription.value = '';
+  creditAccountId.value = undefined;
+  debitAccountId.value = undefined;
+  transactionDate.value = new Date().toISOString();
+  transactionAmount.value = 0;
+};
 
-// const liabilitiesTotal = computed(() =>
-//   liabilitiesAccounts.value.reduce((acc, account) => acc + account.balance, 0)
-// );
-
-// const incomeTotal = computed(() =>
-//   incomeAccounts.value.reduce((acc, account) => acc + account.balance, 0)
-// );
-
-// const expensesTotal = computed(() =>
-//   expensesAccounts.value.reduce((acc, account) => acc + account.balance, 0)
-// );
+const { mutateAsync: createTransactionMutation } = useMutation({
+  mutationFn: async (data: {
+    creditAmount: number;
+    debitAmount: number;
+    description: string;
+    creditAccountId: string;
+    debitAccountId: string;
+    transactionDate: string;
+  }) => {
+    return await useFetch(`http://localhost:3000/v1/transactions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        creditAmount: data.creditAmount,
+        debitAmount: data.debitAmount,
+        description: data.description,
+        creditAccountId: data.creditAccountId,
+        debitAccountId: data.debitAccountId,
+        transactionDate: data.transactionDate,
+      }),
+    });
+  },
+});
 </script>

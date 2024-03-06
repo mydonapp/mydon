@@ -14,7 +14,6 @@ export class AccountsService {
 
   async findAll() {
     const result = await this.accountsRepository.find();
-
     return result.map((account) => {
       const creditBalance = account.creditBalance + account.openingBalance;
 
@@ -100,5 +99,61 @@ export class AccountsService {
     account.type = options.type;
     account.openingBalance = options.openingBalance;
     return this.accountsRepository.save(account);
+  }
+
+  async getAccount(accountId: string) {
+    const account = await this.accountsRepository.findOne({
+      where: { id: accountId },
+      relations: [
+        'debitTransactions',
+        'creditTransactions',
+        'creditTransactions.debitAccount',
+        'debitTransactions.creditAccount',
+      ],
+    });
+
+    console.log('account', account);
+
+    return {
+      id: account.id,
+      name: account.name,
+      type: account.type,
+      balance: account.balance,
+      currency: account.currency,
+      debitTransactions: account.debitTransactions,
+      creditTransactions: account.creditTransactions,
+      transactions: [
+        ...(account.debitTransactions.map((x) => ({
+          id: x.id,
+          transactionDate: x.transactionDate,
+          description: x.description,
+          amount:
+            account.type === AccountType.INCOME ||
+            account.type === AccountType.LIABILITIES
+              ? x.debitAmount
+              : x.debitAmount * -1,
+          counterAccount: {
+            id: x.creditAccount.id,
+            name: x.creditAccount.name,
+          },
+        })) || []),
+        ...(account.creditTransactions.map((x) => ({
+          id: x.id,
+          transactionDate: x.transactionDate,
+          description: x.description,
+          amount:
+            account.type === AccountType.ASSETS ||
+            account.type === AccountType.EXPENSE
+              ? x.creditAmount
+              : x.creditAmount * -1,
+          counterAccount: {
+            id: x.debitAccount.id,
+            name: x.debitAccount.name,
+          },
+        })) || []),
+      ].sort(
+        (a, b) => a.transactionDate.getTime() - b.transactionDate.getTime()
+      ),
+    };
   }
 }

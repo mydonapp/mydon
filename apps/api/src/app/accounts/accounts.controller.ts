@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dtos/create-account.dto';
 
@@ -19,5 +19,10 @@ export class AccountsController {
       type: createAccountDto.type,
       openingBalance: createAccountDto.openingBalance,
     });
+  }
+
+  @Get(':accountId')
+  getAccountTransactions(@Param('accountId') accountId: string) {
+    return this.accountsService.getAccount(accountId);
   }
 }
