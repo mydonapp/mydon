@@ -91,7 +91,7 @@
                 {{ new Date(transaction.transactionDate).toLocaleDateString() }}
               </td>
               <td>
-                <input
+                <textarea
                   type="text"
                   placeholder="Enter a description"
                   class="input w-full select-bordered"
