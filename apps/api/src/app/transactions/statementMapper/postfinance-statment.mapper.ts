@@ -2,11 +2,11 @@ import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 import { parse } from 'csv-parse/sync';
 
 export interface PostFinanceStatement {
-  Datum: string;
-  Bewegungstyp: string;
-  Avisierungstext: string;
-  'Gutschrift in CHF': number | string;
-  'Lastschrift in CHF': number | string;
+  Date: string;
+  'Type of transaction': string;
+  'Notification text': string;
+  'Credit in CHF': number | string;
+  'Debit in CHF': number | string;
 }
 
 interface PostFinanceStatementResponse extends PostFinanceStatement {
@@ -33,20 +33,20 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
     const mappedStatement: MappedTransaction<PostFinanceStatementResponse>[] =
       [];
     for (const transaction of this.statement) {
-      const dmy = transaction.Datum.split('.');
+      const dmy = transaction.Date.split('.');
 
       mappedStatement.push({
         creditAmount: Math.abs(
-          transaction['Gutschrift in CHF'] === ''
-            ? parseFloat(transaction['Lastschrift in CHF'].toString())
-            : parseFloat(transaction['Gutschrift in CHF'].toString())
+          transaction['Credit in CHF'] === ''
+            ? parseFloat(transaction['Debit in CHF'].toString())
+            : parseFloat(transaction['Credit in CHF'].toString())
         ),
         debitAmount: Math.abs(
-          transaction['Gutschrift in CHF'] === ''
-            ? parseFloat(transaction['Lastschrift in CHF'].toString())
-            : parseFloat(transaction['Gutschrift in CHF'].toString())
+          transaction['Credit in CHF'] === ''
+            ? parseFloat(transaction['Debit in CHF'].toString())
+            : parseFloat(transaction['Credit in CHF'].toString())
         ),
-        description: transaction.Avisierungstext,
+        description: transaction['Notification text'],
         transactionDate: new Date(
           parseInt(dmy[2]),
           parseInt(dmy[1]) - 1,
@@ -65,14 +65,14 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
   protected getCreditAccountIdFromStatement(
     transaction: MappedTransaction<PostFinanceStatementResponse>
   ): string {
-    if (transaction.raw['Gutschrift in CHF'] !== '') {
+    if (transaction.raw['Credit in CHF'] !== '') {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
     transaction: MappedTransaction<PostFinanceStatementResponse>
   ): string {
-    if (transaction.raw['Lastschrift in CHF'] !== '') {
+    if (transaction.raw['Debit in CHF'] !== '') {
       return this.accountId;
     }
   }

@@ -12,6 +12,8 @@ export const useCurrency = () => {
         return 'USD';
       case 'KRW':
         return 'KRW';
+      case 'GBP':
+        return 'GBP';
       default:
         return 'CHF';
     }

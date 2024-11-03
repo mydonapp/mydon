@@ -21,6 +21,7 @@ export enum Currency {
   EUR = 'EUR',
   USD = 'USD',
   KRW = 'KRW',
+  GBP = 'GBP',
 }
 
 @Entity('accounts')
