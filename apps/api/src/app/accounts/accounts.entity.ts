@@ -1,12 +1,6 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  VirtualColumn,
-} from 'typeorm';
-import { Transaction } from '../transactions/transactions.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
+import { Transaction } from '../transactions/transactions.entity';
 
 export enum AccountType {
   ASSETS = 'ASSETS',
@@ -35,6 +29,9 @@ export class Account {
   @Column({ default: true })
   private isActive: boolean;
 
+  @Column({ default: false })
+  retirementAccount: boolean;
+
   @Column({ enum: AccountType, type: 'enum' })
   type: AccountType;
 
@@ -47,14 +44,15 @@ export class Account {
   @OneToMany(() => Transaction, (transaction) => transaction.debitAccount)
   debitTransactions: Transaction[];
 
-  @VirtualColumn({
-    query: (alias) =>
-      `SELECT COALESCE(SUM("creditAmount"), 0) FROM "transactions" WHERE "creditAccountId" = ${alias}.id`,
-    type: 'decimal',
-    transformer: new ColumnDecimalTransformer(),
-  })
-  creditBalance: number;
+  // @VirtualColumn({
+  //   query: (alias) =>
+  //     `SELECT COALESCE(SUM("creditAmount"), 0) FROM "transactions" WHERE "creditAccountId" = ${alias}.id`,
+  //   type: 'decimal',
+  //   transformer: new ColumnDecimalTransformer(),
+  // })
+  //_creditBalance: number;
 
+  /*
   @VirtualColumn({
     query: (alias) =>
       `SELECT COALESCE(SUM("debitAmount"), 0) FROM "transactions" WHERE "debitAccountId" = ${alias}.id`,
@@ -62,6 +60,26 @@ export class Account {
     transformer: new ColumnDecimalTransformer(),
   })
   debitBalance: number;
+  */
+  //_debitBalance: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    select: false,
+  })
+  debitBalance?: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    select: false,
+  })
+  creditBalance?: number;
 
   @Column({
     type: 'decimal',
@@ -75,6 +93,22 @@ export class Account {
   setInactive() {
     this.isActive = false;
   }
+
+  // set debitBalance(value: number) {
+  //   this._debitBalance = value;
+  // }
+
+  // get debitBalance() {
+  //   return this._debitBalance;
+  // }
+
+  // set creditBalance(value: number) {
+  //   this._creditBalance = value;
+  // }
+
+  // get creditBalance() {
+  //   return this._creditBalance;
+  // }
 
   get balance() {
     if (this.type === AccountType.ASSETS || this.type === AccountType.EXPENSE) {

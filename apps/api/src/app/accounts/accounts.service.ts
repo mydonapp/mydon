@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Account, AccountType } from './accounts.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ForexService } from '../shared/forex/forex.service';
+import { Account, AccountType } from './accounts.entity';
 
 @Injectable()
 export class AccountsService {
@@ -52,6 +52,7 @@ export class AccountsService {
                 'CHF',
                 new Date()
               ),
+              retirementAccount: account.retirementAccount,
             };
           })
       )
@@ -63,11 +64,54 @@ export class AccountsService {
         (acc, account) => acc + account.balanceMainCurrency,
         0
       ),
+      totalWithoutRetirement: result.reduce(
+        (acc, account) =>
+          acc + (account.retirementAccount ? 0 : account.balanceMainCurrency),
+        0
+      ),
     };
   }
 
-  async findAllGroupedByAccountType() {
-    const result = await this.accountsRepository.find();
+  async findAllGroupedByAccountType(options?: {
+    filter: { from: Date; to: Date };
+  }) {
+    console.log('findAllGroupedByAccountType', options);
+    const query = this.accountsRepository
+      .createQueryBuilder('account')
+      .addSelect(
+        `(SELECT COALESCE(SUM("debitTransaction"."debitAmount"), 0)
+          FROM transactions "debitTransaction"
+          WHERE "debitTransaction"."debitAccountId" = account.id
+          AND (
+            account.type IN (:...filteredTypes)
+            AND "debitTransaction"."transactionDate" BETWEEN cast(:from as timestamptz) AND cast(:to as timestamptz)
+            OR account.type NOT IN (:...filteredTypes)
+          )
+        )`,
+        'account_debitBalance'
+      )
+      .addSelect(
+        `(SELECT COALESCE(SUM("creditTransaction"."creditAmount"), 0)
+          FROM transactions "creditTransaction"
+          WHERE "creditTransaction"."creditAccountId" = account.id
+          AND (
+            account.type IN (:...filteredTypes)
+            AND "creditTransaction"."transactionDate" BETWEEN cast(:from as timestamptz) AND cast(:to as timestamptz)
+            OR account.type NOT IN (:...filteredTypes)
+          )
+        )`,
+        'account_creditBalance'
+      )
+      .setParameters({
+        from: options?.filter?.from || new Date('1970-01-01'),
+        to: options?.filter?.to
+          ? new Date(options?.filter?.to?.setUTCHours(23, 59, 59, 999))
+          : new Date('2100-12-31'),
+        filteredTypes: ['EXPENSE', 'INCOME'],
+      });
+
+    console.log(query.getQueryAndParameters());
+    const result = await query.getMany();
 
     const grouped = {
       assets: await this.mapAccountsToGrouped(result, AccountType.ASSETS),

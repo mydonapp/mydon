@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseDatePipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dtos/create-account.dto';
 
@@ -6,9 +14,14 @@ import { CreateAccountDto } from './dtos/create-account.dto';
 export class AccountsController {
   constructor(private accountsService: AccountsService) {}
 
-  @Get()
-  async findAll() {
-    const result = await this.accountsService.findAllGroupedByAccountType();
+  @Get('')
+  async findAll(
+    @Query('from', new ParseDatePipe({ optional: true })) from?: Date,
+    @Query('to', new ParseDatePipe({ optional: true })) to?: Date
+  ) {
+    const result = await this.accountsService.findAllGroupedByAccountType({
+      filter: { from, to },
+    });
     return result;
   }
 
