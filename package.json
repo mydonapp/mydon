@@ -1,11 +1,14 @@
 {
-  "name": "@don/source",
-  "version": "0.0.0",
+  "name": "@mydonapp/mydon",
+  "version": "0.0.1",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start:infra": "docker compose --file docker-compose.dev.yml up"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "11.0.11",
+    "@nestjs/config": "4.0.2",
     "@nestjs/core": "11.0.11",
     "@nestjs/platform-express": "11.0.11",
     "@nestjs/typeorm": "11.0.0",
