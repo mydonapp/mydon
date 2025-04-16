@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Context } from '../shared/types/context';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
 import { Transaction } from './transactions.entity';
 
@@ -11,8 +12,10 @@ export class TransactionsService {
     private transactionRepository: Repository<Transaction>
   ) {}
 
-  findAll(filter?: string) {
-    const where = {};
+  findAll(context: Context, filter?: string) {
+    const where = {
+      user: { id: context.user.id },
+    };
 
     if (filter === 'draft') {
       where['draft'] = true;
@@ -21,23 +24,33 @@ export class TransactionsService {
     return this.transactionRepository.find({ where, loadRelationIds: true });
   }
 
-  createTransaction(options: {
-    creditAmount: number;
-    debitAmount: number;
-    description: string;
-    creditAccountId: string;
-    debitAccountId: string;
-    transactionDate: Date;
-  }) {
-    const transaction = Transaction.create(options);
+  createTransaction(
+    context: Context,
+    options: {
+      creditAmount: number;
+      debitAmount: number;
+      description: string;
+      creditAccountId: string;
+      debitAccountId: string;
+      transactionDate: Date;
+    }
+  ) {
+    const transaction = Transaction.create({
+      ...options,
+      userId: context.user.id,
+    });
     return this.transactionRepository.save(transaction);
   }
 
-  deleteTransaction(id: string) {
-    return this.transactionRepository.delete(id);
+  deleteTransaction(context: Context, id: string) {
+    return this.transactionRepository.delete({
+      id,
+      user: { id: context.user.id },
+    });
   }
 
   async patchTransaction(
+    context: Context,
     id: string,
     options: {
       creditAmount?: number;
@@ -49,7 +62,7 @@ export class TransactionsService {
     }
   ) {
     const transaction = await this.transactionRepository.findOne({
-      where: { id },
+      where: { id, user: { id: context.user.id } },
     });
 
     if (options.creditAmount) {
@@ -75,11 +88,13 @@ export class TransactionsService {
   }
 
   async importStatement(
+    context: Context,
     fileContent: string,
     statementIssuer: string,
     accountId: string
   ) {
     const mapper = StatementMapperFactory.create(
+      context,
       fileContent,
       statementIssuer,
       accountId

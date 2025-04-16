@@ -1,5 +1,6 @@
 import { useFetch } from '@vueuse/core';
 import { ref, watch, type Ref } from 'vue';
+import { useAuth } from '../useAuth';
 
 interface CreateAccount {
   name: string;
@@ -8,6 +9,8 @@ interface CreateAccount {
 }
 
 export const useAccounts = (timeFilter?: Ref<string>) => {
+  const { getAccessToken } = useAuth();
+
   console.log('Updating time filter:', timeFilter?.value);
   let toFromQuery = '';
   if (timeFilter?.value === '2024') {
@@ -36,13 +39,26 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
     error,
     data,
     execute: refetchAccounts,
-  } = useFetch<any[]>(url, { refetch: true }).json();
+  } = useFetch<any[]>(url, {
+    refetch: true,
+    beforeFetch({ options }) {
+      options.headers = {
+        ...options.headers,
+        Authorization: `Bearer ${getAccessToken()}`,
+      };
+
+      return {
+        options,
+      };
+    },
+  }).json();
 
   const createAccount = async (account: CreateAccount) => {
     await fetch('http://localhost:3000/v1/accounts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${getAccessToken()}`,
       },
       body: JSON.stringify(account),
     });

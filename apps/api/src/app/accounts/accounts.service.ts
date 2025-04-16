@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ForexService } from '../shared/forex/forex.service';
+import { Context } from '../shared/types/context';
 import { Account, AccountType } from './accounts.entity';
 
 @Injectable()
@@ -72,16 +73,20 @@ export class AccountsService {
     };
   }
 
-  async findAllGroupedByAccountType(options?: {
-    filter: { from: Date; to: Date };
-  }) {
-    console.log('findAllGroupedByAccountType', options);
+  async findAllGroupedByAccountType(
+    context: Context,
+    options?: {
+      filter: { from: Date; to: Date };
+    }
+  ) {
     const query = this.accountsRepository
       .createQueryBuilder('account')
       .addSelect(
         `(SELECT COALESCE(SUM("debitTransaction"."debitAmount"), 0)
           FROM transactions "debitTransaction"
           WHERE "debitTransaction"."debitAccountId" = account.id
+          AND account."userId" = :userId
+          AND "debitTransaction"."userId" = :userId
           AND (
             account.type IN (:...filteredTypes)
             AND "debitTransaction"."transactionDate" BETWEEN cast(:from as timestamptz) AND cast(:to as timestamptz)
@@ -94,6 +99,8 @@ export class AccountsService {
         `(SELECT COALESCE(SUM("creditTransaction"."creditAmount"), 0)
           FROM transactions "creditTransaction"
           WHERE "creditTransaction"."creditAccountId" = account.id
+          AND account."userId" = :userId
+          AND "creditTransaction"."userId" = :userId
           AND (
             account.type IN (:...filteredTypes)
             AND "creditTransaction"."transactionDate" BETWEEN cast(:from as timestamptz) AND cast(:to as timestamptz)
@@ -108,9 +115,9 @@ export class AccountsService {
           ? new Date(options?.filter?.to?.setUTCHours(23, 59, 59, 999))
           : new Date('2100-12-31'),
         filteredTypes: ['EXPENSE', 'INCOME'],
+        userId: context.user.id,
       });
 
-    console.log(query.getQueryAndParameters());
     const result = await query.getMany();
 
     const grouped = {
@@ -133,21 +140,25 @@ export class AccountsService {
     return a;
   }
 
-  createAccount(options: {
-    name: string;
-    type: AccountType;
-    openingBalance: number;
-  }) {
+  createAccount(
+    context: Context,
+    options: {
+      name: string;
+      type: AccountType;
+      openingBalance: number;
+    }
+  ) {
     const account = new Account();
     account.name = options.name;
     account.type = options.type;
     account.openingBalance = options.openingBalance;
+    account.user.id = context.user.id;
     return this.accountsRepository.save(account);
   }
 
-  async getAccount(accountId: string) {
+  async getAccount(context: Context, accountId: string) {
     const account = await this.accountsRepository.findOne({
-      where: { id: accountId },
+      where: { id: accountId, user: { id: context.user.id } },
       relations: [
         'debitTransactions',
         'creditTransactions',
@@ -155,8 +166,6 @@ export class AccountsService {
         'debitTransactions.creditAccount',
       ],
     });
-
-    console.log('account', account);
 
     return {
       id: account.id,

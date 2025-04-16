@@ -73,10 +73,13 @@ import { useQuery } from '@tanstack/vue-query';
 import { computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCurrency } from '../composables/useCurrency';
+import { useAuth } from '../composables/useAuth';
 
 const { formatCurrency } = useCurrency();
 
 const route = useRoute();
+
+const { getAccessToken } = useAuth();
 
 const accountId = route.params.id;
 
@@ -98,8 +101,8 @@ const {
   queryKey: ['accounts', accountId],
   staleTime: 1000 * 60 * 1,
   queryFn: async (): Promise<any> =>
-    await fetch(`http://localhost:3000/v1/accounts/${accountId}`).then(
-      (response) => response.json()
-    ),
+    await fetch(`http://localhost:3000/v1/accounts/${accountId}`, {
+      headers: { Authorization: `Bearer ${getAccessToken()}` },
+    }).then((response) => response.json()),
 });
 </script>

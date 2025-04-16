@@ -17,7 +17,6 @@ import { TransactionsModule } from './transactions/transactions.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        console.log(configService.get('DB_POSTGRES_PORT'));
         return {
           type: 'postgres',
           host: 'localhost',

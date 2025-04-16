@@ -20,7 +20,7 @@ export class AuthController {
     if (!signupDto.password) {
       throw new BadRequestException('invalid password');
     }
-    await this.authService.createAccount(signupDto);
+    await this.authService.createUser(signupDto);
   }
 
   @Post('logout')

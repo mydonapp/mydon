@@ -120,7 +120,8 @@ export const useAuth = () => {
           withCredentials: true,
         }
       );
-
+      accessTokenExpiry = undefined;
+      accessToken = undefined;
       void router.push({ name: 'Login' });
     } catch (error) {
       console.error('logout failed', error as Error);

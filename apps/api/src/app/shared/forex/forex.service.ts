@@ -5,7 +5,9 @@ import axios from 'axios';
 export class ForexService {
   private async fetchCurrencyRate(from: string, date: Date) {
     const result = await axios.get(
-      `https://api.frankfurter.app/2024-01-03?from=${from}`
+      `https://api.frankfurter.app/${
+        date.toISOString().split('T')[0]
+      }?from=${from}`
     );
     return result.data;
   }

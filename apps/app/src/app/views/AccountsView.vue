@@ -329,12 +329,15 @@ import { useCurrency } from '../composables/useCurrency';
 import { usePrivacy } from '../composables/usePrivacy';
 import { useMutation } from '@tanstack/vue-query';
 import { useFetch } from '@vueuse/core';
+import { useAuth } from '../composables/useAuth';
 
 const { formatCurrency } = useCurrency();
 
 const timeFilter = ref('2025');
 
 const { accounts, createAccount, loading } = useAccounts(timeFilter);
+
+const { getAccessToken } = useAuth();
 
 const { isPrivate, togglePrivacy } = usePrivacy();
 
@@ -400,6 +403,7 @@ const { mutateAsync: createTransactionMutation } = useMutation({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${getAccessToken()}`,
       },
       body: JSON.stringify({
         creditAmount: data.creditAmount,

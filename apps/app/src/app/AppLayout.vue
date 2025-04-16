@@ -21,6 +21,9 @@
               >{{ item.name }}</router-link
             >
           </li>
+          <li>
+            <span @click="logout">Logout</span>
+          </li>
         </ul>
       </div>
     </div>
@@ -30,8 +33,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
+import { useAuth } from './composables/useAuth';
 
 const route = useRoute();
+
+const { logout } = useAuth();
 
 const currentRouteName = computed(() => route.matched.map((x) => x.name));
 

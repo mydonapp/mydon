@@ -18,6 +18,7 @@ export interface CreateTransaction {
   creditAccountId: string;
   debitAccountId: string;
   transactionDate: Date;
+  userId: string;
   draft?: boolean;
   raw?: string;
 }
@@ -110,6 +111,7 @@ export class Transaction {
     transaction.transactionDate = props.transactionDate;
     transaction.draft = props.draft || false;
     transaction.raw = props.raw || null;
+    transaction.user.id = props.userId;
     return transaction;
   }
 }

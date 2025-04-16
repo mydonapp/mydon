@@ -9,15 +9,19 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
+import { AuthGuard } from '../auth/auth.guard';
+import { ForexService } from '../shared/forex/forex.service';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { ImportStatementDto } from './dtos/import-statenment.dto';
 import { PatchTransactionDto } from './dtos/patch-transaction.dto';
 import { TransactionsService } from './transactions.service';
-import { ForexService } from '../shared/forex/forex.service';
 
 @Controller()
 export class TransactionsController {
@@ -26,9 +30,13 @@ export class TransactionsController {
     private forexService: ForexService
   ) {}
 
+  @UseGuards(AuthGuard)
   @Get('v1/transactions')
-  async findAll(@Query('filter') filter: string) {
-    const result = await this.transactionsService.findAll(filter);
+  async findAll(@Req() req: Request, @Query('filter') filter: string) {
+    const result = await this.transactionsService.findAll(
+      req['context'],
+      filter
+    );
 
     return result.map((transaction) => {
       return {
@@ -44,9 +52,13 @@ export class TransactionsController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Post('v1/transactions')
-  createTransaction(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.createTransaction({
+  createTransaction(
+    @Req() req: Request,
+    @Body() createTransactionDto: CreateTransactionDto
+  ) {
+    return this.transactionsService.createTransaction(req['context'], {
       creditAmount: createTransactionDto.creditAmount,
       debitAmount: createTransactionDto.debitAmount,
       creditAccountId: createTransactionDto.creditAccountId,
@@ -55,14 +67,15 @@ export class TransactionsController {
       description: createTransactionDto.description,
     });
   }
-  x;
 
+  @UseGuards(AuthGuard)
   @Patch('v1/transactions/:id')
   patchTransaction(
+    @Req() req: Request,
     @Param('id') id: string,
     @Body() patchTransactionDto: PatchTransactionDto
   ) {
-    return this.transactionsService.patchTransaction(id, {
+    return this.transactionsService.patchTransaction(req['context'], id, {
       creditAmount: patchTransactionDto.creditAmount,
       debitAmount: patchTransactionDto.debitAmount,
       creditAccountId: patchTransactionDto.creditAccountId,
@@ -72,14 +85,17 @@ export class TransactionsController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Delete('v1/transactions/:id')
-  deleteTransaction(@Param('id') id: string) {
-    return this.transactionsService.deleteTransaction(id);
+  deleteTransaction(@Req() req: Request, @Param('id') id: string) {
+    return this.transactionsService.deleteTransaction(req['context'], id);
   }
 
+  @UseGuards(AuthGuard)
   @Post('v1/statements/import')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
+    @Req() req: Request,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -96,14 +112,17 @@ export class TransactionsController {
     @Body() body: ImportStatementDto
   ) {
     return this.transactionsService.importStatement(
+      req['context'],
       file.buffer.toString(),
       body.statementIssuer,
       body.accountId
     );
   }
 
+  @UseGuards(AuthGuard)
   @Get('v1/currency/convert')
   convertAmount(
+    @Req() req: Request,
     @Query() query: { amount: number; from: string; to: string; date: string }
   ) {
     return this.forexService.convertCurrency(

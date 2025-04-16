@@ -1,3 +1,4 @@
+import { Context } from '../../shared/types/context';
 import { PostFinanceStatementMapper } from './postfinance-statment.mapper';
 import {
   SwisscardStatement,
@@ -19,21 +20,22 @@ export class StatementMapperFactory {
   }
 
   static create(
+    context: Context,
     fileContent: string,
-    statementIssuer,
+    statementIssuer: string,
     accountId: string
   ): StatementMapper {
     if (statementIssuer === 'SWISSCARD') {
-      return new SwisscardStatementMapper(fileContent, accountId);
+      return new SwisscardStatementMapper(context, fileContent, accountId);
     }
     if (statementIssuer === 'POSTFINANCE') {
-      return new PostFinanceStatementMapper(fileContent, accountId);
+      return new PostFinanceStatementMapper(context, fileContent, accountId);
     }
     if (statementIssuer === 'WISE') {
-      return new WiseStatementMapper(fileContent, accountId);
+      return new WiseStatementMapper(context, fileContent, accountId);
     }
     if (statementIssuer === 'YUH') {
-      return new YuhStatementMapper(fileContent, accountId);
+      return new YuhStatementMapper(context, fileContent, accountId);
     }
     throw new Error('Invalid statement issuer');
   }

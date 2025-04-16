@@ -165,10 +165,13 @@
 </template>
 
 <script setup lang="ts">
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useFetch } from '@vueuse/core';
 import { computed, ref, watch, watchEffect } from 'vue';
 import { useAccounts } from '../composables/useAccounts';
-import { useFetch } from '@vueuse/core';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useAuth } from '../composables/useAuth';
+
+const { getAccessToken } = useAuth();
 
 const importType = ref('');
 const accountId = ref('');
@@ -182,6 +185,9 @@ const { mutate } = useMutation({
     await useFetch(`http://localhost:3000/v1/statements/import`, {
       method: 'POST',
       body: data,
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
     }).json(),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -192,6 +198,9 @@ const { mutate: deleteTransactionMutation } = useMutation({
   mutationFn: async (id: string) =>
     await useFetch(`http://localhost:3000/v1/transactions/${id}`, {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
     }).json(),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['transactions'] });
@@ -279,9 +288,9 @@ const {
   queryKey: ['transactions', { filter: 'draft' }],
   staleTime: 1000 * 60 * 1,
   queryFn: async (): Promise<any[]> =>
-    await fetch('http://localhost:3000/v1/transactions?filter=draft').then(
-      (response) => response.json()
-    ),
+    await fetch('http://localhost:3000/v1/transactions?filter=draft', {
+      headers: { Authorization: `Bearer ${getAccessToken()}` },
+    }).then((response) => response.json()),
 });
 
 const transactions = ref([]);
@@ -325,7 +334,19 @@ const getCurrencyAmount = async (
   date: string
 ) => {
   const { data } = await useFetch<any>(
-    `http://localhost:3000/v1/currency/convert?from=${from}&to=${to}&amount=${amount}&date=${date}`
+    `http://localhost:3000/v1/currency/convert?from=${from}&to=${to}&amount=${amount}&date=${date}`,
+    {
+      beforeFetch({ options }) {
+        options.headers = {
+          ...options.headers,
+          Authorization: `Bearer ${getAccessToken()}`,
+        };
+
+        return {
+          options,
+        };
+      },
+    }
   ).json();
 
   return data.value;
@@ -360,6 +381,7 @@ const { mutateAsync: updateDraftMutate } = useMutation({
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify({
           description: transaction.description,

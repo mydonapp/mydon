@@ -23,27 +23,27 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>
   ) {}
 
-  async accountById(id: string): Promise<User | null> {
+  async userById(id: string): Promise<User | null> {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async accountByEmail(email: string): Promise<User | null> {
+  async userByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOneBy({ email });
   }
 
-  async accountByRefreshToken(refreshToken: string): Promise<User | null> {
+  async userByRefreshToken(refreshToken: string): Promise<User | null> {
     return await this.userRepository.findOneBy({
       refreshToken: { token: refreshToken },
     });
   }
 
-  async accountByAccessToken(accessToken: string): Promise<User | null> {
+  async userByAccessToken(accessToken: string): Promise<User | null> {
     return await this.userRepository.findOneBy({
       accessToken: { token: accessToken },
     });
   }
 
-  async createAccount(data: {
+  async createUser(data: {
     email: string;
     password: string;
     name: string;
@@ -78,13 +78,13 @@ export class AuthService {
     accessTokenExpiry: number;
     refreshTokenExpiry: number;
   }> {
-    const account = await this.accountByEmail(email);
+    const user = await this.userByEmail(email);
 
-    if (!account) {
+    if (!user) {
       const error = new WrongCredentialsError();
       throw new BadRequestException(error.message, { cause: error });
     }
-    if (!(await argon2.verify(account.password, password))) {
+    if (!(await argon2.verify(user.password, password))) {
       const error = new WrongCredentialsError();
       throw new BadRequestException(error.message, { cause: error });
     }
@@ -98,7 +98,7 @@ export class AuthService {
 
     let refreshTokenEntity = new RefreshToken();
     refreshTokenEntity.token = refreshToken;
-    refreshTokenEntity.user = account;
+    refreshTokenEntity.user = user;
     refreshTokenEntity.expiresAt = new Date(refreshTokenExpiry);
     refreshTokenEntity.userAgent = userAgent;
     refreshTokenEntity.ip = ip;
@@ -109,7 +109,7 @@ export class AuthService {
 
     const accessTokenEntity = new AccessToken();
     accessTokenEntity.token = accessToken;
-    accessTokenEntity.user = account;
+    accessTokenEntity.user = user;
     accessTokenEntity.refreshToken = refreshTokenEntity;
     accessTokenEntity.expiresAt = new Date(accessTokenExpiry);
 
@@ -119,14 +119,14 @@ export class AuthService {
   }
 
   async getNewAccessTokenFromRefreshToken(refreshToken: string) {
-    const account = await this.accountByRefreshToken(refreshToken);
+    const user = await this.userByRefreshToken(refreshToken);
 
     const refreshTokenResponse = await this.refreshTokenRepository.findOneBy({
       token: refreshToken,
       expiresAt: Raw((alias) => `${alias} > NOW()`),
     });
 
-    if (!account || !refreshTokenResponse) {
+    if (!user || !refreshTokenResponse) {
       const error = new WrongCredentialsError();
       throw new BadRequestException(error.message, { cause: error });
     }
@@ -141,7 +141,7 @@ export class AuthService {
 
     const accessTokenEntity = new AccessToken();
     accessTokenEntity.token = accessToken;
-    accessTokenEntity.user = account;
+    accessTokenEntity.user = user;
     accessTokenEntity.refreshToken = refreshTokenResponse;
     accessTokenEntity.expiresAt = new Date(accessTokenExpiry);
 
@@ -150,14 +150,14 @@ export class AuthService {
     return { accessToken, expiry: accessTokenExpiry };
   }
 
-  async getAccountFromAccessToken(accessToken: string) {
-    const account = await this.accountByAccessToken(accessToken);
-    if (!account) {
+  async getUserFromAccessToken(accessToken: string) {
+    const user = await this.userByAccessToken(accessToken);
+    if (!user) {
       const error = new WrongCredentialsError();
       throw new BadRequestException(error.message, { cause: error });
     }
 
-    return account;
+    return user;
   }
 
   async deleteExpiredAccessTokens(): Promise<void> {

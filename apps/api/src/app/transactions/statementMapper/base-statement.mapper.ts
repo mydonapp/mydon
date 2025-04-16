@@ -1,3 +1,4 @@
+import { Context } from '../../shared/types/context';
 import { Transaction } from '../transactions.entity';
 
 export interface MappedTransaction<T> {
@@ -11,7 +12,11 @@ export interface MappedTransaction<T> {
 export abstract class StatementMapper<T> {
   protected statement: T[];
 
-  constructor(protected fileContent: string, protected accountId: string) {}
+  constructor(
+    protected context: Context,
+    protected fileContent: string,
+    protected accountId: string
+  ) {}
 
   protected abstract mapStatement(): Promise<MappedTransaction<T>[]>;
 
@@ -33,6 +38,7 @@ export abstract class StatementMapper<T> {
         transactionDate: transaction.transactionDate,
         draft: true,
         raw: JSON.stringify(transaction.raw),
+        userId: this.context.user.id,
       });
       return newTransaction;
     });
