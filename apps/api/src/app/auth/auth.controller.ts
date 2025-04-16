@@ -90,7 +90,7 @@ export class AuthController {
         .status(200)
         .json({ accessToken, type: 'Bearer', expiry: Math.abs(expiry / 1000) });
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       return res.status(401).send({ message: 'Unauthorized' });
     }
   }

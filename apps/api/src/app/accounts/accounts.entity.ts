@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from '../auth/user.entity';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
 import { Transaction } from '../transactions/transactions.entity';
 
@@ -89,6 +96,9 @@ export class Account {
     transformer: new ColumnDecimalTransformer(),
   })
   openingBalance: number;
+
+  @ManyToOne(() => User, (user) => user.accounts, {})
+  user: User;
 
   setInactive() {
     this.isActive = false;

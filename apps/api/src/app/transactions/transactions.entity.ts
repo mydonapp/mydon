@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Account } from '../accounts/accounts.entity';
+import { User } from '../auth/user.entity';
 
 export interface CreateTransaction {
   creditAmount: number;
@@ -71,6 +72,9 @@ export class Transaction {
 
   @Column({ nullable: true })
   raw: string;
+
+  @ManyToOne(() => User, (user) => user.transactions, {})
+  user: User;
 
   @BeforeInsert()
   @BeforeUpdate()
