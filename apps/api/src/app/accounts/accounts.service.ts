@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ForexService } from '../shared/forex/forex.service';
@@ -166,6 +166,10 @@ export class AccountsService {
         'debitTransactions.creditAccount',
       ],
     });
+
+    if (!account) {
+      throw new NotFoundException();
+    }
 
     return {
       id: account.id,
