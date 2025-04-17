@@ -1,3 +1,3 @@
-# MyDon |
+# MyDon
 
 # Installation Guide
