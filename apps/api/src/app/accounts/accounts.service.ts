@@ -85,7 +85,6 @@ export class AccountsService {
         `(SELECT COALESCE(SUM("debitTransaction"."debitAmount"), 0)
           FROM transactions "debitTransaction"
           WHERE "debitTransaction"."debitAccountId" = account.id
-          AND account."userId" = :userId
           AND "debitTransaction"."userId" = :userId
           AND (
             account.type IN (:...filteredTypes)
@@ -99,7 +98,6 @@ export class AccountsService {
         `(SELECT COALESCE(SUM("creditTransaction"."creditAmount"), 0)
           FROM transactions "creditTransaction"
           WHERE "creditTransaction"."creditAccountId" = account.id
-          AND account."userId" = :userId
           AND "creditTransaction"."userId" = :userId
           AND (
             account.type IN (:...filteredTypes)
@@ -109,6 +107,7 @@ export class AccountsService {
         )`,
         'account_creditBalance'
       )
+      .where('account."userId" = :userId')
       .setParameters({
         from: options?.filter?.from || new Date('1970-01-01'),
         to: options?.filter?.to
