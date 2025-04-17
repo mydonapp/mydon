@@ -16,7 +16,7 @@
           <input
             type="text"
             placeholder="Name"
-            class="input input-bordered w-full"
+            class="input w-full"
             v-model="name"
             autocomplete="name"
           />
@@ -26,7 +26,7 @@
           <input
             type="email"
             placeholder="Email"
-            class="input input-bordered w-full"
+            class="input w-full"
             v-model="email"
             autocomplete="username"
           />
@@ -36,7 +36,7 @@
           <input
             type="password"
             placeholder="Password"
-            class="input input-bordered w-full"
+            class="input w-full"
             v-model="password"
             autocomplete="new-password"
           />

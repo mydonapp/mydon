@@ -1,9 +1,9 @@
-import './styles.scss';
+import './styles.css';
 
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import { createApp } from 'vue';
 import App from './app/App.vue';
 import router from './app/router/router';
-import { VueQueryPlugin } from '@tanstack/vue-query';
 
 const app = createApp(App);
 

@@ -229,12 +229,7 @@
         <div class="label">
           <span class="label-text">Account Name</span>
         </div>
-        <input
-          type="text"
-          placeholder=""
-          class="input input-bordered w-full max-w-xs"
-          v-model="name"
-        />
+        <input type="text" placeholder="" class="input" v-model="name" />
       </label>
       <label class="form-control w-full max-w-xs">
         <div class="label">
@@ -243,7 +238,7 @@
         <input
           type="number"
           placeholder="openingBalance"
-          class="input input-bordered w-full max-w-xs"
+          class="input"
           v-model="openingBalance"
         />
       </label>
@@ -349,7 +344,7 @@ const transactionDescription = ref('');
 const creditAccountId = ref();
 const debitAccountId = ref();
 const transactionDate = ref(
-  new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()
+  new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
 );
 const transactionAmount = ref(0);
 
@@ -385,7 +380,7 @@ const createTransaction = async () => {
   creditAccountId.value = undefined;
   debitAccountId.value = undefined;
   transactionDate.value = new Date(
-    new Date().setUTCHours(0, 0, 0, 0)
+    new Date().setUTCHours(0, 0, 0, 0),
   ).toISOString();
   transactionAmount.value = 0;
 };

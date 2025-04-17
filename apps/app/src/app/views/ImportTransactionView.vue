@@ -38,11 +38,7 @@
           <div class="label">
             <span class="label-text">Select CSV file</span>
           </div>
-          <input
-            type="file"
-            class="file-input file-input-bordered w-full max-w-xs"
-            accept=".csv"
-          />
+          <input type="file" class="file-input" accept=".csv" />
         </label>
         <button
           class="btn btn-primary max-w-xs mt-6"
@@ -234,10 +230,10 @@ const allAccounts = computed(() => [
 
 const isEqualCurrency = (transaction) => {
   const debitCurrency = allAccounts.value.find(
-    (account) => account.id === transaction.debitAccountId
+    (account) => account.id === transaction.debitAccountId,
   )?.currency;
   const creditCurrency = allAccounts.value.find(
-    (account) => account.id === transaction.creditAccountId
+    (account) => account.id === transaction.creditAccountId,
   )?.currency;
 
   if (!debitCurrency || !creditCurrency) return true;
@@ -256,23 +252,23 @@ const onAccountChange = async (transaction, type: 'credit' | 'debit') => {
     transaction.creditAmount = await getCurrencyAmount(
       transaction.debitAmount,
       allAccounts.value.find(
-        (account) => account.id === transaction.debitAccountId
+        (account) => account.id === transaction.debitAccountId,
       )?.currency,
       allAccounts.value.find(
-        (account) => account.id === transaction.creditAccountId
+        (account) => account.id === transaction.creditAccountId,
       )?.currency,
-      transaction.transactionDate
+      transaction.transactionDate,
     );
   } else {
     transaction.debitAmount = await getCurrencyAmount(
       transaction.creditAmount,
       allAccounts.value.find(
-        (account) => account.id === transaction.creditAccountId
+        (account) => account.id === transaction.creditAccountId,
       )?.currency,
       allAccounts.value.find(
-        (account) => account.id === transaction.debitAccountId
+        (account) => account.id === transaction.debitAccountId,
       )?.currency,
-      transaction.transactionDate
+      transaction.transactionDate,
     );
   }
 };
@@ -324,14 +320,14 @@ watch(
         selected: selectAll.value,
       };
     });
-  }
+  },
 );
 
 const getCurrencyAmount = async (
   amount: number,
   from: string,
   to: string,
-  date: string
+  date: string,
 ) => {
   const { data } = await useFetch<any>(
     `http://localhost:3000/v1/currency/convert?from=${from}&to=${to}&amount=${amount}&date=${date}`,
@@ -346,7 +342,7 @@ const getCurrencyAmount = async (
           options,
         };
       },
-    }
+    },
   ).json();
 
   return data.value;
@@ -356,10 +352,10 @@ const { mutateAsync: updateDraftMutate } = useMutation({
   mutationFn: async (transaction: any) => {
     const getAmount = (transaction) => {
       const debitCurrency = allAccounts.value.find(
-        (account) => account.id === transaction.debitAccountId
+        (account) => account.id === transaction.debitAccountId,
       )?.currency;
       const creditCurrency = allAccounts.value.find(
-        (account) => account.id === transaction.creditAccountId
+        (account) => account.id === transaction.creditAccountId,
       )?.currency;
 
       if (debitCurrency === creditCurrency) {
@@ -390,19 +386,19 @@ const { mutateAsync: updateDraftMutate } = useMutation({
           ...getAmount(transaction),
           draft: false,
         }),
-      }
+      },
     );
   },
 });
 
 const updateDraft = async () => {
   const selectedTransactions = transactions.value?.filter(
-    (transaction) => transaction.selected
+    (transaction) => transaction.selected,
   );
   await Promise.all(
     selectedTransactions?.map(async (transaction) => {
       await updateDraftMutate(transaction);
-    })
+    }),
   );
 
   await queryClient.invalidateQueries({ queryKey: ['transactions'] });

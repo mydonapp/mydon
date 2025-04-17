@@ -16,7 +16,7 @@
           <input
             type="email"
             placeholder="Email"
-            class="input input-bordered w-full"
+            class="input w-full"
             v-model="loginForm.email"
             autocomplete="username"
             data-form-type="username,email"
@@ -36,7 +36,7 @@
             v-model="loginForm.password"
             autocomplete="current-password"
             data-form-type="password"
-            class="input input-bordered w-full"
+            class="input w-full"
           />
           <span
             v-if="errorFields?.password && errorFields?.password[0].message"
@@ -106,7 +106,7 @@ watch(
   () => {
     formTouched.value = true;
   },
-  { deep: true }
+  { deep: true },
 );
 
 if (route.query.email) {
@@ -118,7 +118,7 @@ const authenticate = async () => {
     const { success, errorMessage } = await login(
       loginForm.email,
       loginForm.password,
-      route.query.next as string
+      route.query.next as string,
     );
     if (!success) {
       wrongPassword.value = errorMessage;
