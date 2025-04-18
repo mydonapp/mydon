@@ -166,6 +166,9 @@ import { useFetch } from '@vueuse/core';
 import { computed, ref, watch, watchEffect } from 'vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
+import { useConstant } from '../composables/useConstant';
+
+const { URI } = useConstant();
 
 const { getAccessToken } = useAuth();
 
@@ -178,7 +181,7 @@ const queryClient = useQueryClient();
 
 const { mutate } = useMutation({
   mutationFn: async (data: any) =>
-    await useFetch(`http://localhost:3000/v1/statements/import`, {
+    await useFetch(`${URI.API}/v1/statements/import`, {
       method: 'POST',
       body: data,
       headers: {
@@ -192,7 +195,7 @@ const { mutate } = useMutation({
 
 const { mutate: deleteTransactionMutation } = useMutation({
   mutationFn: async (id: string) =>
-    await useFetch(`http://localhost:3000/v1/transactions/${id}`, {
+    await useFetch(`${URI.API}/v1/transactions/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${getAccessToken()}`,
@@ -214,8 +217,8 @@ const importTransactions = async () => {
   mutate(data);
 };
 
-const deleteTransaction = async (id: string) => {
-  await deleteTransactionMutation(id);
+const deleteTransaction = (id: string) => {
+  deleteTransactionMutation(id);
 };
 
 const { accounts } = useAccounts();
@@ -284,7 +287,7 @@ const {
   queryKey: ['transactions', { filter: 'draft' }],
   staleTime: 1000 * 60 * 1,
   queryFn: async (): Promise<any[]> =>
-    await fetch('http://localhost:3000/v1/transactions?filter=draft', {
+    await fetch(`${URI.API}/v1/transactions?filter=draft`, {
       headers: { Authorization: `Bearer ${getAccessToken()}` },
     }).then((response) => response.json()),
 });
@@ -330,7 +333,7 @@ const getCurrencyAmount = async (
   date: string,
 ) => {
   const { data } = await useFetch<any>(
-    `http://localhost:3000/v1/currency/convert?from=${from}&to=${to}&amount=${amount}&date=${date}`,
+    `${URI.API}/v1/currency/convert?from=${from}&to=${to}&amount=${amount}&date=${date}`,
     {
       beforeFetch({ options }) {
         options.headers = {
@@ -371,23 +374,20 @@ const { mutateAsync: updateDraftMutate } = useMutation({
       }
     };
 
-    return await useFetch(
-      `http://localhost:3000/v1/transactions/${transaction.id}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-        body: JSON.stringify({
-          description: transaction.description,
-          creditAccountId: transaction.creditAccountId,
-          debitAccountId: transaction.debitAccountId,
-          ...getAmount(transaction),
-          draft: false,
-        }),
+    return await useFetch(`${URI.API}/v1/transactions/${transaction.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getAccessToken()}`,
       },
-    );
+      body: JSON.stringify({
+        description: transaction.description,
+        creditAccountId: transaction.creditAccountId,
+        debitAccountId: transaction.debitAccountId,
+        ...getAmount(transaction),
+        draft: false,
+      }),
+    });
   },
 });
 

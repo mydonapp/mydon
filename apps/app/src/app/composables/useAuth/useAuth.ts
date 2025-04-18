@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
+import { useConstant } from '../useConstant';
 
 export interface SignUpInput {
   name: string;
@@ -16,9 +17,9 @@ let accessToken: string | undefined = undefined;
 let accessTokenExpiry: Date | undefined = undefined;
 
 export const useAuth = () => {
+  const { URI } = useConstant();
   const router = useRouter();
   const route = useRoute();
-  const AUTH_URI = 'http://localhost:3000';
 
   const isAuthenticated = () => {
     return !!getAccessToken();
@@ -40,12 +41,12 @@ export const useAuth = () => {
   const login = async (email: string, password: string, next?: string) => {
     try {
       const response = await axios.post<FetchTokenResponse>(
-        AUTH_URI + '/v1/auth/login/password',
+        `${URI.API}/v1/auth/login/password`,
         {
           email,
           password,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.data) {
@@ -82,11 +83,11 @@ export const useAuth = () => {
 
   const signup = async (input: SignUpInput) => {
     const result = await axios.post(
-      AUTH_URI + '/v1/auth/signup',
+      `${URI.API}/v1/auth/signup`,
       {
         ...input,
       },
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     if (result.status === 201) {
@@ -99,11 +100,11 @@ export const useAuth = () => {
 
   const fetchAccessToken = async () => {
     const result = await axios.post<FetchTokenResponse>(
-      AUTH_URI + '/v1/auth/refresh',
+      `${URI.API}/v1/auth/refresh`,
       undefined,
       {
         withCredentials: true,
-      }
+      },
     );
     if (result.data) {
       accessTokenExpiry = new Date(result.data.expiry * 1000);
@@ -114,11 +115,11 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       await axios.post(
-        AUTH_URI + '/v1/auth/logout',
+        `${URI.API}/v1/auth/logout`,
         {},
         {
           withCredentials: true,
-        }
+        },
       );
       accessTokenExpiry = undefined;
       accessToken = undefined;
@@ -134,11 +135,11 @@ export const useAuth = () => {
   }) => {
     try {
       await axios.put(
-        AUTH_URI + '/v1/auth/account/password',
+        `${URI.API}/v1/auth/account/password`,
         {
           ...input,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       return {

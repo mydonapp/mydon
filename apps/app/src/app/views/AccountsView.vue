@@ -325,6 +325,9 @@ import { usePrivacy } from '../composables/usePrivacy';
 import { useMutation } from '@tanstack/vue-query';
 import { useFetch } from '@vueuse/core';
 import { useAuth } from '../composables/useAuth';
+import { useConstant } from '../composables/useConstant';
+
+const { URI } = useConstant();
 
 const { formatCurrency } = useCurrency();
 
@@ -394,7 +397,7 @@ const { mutateAsync: createTransactionMutation } = useMutation({
     debitAccountId: string;
     transactionDate: string;
   }) => {
-    return await useFetch(`http://localhost:3000/v1/transactions`, {
+    return await useFetch(`${URI.API}/v1/transactions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
