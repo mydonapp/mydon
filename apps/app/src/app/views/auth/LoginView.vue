@@ -3,64 +3,56 @@
     class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <h2
-        class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-primary-12"
-      >
+      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
         Login to your account
       </h2>
     </div>
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-      <div class="flex flex-col gap-4 w-full">
-        <div class="flex flex-col">
-          <label class="text-xl mb-2">Email</label>
-          <input
-            type="email"
-            placeholder="Email"
-            class="input w-full"
-            v-model="loginForm.email"
-            autocomplete="username"
-            data-form-type="username,email"
-          />
-          <span
-            v-if="errorFields?.email && errorFields?.email[0].message"
-            class="text-sm py-1 text-error"
-          >
-            {{ errorFields?.email && errorFields?.email[0].message }}
-          </span>
-        </div>
-        <div class="flex flex-col">
-          <label class="text-xl mb-2">Password</label>
-          <input
-            type="password"
-            placeholder="Password"
-            v-model="loginForm.password"
-            autocomplete="current-password"
-            data-form-type="password"
-            class="input w-full"
-          />
-          <span
-            v-if="errorFields?.password && errorFields?.password[0].message"
-            class="text-sm py-1 text-error"
-          >
-            {{ errorFields?.password && errorFields?.password[0].message }}
-          </span>
-        </div>
-        <div>
-          <button
-            class="btn btn-primary w-full text-gray-100"
-            @click="authenticate"
-          >
-            Login
-          </button>
-        </div>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Email</legend>
+        <input
+          type="email"
+          placeholder="Email"
+          class="input w-full"
+          v-model="loginForm.email"
+          autocomplete="username"
+          data-form-type="username,email"
+        />
+        <span
+          v-if="errorFields?.email && errorFields?.email[0].message"
+          class="text-sm py-1 text-error"
+        >
+          {{ errorFields?.email && errorFields?.email[0].message }}
+        </span>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Password</legend>
+        <input
+          type="password"
+          placeholder="Password"
+          v-model="loginForm.password"
+          autocomplete="current-password"
+          data-form-type="password"
+          class="input w-full"
+        />
+        <span
+          v-if="errorFields?.password && errorFields?.password[0].message"
+          class="text-sm py-1 text-error"
+        >
+          {{ errorFields?.password && errorFields?.password[0].message }}
+        </span>
+      </fieldset>
+
+      <div>
+        <button class="btn btn-primary w-full mt-6" @click="authenticate">
+          Login
+        </button>
       </div>
     </div>
-    <p class="mt-10 text-center text-sm text-primary-11">
+    <p class="mt-10 text-center text-sm">
       Not a member?
       {{ ' ' }}
-      <router-link
-        :to="{ name: 'SignUp', query: route.query }"
-        class="font-semibold leading-6 text-brand-11 hover:text-brand-12"
+      <router-link :to="{ name: 'SignUp', query: route.query }" class="link"
         >Create an account now</router-link
       >
     </p>
