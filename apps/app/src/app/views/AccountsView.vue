@@ -225,91 +225,95 @@
     <div class="divider"></div>
     <h2 class="text-lg pb-4">Add Account</h2>
     <div class="flex flex-col gap">
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text">Account Name</span>
-        </div>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Account Name</legend>
         <input type="text" placeholder="" class="input" v-model="name" />
-      </label>
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text">Opening Balance</span>
-        </div>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Opening Balance</legend>
         <input
           type="number"
           placeholder="openingBalance"
           class="input"
           v-model="openingBalance"
         />
-      </label>
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text">Account Type</span>
-        </div>
-        <select
-          class="select select-bordered w-full max-w-xs"
-          v-model="accountType"
-        >
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Account Type</legend>
+        <select class="select" v-model="accountType">
           <option>ASSETS</option>
           <option>LIABILITIES</option>
           <option>INCOME</option>
           <option>EXPENSE</option>
         </select>
-      </label>
+      </fieldset>
+
       <button class="btn btn-primary max-w-xs mt-6" @click="addAccount">
-        Add
+        Add Account
       </button>
     </div>
+    <div class="divider"></div>
+    <h2 class="text-lg pb-4">Create Transaction</h2>
     <div>
-      <input
-        type="text"
-        placeholder="Enter a description"
-        class="input w-full select-bordered"
-        v-model="transactionDate"
-      />
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Date</legend>
+        <input
+          type="text"
+          placeholder="Enter a description"
+          class="input"
+          v-model="transactionDate"
+        />
+      </fieldset>
 
-      <input
-        type="text"
-        placeholder="Enter a description"
-        class="input w-full select-bordered"
-        v-model="transactionDescription"
-      />
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Description</legend>
+        <input
+          type="text"
+          placeholder="Enter a description"
+          class="input"
+          v-model="transactionDescription"
+        />
+      </fieldset>
 
-      <select
-        class="select select-bordered w-full max-w-xs"
-        v-model="creditAccountId"
-      >
-        <option :value="undefined">Select Account</option>
-        <option
-          v-for="account in allAccounts"
-          :key="account.id"
-          :value="account.id"
-        >
-          {{ account.name }}
-        </option>
-      </select>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Credit Account</legend>
+        <select class="select" v-model="creditAccountId">
+          <option :value="undefined">Select Account</option>
+          <option
+            v-for="account in allAccounts"
+            :key="account.id"
+            :value="account.id"
+          >
+            {{ account.name }}
+          </option>
+        </select>
+      </fieldset>
 
-      <select
-        class="select select-bordered w-full max-w-xs"
-        v-model="debitAccountId"
-      >
-        <option :value="undefined">Select Account</option>
-        <option
-          v-for="account in allAccounts"
-          :key="account.id"
-          :value="account.id"
-        >
-          {{ account.name }}
-        </option>
-      </select>
-      <div>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Debit Account</legend>
+        <select class="select" v-model="debitAccountId">
+          <option :value="undefined">Select Account</option>
+          <option
+            v-for="account in allAccounts"
+            :key="account.id"
+            :value="account.id"
+          >
+            {{ account.name }}
+          </option>
+        </select>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Amount</legend>
         <input
           type="number"
           placeholder="Enter an amount"
-          class="input w-full select-bordered"
+          class="input"
           v-model="transactionAmount"
         />
-      </div>
+      </fieldset>
       <button class="btn btn-primary max-w-xs mt-6" @click="createTransaction">
         Create Transaction
       </button>

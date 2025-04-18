@@ -13,7 +13,7 @@
   If we ever want to remove these styles, we need to add an explicit border
   color utility to any element that depends on these defaults.
 */
-@layer base {
+/* @layer base {
   *,
   ::after,
   ::before,
@@ -54,26 +54,26 @@ h2,
 p,
 pre {
   margin: 0;
-}
-*,
+} */
+/* *,
 ::before,
 ::after {
   box-sizing: border-box;
   border-width: 0;
   border-style: solid;
   border-color: currentColor;
-}
-h1,
+} */
+/* h1,
 h2 {
   font-size: inherit;
   font-weight: inherit;
-}
-a {
+} */
+/* a {
   color: inherit;
   text-decoration: inherit;
-}
-pre {
+} */
+/* pre {
   font-family:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     'Courier New', monospace;
-}
+} */

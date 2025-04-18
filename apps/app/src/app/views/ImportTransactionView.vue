@@ -3,10 +3,8 @@
     <div>
       <h1 class="text-2xl">Import Transactions</h1>
       <div>
-        <label class="form-control w-full max-w-xs">
-          <div class="label">
-            <span class="label-text">Import Account</span>
-          </div>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Import Account</legend>
           <select
             class="select select-bordered w-full max-w-xs"
             v-model="accountId"
@@ -19,11 +17,9 @@
               {{ account.name }}
             </option>
           </select>
-        </label>
-        <label class="form-control w-full max-w-xs">
-          <div class="label">
-            <span class="label-text">Import Statement Issuer</span>
-          </div>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Import Statement Issuer</legend>
           <select
             class="select select-bordered w-full max-w-xs"
             v-model="importType"
@@ -33,13 +29,22 @@
             <option value="POSTFINANCE">Postfinance</option>
             <option value="WISE">Wise</option>
           </select>
-        </label>
-        <label class="form-control w-full max-w-xs">
-          <div class="label">
-            <span class="label-text">Select CSV file</span>
-          </div>
+          <p class="label">
+            You can request new issuers
+            <a
+              href="https://github.com/mydonapp/mydon/issues"
+              target="_blank"
+              class="link"
+              >here</a
+            >
+          </p>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Select CSV file</legend>
           <input type="file" class="file-input" accept=".csv" />
-        </label>
+        </fieldset>
+
         <button
           class="btn btn-primary max-w-xs mt-6"
           @click="importTransactions"

@@ -17,7 +17,9 @@
           <li v-for="(item, index) in menu" :key="`sideMenu_${index}`">
             <router-link
               :to="{ name: item.routeName }"
-              :class="currentRouteName.includes(item.routeName) ? 'active' : ''"
+              :class="
+                currentRouteName.includes(item.routeName) ? 'menu-active' : ''
+              "
               >{{ item.name }}</router-link
             >
           </li>
