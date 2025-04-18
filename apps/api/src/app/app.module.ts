@@ -19,7 +19,7 @@ import { TransactionsModule } from './transactions/transactions.module';
       useFactory: (configService: ConfigService) => {
         return {
           type: 'postgres',
-          host: 'localhost',
+          host: configService.get('DB_POSTGRES_HOST'),
           port: configService.get('DB_POSTGRES_PORT'),
           username: 'postgres',
           password: configService.get('DB_POSTGRES_PASSWORD'),

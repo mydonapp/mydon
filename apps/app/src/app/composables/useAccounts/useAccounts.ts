@@ -21,7 +21,7 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
     toFromQuery = '?from=2025-01-01&to=2025-12-31';
   }
 
-  const url = ref(`http://localhost:3000/v1/accounts${toFromQuery}`);
+  const url = ref(`${URI.API}/v1/accounts${toFromQuery}`);
 
   watch(timeFilter, () => {
     console.log('Updating URL:', timeFilter?.value);
