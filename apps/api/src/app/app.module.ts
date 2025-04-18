@@ -25,7 +25,7 @@ import { TransactionsModule } from './transactions/transactions.module';
           password: configService.get('DB_POSTGRES_PASSWORD'),
           database: 'don',
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: false,
         };
       },
       inject: [ConfigService],
