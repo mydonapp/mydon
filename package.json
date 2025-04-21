@@ -55,7 +55,7 @@
     "@types/express": "4.17.21",
     "@types/jest": "29.5.14",
     "@types/multer": "1.4.12",
-    "@types/node": "18.16.9",
+    "@types/node": "22.14.1",
     "@vitejs/plugin-vue": "5.2.3",
     "@vitest/coverage-v8": "3.1.1",
     "@vitest/ui": "3.1.1",
