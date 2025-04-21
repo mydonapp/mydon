@@ -13,7 +13,7 @@
     "@nestjs/platform-express": "11.0.20",
     "@nestjs/typeorm": "11.0.0",
     "@tailwindcss/vite": "^4.1.4",
-    "@tanstack/vue-query": "5.74.4",
+    "@tanstack/vue-query": "5.74.5",
     "@tanstack/vue-query-devtools": "5.74.4",
     "@vueuse/core": "13.1.0",
     "@vueuse/integrations": "13.1.0",
