@@ -10,7 +10,7 @@ export class AccountsService {
   constructor(
     @InjectRepository(Account)
     private accountsRepository: Repository<Account>,
-    private forexService: ForexService
+    private forexService: ForexService,
   ) {}
 
   async findAll() {
@@ -51,11 +51,11 @@ export class AccountsService {
                 account.balance,
                 account.currency,
                 'CHF',
-                new Date()
+                new Date(),
               ),
               retirementAccount: account.retirementAccount,
             };
-          })
+          }),
       )
     ).sort((a, b) => b.balanceMainCurrency - a.balanceMainCurrency);
 
@@ -63,12 +63,12 @@ export class AccountsService {
       accounts: result,
       total: result.reduce(
         (acc, account) => acc + account.balanceMainCurrency,
-        0
+        0,
       ),
       totalWithoutRetirement: result.reduce(
         (acc, account) =>
           acc + (account.retirementAccount ? 0 : account.balanceMainCurrency),
-        0
+        0,
       ),
     };
   }
@@ -77,7 +77,7 @@ export class AccountsService {
     context: Context,
     options?: {
       filter: { from: Date; to: Date };
-    }
+    },
   ) {
     const query = this.accountsRepository
       .createQueryBuilder('account')
@@ -92,7 +92,7 @@ export class AccountsService {
             OR account.type NOT IN (:...filteredTypes)
           )
         )`,
-        'account_debitBalance'
+        'account_debitBalance',
       )
       .addSelect(
         `(SELECT COALESCE(SUM("creditTransaction"."creditAmount"), 0)
@@ -105,7 +105,7 @@ export class AccountsService {
             OR account.type NOT IN (:...filteredTypes)
           )
         )`,
-        'account_creditBalance'
+        'account_creditBalance',
       )
       .where('account."userId" = :userId')
       .setParameters({
@@ -123,7 +123,7 @@ export class AccountsService {
       assets: await this.mapAccountsToGrouped(result, AccountType.ASSETS),
       liabilities: await this.mapAccountsToGrouped(
         result,
-        AccountType.LIABILITIES
+        AccountType.LIABILITIES,
       ),
       equity: await this.mapAccountsToGrouped(result, AccountType.EQUITY),
       income: await this.mapAccountsToGrouped(result, AccountType.INCOME),
@@ -145,13 +145,13 @@ export class AccountsService {
       name: string;
       type: AccountType;
       openingBalance: number;
-    }
+    },
   ) {
     const account = new Account();
     account.name = options.name;
     account.type = options.type;
     account.openingBalance = options.openingBalance;
-    account.user.id = context.user.id;
+    account.setUserId(context.user.id);
     return this.accountsRepository.save(account);
   }
 
@@ -208,7 +208,7 @@ export class AccountsService {
           },
         })) || []),
       ].sort(
-        (a, b) => a.transactionDate.getTime() - b.transactionDate.getTime()
+        (a, b) => a.transactionDate.getTime() - b.transactionDate.getTime(),
       ),
     };
   }

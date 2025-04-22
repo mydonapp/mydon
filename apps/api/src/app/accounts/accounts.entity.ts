@@ -104,27 +104,15 @@ export class Account {
     this.isActive = false;
   }
 
-  // set debitBalance(value: number) {
-  //   this._debitBalance = value;
-  // }
-
-  // get debitBalance() {
-  //   return this._debitBalance;
-  // }
-
-  // set creditBalance(value: number) {
-  //   this._creditBalance = value;
-  // }
-
-  // get creditBalance() {
-  //   return this._creditBalance;
-  // }
-
   get balance() {
     if (this.type === AccountType.ASSETS || this.type === AccountType.EXPENSE) {
       return this.creditBalance - this.debitBalance + this.openingBalance;
     } else {
       return this.debitBalance - this.creditBalance + this.openingBalance;
     }
+  }
+
+  setUserId(userId: string) {
+    this.user = userId as any;
   }
 }

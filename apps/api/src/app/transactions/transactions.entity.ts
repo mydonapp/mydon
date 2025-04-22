@@ -111,7 +111,7 @@ export class Transaction {
     transaction.transactionDate = props.transactionDate;
     transaction.draft = props.draft || false;
     transaction.raw = props.raw || null;
-    transaction.user.id = props.userId;
+    transaction.user = props.userId as any;
     return transaction;
   }
 }
