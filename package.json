@@ -65,7 +65,7 @@
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
     "autoprefixer": "10.4.21",
-    "daisyui": "5.0.27",
+    "daisyui": "5.0.35",
     "eslint": "9.25.1",
     "eslint-config-prettier": "10.1.2",
     "eslint-plugin-vue": "10.1.0",
