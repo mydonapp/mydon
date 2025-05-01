@@ -85,21 +85,7 @@ const { getAccessToken } = useAuth();
 
 const accountId = route.params.id;
 
-// watch(
-//   () => accountId,
-//   () => {
-//     refetch();
-//   }
-// );
-
-const {
-  isPending,
-  isError,
-  isFetching,
-  data: account,
-  error,
-  refetch,
-} = useQuery({
+const { isFetching, data: account } = useQuery({
   queryKey: ['accounts', accountId],
   staleTime: 1000 * 60 * 1,
   queryFn: async (): Promise<any> =>

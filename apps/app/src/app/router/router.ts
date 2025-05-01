@@ -68,6 +68,7 @@ router.beforeEach(async (to) => {
       await init();
     } catch (error) {
       // stub
+      console.log(error);
     }
     isInitialized = true;
   }

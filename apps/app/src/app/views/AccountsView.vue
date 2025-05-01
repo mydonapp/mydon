@@ -337,11 +337,11 @@ const { formatCurrency } = useCurrency();
 
 const timeFilter = ref('2025');
 
-const { accounts, createAccount, loading } = useAccounts(timeFilter);
+const { accounts, createAccount } = useAccounts(timeFilter);
 
 const { getAccessToken } = useAuth();
 
-const { isPrivate, togglePrivacy } = usePrivacy();
+const { isPrivate } = usePrivacy();
 
 const name = ref('');
 const openingBalance = ref(0);

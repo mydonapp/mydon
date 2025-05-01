@@ -212,9 +212,10 @@ const { mutate: deleteTransactionMutation } = useMutation({
 });
 
 const importTransactions = async () => {
-  var input = document.querySelector('input[type="file"]');
-  var data = new FormData();
-  // @ts-ignore
+  const input = document.querySelector(
+    'input[type="file"]',
+  ) as HTMLInputElement;
+  const data = new FormData();
   data.append('file', input.files[0]);
   data.append('accountId', accountId.value);
   data.append('statementIssuer', importType.value);
@@ -281,14 +282,7 @@ const onAccountChange = async (transaction, type: 'credit' | 'debit') => {
   }
 };
 
-const {
-  isPending,
-  isError,
-  isFetching,
-  data: draftTransactions,
-  error,
-  refetch,
-} = useQuery({
+const { data: draftTransactions } = useQuery({
   queryKey: ['transactions', { filter: 'draft' }],
   staleTime: 1000 * 60 * 1,
   queryFn: async (): Promise<any[]> =>
