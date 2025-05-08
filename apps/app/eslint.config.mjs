@@ -1,40 +1,23 @@
-import { FlatCompat } from "@eslint/eslintrc";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import baseConfig from "../../eslint.config.mjs";
-import js from "@eslint/js";
-
-const compat = new FlatCompat({
-  baseDirectory: dirname(fileURLToPath(import.meta.url)),
-  recommendedConfig: js.configs.recommended,
-});
-
+import vue from 'eslint-plugin-vue';
+import baseConfig from '../../eslint.config.mjs';
 
 export default [
-    {
-        ignores: [
-            "**/dist"
-        ]
+  ...baseConfig,
+  ...vue.configs['flat/recommended'],
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parserOptions: {
+        parser: await import('@typescript-eslint/parser'),
+      },
     },
-    ...baseConfig,
-    js.configs.recommended,
-    ...compat.extends("plugin:vue/vue3-essential", "@vue/eslint-config-typescript", "@vue/eslint-config-prettier/skip-formatting"),
-    {
-        files: [
-            "**/*.ts",
-            "**/*.tsx",
-            "**/*.js",
-            "**/*.jsx",
-            "**/*.vue"
-        ],
-        rules: {
-            "vue/multi-word-component-names": "off"
-        }
+  },
+  {
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'vue/singleline-html-element-content-newline': 'off',
+      'vue/html-self-closing': 'off',
     },
-    {
-        ignores: [
-            "**/vite.config.*.timestamp*",
-            "**/vitest.config.*.timestamp*"
-        ]
-    }
+  },
 ];

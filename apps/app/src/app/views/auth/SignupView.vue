@@ -4,54 +4,66 @@
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
-        Signup to your account
+        {{ t('views.signup.title') }}
       </h2>
     </div>
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Name</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.signup.signupForm.name.label') }}
+        </legend>
         <input
-          type="text"
-          placeholder="Name"
-          class="input w-full"
           v-model="name"
+          type="text"
+          :placeholder="t('views.signup.signupForm.name.placeholder')"
+          class="input w-full"
           autocomplete="name"
         />
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Email</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.signup.signupForm.email.label') }}
+        </legend>
         <input
-          type="email"
-          placeholder="Email"
-          class="input w-full"
           v-model="email"
+          type="email"
+          :placeholder="t('views.signup.signupForm.email.placeholder')"
+          class="input w-full"
           autocomplete="username"
         />
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Password</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.signup.signupForm.password.label') }}
+        </legend>
         <input
-          type="password"
-          placeholder="Password"
-          class="input w-full"
           v-model="password"
+          type="password"
+          :placeholder="t('views.signup.signupForm.password.placeholder')"
+          class="input w-full"
           autocomplete="new-password"
         />
       </fieldset>
 
       <div>
-        <button class="btn btn-primary w-full mt-6" @click="signup">
-          Create Account
+        <button
+          class="btn btn-primary w-full mt-6"
+          @click="signup"
+        >
+          {{ t('views.signup.signupForm.submit.label') }}
         </button>
       </div>
       <p class="mt-10 text-center text-sm">
-        Already a member?
+        {{ t('views.signup.loginPrompt.text') }}
         {{ ' ' }}
-        <router-link :to="{ name: 'Login', query: route.query }" class="link"
-          >Login now</router-link
+        <router-link
+          :to="{ name: 'Login', query: route.query }"
+          class="link"
         >
+          {{ t('views.signup.loginPrompt.link') }}
+        </router-link>
       </p>
     </div>
   </div>
@@ -59,8 +71,11 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
-import { useAuth } from '../../composables/useAuth';
 import { useRoute, useRouter } from 'vue-router';
+import { useAuth } from '../../composables/useAuth';
+import { useLanguage } from '../../composables/useLanguage';
+
+const { t } = useLanguage();
 
 const { signup: signupMutation, isAuthenticated } = useAuth();
 

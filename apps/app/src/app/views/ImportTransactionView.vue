@@ -1,13 +1,17 @@
 <template>
   <div class="p-4">
     <div>
-      <h1 class="text-2xl">Import Transactions</h1>
+      <h1 class="text-2xl">
+        {{ t('views.importTransactions.importForm.title') }}
+      </h1>
       <div>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Import Account</legend>
+          <legend class="fieldset-legend">
+            {{ t('views.importTransactions.importForm.account.label') }}
+          </legend>
           <select
-            class="select select-bordered w-full max-w-xs"
             v-model="accountId"
+            class="select select-bordered w-full max-w-xs"
           >
             <option
               v-for="account in assetsAccounts"
@@ -19,44 +23,61 @@
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Import Statement Issuer</legend>
+          <legend class="fieldset-legend">
+            {{ t('views.importTransactions.importForm.account.label') }}
+          </legend>
           <select
-            class="select select-bordered w-full max-w-xs"
             v-model="importType"
+            class="select select-bordered w-full max-w-xs"
           >
             <option value="SWISSCARD">Swisscard</option>
             <option value="YUH">Yuh</option>
             <option value="POSTFINANCE">Postfinance</option>
             <option value="WISE">Wise</option>
           </select>
-          <p class="label">
-            You can request new issuers
+          <i18n-t
+            tag="p"
+            class="label"
+            keypath="views.importTransactions.importForm.issuer.footer.text"
+          >
             <a
               href="https://github.com/mydonapp/mydon/issues"
               target="_blank"
               class="link"
-              >here</a
             >
-          </p>
+              {{ t('views.importTransactions.importForm.issuer.footer.link') }}
+            </a>
+          </i18n-t>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Select CSV file</legend>
-          <input type="file" class="file-input" accept=".csv" />
+          <legend class="fieldset-legend">
+            {{ t('views.importTransactions.importForm.upload.label') }}
+          </legend>
+          <input
+            type="file"
+            class="file-input"
+            accept=".csv"
+          />
         </fieldset>
 
         <button
           class="btn btn-primary max-w-xs mt-6"
           @click="importTransactions"
         >
-          Import
+          {{ t('views.importTransactions.importForm.submit.label') }}
         </button>
       </div>
     </div>
     <div class="divider"></div>
     <div>
-      <h1 class="text-2xl">Draft Transactions</h1>
-      <button class="btn btn-primary max-w-xs mt-6" @click="updateDraft">
+      <h1 class="text-2xl">
+        {{ t('views.importTransactions.draftTransactions.title') }}
+      </h1>
+      <button
+        class="btn btn-primary max-w-xs mt-6"
+        @click="updateDraft"
+      >
         Update
       </button>
       <div class="overflow-x-auto">
@@ -66,25 +87,56 @@
             <tr>
               <th>
                 <label>
-                  <input type="checkbox" class="checkbox" v-model="selectAll" />
+                  <input
+                    v-model="selectAll"
+                    type="checkbox"
+                    class="checkbox"
+                  />
                 </label>
               </th>
-              <th>Transaction Date</th>
-              <th>Description</th>
-              <th>Credit Account</th>
-              <th>Debit Account</th>
-              <th>Amount</th>
+              <th>
+                {{ t('views.importTransactions.draftTransactions.table.date') }}
+              </th>
+              <th>
+                {{
+                  t(
+                    'views.importTransactions.draftTransactions.table.description',
+                  )
+                }}
+              </th>
+              <th>
+                {{
+                  t(
+                    'views.importTransactions.draftTransactions.table.creditAccount',
+                  )
+                }}
+              </th>
+              <th>
+                {{
+                  t(
+                    'views.importTransactions.draftTransactions.table.debitAccount',
+                  )
+                }}
+              </th>
+              <th>
+                {{
+                  t('views.importTransactions.draftTransactions.table.amount')
+                }}
+              </th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="transaction in transactions" :key="transaction.id">
+            <tr
+              v-for="transaction in transactions"
+              :key="transaction.id"
+            >
               <th>
                 <label>
                   <input
+                    v-model="transaction.selected"
                     type="checkbox"
                     class="checkbox"
-                    v-model="transaction.selected"
                   />
                 </label>
               </th>
@@ -93,19 +145,25 @@
               </td>
               <td>
                 <textarea
+                  v-model="transaction.description"
                   type="text"
                   placeholder="Enter a description"
                   class="input w-full select-bordered"
-                  v-model="transaction.description"
                 />
               </td>
               <td>
                 <select
-                  class="select select-bordered w-full max-w-xs"
                   v-model="transaction.creditAccountId"
+                  class="select select-bordered w-full max-w-xs"
                   @change="onAccountChange(transaction, 'credit')"
                 >
-                  <option :value="undefined">Select Account</option>
+                  <option :value="undefined">
+                    {{
+                      t(
+                        'views.importTransactions.draftTransactions.table.selectAccount',
+                      )
+                    }}
+                  </option>
                   <option
                     v-for="account in allAccounts"
                     :key="account.id"
@@ -117,10 +175,16 @@
               </td>
               <td>
                 <select
-                  class="select select-bordered w-full max-w-xs"
                   v-model="transaction.debitAccountId"
+                  class="select select-bordered w-full max-w-xs"
                 >
-                  <option :value="undefined">Select Account</option>
+                  <option :value="undefined">
+                    {{
+                      t(
+                        'views.importTransactions.draftTransactions.table.selectAccount',
+                      )
+                    }}
+                  </option>
                   <option
                     v-for="account in allAccounts"
                     :key="account.id"
@@ -133,29 +197,34 @@
               <td>
                 <div v-if="isEqualCurrency(transaction)">
                   <input
+                    v-model="transaction.amount"
                     type="number"
                     placeholder="Enter an amount"
                     class="input w-full select-bordered"
-                    v-model="transaction.amount"
                   />
                 </div>
-                <div v-else class="flex flex-row gap-4">
+                <div
+                  v-else
+                  class="flex flex-row gap-4"
+                >
                   <input
+                    v-model="transaction.creditAmount"
                     type="number"
                     placeholder="Enter an amount"
                     class="input w-full select-bordered"
-                    v-model="transaction.creditAmount"
                   />
                   <input
+                    v-model="transaction.debitAmount"
                     type="number"
                     placeholder="Enter an amount"
                     class="input w-full select-bordered"
-                    v-model="transaction.debitAmount"
                   />
                 </div>
               </td>
               <td>
-                <label @click="deleteTransaction(transaction.id)">Delete</label>
+                <label @click="deleteTransaction(transaction.id)">{{
+                  t('views.importTransactions.draftTransactions.table.delete')
+                }}</label>
               </td>
             </tr>
           </tbody>
@@ -172,8 +241,11 @@ import { computed, ref, watch, watchEffect } from 'vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
+import { useLanguage } from '../composables/useLanguage';
 
 const { URI } = useConstant();
+
+const { t } = useLanguage();
 
 const { getAccessToken } = useAuth();
 
@@ -212,9 +284,10 @@ const { mutate: deleteTransactionMutation } = useMutation({
 });
 
 const importTransactions = async () => {
-  var input = document.querySelector('input[type="file"]');
-  var data = new FormData();
-  // @ts-ignore
+  const input = document.querySelector(
+    'input[type="file"]',
+  ) as HTMLInputElement;
+  const data = new FormData();
   data.append('file', input.files[0]);
   data.append('accountId', accountId.value);
   data.append('statementIssuer', importType.value);
@@ -281,14 +354,7 @@ const onAccountChange = async (transaction, type: 'credit' | 'debit') => {
   }
 };
 
-const {
-  isPending,
-  isError,
-  isFetching,
-  data: draftTransactions,
-  error,
-  refetch,
-} = useQuery({
+const { data: draftTransactions } = useQuery({
   queryKey: ['transactions', { filter: 'draft' }],
   staleTime: 1000 * 60 * 1,
   queryFn: async (): Promise<any[]> =>
