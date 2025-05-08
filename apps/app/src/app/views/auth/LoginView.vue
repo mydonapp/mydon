@@ -4,17 +4,19 @@
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
-        Login to your account
+        {{ t('views.login.title') }}
       </h2>
     </div>
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Email</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.login.loginForm.email.label') }}
+        </legend>
         <input
-          type="email"
-          placeholder="Email"
-          class="input w-full"
           v-model="loginForm.email"
+          type="email"
+          :placeholder="t('views.login.loginForm.email.placeholder')"
+          class="input w-full"
           autocomplete="username"
           data-form-type="username,email"
         />
@@ -26,11 +28,13 @@
         </span>
       </fieldset>
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Password</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.login.loginForm.password.label') }}
+        </legend>
         <input
-          type="password"
-          placeholder="Password"
           v-model="loginForm.password"
+          type="password"
+          :placeholder="t('views.login.loginForm.password.label')"
           autocomplete="current-password"
           data-form-type="password"
           class="input w-full"
@@ -44,17 +48,23 @@
       </fieldset>
 
       <div>
-        <button class="btn btn-primary w-full mt-6" @click="authenticate">
-          Login
+        <button
+          class="btn btn-primary w-full mt-6"
+          @click="authenticate"
+        >
+          {{ t('views.login.loginForm.submit.label') }}
         </button>
       </div>
     </div>
     <p class="mt-10 text-center text-sm">
-      Not a member?
+      {{ t('views.login.signupPrompt.text') }}
       {{ ' ' }}
-      <router-link :to="{ name: 'SignUp', query: route.query }" class="link"
-        >Create an account now</router-link
+      <router-link
+        :to="{ name: 'SignUp', query: route.query }"
+        class="link"
       >
+        {{ t('views.login.signupPrompt.link') }}
+      </router-link>
     </p>
   </div>
 </template>
@@ -65,6 +75,9 @@ import type { Rules } from 'async-validator';
 import { onBeforeMount, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuth } from '../../composables/useAuth';
+import { useLanguage } from '../../composables/useLanguage';
+
+const { t } = useLanguage();
 
 const { login, isAuthenticated } = useAuth();
 

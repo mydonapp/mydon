@@ -3,7 +3,10 @@
     <div class="flex">
       <div>
         <label class="swap">
-          <input type="checkbox" v-model="isPrivate" />
+          <input
+            v-model="isPrivate"
+            type="checkbox"
+          />
           <svg
             class="w-6 h-6 text-gray-800 dark:text-white swap-off"
             aria-hidden="true"
@@ -69,267 +72,341 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-4 gap-8" v-if="accounts">
+    <div
+      v-if="accounts"
+      class="grid grid-cols-4 gap-8"
+    >
       <div>
-        <h2 class="text-xl mb-2">Assets</h2>
+        <h2>{{ t('words.assets') }}</h2>
         <ul class="menu bg-base-200 w-full rounded-box">
-          <li v-for="account in accounts.assets.accounts" :key="account.id">
-            <router-link :to="{ name: 'Account', params: { id: account.id } }"
-              >{{ account.name }}
-              <span v-if="account.retirementAccount"
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
+          <li
+            v-for="account in accounts.assets.accounts"
+            :key="account.id"
+          >
+            <router-link :to="{ name: 'Account', params: { id: account.id } }">
+              {{ account.name }}
+
+              <svg
+                v-if="account.retirementAccount"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <g
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  color="currentColor"
                 >
-                  <g
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    color="currentColor"
-                  >
-                    <path
-                      d="M19.5 16v-3.994c0-1.486 0-2.23-.256-2.91c-.255-.68-.745-1.24-1.723-2.358L16 5H8L6.48 6.738C5.5 7.856 5.01 8.416 4.755 9.096s-.256 1.424-.256 2.91V16c0 2.828 0 4.243.879 5.121S7.672 22 10.5 22h3c2.828 0 4.243 0 5.121-.879c.879-.878.879-2.293.879-5.121"
-                    />
-                    <path
-                      d="M9.5 15.683c0 1.23 1.854 2.237 3.633 1.672s1.517-2.23.913-2.884s-1.491-.544-2.506-.596c-2.281-.116-2.442-2.303-.595-3.168c1.355-.635 3.093.18 3.293 1.293m-2.267-2.5v.978m0 7.242v.78M7.5 2h9c.466 0 .699 0 .883.076a1 1 0 0 1 .54.541c.077.184.077.417.077.883s0 .699-.076.883a1 1 0 0 1-.541.54C17.199 5 16.966 5 16.5 5h-9c-.466 0-.699 0-.883-.076a1 1 0 0 1-.54-.541C6 4.199 6 3.966 6 3.5s0-.699.076-.883a1 1 0 0 1 .541-.54C6.801 2 7.034 2 7.5 2"
-                    />
-                  </g></svg></span
-              ><span
+                  <path
+                    d="M19.5 16v-3.994c0-1.486 0-2.23-.256-2.91c-.255-.68-.745-1.24-1.723-2.358L16 5H8L6.48 6.738C5.5 7.856 5.01 8.416 4.755 9.096s-.256 1.424-.256 2.91V16c0 2.828 0 4.243.879 5.121S7.672 22 10.5 22h3c2.828 0 4.243 0 5.121-.879c.879-.878.879-2.293.879-5.121"
+                  />
+                  <path
+                    d="M9.5 15.683c0 1.23 1.854 2.237 3.633 1.672s1.517-2.23.913-2.884s-1.491-.544-2.506-.596c-2.281-.116-2.442-2.303-.595-3.168c1.355-.635 3.093.18 3.293 1.293m-2.267-2.5v.978m0 7.242v.78M7.5 2h9c.466 0 .699 0 .883.076a1 1 0 0 1 .54.541c.077.184.077.417.077.883s0 .699-.076.883a1 1 0 0 1-.541.54C17.199 5 16.966 5 16.5 5h-9c-.466 0-.699 0-.883-.076a1 1 0 0 1-.54-.541C6 4.199 6 3.966 6 3.5s0-.699.076-.883a1 1 0 0 1 .541-.54C6.801 2 7.034 2 7.5 2"
+                  />
+                </g>
+              </svg>
+              <span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-success' : 'badge-error'
                 }`"
-                >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></router-link
-            >
+              >
+                {{ formatCurrency(account.balance, account.currency) }}
+              </span>
+            </router-link>
           </li>
           <li>
-            <a
-              >Total Without Retirement:
+            <a>
+              Total Without Retirement:
               <span
                 :class="`badge badge-sm ${
                   accounts.assets.totalWithoutRetirement >= 0
                     ? 'badge-success'
                     : 'badge-error'
                 }`"
-                >{{
+              >
+                {{
                   formatCurrency(accounts.assets.totalWithoutRetirement, 'CHF')
-                }}</span
-              ></a
-            >
+                }}
+              </span>
+            </a>
           </li>
           <li>
-            <a
-              >Total:
+            <a>
+              Total:
               <span
                 :class="`badge badge-sm ${
                   accounts.assets.total >= 0 ? 'badge-success' : 'badge-error'
                 }`"
-                >{{ formatCurrency(accounts.assets.total, 'CHF') }}</span
-              ></a
-            >
+              >
+                {{ formatCurrency(accounts.assets.total, 'CHF') }}
+              </span>
+            </a>
           </li>
         </ul>
       </div>
       <div>
-        <h2>Liabilities</h2>
+        <h2>{{ t('words.liabilities') }}</h2>
         <ul class="menu bg-base-200 w-full rounded-box">
           <li
             v-for="account in accounts.liabilities.accounts"
             :key="account.id"
           >
-            <router-link :to="{ name: 'Account', params: { id: account.id } }"
-              >{{ account.name
-              }}<span
+            <router-link :to="{ name: 'Account', params: { id: account.id } }">
+              {{ account.name }}
+              <span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-error' : 'badge-success'
                 }`"
-                >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></router-link
-            >
+              >
+                {{ formatCurrency(account.balance, account.currency) }}
+              </span>
+            </router-link>
           </li>
           <li>
-            <a
-              >Total:
+            <a>
+              Total:
               <span
                 :class="`badge badge-sm ${
                   accounts.liabilities.total >= 0
                     ? 'badge-success'
                     : 'badge-error'
                 }`"
-                >{{ formatCurrency(accounts.liabilities.total, 'CHF') }}</span
-              ></a
-            >
+              >
+                {{ formatCurrency(accounts.liabilities.total, 'CHF') }}
+              </span>
+            </a>
           </li>
         </ul>
       </div>
       <div>
-        <h2>Income</h2>
+        <h2>{{ t('words.income') }}</h2>
         <ul class="menu bg-base-200 w-full rounded-box">
-          <li v-for="account in accounts.income.accounts" :key="account.id">
-            <router-link :to="{ name: 'Account', params: { id: account.id } }"
-              >{{ account.name
-              }}<span
+          <li
+            v-for="account in accounts.income.accounts"
+            :key="account.id"
+          >
+            <router-link :to="{ name: 'Account', params: { id: account.id } }">
+              {{ account.name }}
+              <span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-success' : 'badge-error'
                 }`"
-                >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></router-link
-            >
+              >
+                {{ formatCurrency(account.balance, account.currency) }}
+              </span>
+            </router-link>
           </li>
           <li>
-            <a
-              >Total:
+            <a>
+              Total:
               <span
                 :class="`badge badge-sm ${
                   accounts.income.total >= 0 ? 'badge-success' : 'badge-error'
                 }`"
-                >{{ formatCurrency(accounts.income.total, 'CHF') }}</span
-              ></a
-            >
+              >
+                {{ formatCurrency(accounts.income.total, 'CHF') }}
+              </span>
+            </a>
           </li>
         </ul>
       </div>
       <div>
-        <h2>Expenses</h2>
+        <h2>{{ t('words.expenses') }}</h2>
         <ul class="menu bg-base-200 w-full rounded-box">
-          <li v-for="account in accounts.expense.accounts" :key="account.id">
-            <router-link :to="{ name: 'Account', params: { id: account.id } }"
-              >{{ account.name
-              }}<span
+          <li
+            v-for="account in accounts.expense.accounts"
+            :key="account.id"
+          >
+            <router-link :to="{ name: 'Account', params: { id: account.id } }">
+              {{ account.name }}
+              <span
                 :class="`badge badge-sm ${
                   account.balance >= 0 ? 'badge-error' : 'badge-success'
                 }`"
-                >{{ formatCurrency(account.balance, account.currency) }}</span
-              ></router-link
-            >
+              >
+                {{ formatCurrency(account.balance, account.currency) }}
+              </span>
+            </router-link>
           </li>
           <li>
-            <a
-              >Total:
+            <a>
+              Total:
               <span
                 :class="`badge badge-sm ${
                   accounts.expense.total >= 0 ? 'badge-error' : 'badge-success'
                 }`"
-                >{{ formatCurrency(accounts.expense.total, 'CHF') }}</span
-              ></a
-            >
+              >
+                {{ formatCurrency(accounts.expense.total, 'CHF') }}
+              </span>
+            </a>
           </li>
         </ul>
       </div>
     </div>
 
     <div class="divider"></div>
-    <h2 class="text-lg pb-4">Add Account</h2>
+    <h2 class="text-lg pb-4">{{ t('views.accounts.addAccountForm.title') }}</h2>
     <div class="flex flex-col gap">
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Account Name</legend>
-        <input type="text" placeholder="" class="input" v-model="name" />
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.addAccountForm.accountName.label') }}
+        </legend>
+        <input
+          v-model="name"
+          type="text"
+          placeholder=""
+          class="input"
+        />
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Opening Balance</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.addAccountForm.openingBalance.label') }}
+        </legend>
         <input
+          v-model="openingBalance"
           type="number"
           placeholder="openingBalance"
           class="input"
-          v-model="openingBalance"
         />
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Account Type</legend>
-        <select class="select" v-model="accountType">
-          <option>ASSETS</option>
-          <option>LIABILITIES</option>
-          <option>INCOME</option>
-          <option>EXPENSE</option>
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.addAccountForm.accountType.label') }}
+        </legend>
+        <select
+          v-model="accountType"
+          class="select"
+        >
+          <option>{{ t('words.assets').toUpperCase() }}</option>
+          <option>{{ t('words.liabilities').toUpperCase() }}</option>
+          <option>{{ t('words.income').toUpperCase() }}</option>
+          <option>{{ t('words.expenses').toUpperCase() }}</option>
         </select>
       </fieldset>
 
-      <button class="btn btn-primary max-w-xs mt-6" @click="addAccount">
-        Add Account
+      <button
+        class="btn btn-primary max-w-xs mt-6"
+        @click="addAccount"
+      >
+        {{ t('views.accounts.addAccountForm.submit.label') }}
       </button>
     </div>
     <div class="divider"></div>
-    <h2 class="text-lg pb-4">Create Transaction</h2>
+    <h2 class="text-lg pb-4">
+      {{ t('views.accounts.createTransactionForm.title') }}
+    </h2>
     <div>
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Date</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.createTransactionForm.date.label') }}
+        </legend>
         <input
-          type="text"
-          placeholder="Enter a description"
-          class="input"
           v-model="transactionDate"
-        />
-      </fieldset>
-
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Description</legend>
-        <input
           type="text"
           placeholder="Enter a description"
           class="input"
-          v-model="transactionDescription"
         />
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Credit Account</legend>
-        <select class="select" v-model="creditAccountId">
-          <option :value="undefined">Select Account</option>
-          <option
-            v-for="account in allAccounts"
-            :key="account.id"
-            :value="account.id"
-          >
-            {{ account.name }}
-          </option>
-        </select>
-      </fieldset>
-
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Debit Account</legend>
-        <select class="select" v-model="debitAccountId">
-          <option :value="undefined">Select Account</option>
-          <option
-            v-for="account in allAccounts"
-            :key="account.id"
-            :value="account.id"
-          >
-            {{ account.name }}
-          </option>
-        </select>
-      </fieldset>
-
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Amount</legend>
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.createTransactionForm.description.label') }}
+        </legend>
         <input
+          v-model="transactionDescription"
+          type="text"
+          placeholder="Enter a description"
+          class="input"
+        />
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.createTransactionForm.creditAccount.label') }}
+        </legend>
+        <select
+          v-model="creditAccountId"
+          class="select"
+        >
+          <option :value="undefined">
+            {{
+              t(
+                'views.accounts.createTransactionForm.creditAccount.placeholder',
+              )
+            }}
+          </option>
+          <option
+            v-for="account in allAccounts"
+            :key="account.id"
+            :value="account.id"
+          >
+            {{ account.name }}
+          </option>
+        </select>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.createTransactionForm.debitAccount.label') }}
+        </legend>
+        <select
+          v-model="debitAccountId"
+          class="select"
+        >
+          <option :value="undefined">
+            {{
+              t('views.accounts.createTransactionForm.debitAccount.placeholder')
+            }}
+          </option>
+          <option
+            v-for="account in allAccounts"
+            :key="account.id"
+            :value="account.id"
+          >
+            {{ account.name }}
+          </option>
+        </select>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">
+          {{ t('views.accounts.createTransactionForm.amount.label') }}
+        </legend>
+        <input
+          v-model="transactionAmount"
           type="number"
           placeholder="Enter an amount"
           class="input"
-          v-model="transactionAmount"
         />
       </fieldset>
-      <button class="btn btn-primary max-w-xs mt-6" @click="createTransaction">
-        Create Transaction
+      <button
+        class="btn btn-primary max-w-xs mt-6"
+        @click="createTransaction"
+      >
+        {{ t('views.accounts.createTransactionForm.submit.label') }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useAccounts } from '../composables/useAccounts';
-import { useCurrency } from '../composables/useCurrency';
-import { usePrivacy } from '../composables/usePrivacy';
 import { useMutation } from '@tanstack/vue-query';
 import { useFetch } from '@vueuse/core';
+import { computed, ref } from 'vue';
+import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
+import { useCurrency } from '../composables/useCurrency';
+import { usePrivacy } from '../composables/usePrivacy';
+import { useLanguage } from '../composables/useLanguage';
+
+const { t } = useLanguage();
 
 const { URI } = useConstant();
 
