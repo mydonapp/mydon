@@ -85,7 +85,7 @@ export default {
       },
     },
     account: {
-      title: 'Account: {{accountName}}',
+      title: 'Account: {accountName}',
       transactions: {
         title: 'Transactions',
         table: {

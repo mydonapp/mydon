@@ -27,7 +27,7 @@ import { TransactionsService } from './transactions.service';
 export class TransactionsController {
   constructor(
     private transactionsService: TransactionsService,
-    private forexService: ForexService
+    private forexService: ForexService,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -35,7 +35,7 @@ export class TransactionsController {
   async findAll(@Req() req: Request, @Query('filter') filter: string) {
     const result = await this.transactionsService.findAll(
       req['context'],
-      filter
+      filter,
     );
 
     return result.map((transaction) => {
@@ -56,7 +56,7 @@ export class TransactionsController {
   @Post('v1/transactions')
   createTransaction(
     @Req() req: Request,
-    @Body() createTransactionDto: CreateTransactionDto
+    @Body() createTransactionDto: CreateTransactionDto,
   ) {
     return this.transactionsService.createTransaction(req['context'], {
       creditAmount: createTransactionDto.creditAmount,
@@ -73,7 +73,7 @@ export class TransactionsController {
   patchTransaction(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() patchTransactionDto: PatchTransactionDto
+    @Body() patchTransactionDto: PatchTransactionDto,
   ) {
     return this.transactionsService.patchTransaction(req['context'], id, {
       creditAmount: patchTransactionDto.creditAmount,
@@ -100,22 +100,23 @@ export class TransactionsController {
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
           fileType: 'csv',
+          skipMagicNumbersValidation: true,
         })
         // .addMaxSizeValidator({
         //   maxSize: 1000,
         // })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        })
+        }),
     )
     file: Express.Multer.File,
-    @Body() body: ImportStatementDto
+    @Body() body: ImportStatementDto,
   ) {
     return this.transactionsService.importStatement(
       req['context'],
       file.buffer.toString(),
       body.statementIssuer,
-      body.accountId
+      body.accountId,
     );
   }
 
@@ -123,13 +124,13 @@ export class TransactionsController {
   @Get('v1/currency/convert')
   convertAmount(
     @Req() req: Request,
-    @Query() query: { amount: number; from: string; to: string; date: string }
+    @Query() query: { amount: number; from: string; to: string; date: string },
   ) {
     return this.forexService.convertCurrency(
       query.amount,
       query.from,
       query.to,
-      new Date(query.date)
+      new Date(query.date),
     );
   }
 }

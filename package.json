@@ -8,10 +8,10 @@
   },
   "private": true,
   "dependencies": {
-    "@nestjs/common": "11.0.20",
+    "@nestjs/common": "11.1.0",
     "@nestjs/config": "4.0.2",
-    "@nestjs/core": "11.0.20",
-    "@nestjs/platform-express": "11.0.20",
+    "@nestjs/core": "11.1.0",
+    "@nestjs/platform-express": "11.1.0",
     "@nestjs/typeorm": "11.0.0",
     "@tailwindcss/vite": "4.1.4",
     "@tanstack/vue-query": "5.74.5",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@eslint/js": "9.25.1",
     "@nestjs/schematics": "11.0.5",
-    "@nestjs/testing": "11.0.20",
+    "@nestjs/testing": "11.1.0",
     "@nx/eslint": "20.8.0",
     "@nx/eslint-plugin": "20.8.0",
     "@nx/jest": "20.8.0",
@@ -83,5 +83,6 @@
     "vite": "6.3.2",
     "vitest": "3.1.2",
     "vue-tsc": "2.2.10"
-  }
+  },
+  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }
