@@ -14,6 +14,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
@@ -23,6 +24,8 @@ import { ImportStatementDto } from './dtos/import-statenment.dto';
 import { PatchTransactionDto } from './dtos/patch-transaction.dto';
 import { TransactionsService } from './transactions.service';
 
+@ApiTags('transactions')
+@ApiBearerAuth()
 @Controller()
 export class TransactionsController {
   constructor(

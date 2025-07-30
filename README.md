@@ -45,6 +45,7 @@ services:
     environment:
       DATABASE_URL: postgres://mydon:mydonpass@db:5432/mydon
       CORS_ORIGINS: http://localhost:4000
+      ENABLE_API_DOCS: false
     depends_on:
       - db
     ports:
@@ -71,6 +72,10 @@ Once running:
 🖥 Frontend → http://localhost:4000
 
 ⚙️ API → http://localhost:3000
+
+📚 API Documentation → http://localhost:3000/api/docs
+
+> **Note:** API documentation can be disabled in production by setting `ENABLE_API_DOCS=false`.
 
 ---
 
@@ -115,6 +120,8 @@ nx serve app
 Once running:
 
 API: http://localhost:3000
+
+API Documentation: http://localhost:3000/api/docs
 
 Frontend: http://localhost:4200
 
