@@ -10,6 +10,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const PORT = configService.get<string>('API_PORT');
+  const corsOrigins = configService.get<string>('CORS_ORIGINS');
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -20,7 +21,16 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.use(helmet());
-  app.enableCors({ origin: 'http://localhost:4200', credentials: true });
+
+  // Configure CORS with environment-based origins
+  const origins = corsOrigins
+    ? corsOrigins.split(',').map((origin) => origin.trim())
+    : ['http://localhost:4200']; // fallback for local development
+
+  app.enableCors({
+    origin: origins,
+    credentials: true,
+  });
 
   app.enableShutdownHooks();
 
