@@ -6,6 +6,8 @@ export const useLanguage = () => {
   const AVAILABLE_LANGUAGES = {
     en: 'English',
     de: 'Deutsch',
+    fr: 'Français',
+    it: 'Italiano',
   };
 
   const { t, locale } = useI18n();
