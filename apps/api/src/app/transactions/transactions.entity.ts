@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Account } from '../accounts/accounts.entity';
 import { User } from '../auth/user.entity';
+import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
 
 export interface CreateTransaction {
   creditAmount: number;
@@ -28,7 +29,12 @@ export class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: new ColumnDecimalTransformer(),
+  })
   creditAmount: number;
 
   @Column({
@@ -36,6 +42,7 @@ export class Transaction {
     precision: 10,
     scale: 2,
     default: 0,
+    transformer: new ColumnDecimalTransformer(),
   })
   debitAmount: number;
 
@@ -111,6 +118,7 @@ export class Transaction {
     transaction.transactionDate = props.transactionDate;
     transaction.draft = props.draft || false;
     transaction.raw = props.raw || null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     transaction.user = props.userId as any;
     return transaction;
   }

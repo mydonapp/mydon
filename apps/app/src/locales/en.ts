@@ -14,7 +14,7 @@ export default {
   app: {
     subtitle: 'Finance Tracker',
     user: 'User Account',
-    userEmail: 'user@example.com',
+    userEmail: "user{'@'}example.com",
   },
   views: {
     dashboard: {
@@ -143,6 +143,8 @@ export default {
       subtitle: 'Detailed view of account transactions and balance',
       currentBalance: 'Current Balance',
       totalTransactions: 'Total Transactions',
+      totalCredit: 'Total Credit',
+      totalDebit: 'Total Debit',
       totalIncome: 'Total Income',
       totalExpenses: 'Total Expenses',
       noTransactions: 'No transactions found',

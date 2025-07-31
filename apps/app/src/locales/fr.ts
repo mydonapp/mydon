@@ -14,7 +14,7 @@ export default {
   app: {
     subtitle: 'Suivi Financier',
     user: 'Compte Utilisateur',
-    userEmail: 'utilisateur@exemple.com',
+    userEmail: "utilisateur{'@'}exemple.com",
   },
   views: {
     dashboard: {
@@ -144,6 +144,8 @@ export default {
       subtitle: 'Vue détaillée des transactions et du solde du compte',
       currentBalance: 'Solde Actuel',
       totalTransactions: 'Total des Transactions',
+      totalCredit: 'Total Crédit',
+      totalDebit: 'Total Débit',
       totalIncome: 'Total des Revenus',
       totalExpenses: 'Total des Dépenses',
       noTransactions: 'Aucune transaction trouvée',

@@ -47,7 +47,7 @@
                 <div class="flex items-center justify-between">
                   <span
                     class="text-3xl font-bold"
-                    :class="accountBalance >= 0 ? 'text-success' : 'text-error'"
+                    :class="getBalanceColorClass(accountBalance)"
                   >
                     {{
                       formatCurrency(accountBalance, account.currency || 'CHF')
@@ -107,10 +107,10 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-semibold text-success">
-                    {{ t('views.account.totalIncome') }}
+                    {{ t('views.account.totalCredit') }}
                   </h3>
                   <p class="text-2xl font-bold text-success">
-                    {{ formatCurrency(totalIncome, account.currency || 'CHF') }}
+                    {{ formatCurrency(totalCredit, account.currency || 'CHF') }}
                   </p>
                 </div>
                 <svg
@@ -133,12 +133,12 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-semibold text-error">
-                    {{ t('views.account.totalExpenses') }}
+                    {{ t('views.account.totalDebit') }}
                   </h3>
                   <p class="text-2xl font-bold text-error">
                     {{
                       formatCurrency(
-                        Math.abs(totalExpenses),
+                        Math.abs(totalDebit),
                         account.currency || 'CHF',
                       )
                     }}
@@ -251,9 +251,9 @@
                           <div
                             class="w-10 h-10 rounded-full flex items-center justify-center text-white"
                             :class="
-                              (parseFloat(transaction.amount) || 0) >= 0
-                                ? 'bg-success'
-                                : 'bg-error'
+                              getTransactionColorClass(
+                                transaction.amount,
+                              ).replace('text-', 'bg-')
                             "
                           >
                             <svg
@@ -263,7 +263,9 @@
                             >
                               <path
                                 v-if="
-                                  (parseFloat(transaction.amount) || 0) >= 0
+                                  getTransactionIconDirection(
+                                    transaction.amount,
+                                  )
                                 "
                                 d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
                               />
@@ -309,9 +311,7 @@
                           <span
                             class="text-lg font-bold"
                             :class="
-                              (parseFloat(transaction.amount) || 0) >= 0
-                                ? 'text-success'
-                                : 'text-error'
+                              getTransactionColorClass(transaction.amount)
                             "
                           >
                             {{
@@ -412,8 +412,8 @@
       class="modal"
     >
       <div
-        class="modal-box w-11/12 max-w-2xl"
         v-if="selectedTransaction"
+        class="modal-box w-11/12 max-w-2xl"
       >
         <div class="flex justify-between items-center mb-6">
           <h3 class="font-bold text-lg">
@@ -443,11 +443,7 @@
               }}</label>
               <p
                 class="text-lg font-bold"
-                :class="
-                  (parseFloat(selectedTransaction.amount) || 0) >= 0
-                    ? 'text-success'
-                    : 'text-error'
-                "
+                :class="getTransactionColorClass(selectedTransaction.amount)"
               >
                 {{
                   formatCurrency(
@@ -534,35 +530,20 @@ const { isFetching, data: account } = useQuery({
       headers: { Authorization: `Bearer ${getAccessToken()}` },
     }).then((response) => response.json());
 
-    // Debug logging to understand the data structure
-    console.log('=== ACCOUNT API RESPONSE ===');
-    console.log('Full response:', response);
-    console.log('Response keys:', Object.keys(response || {}));
-    console.log('Balance field:', response?.balance);
-    console.log('Balance type:', typeof response?.balance);
-    console.log('Opening balance field:', response?.openingBalance);
-    console.log('Opening balance type:', typeof response?.openingBalance);
-    console.log('Retirement account:', response?.retirementAccount);
-    console.log('Transactions field:', response?.transactions);
-    console.log('Transactions type:', typeof response?.transactions);
-    console.log('Transactions length:', response?.transactions?.length);
-    console.log('============================');
-
     return response;
   },
 });
 
 // Computed Properties
-const totalIncome = computed(() => {
+const totalCredit = computed(() => {
   if (
     !account.value?.transactions ||
     !Array.isArray(account.value.transactions)
   ) {
-    console.log('No transactions array found:', account.value);
     return 0;
   }
 
-  const income = account.value.transactions
+  const credit = account.value.transactions
     .filter((t: any) => {
       const amount = parseFloat(t.amount) || 0;
       return amount > 0;
@@ -572,20 +553,18 @@ const totalIncome = computed(() => {
       return sum + amount;
     }, 0);
 
-  console.log('Calculated total income:', income);
-  return income;
+  return credit;
 });
 
-const totalExpenses = computed(() => {
+const totalDebit = computed(() => {
   if (
     !account.value?.transactions ||
     !Array.isArray(account.value.transactions)
   ) {
-    console.log('No transactions array found for expenses:', account.value);
     return 0;
   }
 
-  const expenses = account.value.transactions
+  const debit = account.value.transactions
     .filter((t: any) => {
       const amount = parseFloat(t.amount) || 0;
       return amount < 0;
@@ -595,35 +574,24 @@ const totalExpenses = computed(() => {
       return sum + amount;
     }, 0);
 
-  console.log('Calculated total expenses:', expenses);
-  return expenses;
+  return debit;
 });
 
 // Add computed property for account balance with proper parsing
 const accountBalance = computed(() => {
   if (!account.value) {
-    console.log('No account data available');
     return 0;
   }
 
-  console.log('Full account object:', account.value);
-  console.log('Account balance raw:', account.value.balance);
-  console.log('Account balance type:', typeof account.value.balance);
-
-  // The backend balance field may not be properly calculated due to select: false on creditBalance/debitBalance
-  // So we calculate the balance from transactions which are properly loaded
   if (
     !account.value.transactions ||
     !Array.isArray(account.value.transactions)
   ) {
-    console.log('No transactions array found, trying to use API balance field');
     // Fallback to API balance field if available
     if (account.value.balance !== undefined && account.value.balance !== null) {
       const balance = parseFloat(account.value.balance) || 0;
-      console.log('Using API balance field as fallback, parsed:', balance);
       return balance;
     }
-    console.log('No balance data available, returning 0');
     return 0;
   }
 
@@ -636,18 +604,9 @@ const accountBalance = computed(() => {
     0,
   );
 
-  console.log('Calculated balance from transactions:', calculatedBalance);
-  console.log(
-    'Number of transactions used:',
-    account.value.transactions.length,
-  );
-
   // Add opening balance if available
   const openingBalance = parseFloat(account.value.openingBalance) || 0;
   const finalBalance = calculatedBalance + openingBalance;
-
-  console.log('Opening balance:', openingBalance);
-  console.log('Final balance (transactions + opening):', finalBalance);
 
   return finalBalance;
 });
@@ -657,7 +616,6 @@ const filteredTransactions = computed(() => {
     !account.value?.transactions ||
     !Array.isArray(account.value.transactions)
   ) {
-    console.log('No transactions to filter');
     return [];
   }
 
@@ -758,6 +716,48 @@ const getAccountTypeBadgeClass = () => {
   };
 
   return classes[type] || 'badge-primary';
+};
+
+// Helper methods for handling expense account color inversion
+const isNegativeAccount = () => {
+  if (!account.value) return false;
+  const type = account.value.type || 'ASSETS';
+  return type === 'EXPENSE' || type === 'LIABILITIES';
+};
+
+const getBalanceColorClass = (balance: number) => {
+  const isPositive = balance >= 0;
+  if (isNegativeAccount()) {
+    // For expense/liability accounts, invert the colors
+    return isPositive ? 'text-error' : 'text-success';
+  } else {
+    // For asset/income accounts, normal colors
+    return isPositive ? 'text-success' : 'text-error';
+  }
+};
+
+const getTransactionColorClass = (amount: string | number) => {
+  const numAmount = parseFloat(amount?.toString() || '0') || 0;
+  const isPositive = numAmount >= 0;
+  if (isNegativeAccount()) {
+    // For expense/liability accounts, invert the colors
+    return isPositive ? 'text-error' : 'text-success';
+  } else {
+    // For asset/income accounts, normal colors
+    return isPositive ? 'text-success' : 'text-error';
+  }
+};
+
+const getTransactionIconDirection = (amount: string | number) => {
+  const numAmount = parseFloat(amount?.toString() || '0') || 0;
+  const isPositive = numAmount >= 0;
+  if (isNegativeAccount()) {
+    // For expense/liability accounts, invert the icons
+    return !isPositive; // negative amounts get up arrow (good)
+  } else {
+    // For asset/income accounts, normal icons
+    return isPositive; // positive amounts get up arrow (good)
+  }
 };
 
 const selectTransaction = (transaction: any) => {

@@ -9,7 +9,7 @@ import { Transaction } from './transactions.entity';
 export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
-    private transactionRepository: Repository<Transaction>
+    private transactionRepository: Repository<Transaction>,
   ) {}
 
   findAll(context: Context, filter?: string) {
@@ -21,7 +21,11 @@ export class TransactionsService {
       where['draft'] = true;
     }
 
-    return this.transactionRepository.find({ where, loadRelationIds: true });
+    return this.transactionRepository.find({
+      where,
+      relations: ['creditAccount', 'debitAccount'],
+      order: { transactionDate: 'DESC' },
+    });
   }
 
   createTransaction(
@@ -33,7 +37,7 @@ export class TransactionsService {
       creditAccountId: string;
       debitAccountId: string;
       transactionDate: Date;
-    }
+    },
   ) {
     const transaction = Transaction.create({
       ...options,
@@ -59,7 +63,7 @@ export class TransactionsService {
       creditAccountId?: string;
       debitAccountId?: string;
       draft?: boolean;
-    }
+    },
   ) {
     const transaction = await this.transactionRepository.findOne({
       where: { id, user: { id: context.user.id } },
@@ -75,9 +79,11 @@ export class TransactionsService {
       transaction.description = options.description;
     }
     if (options.creditAccountId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       transaction.creditAccount = options.creditAccountId as any;
     }
     if (options.debitAccountId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       transaction.debitAccount = options.debitAccountId as any;
     }
     if ('draft' in options) {
@@ -91,13 +97,13 @@ export class TransactionsService {
     context: Context,
     fileContent: string,
     statementIssuer: string,
-    accountId: string
+    accountId: string,
   ) {
     const mapper = StatementMapperFactory.create(
       context,
       fileContent,
       statementIssuer,
-      accountId
+      accountId,
     );
 
     const transactions = await mapper.convertStatement();

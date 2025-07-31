@@ -14,7 +14,7 @@ export default {
   app: {
     subtitle: 'Finanz Tracker',
     user: 'Benutzerkonto',
-    userEmail: 'benutzer@beispiel.com',
+    userEmail: "benutzer{'@'}beispiel.com",
   },
   views: {
     dashboard: {
@@ -143,6 +143,8 @@ export default {
       subtitle: 'Detailansicht der Kontotransaktionen und des Saldos',
       currentBalance: 'Aktueller Saldo',
       totalTransactions: 'Gesamttransaktionen',
+      totalCredit: 'Total Kredit',
+      totalDebit: 'Total Debit',
       totalIncome: 'Gesamteinkommen',
       totalExpenses: 'Gesamtausgaben',
       noTransactions: 'Keine Transaktionen gefunden',
