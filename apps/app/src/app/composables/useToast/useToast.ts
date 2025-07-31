@@ -8,6 +8,7 @@ export interface Toast {
 }
 
 const toasts = ref<Toast[]>([]);
+let idCounter = 0;
 
 export const useToast = () => {
   const showToast = (
@@ -15,7 +16,7 @@ export const useToast = () => {
     type: Toast['type'] = 'info',
     duration = 4000,
   ) => {
-    const id = Date.now().toString();
+    const id = `${Date.now()}_${++idCounter}`;
     const toast: Toast = {
       id,
       message,
