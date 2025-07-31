@@ -128,3 +128,14 @@ Frontend: http://localhost:4200
 ## 📜 License
 
 This project is licensed under the [MIT License](./LICENSE).
+
+---
+
+## 🤝 Support the Project
+
+If you find MyDon useful, please consider supporting its development:
+
+- ⭐ **Star this repository** - It helps others discover the project
+- 🐛 **Report bugs** - Help us improve by reporting issues
+- 💡 **Suggest features** - Share your ideas for new functionality
+- 🔧 **Contribute code** - Submit pull requests with improvements
