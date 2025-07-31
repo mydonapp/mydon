@@ -5,13 +5,21 @@
       <div class="container mx-auto px-6 py-8">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold mb-2">{{ t('views.importTransactions.title') }}</h1>
-            <p class="text-info-content/80">{{ t('views.importTransactions.subtitle') }}</p>
+            <h1 class="text-3xl font-bold mb-2">
+              {{ t('views.importTransactions.title') }}
+            </h1>
+            <p class="text-info-content/80">
+              {{ t('views.importTransactions.subtitle') }}
+            </p>
           </div>
           <div class="stats stats-horizontal bg-info-content/10">
             <div class="stat">
-              <div class="stat-title text-info-content/80">{{ t('views.importTransactions.pendingTransactions') }}</div>
-              <div class="stat-value text-info-content">{{ draftTransactions?.length || 0 }}</div>
+              <div class="stat-title text-info-content/80">
+                {{ t('views.importTransactions.pendingTransactions') }}
+              </div>
+              <div class="stat-value text-info-content">
+                {{ draftTransactions?.length || 0 }}
+              </div>
             </div>
           </div>
         </div>
@@ -28,17 +36,21 @@
               fill="currentColor"
               viewBox="0 0 24 24"
             >
-              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+              <path
+                d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+              />
             </svg>
             {{ t('views.importTransactions.importForm.title') }}
           </h2>
-          
+
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Configuration Section -->
             <div class="space-y-6">
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-lg font-semibold">{{ t('views.importTransactions.importForm.account.label') }}</span>
+                  <span class="label-text text-lg font-semibold">{{
+                    t('views.importTransactions.importForm.account.label')
+                  }}</span>
                 </label>
                 <select
                   v-model="accountId"
@@ -48,7 +60,11 @@
                     value=""
                     disabled
                   >
-                    {{ t('views.importTransactions.importForm.account.placeholder') }}
+                    {{
+                      t(
+                        'views.importTransactions.importForm.account.placeholder',
+                      )
+                    }}
                   </option>
                   <option
                     v-for="account in assetsAccounts"
@@ -59,13 +75,17 @@
                   </option>
                 </select>
                 <label class="label">
-                  <span class="label-text-alt">{{ t('views.importTransactions.importForm.account.help') }}</span>
+                  <span class="label-text-alt">{{
+                    t('views.importTransactions.importForm.account.help')
+                  }}</span>
                 </label>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-lg font-semibold">{{ t('views.importTransactions.importForm.issuer.label') }}</span>
+                  <span class="label-text text-lg font-semibold">{{
+                    t('views.importTransactions.importForm.issuer.label')
+                  }}</span>
                 </label>
                 <select
                   v-model="importType"
@@ -75,26 +95,34 @@
                     value=""
                     disabled
                   >
-                    {{ t('views.importTransactions.importForm.issuer.placeholder') }}
+                    {{
+                      t(
+                        'views.importTransactions.importForm.issuer.placeholder',
+                      )
+                    }}
                   </option>
                   <option value="SWISSCARD">
                     <span class="flex items-center">
-                      <span class="font-semibold">Swisscard</span> - Credit Cards
+                      <span class="font-semibold">Swisscard</span> - Credit
+                      Cards
                     </span>
                   </option>
                   <option value="YUH">
                     <span class="flex items-center">
-                      <span class="font-semibold">Yuh</span> - Banking & Investment
+                      <span class="font-semibold">Yuh</span> - Banking &
+                      Investment
                     </span>
                   </option>
                   <option value="POSTFINANCE">
                     <span class="flex items-center">
-                      <span class="font-semibold">PostFinance</span> - Swiss Bank
+                      <span class="font-semibold">PostFinance</span> - Swiss
+                      Bank
                     </span>
                   </option>
                   <option value="WISE">
                     <span class="flex items-center">
-                      <span class="font-semibold">Wise</span> - International Transfers
+                      <span class="font-semibold">Wise</span> - International
+                      Transfers
                     </span>
                   </option>
                 </select>
@@ -109,7 +137,11 @@
                         target="_blank"
                         class="link link-primary"
                       >
-                        {{ t('views.importTransactions.importForm.issuer.footer.link') }}
+                        {{
+                          t(
+                            'views.importTransactions.importForm.issuer.footer.link',
+                          )
+                        }}
                       </a>
                     </i18n-t>
                   </span>
@@ -121,7 +153,9 @@
             <div class="space-y-6">
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-lg font-semibold">{{ t('views.importTransactions.importForm.upload.label') }}</span>
+                  <span class="label-text text-lg font-semibold">{{
+                    t('views.importTransactions.importForm.upload.label')
+                  }}</span>
                 </label>
                 <input
                   type="file"
@@ -129,7 +163,9 @@
                   accept=".csv"
                 />
                 <label class="label">
-                  <span class="label-text-alt">{{ t('views.importTransactions.importForm.upload.help') }}</span>
+                  <span class="label-text-alt">{{
+                    t('views.importTransactions.importForm.upload.help')
+                  }}</span>
                 </label>
               </div>
 
@@ -142,8 +178,14 @@
                   <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" />
                 </svg>
                 <div>
-                  <h3 class="font-bold">{{ t('views.importTransactions.importForm.tip.title') }}</h3>
-                  <div class="text-xs">{{ t('views.importTransactions.importForm.tip.description') }}</div>
+                  <h3 class="font-bold">
+                    {{ t('views.importTransactions.importForm.tip.title') }}
+                  </h3>
+                  <div class="text-xs">
+                    {{
+                      t('views.importTransactions.importForm.tip.description')
+                    }}
+                  </div>
                 </div>
               </div>
 
@@ -179,22 +221,32 @@
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V7H5V5H19M5,19V9H19V19H5M11,11H13V17H11V11M15,11H17V17H15V11M7,11H9V17H7V11Z" />
+                <path
+                  d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V7H5V5H19M5,19V9H19V19H5M11,11H13V17H11V11M15,11H17V17H15V11M7,11H9V17H7V11Z"
+                />
               </svg>
               {{ t('views.importTransactions.draftTransactions.title') }}
-              <div class="badge badge-warning">{{ draftTransactions.length }}</div>
+              <div class="badge badge-warning">
+                {{ draftTransactions.length }}
+              </div>
             </h2>
-            
+
             <div class="flex gap-2">
               <button
                 class="btn btn-outline btn-sm"
                 @click="selectAll = !selectAll"
               >
-                {{ selectAll ? t('views.importTransactions.draftTransactions.deselectAll') : t('views.importTransactions.draftTransactions.selectAll') }}
+                {{
+                  selectAll
+                    ? t(
+                        'views.importTransactions.draftTransactions.deselectAll',
+                      )
+                    : t('views.importTransactions.draftTransactions.selectAll')
+                }}
               </button>
               <button
                 class="btn btn-success btn-sm"
-                :disabled="!transactions.some(t => t.selected)"
+                :disabled="!transactions.some((t) => t.selected)"
                 @click="updateDraft"
               >
                 <svg
@@ -202,9 +254,14 @@
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                  <path
+                    d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
+                  />
                 </svg>
-                {{ t('views.importTransactions.draftTransactions.approve') }} ({{ transactions.filter(t => t.selected).length }})
+                {{
+                  t('views.importTransactions.draftTransactions.approve')
+                }}
+                ({{ transactions.filter((t) => t.selected).length }})
               </button>
             </div>
           </div>
@@ -222,12 +279,46 @@
                       />
                     </label>
                   </th>
-                  <th>{{ t('views.importTransactions.draftTransactions.table.date') }}</th>
-                  <th>{{ t('views.importTransactions.draftTransactions.table.description') }}</th>
-                  <th>{{ t('views.importTransactions.draftTransactions.table.creditAccount') }}</th>
-                  <th>{{ t('views.importTransactions.draftTransactions.table.debitAccount') }}</th>
-                  <th>{{ t('views.importTransactions.draftTransactions.table.amount') }}</th>
-                  <th>{{ t('views.importTransactions.draftTransactions.table.actions') }}</th>
+                  <th>
+                    {{
+                      t('views.importTransactions.draftTransactions.table.date')
+                    }}
+                  </th>
+                  <th>
+                    {{
+                      t(
+                        'views.importTransactions.draftTransactions.table.description',
+                      )
+                    }}
+                  </th>
+                  <th>
+                    {{
+                      t(
+                        'views.importTransactions.draftTransactions.table.creditAccount',
+                      )
+                    }}
+                  </th>
+                  <th>
+                    {{
+                      t(
+                        'views.importTransactions.draftTransactions.table.debitAccount',
+                      )
+                    }}
+                  </th>
+                  <th>
+                    {{
+                      t(
+                        'views.importTransactions.draftTransactions.table.amount',
+                      )
+                    }}
+                  </th>
+                  <th>
+                    {{
+                      t(
+                        'views.importTransactions.draftTransactions.table.actions',
+                      )
+                    }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -247,7 +338,11 @@
                   </td>
                   <td>
                     <span class="text-sm">
-                      {{ new Date(transaction.transactionDate).toLocaleDateString() }}
+                      {{
+                        new Date(
+                          transaction.transactionDate,
+                        ).toLocaleDateString()
+                      }}
                     </span>
                   </td>
                   <td>
@@ -264,7 +359,11 @@
                       @change="onAccountChange(transaction, 'credit')"
                     >
                       <option :value="undefined">
-                        {{ t('views.importTransactions.draftTransactions.table.selectAccount') }}
+                        {{
+                          t(
+                            'views.importTransactions.draftTransactions.table.selectAccount',
+                          )
+                        }}
                       </option>
                       <option
                         v-for="account in allAccounts"
@@ -282,7 +381,11 @@
                       @change="onAccountChange(transaction, 'debit')"
                     >
                       <option :value="undefined">
-                        {{ t('views.importTransactions.draftTransactions.table.selectAccount') }}
+                        {{
+                          t(
+                            'views.importTransactions.draftTransactions.table.selectAccount',
+                          )
+                        }}
                       </option>
                       <option
                         v-for="account in allAccounts"
@@ -330,7 +433,9 @@
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+                        <path
+                          d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
+                        />
                       </svg>
                     </button>
                   </td>
@@ -352,22 +457,40 @@
             fill="currentColor"
             viewBox="0 0 24 24"
           >
-            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+            <path
+              d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+            />
           </svg>
-          <h3 class="text-2xl font-bold mb-4">{{ t('views.importTransactions.emptyState.title') }}</h3>
-          <p class="text-base-content/60 mb-6">{{ t('views.importTransactions.emptyState.description') }}</p>
+          <h3 class="text-2xl font-bold mb-4">
+            {{ t('views.importTransactions.emptyState.title') }}
+          </h3>
+          <p class="text-base-content/60 mb-6">
+            {{ t('views.importTransactions.emptyState.description') }}
+          </p>
           <div class="flex flex-wrap justify-center gap-4">
             <div class="card bg-base-100 shadow p-4">
-              <h4 class="font-semibold mb-2">{{ t('views.importTransactions.emptyState.step1.title') }}</h4>
-              <p class="text-sm text-base-content/60">{{ t('views.importTransactions.emptyState.step1.description') }}</p>
+              <h4 class="font-semibold mb-2">
+                {{ t('views.importTransactions.emptyState.step1.title') }}
+              </h4>
+              <p class="text-sm text-base-content/60">
+                {{ t('views.importTransactions.emptyState.step1.description') }}
+              </p>
             </div>
             <div class="card bg-base-100 shadow p-4">
-              <h4 class="font-semibold mb-2">{{ t('views.importTransactions.emptyState.step2.title') }}</h4>
-              <p class="text-sm text-base-content/60">{{ t('views.importTransactions.emptyState.step2.description') }}</p>
+              <h4 class="font-semibold mb-2">
+                {{ t('views.importTransactions.emptyState.step2.title') }}
+              </h4>
+              <p class="text-sm text-base-content/60">
+                {{ t('views.importTransactions.emptyState.step2.description') }}
+              </p>
             </div>
             <div class="card bg-base-100 shadow p-4">
-              <h4 class="font-semibold mb-2">{{ t('views.importTransactions.emptyState.step3.title') }}</h4>
-              <p class="text-sm text-base-content/60">{{ t('views.importTransactions.emptyState.step3.description') }}</p>
+              <h4 class="font-semibold mb-2">
+                {{ t('views.importTransactions.emptyState.step3.title') }}
+              </h4>
+              <p class="text-sm text-base-content/60">
+                {{ t('views.importTransactions.emptyState.step3.description') }}
+              </p>
             </div>
           </div>
         </div>
@@ -402,10 +525,12 @@ import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
 import { useLanguage } from '../composables/useLanguage';
+import { useToast } from '../composables/useToast';
 
 const { t } = useLanguage();
 const { URI } = useConstant();
 const { getAccessToken } = useAuth();
+const { success, error } = useToast();
 const queryClient = useQueryClient();
 
 const accountId = ref('');
@@ -425,6 +550,11 @@ const { mutate } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    success('Statement imported successfully!');
+  },
+  onError: () => {
+    error('Failed to import statement. Please try again.');
   },
 });
 
@@ -439,6 +569,11 @@ const { mutateAsync: deleteTransactionMutation } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    success('Transaction deleted successfully!');
+  },
+  onError: () => {
+    error('Failed to delete transaction. Please try again.');
   },
 });
 
@@ -490,7 +625,7 @@ const importTransactions = async () => {
     'input[type="file"]',
   ) as HTMLInputElement;
   if (!input.files?.[0]) return;
-  
+
   const data = new FormData();
   data.append('file', input.files[0]);
   data.append('accountId', accountId.value);
@@ -632,13 +767,18 @@ const updateDraft = async () => {
 
   try {
     await Promise.all(
-      selectedTransactions.map((transaction) =>
-        updateDraftMutate(transaction),
-      ),
+      selectedTransactions.map((transaction) => updateDraftMutate(transaction)),
     );
+    // Invalidate both transactions and accounts queries to update all related views
     queryClient.invalidateQueries({ queryKey: ['transactions'] });
-  } catch (error) {
-    console.error('Failed to update transactions:', error);
+    queryClient.invalidateQueries({ queryKey: ['accounts'] });
+
+    success(
+      `${selectedTransactions.length} transaction(s) approved successfully!`,
+    );
+  } catch (err) {
+    console.error('Failed to update transactions:', err);
+    error('Failed to update transactions. Please try again.');
   }
 };
 </script>

@@ -987,20 +987,23 @@
 </template>
 
 <script setup lang="ts">
-import { useMutation } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
 import { useCurrency } from '../composables/useCurrency';
 import { useLanguage } from '../composables/useLanguage';
+import { useToast } from '../composables/useToast';
 
 const { t } = useLanguage();
 const { URI } = useConstant();
 const { formatCurrency } = useCurrency();
-const timeFilter = ref('2025');
-const { accounts, createAccount } = useAccounts(timeFilter);
 const { getAccessToken } = useAuth();
+const queryClient = useQueryClient();
+const { success, error } = useToast();
+const timeFilter = ref('2025');
+const { accounts, createAccount, refetchAccounts } = useAccounts(timeFilter);
 
 // UI State
 const addAccountModal = ref<HTMLDialogElement>();
@@ -1083,8 +1086,16 @@ const addAccount = async () => {
       type: accountType.value,
     });
     closeAddAccountModal();
-  } catch (error) {
-    console.error('Failed to create account:', error);
+    success(
+      t('views.accounts.addAccountForm.success') ||
+        'Account created successfully!',
+    );
+  } catch (err) {
+    console.error('Failed to create account:', err);
+    error(
+      t('views.accounts.addAccountForm.error') ||
+        'Failed to create account. Please try again.',
+    );
   }
 };
 
@@ -1100,8 +1111,18 @@ const createTransaction = async () => {
       transactionDate: transactionDate.value,
     });
     closeTransactionModal();
-  } catch (error) {
-    console.error('Failed to create transaction:', error);
+
+    // Show success feedback to user
+    success(
+      t('views.accounts.createTransactionForm.success') ||
+        'Transaction created successfully!',
+    );
+  } catch (err) {
+    console.error('Failed to create transaction:', err);
+    error(
+      t('views.accounts.createTransactionForm.error') ||
+        'Failed to create transaction. Please try again.',
+    );
   }
 };
 
@@ -1129,7 +1150,23 @@ const { mutateAsync: createTransactionMutation } = useMutation({
         transactionDate: data.transactionDate,
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     return response.json();
+  },
+  onSuccess: () => {
+    // Invalidate all related queries to update UI
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['accounts'] });
+
+    // Also refetch the accounts data from the composable
+    refetchAccounts();
+  },
+  onError: (error) => {
+    console.error('Transaction creation failed:', error);
   },
 });
 </script>

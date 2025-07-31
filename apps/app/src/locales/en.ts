@@ -112,6 +112,8 @@ export default {
         submit: {
           label: 'Add Account',
         },
+        success: 'Account created successfully!',
+        error: 'Failed to create account. Please try again.',
       },
       createTransactionForm: {
         title: 'Create Transaction',
@@ -136,6 +138,8 @@ export default {
         submit: {
           label: 'Create Transaction',
         },
+        success: 'Transaction created successfully!',
+        error: 'Failed to create transaction. Please try again.',
       },
     },
     account: {

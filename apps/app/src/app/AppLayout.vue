@@ -218,12 +218,16 @@
         </aside>
       </div>
     </div>
+
+    <!-- Toast Notifications -->
+    <ToastContainer />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, type ComputedRef, h } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
+import ToastContainer from './components/ToastContainer.vue';
 import { useAuth } from './composables/useAuth';
 import { useLanguage } from './composables/useLanguage';
 import { usePrivacy } from './composables/usePrivacy';
