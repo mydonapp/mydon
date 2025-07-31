@@ -1,17 +1,46 @@
 {
   "name": "@mydonapp/mydon",
   "version": "0.0.1",
+  "description": "MyDon - Your clever finance tracker",
   "license": "MIT",
+  "author": {
+    "name": "Maece97",
+    "url": "https://maece.ch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mydonapp/mydon.git"
+  },
+  "homepage": "https://mydon.app",
+  "bugs": {
+    "url": "https://github.com/mydonapp/mydon/issues"
+  },
+  "keywords": [
+    "finance",
+    "personal-finance",
+    "budgeting",
+    "accounting",
+    "double-entry",
+    "money-management",
+    "expense-tracker",
+    "vue",
+    "nestjs",
+    "typescript",
+    "self-hosted"
+  ],
   "scripts": {
     "start:infra": "docker compose --file docker-compose.dev.yml --env-file .env.local up",
-    "lint": "nx run-many --all --target=lint"
+    "lint": "nx run-many --all --target=lint",
+    "test": "nx run-many --all --target=test",
+    "build": "nx run-many --all --target=build"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@nestjs/common": "11.1.2",
     "@nestjs/config": "4.0.2",
     "@nestjs/core": "11.1.2",
     "@nestjs/platform-express": "11.1.2",
+    "@nestjs/swagger": "^11.2.0",
     "@nestjs/typeorm": "11.0.0",
     "@tailwindcss/vite": "4.1.8",
     "@tanstack/vue-query": "5.79.0",

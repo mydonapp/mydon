@@ -24,19 +24,27 @@ git clone https://github.com/mydonapp/mydon.git
 cd mydon
 ```
 
-2. **Install dependencies:**
+2. **Set up environment variables:**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your local configuration values.
+
+3. **Install dependencies:**
 
 ```bash
 pnpm install
 ```
 
-3. **Start services (Postgres via Docker):**
+4. **Start services (Postgres via Docker):**
 
 ```bash
 pnpm start:infra
 ```
 
-4. **Start backend and frontend:**
+5. **Start backend and frontend:**
 
 ```bash
 nx serve api

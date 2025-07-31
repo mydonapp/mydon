@@ -30,8 +30,6 @@ I created Mydon because I couldn't find a tool that made it easy to import bank 
 To run Mydon locally with Docker, create a `docker-compose.yml` file:
 
 ```yaml
-version: "3.8"
-
 services:
   db:
     image: postgres:16
@@ -40,16 +38,18 @@ services:
       POSTGRES_PASSWORD: mydonpass
       POSTGRES_DB: mydon
     ports:
-      - "5432:5432"
+      - '5432:5432'
 
   backend:
     image: mydon/mydon-api:latest
     environment:
       DATABASE_URL: postgres://mydon:mydonpass@db:5432/mydon
+      CORS_ORIGINS: http://localhost:4000
+      ENABLE_API_DOCS: false
     depends_on:
       - db
     ports:
-      - "3000:3000"
+      - '3000:3000'
 
   frontend:
     image: mydon/mydon-app:latest
@@ -58,7 +58,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "4000:80"
+      - '4000:80'
 ```
 
 Then run:
@@ -73,22 +73,46 @@ Once running:
 
 ⚙️ API → http://localhost:3000
 
+📚 API Documentation → http://localhost:3000/api/docs
+
+> **Note:** API documentation can be disabled in production by setting `ENABLE_API_DOCS=false`.
+
 ---
+
 ## 🧑‍💻 Contributing
+
 ### 🔧 Local Development Guide
 
 To run the full app locally for development or contributions:
 
-1. **Start infrastructure (Postgres) via Docker:**
+1. **Set up environment variables:**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your local configuration values.
+
+2. **Install dependencies:**
+
+```bash
+pnpm install
+```
+
+3. **Start infrastructure (Postgres) via Docker:**
 
 ```bash
 pnpm start:infra
 ```
-2. **Start the backend API (NestJS):**
+
+4. **Start the backend API (NestJS):**
+
 ```bash
 nx serve api
 ```
-3. **Start the frontend app (Vue):**
+
+5. **Start the frontend app (Vue):**
+
 ```bash
 nx serve app
 ```
@@ -97,8 +121,21 @@ Once running:
 
 API: http://localhost:3000
 
+API Documentation: http://localhost:3000/api/docs
+
 Frontend: http://localhost:4200
 
 ## 📜 License
 
 This project is licensed under the [MIT License](./LICENSE).
+
+---
+
+## 🤝 Support the Project
+
+If you find MyDon useful, please consider supporting its development:
+
+- ⭐ **Star this repository** - It helps others discover the project
+- 🐛 **Report bugs** - Help us improve by reporting issues
+- 💡 **Suggest features** - Share your ideas for new functionality
+- 🔧 **Contribute code** - Submit pull requests with improvements

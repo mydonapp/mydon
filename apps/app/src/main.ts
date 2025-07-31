@@ -7,15 +7,19 @@ import router from './app/router/router';
 import { createI18n } from 'vue-i18n';
 import en from './locales/en';
 import de from './locales/de';
+import fr from './locales/fr';
+import it from './locales/it';
 
 const i18n = createI18n({
   legacy: false,
   fallbackLocale: 'en',
   locale: 'en',
-  availableLocales: ['en', 'de'],
+  availableLocales: ['en', 'de', 'fr', 'it'],
   messages: {
     en,
     de,
+    fr,
+    it,
   },
 });
 

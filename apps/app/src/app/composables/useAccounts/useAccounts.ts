@@ -72,5 +72,6 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
     loading: isFetching,
     error,
     createAccount,
+    refetchAccounts,
   };
 };
