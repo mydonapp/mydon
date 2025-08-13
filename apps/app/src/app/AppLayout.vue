@@ -303,6 +303,21 @@ const SettingsIcon = () =>
     ],
   );
 
+const SpendingAnalysisIcon = () =>
+  h(
+    'svg',
+    {
+      fill: 'currentColor',
+      viewBox: '0 0 24 24',
+      class: 'w-5 h-5',
+    },
+    [
+      h('path', {
+        d: 'M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21M16,8H18V15H16V8M12,2H14V15H12V2M6,9H10V15H6V9Z',
+      }),
+    ],
+  );
+
 type MenuItem = {
   name: ComputedRef<string>;
   routeName?: string;
@@ -319,6 +334,11 @@ const menu: MenuItem[] = [
     name: computed(() => t('components.sidebar.menu.accounts')),
     routeName: 'Accounts',
     icon: AccountsIcon,
+  },
+  {
+    name: computed(() => t('components.sidebar.menu.spendingAnalysis')),
+    routeName: 'SpendingAnalysis',
+    icon: SpendingAnalysisIcon,
   },
   {
     name: computed(() => t('components.sidebar.menu.importTransactions')),

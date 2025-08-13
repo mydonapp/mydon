@@ -29,7 +29,7 @@
     "self-hosted"
   ],
   "scripts": {
-    "start:infra": "docker compose --file docker-compose.dev.yml --env-file .env.local up",
+    "start:infra": "docker compose --file docker-compose.dev.yml --env-file .env up",
     "lint": "nx run-many --all --target=lint",
     "test": "nx run-many --all --target=test",
     "build": "nx run-many --all --target=build"

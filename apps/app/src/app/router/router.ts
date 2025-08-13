@@ -49,6 +49,11 @@ const router = createRouter({
           name: 'Import',
         },
         {
+          path: 'spending-analysis',
+          component: () => import('../views/SpendingAnalysisView.vue'),
+          name: 'SpendingAnalysis',
+        },
+        {
           path: 'settings',
           component: () => import('../views/SettingsView.vue'),
           name: 'Settings',
