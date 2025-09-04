@@ -40,62 +40,46 @@
             @submit.prevent="authenticate"
           >
             <!-- Email Field -->
-            <div class="space-y-2">
-              <label class="block">
-                <span class="text-sm font-medium text-white">{{
-                  t('views.login.loginForm.email.label')
-                }}</span>
-              </label>
-              <div class="relative">
-                <input
-                  v-model="loginForm.email"
-                  type="email"
-                  :placeholder="t('views.login.loginForm.email.placeholder')"
-                  class="w-full pl-12 pr-4 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  :class="{
-                    'border-red-500 ring-2 ring-red-200': errorFields?.email,
-                  }"
-                  autocomplete="username"
-                  data-form-type="username,email"
-                />
-                <RiAtLine
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
-              </div>
-              <div
-                v-if="errorFields?.email"
-                class="text-sm text-red-400"
-              >
-                {{ errorFields.email[0].message }}
-              </div>
-            </div>
+            <BaseInput
+              v-model="loginForm.email"
+              type="email"
+              :label="t('views.login.loginForm.email.label')"
+              :placeholder="t('views.login.loginForm.email.placeholder')"
+              :error="
+                errorFields?.email ? errorFields.email[0].message : undefined
+              "
+              autocomplete="username"
+              data-form-type="username,email"
+              class="bg-primary border-gray-600 text-white placeholder-gray-400"
+            >
+              <template #leftIcon>
+                <RiAtLine class="w-5 h-5" />
+              </template>
+            </BaseInput>
 
             <!-- Password Field -->
-            <div class="space-y-2">
-              <label class="block">
-                <span class="text-sm font-medium text-white">{{
-                  t('views.login.loginForm.password.label')
-                }}</span>
-              </label>
-              <div class="relative">
-                <input
-                  v-model="loginForm.password"
-                  :type="showPassword ? 'text' : 'password'"
-                  :placeholder="t('views.login.loginForm.password.placeholder')"
-                  class="w-full pl-12 pr-12 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  :class="{
-                    'border-red-500 ring-2 ring-red-200': errorFields?.password,
-                  }"
-                  autocomplete="current-password"
-                  data-form-type="password"
-                />
-                <RiLockLine
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
+            <BaseInput
+              v-model="loginForm.password"
+              :type="showPassword ? 'text' : 'password'"
+              :label="t('views.login.loginForm.password.label')"
+              :placeholder="t('views.login.loginForm.password.placeholder')"
+              :error="
+                errorFields?.password
+                  ? errorFields.password[0].message
+                  : undefined
+              "
+              autocomplete="current-password"
+              data-form-type="password"
+              class="bg-primary border-gray-600 text-white placeholder-gray-400"
+            >
+              <template #leftIcon>
+                <RiLockLine class="w-5 h-5" />
+              </template>
+              <template #rightIcon>
                 <BaseButton
-                  variant="ghost"
+                  variant="borderless"
                   size="sm"
-                  class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200 p-1"
+                  class="p-1"
                   @click="showPassword = !showPassword"
                 >
                   <RiEyeOffLine
@@ -107,14 +91,8 @@
                     class="w-5 h-5"
                   />
                 </BaseButton>
-              </div>
-              <div
-                v-if="errorFields?.password"
-                class="text-sm text-red-400"
-              >
-                {{ errorFields.password[0].message }}
-              </div>
-            </div>
+              </template>
+            </BaseInput>
 
             <!-- Login Button -->
             <BaseButton
@@ -190,6 +168,7 @@ import {
 import { useAuth } from '../../composables/useAuth';
 import { useLanguage } from '../../composables/useLanguage';
 import BaseButton from '../../components/BaseButton.vue';
+import BaseInput from '../../components/BaseInput.vue';
 
 const { t } = useLanguage();
 

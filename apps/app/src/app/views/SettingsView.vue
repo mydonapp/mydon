@@ -5,16 +5,6 @@
       :title="t('views.settings.title')"
       :subtitle="t('views.settings.subtitle')"
     >
-      <template #extra>
-        <BaseButton
-          variant="ghost"
-          size="sm"
-          class="h-8 w-8 p-0 rounded-full"
-          @click="$router.back()"
-        >
-          <RiArrowLeftLine class="w-5 h-5" />
-        </BaseButton>
-      </template>
     </PageHeader>
 
     <div
@@ -64,35 +54,33 @@
               <div class="space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <label class="block mb-2">
-                      <span class="label font-semibold text-white">
-                        {{ t('views.settings.sections.profile.name') }}
-                      </span>
-                    </label>
-                    <input
+                    <BaseInput
                       v-model="userName"
                       type="text"
-                      class="input w-full"
+                      :label="t('views.settings.sections.profile.name')"
                       :placeholder="
                         t('views.settings.sections.profile.namePlaceholder')
                       "
-                    />
+                    >
+                      <template #leftIcon>
+                        <RiUserLine class="w-5 h-5" />
+                      </template>
+                    </BaseInput>
                   </div>
 
                   <div>
-                    <label class="block mb-2">
-                      <span class="label font-semibold text-white">
-                        {{ t('views.settings.sections.profile.email') }}
-                      </span>
-                    </label>
-                    <input
+                    <BaseInput
                       v-model="userEmail"
                       type="email"
-                      class="input w-full"
+                      :label="t('views.settings.sections.profile.email')"
                       :placeholder="
                         t('views.settings.sections.profile.emailPlaceholder')
                       "
-                    />
+                    >
+                      <template #leftIcon>
+                        <RiMailLine class="w-5 h-5" />
+                      </template>
+                    </BaseInput>
                   </div>
                 </div>
               </div>
@@ -286,9 +274,11 @@ import {
   RiCheckLine,
   RiEyeLine,
   RiInformationLine,
+  RiMailLine,
 } from '@remixicon/vue';
 import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
+import BaseInput from '../components/BaseInput.vue';
 import { useUser } from '../composables/useUser';
 import { useLanguage } from '../composables/useLanguage';
 import { usePrivacy } from '../composables/usePrivacy';

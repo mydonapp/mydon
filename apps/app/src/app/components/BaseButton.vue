@@ -39,7 +39,8 @@ export interface BaseButtonProps {
     | 'warning'
     | 'info'
     | 'ghost'
-    | 'link';
+    | 'link'
+    | 'borderless';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
   // Behavior
@@ -92,8 +93,8 @@ const handleClick = (event: Event) => {
 const baseClasses = computed(() => [
   'inline-flex items-center justify-center gap-2',
   'font-medium transition-all duration-200',
-  'focus:outline-none focus:ring-2 focus:ring-offset-2',
   'disabled:opacity-50 disabled:cursor-not-allowed',
+  'hover:cursor-pointer',
   {
     'w-full': props.block,
     'rounded-lg': props.rounded,
@@ -171,6 +172,12 @@ const variantClasses = computed(() => {
       'underline decoration-1 underline-offset-2',
       'focus:ring-gray-500',
       'px-3 py-2', // Override default padding for links
+    ],
+    borderless: [
+      'bg-transparent',
+      'text-gray-400 hover:text-white',
+      'hover:bg-transparent',
+      'focus:ring-0 focus:ring-offset-0',
     ],
   };
 

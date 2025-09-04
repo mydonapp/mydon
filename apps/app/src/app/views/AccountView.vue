@@ -139,21 +139,17 @@
                 <div class="flex flex-wrap items-center gap-4">
                   <!-- Search -->
                   <div class="form-control">
-                    <div class="input-group">
-                      <input
-                        v-model="searchQuery"
-                        type="text"
-                        placeholder="Search transactions..."
-                        class="input input-bordered input-sm w-64"
-                      />
-                      <BaseButton
-                        variant="ghost"
-                        size="sm"
-                        class="h-10 w-10 p-0"
-                      >
+                    <BaseInput
+                      v-model="searchQuery"
+                      type="text"
+                      placeholder="Search transactions..."
+                      size="sm"
+                      class="w-64"
+                    >
+                      <template #leftIcon>
                         <RiSearchLine class="w-4 h-4" />
-                      </BaseButton>
-                    </div>
+                      </template>
+                    </BaseInput>
                   </div>
 
                   <!-- Amount Filter -->
@@ -459,6 +455,7 @@ import {
 } from '@remixicon/vue';
 import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
+import BaseInput from '../components/BaseInput.vue';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
 import { useCurrency } from '../composables/useCurrency';

@@ -617,20 +617,19 @@
           @submit.prevent="addAccount"
         >
           <div class="mb-4">
-            <label class="label">
-              <span class="label font-semibold">{{
-                t('views.accounts.addAccountForm.accountName.label')
-              }}</span>
-            </label>
-            <input
+            <BaseInput
               v-model="name"
               type="text"
-              class="input w-full"
+              :label="t('views.accounts.addAccountForm.accountName.label')"
               :placeholder="
                 t('views.accounts.addAccountForm.accountName.placeholder')
               "
               required
-            />
+            >
+              <template #leftIcon>
+                <RiAccountCircleLine class="w-5 h-5" />
+              </template>
+            </BaseInput>
           </div>
 
           <div class="mb-4">
@@ -652,18 +651,17 @@
           </div>
 
           <div class="mb-4">
-            <label class="label">
-              <span class="label font-semibold">{{
-                t('views.accounts.addAccountForm.openingBalance.label')
-              }}</span>
-            </label>
-            <input
+            <BaseInput
               v-model="openingBalance"
               type="number"
               step="0.01"
-              class="input w-full"
+              :label="t('views.accounts.addAccountForm.openingBalance.label')"
               placeholder="0.00"
-            />
+            >
+              <template #leftIcon>
+                <RiMoneyDollarCircleLine class="w-5 h-5" />
+              </template>
+            </BaseInput>
           </div>
 
           <div class="flex justify-end gap-2 mt-6">
@@ -715,53 +713,52 @@
         >
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="mb-4">
-              <label class="label">
-                <span class="label font-semibold">{{
-                  t('views.accounts.createTransactionForm.date.label')
-                }}</span>
-              </label>
-              <input
+              <BaseInput
                 v-model="transactionDate"
                 type="date"
-                class="input w-full"
+                :label="t('views.accounts.createTransactionForm.date.label')"
                 required
-              />
+              >
+                <template #leftIcon>
+                  <RiCalendarLine class="w-5 h-5" />
+                </template>
+              </BaseInput>
             </div>
 
             <div class="mb-4">
-              <label class="label">
-                <span class="label font-semibold">{{
-                  t('views.accounts.createTransactionForm.amount.label')
-                }}</span>
-              </label>
-              <input
+              <BaseInput
                 v-model="transactionAmount"
                 type="number"
                 step="0.01"
-                class="input w-full"
+                :label="t('views.accounts.createTransactionForm.amount.label')"
                 placeholder="0.00"
                 required
-              />
+              >
+                <template #leftIcon>
+                  <RiMoneyDollarCircleLine class="w-5 h-5" />
+                </template>
+              </BaseInput>
             </div>
           </div>
 
           <div class="mb-4">
-            <label class="label">
-              <span class="label font-semibold">{{
-                t('views.accounts.createTransactionForm.description.label')
-              }}</span>
-            </label>
-            <input
+            <BaseInput
               v-model="transactionDescription"
               type="text"
-              class="input w-full"
+              :label="
+                t('views.accounts.createTransactionForm.description.label')
+              "
               :placeholder="
                 t(
                   'views.accounts.createTransactionForm.description.placeholder',
                 )
               "
               required
-            />
+            >
+              <template #leftIcon>
+                <RiFileTextLine class="w-5 h-5" />
+              </template>
+            </BaseInput>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -865,9 +862,13 @@ import {
   RiExchangeFundsLine,
   RiErrorWarningLine,
   RiLineChartLine,
+  RiAccountCircleLine,
+  RiCalendarLine,
+  RiFileTextLine,
 } from '@remixicon/vue';
 import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
+import BaseInput from '../components/BaseInput.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';

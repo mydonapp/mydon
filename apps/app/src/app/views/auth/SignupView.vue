@@ -40,102 +40,73 @@
             @submit.prevent="signup"
           >
             <!-- Name Field -->
-            <div class="space-y-2">
-              <label class="block">
-                <span class="text-sm font-medium text-white">{{
-                  t('views.signup.signupForm.name.label')
-                }}</span>
-              </label>
-              <div class="relative">
-                <input
-                  v-model="name"
-                  type="text"
-                  :placeholder="t('views.signup.signupForm.name.placeholder')"
-                  class="w-full pl-12 pr-4 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  :class="{
-                    'border-red-500 ring-2 ring-red-200':
-                      !name && formSubmitted,
-                  }"
-                  autocomplete="name"
-                  required
-                />
-                <RiUserLine
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
-              </div>
-              <div
-                v-if="!name && formSubmitted"
-                class="text-sm text-red-400"
-              >
-                Name is required
-              </div>
-            </div>
+            <BaseInput
+              v-model="name"
+              type="text"
+              :label="t('views.signup.signupForm.name.label')"
+              :placeholder="t('views.signup.signupForm.name.placeholder')"
+              :error="!name && formSubmitted ? 'Name is required' : undefined"
+              autocomplete="name"
+              required
+              class="bg-primary border-gray-600 text-white placeholder-gray-400"
+            >
+              <template #leftIcon>
+                <RiUserLine class="w-5 h-5" />
+              </template>
+            </BaseInput>
 
             <!-- Email Field -->
-            <div class="space-y-2">
-              <label class="block">
-                <span class="text-sm font-medium text-white">{{
-                  t('views.signup.signupForm.email.label')
-                }}</span>
-              </label>
-              <div class="relative">
-                <input
-                  v-model="email"
-                  type="email"
-                  :placeholder="t('views.signup.signupForm.email.placeholder')"
-                  class="w-full pl-12 pr-4 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  :class="{
-                    'border-red-500 ring-2 ring-red-200':
-                      (!email || !isValidEmail) && formSubmitted,
-                  }"
-                  autocomplete="username"
-                  required
-                />
-                <RiMailLine
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
-              </div>
-              <div
-                v-if="(!email || !isValidEmail) && formSubmitted"
-                class="text-sm text-red-400"
-              >
-                {{
-                  !email
+            <BaseInput
+              v-model="email"
+              type="email"
+              :label="t('views.signup.signupForm.email.label')"
+              :placeholder="t('views.signup.signupForm.email.placeholder')"
+              :error="
+                (!email || !isValidEmail) && formSubmitted
+                  ? !email
                     ? 'Email is required'
                     : 'Please enter a valid email address'
-                }}
-              </div>
-            </div>
+                  : undefined
+              "
+              autocomplete="username"
+              required
+              class="bg-primary border-gray-600 text-white placeholder-gray-400"
+            >
+              <template #leftIcon>
+                <RiMailLine class="w-5 h-5" />
+              </template>
+            </BaseInput>
 
             <!-- Password Field -->
-            <div class="space-y-2">
-              <label class="block">
-                <span class="text-sm font-medium text-white">{{
-                  t('views.signup.signupForm.password.label')
-                }}</span>
-              </label>
-              <div class="relative">
-                <input
-                  v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  :placeholder="
-                    t('views.signup.signupForm.password.placeholder')
-                  "
-                  class="w-full pl-12 pr-12 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                  :class="{
-                    'border-red-500 ring-2 ring-red-200':
-                      (!password || !isValidPassword) && formSubmitted,
-                  }"
-                  autocomplete="new-password"
-                  required
-                />
-                <RiLockLine
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
+            <BaseInput
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              :label="t('views.signup.signupForm.password.label')"
+              :placeholder="t('views.signup.signupForm.password.placeholder')"
+              :error="
+                (!password || !isValidPassword) && formSubmitted
+                  ? !password
+                    ? 'Password is required'
+                    : 'Password must be at least 6 characters long'
+                  : undefined
+              "
+              :help-text="
+                password && password.length < 6 && !formSubmitted
+                  ? 'Password should be at least 6 characters'
+                  : undefined
+              "
+              autocomplete="new-password"
+              required
+              class="bg-primary border-gray-600 text-white placeholder-gray-400"
+            >
+              <template #leftIcon>
+                <RiLockLine class="w-5 h-5" />
+              </template>
+              <template #rightIcon>
                 <BaseButton
                   variant="ghost"
                   size="sm"
-                  class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200 p-1"
+                  class="text-gray-400 hover:text-white transition-colors duration-200 p-1"
                   @click="showPassword = !showPassword"
                 >
                   <RiEyeOffLine
@@ -147,24 +118,8 @@
                     class="w-5 h-5"
                   />
                 </BaseButton>
-              </div>
-              <div
-                v-if="(!password || !isValidPassword) && formSubmitted"
-                class="text-sm text-red-400"
-              >
-                {{
-                  !password
-                    ? 'Password is required'
-                    : 'Password must be at least 6 characters long'
-                }}
-              </div>
-              <div
-                v-else-if="password && password.length < 6"
-                class="text-sm text-yellow-400"
-              >
-                Password should be at least 6 characters
-              </div>
-            </div>
+              </template>
+            </BaseInput>
 
             <!-- Signup Button -->
             <BaseButton
@@ -247,6 +202,7 @@ import {
 import { useAuth } from '../../composables/useAuth';
 import { useLanguage } from '../../composables/useLanguage';
 import BaseButton from '../../components/BaseButton.vue';
+import BaseInput from '../../components/BaseInput.vue';
 
 const { t } = useLanguage();
 

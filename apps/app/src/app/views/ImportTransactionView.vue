@@ -140,23 +140,12 @@
 
             <!-- File Upload Section -->
             <div class="space-y-6">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text text-lg font-semibold">{{
-                    t('views.importTransactions.importForm.upload.label')
-                  }}</span>
-                </label>
-                <input
-                  type="file"
-                  class="file-input file-input-bordered file-input-lg w-full"
-                  accept=".csv"
-                />
-                <label class="label">
-                  <span class="label-text-alt">{{
-                    t('views.importTransactions.importForm.upload.help')
-                  }}</span>
-                </label>
-              </div>
+              <BaseFileInput
+                :label="t('views.importTransactions.importForm.upload.label')"
+                accept=".csv"
+                :hint="t('views.importTransactions.importForm.upload.help')"
+                @change="handleFileChange"
+              />
 
               <div class="alert alert-info">
                 <RiErrorWarningLine class="w-6 h-6" />
@@ -311,16 +300,16 @@
                     </span>
                   </td>
                   <td>
-                    <textarea
+                    <BaseTextarea
                       v-model="transaction.description"
-                      class="textarea textarea-bordered w-full min-w-64 h-16 text-sm resize-none"
-                      rows="2"
+                      :rows="2"
+                      class="w-full min-w-64 h-16 text-sm"
                       :placeholder="
                         t(
                           'views.importTransactions.draftTransactions.table.descriptionPlaceholder',
                         )
                       "
-                    ></textarea>
+                    />
                   </td>
                   <td>
                     <select
@@ -368,28 +357,31 @@
                   </td>
                   <td>
                     <div v-if="isEqualCurrency(transaction)">
-                      <input
+                      <BaseInput
                         v-model="transaction.amount"
                         type="number"
                         step="0.01"
-                        class="input input-sm input-bordered w-24"
+                        size="sm"
+                        class="w-24"
                       />
                     </div>
                     <div
                       v-else
                       class="flex flex-col gap-1"
                     >
-                      <input
+                      <BaseInput
                         v-model="transaction.creditAmount"
                         type="number"
                         step="0.01"
-                        class="input input-sm input-bordered w-24"
+                        size="sm"
+                        class="w-24"
                       />
-                      <input
+                      <BaseInput
                         v-model="transaction.debitAmount"
                         type="number"
                         step="0.01"
-                        class="input input-sm input-bordered w-24"
+                        size="sm"
+                        class="w-24"
                       />
                     </div>
                   </td>
@@ -486,6 +478,9 @@ import {
 } from '@remixicon/vue';
 import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
+import BaseInput from '../components/BaseInput.vue';
+import BaseFileInput from '../components/BaseFileInput.vue';
+import BaseTextarea from '../components/BaseTextarea.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
@@ -501,6 +496,8 @@ const queryClient = useQueryClient();
 const accountId = ref('');
 const importType = ref('');
 const selectAll = ref(false);
+const fileContent = ref<File | null>(null);
+const isLoading = ref(false);
 
 const { mutate } = useMutation({
   mutationFn: async (data: FormData) => {
@@ -585,14 +582,19 @@ watch(
   },
 );
 
+const handleFileChange = (files: FileList | null) => {
+  if (files && files.length > 0) {
+    fileContent.value = files[0];
+  } else {
+    fileContent.value = null;
+  }
+};
+
 const importTransactions = async () => {
-  const input = document.querySelector(
-    'input[type="file"]',
-  ) as HTMLInputElement;
-  if (!input.files?.[0]) return;
+  if (!fileContent.value) return;
 
   const data = new FormData();
-  data.append('file', input.files[0]);
+  data.append('file', fileContent.value);
   data.append('accountId', accountId.value);
   data.append('statementIssuer', importType.value);
 
