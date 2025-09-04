@@ -204,6 +204,7 @@ export default {
         table: {
           date: 'Date',
           description: 'Description',
+          descriptionPlaceholder: 'Edit transaction description',
           creditAccount: 'Credit Account',
           debitAccount: 'Debit Account',
           amount: 'Amount',

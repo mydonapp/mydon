@@ -14,11 +14,10 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
-import { AccountType } from '../accounts/accounts.entity';
 import { ForexService } from '../shared/forex/forex.service';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { ImportStatementDto } from './dtos/import-statenment.dto';
@@ -43,19 +42,10 @@ export class TransactionsController {
     );
 
     return result.map((transaction) => {
-      let amount = 0;
-
-      if (transaction.creditAccount.type === AccountType.ASSETS) {
-        amount = transaction.creditAmount;
-      } else {
-        amount = -transaction.creditAmount;
-      }
-
       return {
         id: transaction.id,
         creditAmount: transaction.creditAmount,
         debitAmount: transaction.debitAmount,
-        amount,
         description: transaction.description,
         creditAccountId: transaction.creditAccount?.id,
         debitAccountId: transaction.debitAccount?.id,

@@ -200,6 +200,7 @@ export default {
         table: {
           date: 'Datum',
           description: 'Beschreibung',
+          descriptionPlaceholder: 'Transaktionsbeschreibung bearbeiten',
           creditAccount: 'Kreditkonto',
           debitAccount: 'Debitkonto',
           amount: 'Betrag',

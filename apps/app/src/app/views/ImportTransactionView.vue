@@ -1,45 +1,34 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen bg-primary">
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-info to-info-content text-info-content">
-      <div class="container mx-auto px-6 py-8">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold mb-2">
-              {{ t('views.importTransactions.title') }}
-            </h1>
-            <p class="text-info-content/80">
-              {{ t('views.importTransactions.subtitle') }}
-            </p>
-          </div>
-          <div class="stats stats-horizontal bg-info-content/10">
+    <PageHeader
+      :title="t('views.importTransactions.title')"
+      :subtitle="t('views.importTransactions.subtitle')"
+    >
+      <template #extra>
+        <div class="flex items-center gap-4">
+          <div class="stats stats-horizontal bg-primary-600/10">
             <div class="stat">
-              <div class="stat-title text-info-content/80">
+              <div class="stat-title text-muted">
                 {{ t('views.importTransactions.pendingTransactions') }}
               </div>
-              <div class="stat-value text-info-content">
+              <div class="stat-value text-primary-400">
                 {{ draftTransactions?.length || 0 }}
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
-    <div class="container mx-auto px-6 py-8">
+    <div
+      class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl"
+    >
       <!-- Import Form Card -->
-      <div class="card bg-base-200 shadow-xl mb-8">
-        <div class="card-body">
+      <div class="card bg-secondary shadow-xl mb-6 sm:mb-8">
+        <div class="p-1.5 sm:p-2">
           <h2 class="card-title text-2xl mb-6">
-            <svg
-              class="w-8 h-8 mr-3"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-              />
-            </svg>
+            <RiFileTextLine class="w-8 h-8 mr-3" />
             {{ t('views.importTransactions.importForm.title') }}
           </h2>
 
@@ -170,13 +159,7 @@
               </div>
 
               <div class="alert alert-info">
-                <svg
-                  class="w-6 h-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" />
-                </svg>
+                <RiErrorWarningLine class="w-6 h-6" />
                 <div>
                   <h3 class="font-bold">
                     {{ t('views.importTransactions.importForm.tip.title') }}
@@ -189,20 +172,18 @@
                 </div>
               </div>
 
-              <button
-                class="btn btn-primary btn-lg w-full"
-                :disabled="!accountId || !importType"
+              <BaseButton
+                variant="primary"
+                class="w-full"
+                :disabled="
+                  !fileContent || !accountId || !importType || isLoading
+                "
+                :loading="isLoading"
                 @click="importTransactions"
               >
-                <svg
-                  class="w-5 h-5 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M5,20H19V18H5M19,9H15L13,7H9V9H5L12,16L19,9Z" />
-                </svg>
+                <RiUploadLine class="w-5 h-5 mr-2" />
                 {{ t('views.importTransactions.importForm.submit.label') }}
-              </button>
+              </BaseButton>
             </div>
           </div>
         </div>
@@ -211,20 +192,12 @@
       <!-- Draft Transactions Section -->
       <div
         v-if="draftTransactions && draftTransactions.length > 0"
-        class="card bg-base-200 shadow-xl"
+        class="card bg-secondary shadow-xl"
       >
-        <div class="card-body">
+        <div class="p-1.5 sm:p-2">
           <div class="flex items-center justify-between mb-6">
             <h2 class="card-title text-2xl">
-              <svg
-                class="w-8 h-8 mr-3"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V7H5V5H19M5,19V9H19V19H5M11,11H13V17H11V11M15,11H17V17H15V11M7,11H9V17H7V11Z"
-                />
-              </svg>
+              <RiFileTextLine class="w-8 h-8 mr-3" />
               {{ t('views.importTransactions.draftTransactions.title') }}
               <div class="badge badge-warning">
                 {{ draftTransactions.length }}
@@ -232,8 +205,9 @@
             </h2>
 
             <div class="flex gap-2">
-              <button
-                class="btn btn-outline btn-sm"
+              <BaseButton
+                variant="secondary"
+                size="sm"
                 @click="selectAll = !selectAll"
               >
                 {{
@@ -243,26 +217,17 @@
                       )
                     : t('views.importTransactions.draftTransactions.selectAll')
                 }}
-              </button>
-              <button
-                class="btn btn-success btn-sm"
+              </BaseButton>
+              <BaseButton
+                variant="success"
+                size="sm"
                 :disabled="!transactions.some((t) => t.selected)"
                 @click="updateDraft"
               >
-                <svg
-                  class="w-4 h-4 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
-                  />
-                </svg>
-                {{
-                  t('views.importTransactions.draftTransactions.approve')
-                }}
+                <RiSaveLine class="w-4 h-4 mr-2" />
+                {{ t('views.importTransactions.draftTransactions.approve') }}
                 ({{ transactions.filter((t) => t.selected).length }})
-              </button>
+              </BaseButton>
             </div>
           </div>
 
@@ -346,16 +311,21 @@
                     </span>
                   </td>
                   <td>
-                    <input
+                    <textarea
                       v-model="transaction.description"
-                      type="text"
-                      class="input input-sm input-ghost w-full max-w-xs"
-                    />
+                      class="textarea textarea-bordered w-full min-w-64 h-16 text-sm resize-none"
+                      rows="2"
+                      :placeholder="
+                        t(
+                          'views.importTransactions.draftTransactions.table.descriptionPlaceholder',
+                        )
+                      "
+                    ></textarea>
                   </td>
                   <td>
                     <select
                       v-model="transaction.creditAccountId"
-                      class="select select-sm select-bordered w-full max-w-xs"
+                      class="select select-bordered w-full min-w-48"
                       @change="onAccountChange(transaction, 'credit')"
                     >
                       <option :value="undefined">
@@ -377,7 +347,7 @@
                   <td>
                     <select
                       v-model="transaction.debitAccountId"
-                      class="select select-sm select-bordered w-full max-w-xs"
+                      class="select select-bordered w-full min-w-48"
                       @change="onAccountChange(transaction, 'debit')"
                     >
                       <option :value="undefined">
@@ -424,20 +394,13 @@
                     </div>
                   </td>
                   <td>
-                    <button
-                      class="btn btn-error btn-sm"
+                    <BaseButton
+                      variant="danger"
+                      size="sm"
                       @click="deleteTransaction(transaction.id)"
                     >
-                      <svg
-                        class="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
-                        />
-                      </svg>
-                    </button>
+                      <RiDeleteBinLine class="w-4 h-4" />
+                    </BaseButton>
                   </td>
                 </tr>
               </tbody>
@@ -449,18 +412,10 @@
       <!-- Empty State -->
       <div
         v-else-if="draftTransactions"
-        class="card bg-base-200 shadow-xl"
+        class="card bg-secondary shadow-xl"
       >
-        <div class="card-body text-center py-16">
-          <svg
-            class="w-24 h-24 mx-auto text-base-content/30 mb-6"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-            />
-          </svg>
+        <div class="p-1.5 sm:p-2 text-center py-16">
+          <RiFileTextLine class="w-24 h-24 mx-auto text-muted mb-6" />
           <h3 class="text-2xl font-bold mb-4">
             {{ t('views.importTransactions.emptyState.title') }}
           </h3>
@@ -468,7 +423,7 @@
             {{ t('views.importTransactions.emptyState.description') }}
           </p>
           <div class="flex flex-wrap justify-center gap-4">
-            <div class="card bg-base-100 shadow p-4">
+            <div class="card bg-primary shadow p-1.5 sm:p-2">
               <h4 class="font-semibold mb-2">
                 {{ t('views.importTransactions.emptyState.step1.title') }}
               </h4>
@@ -476,7 +431,7 @@
                 {{ t('views.importTransactions.emptyState.step1.description') }}
               </p>
             </div>
-            <div class="card bg-base-100 shadow p-4">
+            <div class="card bg-primary shadow p-1.5 sm:p-2">
               <h4 class="font-semibold mb-2">
                 {{ t('views.importTransactions.emptyState.step2.title') }}
               </h4>
@@ -484,7 +439,7 @@
                 {{ t('views.importTransactions.emptyState.step2.description') }}
               </p>
             </div>
-            <div class="card bg-base-100 shadow p-4">
+            <div class="card bg-primary shadow p-1.5 sm:p-2">
               <h4 class="font-semibold mb-2">
                 {{ t('views.importTransactions.emptyState.step3.title') }}
               </h4>
@@ -499,9 +454,9 @@
       <!-- Loading State -->
       <div
         v-else
-        class="card bg-base-200 shadow-xl"
+        class="card bg-secondary shadow-xl"
       >
-        <div class="card-body">
+        <div class="p-1.5 sm:p-2">
           <div class="flex items-center justify-between mb-6">
             <div class="skeleton h-8 w-64"></div>
             <div class="skeleton h-8 w-32"></div>
@@ -521,6 +476,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useFetch } from '@vueuse/core';
 import { computed, ref, watch, watchEffect } from 'vue';
+import {
+  RiFileTextLine,
+  RiUploadLine,
+  RiDeleteBinLine,
+  RiSaveLine,
+  RiCheckLine,
+  RiErrorWarningLine,
+} from '@remixicon/vue';
+import PageHeader from '../components/PageHeader.vue';
+import BaseButton from '../components/BaseButton.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';

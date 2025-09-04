@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-secondary via-accent to-primary flex items-center justify-center p-4"
+    class="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center p-4"
   >
     <div class="w-full max-w-md">
       <!-- Brand Section -->
@@ -8,28 +8,20 @@
         <div
           class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4"
         >
-          <svg
-            class="w-8 h-8 text-secondary"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"
-            />
-          </svg>
+          <RiStarFill class="w-8 h-8 text-primary" />
         </div>
         <h1 class="text-3xl font-bold text-white mb-2">myDon</h1>
         <p class="text-white/80 text-sm">{{ t('app.subtitle') }}</p>
       </div>
 
       <!-- Signup Card -->
-      <div class="card bg-base-100 shadow-2xl border-0">
-        <div class="card-body p-8">
+      <div class="bg-secondary rounded-xl shadow-2xl border-0 overflow-hidden">
+        <div class="p-8">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold text-base-content mb-2">
+            <h2 class="text-2xl font-bold text-white mb-2">
               {{ t('views.signup.title') }}
             </h2>
-            <p class="text-base-content/60 text-sm">
+            <p class="text-gray-400 text-sm">
               Create your account to start tracking your finances
             </p>
           </div>
@@ -37,15 +29,9 @@
           <!-- Error Messages -->
           <div
             v-if="signupError"
-            class="alert alert-error mb-4"
+            class="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg flex items-center gap-3 mb-4"
           >
-            <svg
-              class="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" />
-            </svg>
+            <RiErrorWarningLine class="w-5 h-5 text-red-400" />
             <span>{{ signupError }}</span>
           </div>
 
@@ -54,9 +40,9 @@
             @submit.prevent="signup"
           >
             <!-- Name Field -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium">{{
+            <div class="space-y-2">
+              <label class="block">
+                <span class="text-sm font-medium text-white">{{
                   t('views.signup.signupForm.name.label')
                 }}</span>
               </label>
@@ -65,33 +51,30 @@
                   v-model="name"
                   type="text"
                   :placeholder="t('views.signup.signupForm.name.placeholder')"
-                  class="input input-bordered w-full pl-12 focus:input-secondary"
-                  :class="{ 'input-error': !name && formSubmitted }"
+                  class="w-full pl-12 pr-4 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                  :class="{
+                    'border-red-500 ring-2 ring-red-200':
+                      !name && formSubmitted,
+                  }"
                   autocomplete="name"
                   required
                 />
-                <svg
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-base-content/40"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"
-                  />
-                </svg>
+                <RiUserLine
+                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                />
               </div>
-              <label
+              <div
                 v-if="!name && formSubmitted"
-                class="label"
+                class="text-sm text-red-400"
               >
-                <span class="label-text-alt text-error">Name is required</span>
-              </label>
+                Name is required
+              </div>
             </div>
 
             <!-- Email Field -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium">{{
+            <div class="space-y-2">
+              <label class="block">
+                <span class="text-sm font-medium text-white">{{
                   t('views.signup.signupForm.email.label')
                 }}</span>
               </label>
@@ -100,41 +83,34 @@
                   v-model="email"
                   type="email"
                   :placeholder="t('views.signup.signupForm.email.placeholder')"
-                  class="input input-bordered w-full pl-12 focus:input-secondary"
+                  class="w-full pl-12 pr-4 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   :class="{
-                    'input-error': (!email || !isValidEmail) && formSubmitted,
+                    'border-red-500 ring-2 ring-red-200':
+                      (!email || !isValidEmail) && formSubmitted,
                   }"
                   autocomplete="username"
                   required
                 />
-                <svg
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-base-content/40"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"
-                  />
-                </svg>
+                <RiMailLine
+                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                />
               </div>
-              <label
+              <div
                 v-if="(!email || !isValidEmail) && formSubmitted"
-                class="label"
+                class="text-sm text-red-400"
               >
-                <span class="label-text-alt text-error">
-                  {{
-                    !email
-                      ? 'Email is required'
-                      : 'Please enter a valid email address'
-                  }}
-                </span>
-              </label>
+                {{
+                  !email
+                    ? 'Email is required'
+                    : 'Please enter a valid email address'
+                }}
+              </div>
             </div>
 
             <!-- Password Field -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium">{{
+            <div class="space-y-2">
+              <label class="block">
+                <span class="text-sm font-medium text-white">{{
                   t('views.signup.signupForm.password.label')
                 }}</span>
               </label>
@@ -145,115 +121,109 @@
                   :placeholder="
                     t('views.signup.signupForm.password.placeholder')
                   "
-                  class="input input-bordered w-full pl-12 pr-12 focus:input-secondary"
+                  class="w-full pl-12 pr-12 py-3 bg-primary border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   :class="{
-                    'input-error':
+                    'border-red-500 ring-2 ring-red-200':
                       (!password || !isValidPassword) && formSubmitted,
                   }"
                   autocomplete="new-password"
                   required
                 />
-                <svg
-                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-base-content/40"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
-                  />
-                </svg>
-                <button
-                  type="button"
-                  class="absolute right-4 top-1/2 transform -translate-y-1/2 text-base-content/40 hover:text-base-content"
+                <RiLockLine
+                  class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                />
+                <BaseButton
+                  variant="ghost"
+                  size="sm"
+                  class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200 p-1"
                   @click="showPassword = !showPassword"
                 >
-                  <svg
+                  <RiEyeOffLine
                     v-if="showPassword"
                     class="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.09L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.76,7.13 11.37,7 12,7Z"
-                    />
-                  </svg>
-                  <svg
+                  />
+                  <RiEyeLine
                     v-else
                     class="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"
-                    />
-                  </svg>
-                </button>
+                  />
+                </BaseButton>
               </div>
-              <label
+              <div
                 v-if="(!password || !isValidPassword) && formSubmitted"
-                class="label"
+                class="text-sm text-red-400"
               >
-                <span class="label-text-alt text-error">
-                  {{
-                    !password
-                      ? 'Password is required'
-                      : 'Password must be at least 6 characters long'
-                  }}
-                </span>
-              </label>
-              <label
+                {{
+                  !password
+                    ? 'Password is required'
+                    : 'Password must be at least 6 characters long'
+                }}
+              </div>
+              <div
                 v-else-if="password && password.length < 6"
-                class="label"
+                class="text-sm text-yellow-400"
               >
-                <span class="label-text-alt text-warning"
-                  >Password should be at least 6 characters</span
-                >
-              </label>
+                Password should be at least 6 characters
+              </div>
             </div>
 
             <!-- Signup Button -->
-            <button
+            <BaseButton
               type="submit"
-              class="btn btn-secondary w-full mt-6"
-              :class="{ loading: isLoading }"
+              variant="success"
+              size="lg"
+              :loading="isLoading"
               :disabled="isLoading || !isFormValid"
+              shadow
+              block
+              class="mt-6"
             >
-              <svg
-                v-if="!isLoading"
-                class="w-5 h-5 mr-2"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-              </svg>
+              <template #icon>
+                <RiAddLine
+                  v-if="!isLoading"
+                  class="w-5 h-5"
+                />
+              </template>
               {{ t('views.signup.signupForm.submit.label') }}
-            </button>
+            </BaseButton>
           </form>
 
           <!-- Terms and Privacy -->
           <div class="text-center mt-4">
-            <p class="text-xs text-base-content/60">
+            <p class="text-xs text-gray-400">
               By creating an account, you agree to our Terms of Service and
               Privacy Policy
             </p>
           </div>
 
           <!-- Login Link -->
-          <div class="divider mt-6">
-            {{ t('views.signup.loginPrompt.text') }}
+          <div class="mt-8">
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-700"></div>
+              </div>
+              <div class="relative flex justify-center text-sm">
+                <span class="px-3 bg-secondary text-gray-500 text-xs">
+                  {{ t('views.signup.loginPrompt.text') }}
+                </span>
+              </div>
+            </div>
           </div>
-          <router-link
+          <BaseButton
+            tag="router-link"
             :to="{ name: 'Login', query: route.query }"
-            class="btn btn-outline btn-primary w-full"
+            variant="link"
+            size="sm"
+            block
+            class="mt-4"
           >
             {{ t('views.signup.loginPrompt.link') }}
-          </router-link>
+          </BaseButton>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="text-center mt-8">
-        <p class="text-white/60 text-xs">
+        <p class="text-gray-400 text-xs">
           © 2025 myDon Financial Tracker. Start your financial journey today.
         </p>
       </div>
@@ -264,8 +234,19 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import {
+  RiStarFill,
+  RiErrorWarningLine,
+  RiUserLine,
+  RiMailLine,
+  RiLockLine,
+  RiEyeOffLine,
+  RiEyeLine,
+  RiAddLine,
+} from '@remixicon/vue';
 import { useAuth } from '../../composables/useAuth';
 import { useLanguage } from '../../composables/useLanguage';
+import BaseButton from '../../components/BaseButton.vue';
 
 const { t } = useLanguage();
 
