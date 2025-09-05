@@ -183,11 +183,6 @@ export default {
           label: 'File CSV',
           help: 'Carica il tuo estratto conto in formato CSV',
         },
-        tip: {
-          title: 'Suggerimento: Contabilità a Partita Doppia',
-          description:
-            'Ogni transazione sarà automaticamente abbinata ai conti spese/entrate basati sui pattern di descrizione.',
-        },
         submit: {
           label: 'Importa Transazioni',
         },

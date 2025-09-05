@@ -183,11 +183,6 @@ export default {
           label: 'CSV-Datei',
           help: 'Laden Sie Ihren Kontoauszug im CSV-Format hoch',
         },
-        tip: {
-          title: 'Tipp: Doppelte Buchführung',
-          description:
-            'Jede Transaktion wird automatisch basierend auf Beschreibungsmustern Ausgaben-/Einnahmen-Konten zugeordnet.',
-        },
         submit: {
           label: 'Transaktionen importieren',
         },

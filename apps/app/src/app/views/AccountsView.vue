@@ -40,24 +40,6 @@
         <div
           class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8"
         >
-          <!-- Net Worth Card -->
-          <div class="card hover:card-elevated transition-shadow">
-            <div class="p-1.5 sm:p-2">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-primary-400">
-                  {{ t('views.dashboard.netWorth') }}
-                </h3>
-                <RiStarFill class="w-5 h-5 text-primary-400" />
-              </div>
-              <p
-                class="text-2xl font-bold"
-                :class="netWorth >= 0 ? 'amount-positive' : 'amount-negative'"
-              >
-                {{ formatCurrency(netWorth, 'CHF') }}
-              </p>
-            </div>
-          </div>
-
           <!-- Assets Card -->
           <div class="card hover:card-elevated transition-shadow">
             <div class="p-1.5 sm:p-2">
@@ -73,6 +55,23 @@
               </div>
               <p class="text-2xl font-bold text-success">
                 {{ formatCurrency(accounts.assets.total, 'CHF') }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Income Card -->
+          <div class="card hover:card-elevated transition-shadow">
+            <div class="p-1.5 sm:p-2">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-semibold text-info">
+                  {{ t('words.income') }}
+                </h3>
+                <div class="bg-info text-white text-xs px-2 py-1 rounded-full">
+                  {{ accounts.income.accounts.length }}
+                </div>
+              </div>
+              <p class="text-2xl font-bold text-info">
+                {{ formatCurrency(Math.abs(accounts.income.total), 'CHF') }}
               </p>
             </div>
           </div>
@@ -98,22 +97,19 @@
             </div>
           </div>
 
-          <!-- Monthly Flow Card -->
+          <!-- Expenses Card -->
           <div class="card hover:card-elevated transition-shadow">
             <div class="p-1.5 sm:p-2">
               <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-info">
-                  {{ t('views.dashboard.monthlyFlow') }}
+                <h3 class="text-sm font-semibold text-error">
+                  {{ t('words.expenses') }}
                 </h3>
-                <RiArrowUpLine class="w-5 h-5 text-info" />
+                <div class="bg-error text-white text-xs px-2 py-1 rounded-full">
+                  {{ accounts.expense.accounts.length }}
+                </div>
               </div>
-              <p
-                class="text-2xl font-bold"
-                :class="
-                  monthlyFlow >= 0 ? 'amount-positive' : 'amount-negative'
-                "
-              >
-                {{ formatCurrency(monthlyFlow, 'CHF') }}
+              <p class="text-2xl font-bold text-error">
+                {{ formatCurrency(Math.abs(accounts.expense.total), 'CHF') }}
               </p>
             </div>
           </div>
@@ -522,36 +518,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Net Worth Summary -->
-        <div
-          class="card bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/20 shadow-xl mt-8"
-        >
-          <div class="p-1.5 sm:p-2">
-            <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold text-primary">
-                {{ t('views.dashboard.netWorth') }}
-              </h2>
-              <span
-                class="text-3xl font-bold"
-                :class="netWorth >= 0 ? 'text-success' : 'text-error'"
-              >
-                {{ formatCurrency(netWorth, 'CHF') }}
-              </span>
-            </div>
-            <p class="text-sm text-muted mt-2">
-              {{ t('views.accounts.total') }} {{ t('words.assets') }}:
-              {{ formatCurrency(accounts?.assets?.total || 0, 'CHF') }} -
-              {{ t('views.accounts.total') }} {{ t('words.liabilities') }}:
-              {{
-                formatCurrency(
-                  Math.abs(accounts?.liabilities?.total || 0),
-                  'CHF',
-                )
-              }}
-            </p>
-          </div>
-        </div>
       </div>
       <!-- Loading State -->
       <div
@@ -909,21 +875,6 @@ const allAccounts = computed(() => [
   ...(accounts?.value?.income?.accounts || []),
   ...(accounts?.value?.expense?.accounts || []),
 ]);
-
-const netWorth = computed(() => {
-  if (!accounts?.value) return 0;
-  return (
-    (accounts.value.assets?.total || 0) +
-    (accounts.value.liabilities?.total || 0)
-  );
-});
-
-const monthlyFlow = computed(() => {
-  if (!accounts?.value) return 0;
-  const income = Math.abs(accounts.value.income?.total || 0);
-  const expenses = Math.abs(accounts.value.expense?.total || 0);
-  return income - expenses;
-});
 
 // Modal Functions
 const openAddAccountModal = (type?: string) => {

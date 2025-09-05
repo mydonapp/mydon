@@ -147,20 +147,6 @@
                 @change="handleFileChange"
               />
 
-              <div class="alert alert-info">
-                <RiErrorWarningLine class="w-6 h-6" />
-                <div>
-                  <h3 class="font-bold">
-                    {{ t('views.importTransactions.importForm.tip.title') }}
-                  </h3>
-                  <div class="text-xs">
-                    {{
-                      t('views.importTransactions.importForm.tip.description')
-                    }}
-                  </div>
-                </div>
-              </div>
-
               <BaseButton
                 variant="primary"
                 class="w-full"

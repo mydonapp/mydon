@@ -96,31 +96,15 @@
               >
                 <div class="flex items-center space-x-2 min-w-0 flex-1">
                   <RiEyeLine class="w-4 h-4 text-muted flex-shrink-0" />
-                  <span class="text-xs sm:text-sm font-medium truncate"
-                    >Privacy Mode</span
-                  >
+                  <span class="text-xs sm:text-sm font-medium truncate">
+                    Privacy Mode
+                  </span>
                 </div>
-                <label class="flex items-center cursor-pointer flex-shrink-0">
-                  <input
-                    v-model="isPrivate"
-                    type="checkbox"
-                    class="sr-only"
-                  />
-                  <div class="relative">
-                    <div
-                      :class="[
-                        'w-10 h-6 rounded-full transition-colors',
-                        isPrivate ? 'bg-warning' : 'bg-border-primary',
-                      ]"
-                    ></div>
-                    <div
-                      :class="[
-                        'absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform',
-                        isPrivate ? 'translate-x-4' : 'translate-x-0',
-                      ]"
-                    ></div>
-                  </div>
-                </label>
+                <BaseToggle
+                  v-model="isPrivate"
+                  size="sm"
+                  variant="warning"
+                />
               </div>
 
               <!-- User Info -->
@@ -191,6 +175,7 @@ import {
 } from '@remixicon/vue';
 import ToastContainer from './components/ToastContainer.vue';
 import BaseButton from './components/BaseButton.vue';
+import BaseToggle from './components/BaseToggle.vue';
 import { useAuth } from './composables/useAuth';
 import { useLanguage } from './composables/useLanguage';
 import { usePrivacy } from './composables/usePrivacy';

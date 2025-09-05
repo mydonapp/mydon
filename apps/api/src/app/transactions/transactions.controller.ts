@@ -17,6 +17,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { AccountType } from '../accounts/accounts.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { ForexService } from '../shared/forex/forex.service';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
@@ -51,6 +52,12 @@ export class TransactionsController {
         debitAccountId: transaction.debitAccount?.id,
         transactionDate: transaction.transactionDate,
         draft: transaction.draft,
+        // Amount based on user perception
+        amount:
+          transaction.creditAccount.type === AccountType.INCOME ||
+          transaction.creditAccount.type === AccountType.ASSETS
+            ? transaction.creditAmount
+            : transaction.creditAmount * -1,
       };
     });
   }

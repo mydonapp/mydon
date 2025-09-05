@@ -9,141 +9,6 @@
     <div
       class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl"
     >
-      <!-- Quick Stats Cards -->
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8"
-      >
-        <!-- Net Worth Card -->
-        <div class="card hover:card-elevated transition-shadow">
-          <div class="p-1.5 sm:p-2">
-            <div class="flex items-start justify-between">
-              <div class="min-w-0 flex-1">
-                <h2
-                  class="card-title text-xs sm:text-sm font-medium text-muted mb-1 truncate"
-                >
-                  {{ t('views.dashboard.netWorth') }}
-                </h2>
-                <p
-                  v-if="accounts"
-                  class="text-lg sm:text-xl font-bold truncate"
-                >
-                  {{ formatCurrency(netWorth, 'CHF') }}
-                </p>
-                <div
-                  v-else
-                  class="bg-tertiary h-5 sm:h-6 w-16 sm:w-20 rounded"
-                ></div>
-                <div class="text-xs text-muted mt-1 truncate">
-                  {{ t('views.dashboard.totalAssets') }}:
-                  {{ formatCurrency(totalAssets, 'CHF') }}
-                </div>
-              </div>
-              <div class="text-success flex-shrink-0 ml-2">
-                <RiStarFill class="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Total Assets Card -->
-        <div class="card hover:card-elevated transition-shadow">
-          <div class="p-1.5 sm:p-2">
-            <div class="flex items-start justify-between">
-              <div class="min-w-0 flex-1">
-                <h2
-                  class="card-title text-xs sm:text-sm font-medium text-muted mb-1 truncate"
-                >
-                  {{ t('views.dashboard.assets') }}
-                </h2>
-                <p
-                  v-if="accounts"
-                  class="text-lg sm:text-xl font-bold truncate"
-                >
-                  {{ formatCurrency(totalAssets, 'CHF') }}
-                </p>
-                <div
-                  v-else
-                  class="bg-tertiary animate-pulse h-5 sm:h-6 w-16 sm:w-20 rounded"
-                ></div>
-                <div class="text-xs text-muted mt-1 truncate">
-                  {{ accounts?.assets?.accounts?.length || 0 }}
-                  {{ t('views.dashboard.accounts') }}
-                </div>
-              </div>
-              <div class="flex-shrink-0 ml-2">
-                <RiCheckLine class="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Liabilities Card -->
-        <div class="card hover:card-elevated transition-shadow">
-          <div class="p-1.5 sm:p-2">
-            <div class="flex items-start justify-between">
-              <div class="min-w-0 flex-1">
-                <h2
-                  class="card-title text-xs sm:text-sm font-medium text-muted mb-1 truncate"
-                >
-                  {{ t('views.dashboard.liabilities') }}
-                </h2>
-                <p
-                  v-if="accounts"
-                  class="text-lg sm:text-xl font-bold text-warning truncate"
-                >
-                  {{ formatCurrency(Math.abs(totalLiabilities), 'CHF') }}
-                </p>
-                <div
-                  v-else
-                  class="bg-tertiary animate-pulse h-5 sm:h-6 w-16 sm:w-20 rounded"
-                ></div>
-                <div class="text-xs text-muted mt-1 truncate">
-                  {{ accounts?.liabilities?.accounts?.length || 0 }}
-                  {{ t('views.dashboard.accounts') }}
-                </div>
-              </div>
-              <div class="text-warning flex-shrink-0 ml-2">
-                <RiErrorWarningLine class="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Monthly Cash Flow -->
-        <div class="card hover:card-elevated transition-shadow">
-          <div class="p-1.5 sm:p-2">
-            <div class="flex items-start justify-between">
-              <div class="min-w-0 flex-1">
-                <h2
-                  class="card-title text-xs sm:text-sm font-medium text-muted mb-1 truncate"
-                >
-                  {{ t('views.dashboard.monthlyFlow') }}
-                </h2>
-                <p class="text-lg sm:text-xl font-bold truncate">
-                  {{ formatCurrency(monthlyFlow, 'CHF') }}
-                </p>
-                <div class="text-xs text-muted mt-1 truncate">
-                  {{ t('views.dashboard.thisMonth') }}
-                </div>
-              </div>
-              <div
-                :class="monthlyFlow >= 0 ? 'text-success' : 'text-error'"
-                class="flex-shrink-0 ml-2"
-              >
-                <RiArrowUpLine
-                  v-if="monthlyFlow >= 0"
-                  class="w-5 h-5 sm:w-6 sm:h-6"
-                />
-                <RiArrowDownLine
-                  v-else
-                  class="w-5 h-5 sm:w-6 sm:h-6"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Quick Actions -->
       <div class="card">
         <div class="p-1.5 sm:p-2">
@@ -380,23 +245,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { RiFileTextLine, RiRefreshLine, RiWalletLine } from '@remixicon/vue';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
-import {
-  RiStarFill,
-  RiCheckLine,
-  RiArrowUpLine,
-  RiArrowDownLine,
-  RiWalletLine,
-  RiExchangeFundsLine,
-  RiMoneyDollarCircleLine,
-  RiLineChartLine,
-  RiErrorWarningLine,
-  RiFileTextLine,
-  RiRefreshLine,
-} from '@remixicon/vue';
-import PageHeader from '../components/PageHeader.vue';
+import { computed, ref } from 'vue';
 import BaseButton from '../components/BaseButton.vue';
+import PageHeader from '../components/PageHeader.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
@@ -426,13 +279,6 @@ const { data: recentTransactions } = useQuery({
 const totalAssets = computed(() => accounts?.value?.assets?.total || 0);
 const totalLiabilities = computed(
   () => accounts?.value?.liabilities?.total || 0,
-);
-const totalIncome = computed(() => accounts?.value?.income?.total || 0);
-const totalExpenses = computed(() => accounts?.value?.expense?.total || 0);
-
-const netWorth = computed(() => totalAssets.value + totalLiabilities.value);
-const monthlyFlow = computed(
-  () => totalIncome.value - Math.abs(totalExpenses.value),
 );
 
 const refreshData = () => {

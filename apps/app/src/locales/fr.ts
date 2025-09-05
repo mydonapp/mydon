@@ -184,11 +184,6 @@ export default {
           label: 'Fichier CSV',
           help: 'Téléchargez votre relevé bancaire au format CSV',
         },
-        tip: {
-          title: 'Astuce : Comptabilité en Partie Double',
-          description:
-            'Chaque transaction sera automatiquement associée aux comptes de dépenses/revenus basés sur les modèles de description.',
-        },
         submit: {
           label: 'Importer les Transactions',
         },

@@ -187,11 +187,6 @@ export default {
           label: 'CSV File',
           help: 'Upload your bank statement in CSV format',
         },
-        tip: {
-          title: 'Tip: Double-entry Bookkeeping',
-          description:
-            'Each transaction will be automatically matched to expense/income accounts based on description patterns.',
-        },
         submit: {
           label: 'Import Transactions',
         },

@@ -13,7 +13,6 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
   const { getAccessToken } = useAuth();
   const { URI } = useConstant();
 
-  console.log('Updating time filter:', timeFilter?.value);
   let toFromQuery = '';
   if (timeFilter?.value === '2024') {
     toFromQuery = '?from=2024-01-01&to=2024-12-31';
@@ -24,7 +23,6 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
   const url = ref(`${URI.API}/v1/accounts${toFromQuery}`);
 
   watch(timeFilter, () => {
-    console.log('Updating URL:', timeFilter?.value);
     if (timeFilter?.value === '2024') {
       toFromQuery = `?from=2024-01-01&to=2024-12-31`;
     } else if (timeFilter?.value === '2025') {
@@ -33,7 +31,6 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
       toFromQuery = '';
     }
     url.value = `${URI.API}/v1/accounts${toFromQuery}`;
-    console.log('Updated URL:', url.value);
   });
 
   const {

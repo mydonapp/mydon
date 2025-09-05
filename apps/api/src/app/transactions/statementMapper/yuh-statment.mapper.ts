@@ -25,7 +25,6 @@ export class YuhStatementMapper extends StatementMapper<YuhStatement> {
 
   protected mapStatement(): Promise<MappedTransaction<YuhStatementResponse>[]> {
     const mappedStatement: MappedTransaction<YuhStatementResponse>[] = [];
-    console.log(this.statement);
     for (const transaction of this.statement) {
       const dmy = transaction.DATE.split('/');
 
@@ -38,12 +37,12 @@ export class YuhStatementMapper extends StatementMapper<YuhStatement> {
           : Math.abs(transaction.DEBIT),
         description: transaction['ACTIVITY NAME'].substring(
           1,
-          transaction['ACTIVITY NAME'].length - 1
+          transaction['ACTIVITY NAME'].length - 1,
         ),
         transactionDate: new Date(
           parseInt(dmy[2]),
           parseInt(dmy[1]) - 1,
-          parseInt(dmy[0])
+          parseInt(dmy[0]),
         ),
         raw: {
           ...transaction,
@@ -56,14 +55,14 @@ export class YuhStatementMapper extends StatementMapper<YuhStatement> {
   }
 
   protected getCreditAccountIdFromStatement(
-    transaction: MappedTransaction<YuhStatementResponse>
+    transaction: MappedTransaction<YuhStatementResponse>,
   ): string {
     if (transaction.raw.CREDIT) {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
-    transaction: MappedTransaction<YuhStatementResponse>
+    transaction: MappedTransaction<YuhStatementResponse>,
   ): string {
     if (transaction.raw.DEBIT) {
       return this.accountId;
