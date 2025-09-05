@@ -35,106 +35,70 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Configuration Section -->
             <div class="space-y-6">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text text-lg font-semibold">{{
-                    t('views.importTransactions.importForm.account.label')
-                  }}</span>
-                </label>
-                <select
+              <div>
+                <BaseSelect
                   v-model="accountId"
-                  class="select select-bordered select-lg w-full"
-                >
-                  <option
-                    value=""
-                    disabled
-                  >
-                    {{
-                      t(
-                        'views.importTransactions.importForm.account.placeholder',
-                      )
-                    }}
-                  </option>
-                  <option
-                    v-for="account in assetsAccounts"
-                    :key="account.id"
-                    :value="account.id"
-                  >
-                    {{ account.name }} ({{ account.currency }})
-                  </option>
-                </select>
-                <label class="label">
-                  <span class="label-text-alt">{{
+                  :label="
+                    t('views.importTransactions.importForm.account.label')
+                  "
+                  :placeholder="
+                    t('views.importTransactions.importForm.account.placeholder')
+                  "
+                  :help-text="
                     t('views.importTransactions.importForm.account.help')
-                  }}</span>
-                </label>
+                  "
+                  size="lg"
+                  variant="bordered"
+                >
+                  <template #options>
+                    <option
+                      v-for="account in assetsAccounts"
+                      :key="account.id"
+                      :value="account.id"
+                    >
+                      {{ account.name }} ({{ account.currency }})
+                    </option>
+                  </template>
+                </BaseSelect>
               </div>
 
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text text-lg font-semibold">{{
-                    t('views.importTransactions.importForm.issuer.label')
-                  }}</span>
-                </label>
-                <select
+              <div>
+                <BaseSelect
                   v-model="importType"
-                  class="select select-bordered select-lg w-full"
+                  :label="t('views.importTransactions.importForm.issuer.label')"
+                  :placeholder="
+                    t('views.importTransactions.importForm.issuer.placeholder')
+                  "
+                  size="lg"
+                  variant="bordered"
                 >
-                  <option
-                    value=""
-                    disabled
+                  <template #options>
+                    <option value="SWISSCARD">Swisscard - Credit Cards</option>
+                    <option value="YUH">Yuh - Banking & Investment</option>
+                    <option value="POSTFINANCE">
+                      PostFinance - Swiss Bank
+                    </option>
+                    <option value="WISE">Wise - International Transfers</option>
+                  </template>
+                </BaseSelect>
+                <p class="text-xs text-muted mt-1">
+                  <i18n-t
+                    tag="span"
+                    keypath="views.importTransactions.importForm.issuer.footer.text"
                   >
-                    {{
-                      t(
-                        'views.importTransactions.importForm.issuer.placeholder',
-                      )
-                    }}
-                  </option>
-                  <option value="SWISSCARD">
-                    <span class="flex items-center">
-                      <span class="font-semibold">Swisscard</span> - Credit
-                      Cards
-                    </span>
-                  </option>
-                  <option value="YUH">
-                    <span class="flex items-center">
-                      <span class="font-semibold">Yuh</span> - Banking &
-                      Investment
-                    </span>
-                  </option>
-                  <option value="POSTFINANCE">
-                    <span class="flex items-center">
-                      <span class="font-semibold">PostFinance</span> - Swiss
-                      Bank
-                    </span>
-                  </option>
-                  <option value="WISE">
-                    <span class="flex items-center">
-                      <span class="font-semibold">Wise</span> - International
-                      Transfers
-                    </span>
-                  </option>
-                </select>
-                <label class="label">
-                  <span class="label-text-alt">
-                    <i18n-t
-                      tag="span"
-                      keypath="views.importTransactions.importForm.issuer.footer.text"
+                    <a
+                      href="https://github.com/mydonapp/mydon/issues"
+                      target="_blank"
+                      class="text-primary-600 hover:text-primary-700 underline"
                     >
-                      <a
-                        href="https://github.com/mydonapp/mydon/issues"
-                        target="_blank"
-                        class="link link-primary"
-                      >
-                        {{
-                          t(
-                            'views.importTransactions.importForm.issuer.footer.link',
-                          )
-                        }}
-                      </a>
-                    </i18n-t>
-                  </span>
-                </label>
+                      {{
+                        t(
+                          'views.importTransactions.importForm.issuer.footer.link',
+                        )
+                      }}
+                    </a>
+                  </i18n-t>
+                </p>
               </div>
             </div>
 
@@ -144,21 +108,27 @@
                 :label="t('views.importTransactions.importForm.upload.label')"
                 accept=".csv"
                 :hint="t('views.importTransactions.importForm.upload.help')"
+                size="lg"
+                variant="bordered"
                 @change="handleFileChange"
               />
 
-              <BaseButton
-                variant="primary"
-                class="w-full"
-                :disabled="
-                  !fileContent || !accountId || !importType || isLoading
-                "
-                :loading="isLoading"
-                @click="importTransactions"
-              >
-                <RiUploadLine class="w-5 h-5 mr-2" />
-                {{ t('views.importTransactions.importForm.submit.label') }}
-              </BaseButton>
+              <!-- Button positioned to align with the bottom of the issuer select -->
+              <div class="mt-14">
+                <BaseButton
+                  variant="primary"
+                  size="lg"
+                  class="w-full"
+                  :disabled="
+                    !fileContent || !accountId || !importType || isLoading
+                  "
+                  :loading="isLoading"
+                  @click="importTransactions"
+                >
+                  <RiUploadLine class="w-5 h-5 mr-2" />
+                  {{ t('views.importTransactions.importForm.submit.label') }}
+                </BaseButton>
+              </div>
             </div>
           </div>
         </div>
@@ -298,48 +268,52 @@
                     />
                   </td>
                   <td>
-                    <select
+                    <BaseSelect
                       v-model="transaction.creditAccountId"
-                      class="select select-bordered w-full min-w-48"
-                      @change="onAccountChange(transaction, 'credit')"
+                      :placeholder="
+                        t(
+                          'views.importTransactions.draftTransactions.table.selectAccount',
+                        )
+                      "
+                      size="sm"
+                      @update:model-value="
+                        onAccountChange(transaction, 'credit')
+                      "
                     >
-                      <option :value="undefined">
-                        {{
-                          t(
-                            'views.importTransactions.draftTransactions.table.selectAccount',
-                          )
-                        }}
-                      </option>
-                      <option
-                        v-for="account in allAccounts"
-                        :key="account.id"
-                        :value="account.id"
-                      >
-                        {{ account.name }}
-                      </option>
-                    </select>
+                      <template #options>
+                        <option
+                          v-for="account in allAccounts"
+                          :key="account.id"
+                          :value="account.id"
+                        >
+                          {{ account.name }}
+                        </option>
+                      </template>
+                    </BaseSelect>
                   </td>
                   <td>
-                    <select
+                    <BaseSelect
                       v-model="transaction.debitAccountId"
-                      class="select select-bordered w-full min-w-48"
-                      @change="onAccountChange(transaction, 'debit')"
+                      :placeholder="
+                        t(
+                          'views.importTransactions.draftTransactions.table.selectAccount',
+                        )
+                      "
+                      size="sm"
+                      @update:model-value="
+                        onAccountChange(transaction, 'debit')
+                      "
                     >
-                      <option :value="undefined">
-                        {{
-                          t(
-                            'views.importTransactions.draftTransactions.table.selectAccount',
-                          )
-                        }}
-                      </option>
-                      <option
-                        v-for="account in allAccounts"
-                        :key="account.id"
-                        :value="account.id"
-                      >
-                        {{ account.name }}
-                      </option>
-                    </select>
+                      <template #options>
+                        <option
+                          v-for="account in allAccounts"
+                          :key="account.id"
+                          :value="account.id"
+                        >
+                          {{ account.name }}
+                        </option>
+                      </template>
+                    </BaseSelect>
                   </td>
                   <td>
                     <div v-if="isEqualCurrency(transaction)">
@@ -467,6 +441,7 @@ import BaseButton from '../components/BaseButton.vue';
 import BaseInput from '../components/BaseInput.vue';
 import BaseFileInput from '../components/BaseFileInput.vue';
 import BaseTextarea from '../components/BaseTextarea.vue';
+import BaseSelect from '../components/BaseSelect.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';

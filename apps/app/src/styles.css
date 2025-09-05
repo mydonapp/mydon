@@ -312,28 +312,63 @@ body {
 }
 
 .modal::backdrop {
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
 }
 
 .modal[open] {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
 }
 
 .modal-box {
   position: relative;
-  background-color: var(--color-background-secondary);
-  border-radius: 0.5rem;
+  background-color: #3a3a3a; /* Lighter than var(--color-background-elevated) */
+  border: 1px solid #525252; /* Lighter border */
+  border-radius: 0.75rem;
   box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
   max-height: 90vh;
   overflow-y: auto;
+  color: #fafafa; /* Ensure text is bright */
+  padding: 1.5rem;
 }
 
-/* Alert Components */
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #525252; /* Lighter border */
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fafafa; /* Bright white text */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Modal Content */
+.modal-content {
+  margin-bottom: 1.5rem;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #525252; /* Lighter border */
+} /* Alert Components */
 .alert {
   padding: 1rem;
   border-radius: 0.5rem;
@@ -594,4 +629,73 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-muted);
+}
+
+/* Additional Utility Classes for BaseSelect */
+.bg-background-primary {
+  background-color: #262626; /* Lighter than original --color-background-primary */
+}
+
+.bg-background-secondary {
+  background-color: #3a3a3a; /* Lighter than original --color-background-secondary */
+}
+
+.text-text-primary {
+  color: #fafafa; /* Bright white */
+}
+
+.border-border-primary {
+  border-color: #525252; /* Lighter border */
+}
+
+.focus\:border-primary-600:focus {
+  border-color: var(--color-primary-600);
+}
+
+.focus\:ring-primary-200:focus {
+  --tw-ring-color: rgba(20, 184, 166, 0.3); /* Slightly more visible ring */
+}
+
+/* Modal-specific input and select styling */
+.modal-box input,
+.modal-box select {
+  background-color: #262626 !important; /* Lighter background for inputs in modals */
+  border-color: #525252 !important; /* Lighter border */
+  color: #fafafa !important; /* Bright text */
+}
+
+.modal-box input:focus,
+.modal-box select:focus {
+  background-color: #2d2d2d !important; /* Slightly lighter on focus */
+  border-color: var(--color-primary-600) !important;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3) !important;
+}
+
+/* Ensure placeholder text is visible */
+.modal-box input::placeholder {
+  color: #a1a1aa !important;
+}
+
+/* Modal-specific label styling */
+.modal-box label {
+  color: #e5e5e5 !important; /* Brighter labels in modals */
+}
+
+.modal-box .text-secondary {
+  color: #d1d5db !important; /* Override text-secondary in modals to be lighter */
+}
+
+.modal-box .text-muted {
+  color: #9ca3af !important; /* Override text-muted in modals to be more visible */
+}
+
+/* Placeholder styling for consistent colors */
+input::placeholder,
+select::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Fix focus ring for better visibility */
+.focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px var(--tw-ring-color, rgba(20, 184, 166, 0.2));
 }

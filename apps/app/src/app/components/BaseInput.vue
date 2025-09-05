@@ -6,7 +6,7 @@
       :for="inputId"
       class="block mb-2"
     >
-      <span class="text-sm font-medium text-gray-700">
+      <span class="text-sm font-medium text-secondary">
         {{ label }}
         <span
           v-if="required"
@@ -21,7 +21,7 @@
       <!-- Left Icon -->
       <div
         v-if="slots.leftIcon"
-        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10"
+        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted pointer-events-none z-10"
       >
         <slot name="leftIcon" />
       </div>
@@ -62,7 +62,7 @@
       v-if="helpText && !error"
       class="mt-1"
     >
-      <span class="text-xs text-gray-500">{{ helpText }}</span>
+      <span class="text-xs text-muted">{{ helpText }}</span>
     </div>
 
     <!-- Error Message -->
@@ -175,38 +175,47 @@ const inputClasses = computed(() => {
       classes.push('h-12', 'px-4', 'text-base');
   }
 
-  // Variant classes - using Tailwind colors
+  // Variant classes - using CSS variables for consistent styling
   switch (props.variant) {
     case 'bordered':
       classes.push(
-        'border-gray-300',
-        'focus:border-blue-500',
+        'border-2',
+        'bg-background-primary',
+        'border-border-primary',
+        'text-text-primary',
+        'focus:border-primary-600',
         'focus:ring-2',
-        'focus:ring-blue-200',
+        'focus:ring-primary-200',
       );
       break;
     case 'ghost':
       classes.push(
         'border-transparent',
-        'bg-gray-50',
-        'focus:bg-white',
-        'focus:border-gray-300',
+        'bg-transparent',
+        'text-text-primary',
+        'focus:bg-background-secondary',
+        'focus:border-border-primary',
       );
       break;
     case 'primary':
       classes.push(
-        'border-blue-500',
-        'focus:border-blue-600',
+        'bg-background-primary',
+        'border-primary-500',
+        'text-text-primary',
+        'focus:border-primary-600',
         'focus:ring-2',
-        'focus:ring-blue-200',
+        'focus:ring-primary-200',
       );
       break;
     default:
+      // Use CSS variables for consistent styling
       classes.push(
-        'border-gray-300',
-        'focus:border-blue-500',
+        'bg-background-primary',
+        'border-border-primary',
+        'text-text-primary',
+        'focus:border-primary-600',
         'focus:ring-2',
-        'focus:ring-blue-200',
+        'focus:ring-primary-200',
       );
   }
 

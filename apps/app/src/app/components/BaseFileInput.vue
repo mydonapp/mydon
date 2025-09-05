@@ -1,32 +1,27 @@
 <template>
-  <div class="space-y-2">
+  <div class="w-full">
+    <!-- Label -->
     <label
       v-if="label"
       :for="inputId"
-      class="block text-sm font-medium text-gray-300"
+      class="block mb-2"
     >
-      {{ label }}
-      <span
-        v-if="required"
-        class="text-red-400 ml-1"
-        >*</span
-      >
+      <span class="text-sm font-medium text-secondary">
+        {{ label }}
+        <span
+          v-if="required"
+          class="text-danger ml-1"
+          >*</span
+        >
+      </span>
     </label>
 
+    <!-- File Input Container -->
     <div class="relative">
       <input
         :id="inputId"
         type="file"
-        :class="[
-          'w-full px-3 py-2 bg-primary border rounded-lg text-white',
-          'focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
-          'transition-colors duration-200',
-          'file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0',
-          'file:text-sm file:font-medium file:bg-accent file:text-white',
-          'hover:file:bg-accent/80 file:cursor-pointer',
-          error ? 'border-red-500 focus:ring-red-500' : 'border-gray-600',
-          $attrs.class,
-        ]"
+        :class="[inputClasses, $attrs.class]"
         :accept="accept"
         :multiple="multiple"
         :required="required"
@@ -38,28 +33,26 @@
       />
     </div>
 
+    <!-- Help Text -->
     <div
-      v-if="error || hint"
-      class="text-sm"
+      v-if="hint && !error"
+      class="mt-1"
     >
-      <p
-        v-if="error"
-        class="text-red-400"
-      >
-        {{ error }}
-      </p>
-      <p
-        v-else-if="hint"
-        class="text-gray-400"
-      >
-        {{ hint }}
-      </p>
+      <span class="text-xs text-muted">{{ hint }}</span>
+    </div>
+
+    <!-- Error Message -->
+    <div
+      v-if="error"
+      class="mt-1"
+    >
+      <span class="text-xs text-red-500">{{ error }}</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue';
+import { computed, useAttrs, useId } from 'vue';
 
 interface Props {
   label?: string;
@@ -69,6 +62,8 @@ interface Props {
   hint?: string;
   required?: boolean;
   disabled?: boolean;
+  size?: 'xs' | 'sm' | 'md' | 'lg';
+  variant?: 'bordered' | 'ghost' | 'primary' | 'default';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,6 +74,8 @@ const props = withDefaults(defineProps<Props>(), {
   multiple: false,
   required: false,
   disabled: false,
+  size: 'md',
+  variant: 'default',
 });
 
 const emit = defineEmits<{
@@ -89,12 +86,136 @@ const emit = defineEmits<{
 
 const attrs = useAttrs();
 
-// Generate a unique ID for the input
-const inputId = computed(
-  () =>
-    (attrs.id as string) ||
-    `file-input-${Math.random().toString(36).substr(2, 9)}`,
-);
+// Generate unique ID for accessibility (same as BaseInput)
+const inputId = useId();
+
+// Computed classes for the file input (matches BaseInput structure)
+const inputClasses = computed(() => {
+  const classes = [
+    'w-full',
+    'rounded-md',
+    'border',
+    'transition-colors',
+    'duration-200',
+    'bg-primary',
+    'focus:outline-none',
+    // File input specific styles for proper alignment
+    'file:mr-4',
+    'file:rounded-md',
+    'file:border-0',
+    'file:cursor-pointer',
+    'file:bg-primary',
+    'file:text-white',
+    'file:font-medium',
+    'hover:file:bg-primary-700',
+  ];
+
+  // Size classes
+  switch (props.size) {
+    case 'xs':
+      classes.push(
+        'h-8',
+        'px-3',
+        'text-xs',
+        'file:py-1.5',
+        'file:px-2',
+        'file:text-xs',
+      );
+      break;
+    case 'sm':
+      classes.push(
+        'h-10',
+        'px-3',
+        'text-sm',
+        'file:py-2',
+        'file:px-3',
+        'file:text-sm',
+      );
+      break;
+    case 'lg':
+      classes.push(
+        'h-14',
+        'px-4',
+        'text-lg',
+        'file:py-3.5',
+        'file:px-4',
+        'file:text-base',
+      );
+      break;
+    default:
+      classes.push(
+        'h-12',
+        'px-4',
+        'text-base',
+        'file:py-3',
+        'file:px-4',
+        'file:text-sm',
+      );
+  }
+
+  // Variant classes - exactly matching BaseSelect for bordered variant
+  switch (props.variant) {
+    case 'bordered':
+      classes.push(
+        'border-border-primary',
+        'focus:border-primary-600',
+        'focus:ring-2',
+        'focus:ring-primary-200',
+      );
+
+      break;
+    case 'ghost':
+      classes.push(
+        'border-transparent',
+        'bg-transparent',
+        'text-text-primary',
+        'focus:bg-background-secondary',
+        'focus:border-border-primary',
+      );
+      break;
+    case 'primary':
+      classes.push(
+        'bg-background-primary',
+        'border-primary-500',
+        'text-text-primary',
+        'focus:border-primary-600',
+        'focus:ring-2',
+        'focus:ring-primary-200',
+      );
+      break;
+    default:
+      // Use CSS variables for consistent styling
+      classes.push(
+        'bg-background-primary',
+        'border-border-primary',
+        'text-text-primary',
+        'focus:border-primary-600',
+        'focus:ring-2',
+        'focus:ring-primary-200',
+      );
+  }
+
+  // State classes
+  if (props.error) {
+    classes.push(
+      'border-red-500',
+      'focus:border-red-500',
+      'focus:ring-red-200',
+    );
+  }
+
+  if (props.disabled) {
+    classes.push(
+      'bg-gray-100',
+      'text-gray-400',
+      'cursor-not-allowed',
+      'file:bg-gray-400',
+      'file:cursor-not-allowed',
+    );
+  }
+
+  return classes.join(' ');
+});
 
 // Filter out class and id from attrs to avoid conflicts
 const inputAttrs = computed(() => {

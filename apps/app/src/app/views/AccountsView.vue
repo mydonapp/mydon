@@ -560,12 +560,12 @@
       @click="closeAddAccountModal"
     >
       <div
-        class="modal-box bg-elevated p-6 rounded-lg w-11/12 max-w-2xl"
+        class="modal-box w-11/12 max-w-2xl"
         @click.stop
       >
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="font-bold text-lg text-white">
-            <RiAddLine class="w-6 h-6 inline mr-2" />
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <RiAddLine class="w-6 h-6" />
             {{ t('views.accounts.addAccountForm.title') }}
           </h3>
           <BaseButton
@@ -574,77 +574,79 @@
             class="h-8 w-8 p-0 rounded-full"
             @click="closeAddAccountModal"
           >
-            ✕
+            <RiCloseLine class="w-4 h-4" />
           </BaseButton>
         </div>
 
-        <form
-          class="space-y-4"
-          @submit.prevent="addAccount"
-        >
-          <div class="mb-4">
-            <BaseInput
-              v-model="name"
-              type="text"
-              :label="t('views.accounts.addAccountForm.accountName.label')"
-              :placeholder="
-                t('views.accounts.addAccountForm.accountName.placeholder')
-              "
-              required
-            >
-              <template #leftIcon>
-                <RiAccountCircleLine class="w-5 h-5" />
-              </template>
-            </BaseInput>
-          </div>
+        <div class="modal-content">
+          <form
+            class="space-y-6"
+            @submit.prevent="addAccount"
+          >
+            <div>
+              <BaseInput
+                v-model="name"
+                type="text"
+                :label="t('views.accounts.addAccountForm.accountName.label')"
+                :placeholder="
+                  t('views.accounts.addAccountForm.accountName.placeholder')
+                "
+                required
+              >
+                <template #leftIcon>
+                  <RiAccountCircleLine class="w-5 h-5" />
+                </template>
+              </BaseInput>
+            </div>
 
-          <div class="mb-4">
-            <label class="label">
-              <span class="label font-semibold">{{
-                t('views.accounts.addAccountForm.accountType.label')
-              }}</span>
-            </label>
-            <select
-              v-model="accountType"
-              class="select w-full"
-              required
-            >
-              <option value="ASSETS">{{ t('words.assets') }}</option>
-              <option value="LIABILITIES">{{ t('words.liabilities') }}</option>
-              <option value="INCOME">{{ t('words.income') }}</option>
-              <option value="EXPENSE">{{ t('words.expenses') }}</option>
-            </select>
-          </div>
+            <div>
+              <BaseSelect
+                v-model="accountType"
+                :label="t('views.accounts.addAccountForm.accountType.label')"
+                required
+              >
+                <template #options>
+                  <option value="ASSETS">{{ t('words.assets') }}</option>
+                  <option value="LIABILITIES">
+                    {{ t('words.liabilities') }}
+                  </option>
+                  <option value="INCOME">{{ t('words.income') }}</option>
+                  <option value="EXPENSE">{{ t('words.expenses') }}</option>
+                </template>
+              </BaseSelect>
+            </div>
 
-          <div class="mb-4">
-            <BaseInput
-              v-model="openingBalance"
-              type="number"
-              step="0.01"
-              :label="t('views.accounts.addAccountForm.openingBalance.label')"
-              placeholder="0.00"
-            >
-              <template #leftIcon>
-                <RiMoneyDollarCircleLine class="w-5 h-5" />
-              </template>
-            </BaseInput>
-          </div>
+            <div>
+              <BaseInput
+                v-model="openingBalance"
+                type="number"
+                step="0.01"
+                :label="t('views.accounts.addAccountForm.openingBalance.label')"
+                placeholder="0.00"
+              >
+                <template #leftIcon>
+                  <RiMoneyDollarCircleLine class="w-5 h-5" />
+                </template>
+              </BaseInput>
+            </div>
+          </form>
+        </div>
 
-          <div class="flex justify-end gap-2 mt-6">
-            <BaseButton
-              variant="ghost"
-              @click="closeAddAccountModal"
-            >
-              {{ t('words.cancel') }}
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              type="submit"
-            >
-              {{ t('views.accounts.addAccountForm.submit.label') }}
-            </BaseButton>
-          </div>
-        </form>
+        <div class="modal-footer">
+          <BaseButton
+            variant="ghost"
+            @click="closeAddAccountModal"
+          >
+            {{ t('words.cancel') }}
+          </BaseButton>
+          <BaseButton
+            variant="primary"
+            type="submit"
+            @click="addAccount"
+          >
+            {{ t('views.accounts.addAccountForm.submit.label') }}
+          </BaseButton>
+        </div>
       </div>
     </dialog>
 
@@ -655,12 +657,12 @@
       @click="closeTransactionModal"
     >
       <div
-        class="modal-box bg-elevated p-6 rounded-lg w-11/12 max-w-3xl"
+        class="modal-box w-11/12 max-w-3xl"
         @click.stop
       >
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="font-bold text-lg text-white">
-            <RiExchangeFundsLine class="w-6 h-6 inline mr-2" />
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <RiExchangeFundsLine class="w-6 h-6" />
             {{ t('views.accounts.createTransactionForm.title') }}
           </h3>
           <BaseButton
@@ -669,143 +671,138 @@
             class="h-8 w-8 p-0 rounded-full"
             @click="closeTransactionModal"
           >
-            ✕
+            <RiCloseLine class="w-4 h-4" />
           </BaseButton>
         </div>
 
-        <form
-          class="space-y-4"
-          @submit.prevent="createTransaction"
-        >
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="mb-4">
-              <BaseInput
-                v-model="transactionDate"
-                type="date"
-                :label="t('views.accounts.createTransactionForm.date.label')"
-                required
-              >
-                <template #leftIcon>
-                  <RiCalendarLine class="w-5 h-5" />
-                </template>
-              </BaseInput>
-            </div>
-
-            <div class="mb-4">
-              <BaseInput
-                v-model="transactionAmount"
-                type="number"
-                step="0.01"
-                :label="t('views.accounts.createTransactionForm.amount.label')"
-                placeholder="0.00"
-                required
-              >
-                <template #leftIcon>
-                  <RiMoneyDollarCircleLine class="w-5 h-5" />
-                </template>
-              </BaseInput>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <BaseInput
-              v-model="transactionDescription"
-              type="text"
-              :label="
-                t('views.accounts.createTransactionForm.description.label')
-              "
-              :placeholder="
-                t(
-                  'views.accounts.createTransactionForm.description.placeholder',
-                )
-              "
-              required
-            >
-              <template #leftIcon>
-                <RiFileTextLine class="w-5 h-5" />
-              </template>
-            </BaseInput>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="mb-4">
-              <label class="label">
-                <span class="label font-semibold">{{
-                  t('views.accounts.createTransactionForm.creditAccount.label')
-                }}</span>
-              </label>
-              <select
-                v-model="creditAccountId"
-                class="select w-full"
-                required
-              >
-                <option
-                  value=""
-                  disabled
+        <div class="modal-content">
+          <form
+            class="space-y-6"
+            @submit.prevent="createTransaction"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <BaseInput
+                  v-model="transactionDate"
+                  type="date"
+                  :label="t('views.accounts.createTransactionForm.date.label')"
+                  required
                 >
-                  {{
+                  <template #leftIcon>
+                    <RiCalendarLine class="w-5 h-5" />
+                  </template>
+                </BaseInput>
+              </div>
+
+              <div>
+                <BaseInput
+                  v-model="transactionAmount"
+                  type="number"
+                  step="0.01"
+                  :label="
+                    t('views.accounts.createTransactionForm.amount.label')
+                  "
+                  placeholder="0.00"
+                  required
+                >
+                  <template #leftIcon>
+                    <RiMoneyDollarCircleLine class="w-5 h-5" />
+                  </template>
+                </BaseInput>
+              </div>
+            </div>
+
+            <div>
+              <BaseInput
+                v-model="transactionDescription"
+                type="text"
+                :label="
+                  t('views.accounts.createTransactionForm.description.label')
+                "
+                :placeholder="
+                  t(
+                    'views.accounts.createTransactionForm.description.placeholder',
+                  )
+                "
+                required
+              >
+                <template #leftIcon>
+                  <RiFileTextLine class="w-5 h-5" />
+                </template>
+              </BaseInput>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <BaseSelect
+                  v-model="creditAccountId"
+                  :label="
+                    t(
+                      'views.accounts.createTransactionForm.creditAccount.label',
+                    )
+                  "
+                  :placeholder="
                     t(
                       'views.accounts.createTransactionForm.creditAccount.placeholder',
                     )
-                  }}
-                </option>
-                <option
-                  v-for="account in allAccounts"
-                  :key="account.id"
-                  :value="account.id"
+                  "
+                  required
                 >
-                  {{ account.name }} ({{ account.currency || 'CHF' }})
-                </option>
-              </select>
-            </div>
+                  <template #options>
+                    <option
+                      v-for="account in allAccounts"
+                      :key="account.id"
+                      :value="account.id"
+                    >
+                      {{ account.name }} ({{ account.currency || 'CHF' }})
+                    </option>
+                  </template>
+                </BaseSelect>
+              </div>
 
-            <div class="mb-4">
-              <label class="label">
-                <span class="label font-semibold">{{
-                  t('views.accounts.createTransactionForm.debitAccount.label')
-                }}</span>
-              </label>
-              <select
-                v-model="debitAccountId"
-                class="select w-full"
-                required
-              >
-                <option
-                  value=""
-                  disabled
-                >
-                  {{
+              <div>
+                <BaseSelect
+                  v-model="debitAccountId"
+                  :label="
+                    t('views.accounts.createTransactionForm.debitAccount.label')
+                  "
+                  :placeholder="
                     t(
                       'views.accounts.createTransactionForm.debitAccount.placeholder',
                     )
-                  }}
-                </option>
-                <option
-                  v-for="account in allAccounts"
-                  :key="account.id"
-                  :value="account.id"
+                  "
+                  required
                 >
-                  {{ account.name }} ({{ account.currency || 'CHF' }})
-                </option>
-              </select>
+                  <template #options>
+                    <option
+                      v-for="account in allAccounts"
+                      :key="account.id"
+                      :value="account.id"
+                    >
+                      {{ account.name }} ({{ account.currency || 'CHF' }})
+                    </option>
+                  </template>
+                </BaseSelect>
+              </div>
             </div>
-          </div>
+          </form>
+        </div>
 
-          <div class="flex justify-end gap-2 mt-6">
-            <BaseButton
-              variant="ghost"
-              @click="closeTransactionModal"
-            >
-              {{ t('words.cancel') }}
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              type="submit"
-            >
-              {{ t('views.accounts.createTransactionForm.submit.label') }}
-            </BaseButton>
-          </div>
-        </form>
+        <div class="modal-footer">
+          <BaseButton
+            variant="ghost"
+            @click="closeTransactionModal"
+          >
+            {{ t('words.cancel') }}
+          </BaseButton>
+          <BaseButton
+            variant="primary"
+            type="submit"
+            @click="createTransaction"
+          >
+            {{ t('views.accounts.createTransactionForm.submit.label') }}
+          </BaseButton>
+        </div>
       </div>
     </dialog>
   </div>
@@ -835,6 +832,7 @@ import {
 import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
 import BaseInput from '../components/BaseInput.vue';
+import BaseSelect from '../components/BaseSelect.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';

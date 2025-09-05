@@ -9,38 +9,36 @@
         <div class="flex items-center gap-4 flex-shrink-0">
           <!-- Account Filter -->
           <div>
-            <select
+            <BaseSelect
               v-model="selectedAccountId"
-              class="select w-full bg-secondary text-white border-gray-600"
+              :placeholder="t('views.spendingAnalysis.allAccounts')"
             >
-              <option value="">
-                {{ t('views.spendingAnalysis.allAccounts') }}
-              </option>
-              <option
-                v-for="account in expenseAccounts"
-                :key="account.id"
-                :value="account.id"
-              >
-                {{ account.name }}
-              </option>
-            </select>
+              <template #options>
+                <option
+                  v-for="account in expenseAccounts"
+                  :key="account.id"
+                  :value="account.id"
+                >
+                  {{ account.name }}
+                </option>
+              </template>
+            </BaseSelect>
           </div>
           <!-- Period Filter -->
           <div>
-            <select
-              v-model="selectedPeriod"
-              class="select w-full bg-secondary text-white border-gray-600"
-            >
-              <option value="monthly">
-                {{ t('views.spendingAnalysis.monthly') }}
-              </option>
-              <option value="quarterly">
-                {{ t('views.spendingAnalysis.quarterly') }}
-              </option>
-              <option value="yearly">
-                {{ t('views.spendingAnalysis.yearly') }}
-              </option>
-            </select>
+            <BaseSelect v-model="selectedPeriod">
+              <template #options>
+                <option value="monthly">
+                  {{ t('views.spendingAnalysis.monthly') }}
+                </option>
+                <option value="quarterly">
+                  {{ t('views.spendingAnalysis.quarterly') }}
+                </option>
+                <option value="yearly">
+                  {{ t('views.spendingAnalysis.yearly') }}
+                </option>
+              </template>
+            </BaseSelect>
           </div>
         </div>
       </template>
@@ -375,6 +373,8 @@ import {
   RiFileTextLine,
 } from '@remixicon/vue';
 import PageHeader from '../components/PageHeader.vue';
+import BaseSelect from '../components/BaseSelect.vue';
+import BaseSelect from '../components/BaseSelect.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';

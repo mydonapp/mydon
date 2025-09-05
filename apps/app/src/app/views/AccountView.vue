@@ -138,7 +138,7 @@
 
                 <div class="flex flex-wrap items-center gap-4">
                   <!-- Search -->
-                  <div class="form-control">
+                  <div>
                     <BaseInput
                       v-model="searchQuery"
                       type="text"
@@ -153,28 +153,36 @@
                   </div>
 
                   <!-- Amount Filter -->
-                  <div class="form-control">
-                    <select
+                  <div>
+                    <BaseSelect
                       v-model="amountFilter"
-                      class="select select-bordered select-sm"
+                      size="sm"
+                      variant="bordered"
                     >
-                      <option value="all">All Amounts</option>
-                      <option value="positive">Income Only</option>
-                      <option value="negative">Expenses Only</option>
-                    </select>
+                      <template #options>
+                        <option value="all">All Amounts</option>
+                        <option value="positive">Income Only</option>
+                        <option value="negative">Expenses Only</option>
+                      </template>
+                    </BaseSelect>
                   </div>
 
                   <!-- Sort Options -->
-                  <div class="form-control">
-                    <select
+                  <div>
+                    <BaseSelect
                       v-model="sortBy"
-                      class="select select-bordered select-sm"
+                      size="sm"
+                      variant="bordered"
                     >
-                      <option value="date-desc">Date (Newest)</option>
-                      <option value="date-asc">Date (Oldest)</option>
-                      <option value="amount-desc">Amount (High to Low)</option>
-                      <option value="amount-asc">Amount (Low to High)</option>
-                    </select>
+                      <template #options>
+                        <option value="date-desc">Date (Newest)</option>
+                        <option value="date-asc">Date (Oldest)</option>
+                        <option value="amount-desc">
+                          Amount (High to Low)
+                        </option>
+                        <option value="amount-asc">Amount (Low to High)</option>
+                      </template>
+                    </BaseSelect>
                   </div>
                 </div>
               </div>
@@ -350,8 +358,8 @@
         v-if="selectedTransaction"
         class="modal-box w-11/12 max-w-2xl"
       >
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="font-bold text-lg">
+        <div class="modal-header">
+          <h3 class="modal-title">
             {{ t('views.account.transactionDetails') }}
           </h3>
           <BaseButton
@@ -364,58 +372,60 @@
           </BaseButton>
         </div>
 
-        <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-4">
+        <div class="modal-content">
+          <div class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-medium text-secondary block mb-1">{{
+                  t('views.account.transactions.table.date')
+                }}</label>
+                <p class="text-base text-primary">
+                  {{ formatDate(selectedTransaction.transactionDate) }}
+                </p>
+              </div>
+              <div>
+                <label class="text-sm font-medium text-secondary block mb-1">{{
+                  t('views.account.transactions.table.amount')
+                }}</label>
+                <p
+                  class="text-base font-semibold"
+                  :class="getTransactionColorClass(selectedTransaction.amount)"
+                >
+                  {{
+                    formatCurrency(
+                      parseFloat(selectedTransaction.amount) || 0,
+                      account.currency || 'CHF',
+                    )
+                  }}
+                </p>
+              </div>
+            </div>
+
             <div>
-              <label class="text-sm font-semibold text-muted">{{
-                t('views.account.transactions.table.date')
+              <label class="text-sm font-medium text-secondary block mb-1">{{
+                t('views.account.transactions.table.description')
               }}</label>
-              <p class="text-lg">
-                {{ formatDate(selectedTransaction.transactionDate) }}
+              <p class="text-base text-primary">
+                {{ selectedTransaction.description || 'No description' }}
               </p>
             </div>
+
             <div>
-              <label class="text-sm font-semibold text-muted">{{
-                t('views.account.transactions.table.amount')
+              <label class="text-sm font-medium text-secondary block mb-1">{{
+                t('views.account.transactions.table.otherAccount')
               }}</label>
-              <p
-                class="text-lg font-bold"
-                :class="getTransactionColorClass(selectedTransaction.amount)"
-              >
+              <p class="text-base text-primary">
                 {{
-                  formatCurrency(
-                    parseFloat(selectedTransaction.amount) || 0,
-                    account.currency || 'CHF',
-                  )
+                  selectedTransaction.counterAccount?.name || 'Unknown account'
                 }}
               </p>
             </div>
           </div>
-
-          <div>
-            <label class="text-sm font-semibold text-muted">{{
-              t('views.account.transactions.table.description')
-            }}</label>
-            <p class="text-lg">
-              {{ selectedTransaction.description || 'No description' }}
-            </p>
-          </div>
-
-          <div>
-            <label class="text-sm font-semibold text-muted">{{
-              t('views.account.transactions.table.otherAccount')
-            }}</label>
-            <p class="text-lg">
-              {{
-                selectedTransaction.counterAccount?.name || 'Unknown account'
-              }}
-            </p>
-          </div>
         </div>
 
-        <div class="modal-action">
+        <div class="modal-footer">
           <BaseButton
-            variant="ghost"
+            variant="primary"
             @click="closeTransactionModal"
           >
             {{ t('common.close') }}
@@ -456,6 +466,7 @@ import {
 import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
 import BaseInput from '../components/BaseInput.vue';
+import BaseSelect from '../components/BaseSelect.vue';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
 import { useCurrency } from '../composables/useCurrency';
