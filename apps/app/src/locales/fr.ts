@@ -110,6 +110,10 @@ export default {
         accountType: {
           label: 'Type de Compte',
         },
+        currency: {
+          label: 'Devise',
+          placeholder: 'Sélectionnez la devise',
+        },
         submit: {
           label: 'Ajouter le Compte',
         },
@@ -184,11 +188,6 @@ export default {
           label: 'Fichier CSV',
           help: 'Téléchargez votre relevé bancaire au format CSV',
         },
-        tip: {
-          title: 'Astuce : Comptabilité en Partie Double',
-          description:
-            'Chaque transaction sera automatiquement associée aux comptes de dépenses/revenus basés sur les modèles de description.',
-        },
         submit: {
           label: 'Importer les Transactions',
         },
@@ -201,6 +200,7 @@ export default {
         table: {
           date: 'Date',
           description: 'Description',
+          descriptionPlaceholder: 'Modifier la description de la transaction',
           creditAccount: 'Compte Créditeur',
           debitAccount: 'Compte Débiteur',
           amount: 'Montant',
@@ -277,5 +277,12 @@ export default {
     income: 'Revenus',
     expenses: 'Dépenses',
     cancel: 'Annuler',
+    currencies: {
+      CHF: 'Franc Suisse (CHF)',
+      EUR: 'Euro (EUR)',
+      USD: 'Dollar Américain (USD)',
+      GBP: 'Livre Sterling (GBP)',
+      KRW: 'Won Sud-Coréen (KRW)',
+    },
   },
 };

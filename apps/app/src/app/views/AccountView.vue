@@ -1,83 +1,72 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen bg-primary">
     <div v-if="!isFetching && account">
       <!-- Header Section -->
-      <div
-        class="bg-gradient-to-r from-primary to-secondary text-primary-content"
+      <PageHeader
+        :title="account.name"
+        :subtitle="t('views.account.subtitle')"
       >
-        <div class="container mx-auto px-6 py-8">
-          <div
-            class="flex flex-col lg:flex-row lg:items-center justify-between gap-6"
-          >
-            <div class="flex-1">
-              <div class="flex items-center gap-4 mb-4">
-                <button
-                  class="btn btn-circle btn-ghost btn-sm"
-                  @click="$router.back()"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
-                    />
-                  </svg>
-                </button>
-                <h1 class="text-3xl font-bold">{{ account.name }}</h1>
-                <div
-                  class="badge badge-lg"
-                  :class="getAccountTypeBadgeClass()"
-                >
-                  {{ getAccountTypeLabel() }}
-                </div>
-              </div>
-              <p class="text-primary-content/80">
-                {{ t('views.account.subtitle') }}
-              </p>
+        <template #extra>
+          <div class="flex items-center gap-4">
+            <BaseButton
+              variant="ghost"
+              size="sm"
+              @click="$router.back()"
+            >
+              <template #icon>
+                <RiArrowLeftLine class="w-5 h-5" />
+              </template>
+              {{ t('common.back') }}
+            </BaseButton>
+            <div
+              class="badge badge-lg"
+              :class="getAccountTypeBadgeClass()"
+            >
+              {{ getAccountTypeLabel() }}
             </div>
+          </div>
+        </template>
+      </PageHeader>
 
-            <!-- Account Balance Card -->
-            <div class="card bg-base-100 text-base-content shadow-xl min-w-64">
-              <div class="card-body p-6">
-                <h3 class="text-sm font-semibold text-base-content/60 mb-2">
-                  {{ t('views.account.currentBalance') }}
-                </h3>
-                <div class="flex items-center justify-between">
-                  <span
-                    class="text-3xl font-bold"
-                    :class="getBalanceColorClass(accountBalance)"
-                  >
-                    {{
-                      formatCurrency(accountBalance, account.currency || 'CHF')
-                    }}
-                  </span>
-                  <div class="text-right">
-                    <p class="text-xs text-base-content/60">
-                      {{ account.currency || 'CHF' }}
-                    </p>
-                    <div
-                      v-if="account.retirementAccount"
-                      class="badge badge-info badge-xs mt-1"
-                    >
-                      {{ t('views.accounts.retirement') }}
-                    </div>
-                  </div>
+      <div
+        class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl"
+      >
+        <!-- Account Balance Card -->
+        <div class="card shadow-xl mb-6 sm:mb-8">
+          <div class="p-1.5 sm:p-2">
+            <h3 class="text-sm font-semibold text-muted mb-2">
+              {{ t('views.account.currentBalance') }}
+            </h3>
+            <div class="flex items-center justify-between">
+              <span
+                class="text-2xl sm:text-3xl font-bold"
+                :class="getBalanceColorClass(accountBalance)"
+              >
+                {{ formatCurrency(accountBalance, account.currency || 'CHF') }}
+              </span>
+              <div class="text-right">
+                <p class="text-xs text-muted">
+                  {{ account.currency || 'CHF' }}
+                </p>
+                <div
+                  v-if="account.retirementAccount"
+                  class="badge badge-info badge-xs mt-1"
+                >
+                  {{ t('views.accounts.retirement') }}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="container mx-auto px-6 py-8">
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8"
+        >
           <div
             class="card bg-gradient-to-br from-info/10 to-info/5 border border-info/20 shadow-lg"
           >
-            <div class="card-body p-4">
+            <div class="p-1.5 sm:p-2">
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-semibold text-info">
@@ -87,15 +76,7 @@
                     {{ account.transactions?.length || 0 }}
                   </p>
                 </div>
-                <svg
-                  class="w-8 h-8 text-info/60"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M3,3H21V5H3V3M3,7H21V9H3V7M3,11H21V13H3V11M3,15H21V17H3V15M3,19H21V21H3V19Z"
-                  />
-                </svg>
+                <RiFileTextLine class="w-8 h-8 text-info/60" />
               </div>
             </div>
           </div>
@@ -103,7 +84,7 @@
           <div
             class="card bg-gradient-to-br from-success/10 to-success/5 border border-success/20 shadow-lg"
           >
-            <div class="card-body p-4">
+            <div class="p-1.5 sm:p-2">
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-semibold text-success">
@@ -113,15 +94,7 @@
                     {{ formatCurrency(totalCredit, account.currency || 'CHF') }}
                   </p>
                 </div>
-                <svg
-                  class="w-8 h-8 text-success/60"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                  />
-                </svg>
+                <RiArrowUpLine class="w-8 h-8 text-success/60" />
               </div>
             </div>
           </div>
@@ -129,7 +102,7 @@
           <div
             class="card bg-gradient-to-br from-error/10 to-error/5 border border-error/20 shadow-lg"
           >
-            <div class="card-body p-4">
+            <div class="p-1.5 sm:p-2">
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-semibold text-error">
@@ -144,88 +117,72 @@
                     }}
                   </p>
                 </div>
-                <svg
-                  class="w-8 h-8 text-error/60"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
-                  />
-                </svg>
+                <RiArrowDownLine class="w-8 h-8 text-error/60" />
               </div>
             </div>
           </div>
         </div>
 
         <!-- Transactions Section -->
-        <div class="card bg-base-200 shadow-xl">
+        <div class="card bg-secondary shadow-xl">
           <div class="card-body p-0">
             <!-- Transactions Header with Filters -->
-            <div class="p-6 border-b border-base-300">
+            <div class="p-1.5 sm:p-2 border-b border-primary">
               <div
                 class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"
               >
                 <h2 class="text-xl font-bold flex items-center">
-                  <svg
-                    class="w-6 h-6 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M3,3H21V5H3V3M3,7H21V9H3V7M3,11H21V13H3V11M3,15H21V17H3V15M3,19H21V21H3V19Z"
-                    />
-                  </svg>
+                  <RiFileTextLine class="w-6 h-6 mr-2" />
                   {{ t('views.account.transactions.title') }}
                 </h2>
 
                 <div class="flex flex-wrap items-center gap-4">
                   <!-- Search -->
-                  <div class="form-control">
-                    <div class="input-group">
-                      <input
-                        v-model="searchQuery"
-                        type="text"
-                        placeholder="Search transactions..."
-                        class="input input-bordered input-sm w-64"
-                      />
-                      <button class="btn btn-square btn-sm">
-                        <svg
-                          class="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"
-                          />
-                        </svg>
-                      </button>
-                    </div>
+                  <div>
+                    <BaseInput
+                      v-model="searchQuery"
+                      type="text"
+                      placeholder="Search transactions..."
+                      size="sm"
+                      class="w-64"
+                    >
+                      <template #leftIcon>
+                        <RiSearchLine class="w-4 h-4" />
+                      </template>
+                    </BaseInput>
                   </div>
 
                   <!-- Amount Filter -->
-                  <div class="form-control">
-                    <select
+                  <div>
+                    <BaseSelect
                       v-model="amountFilter"
-                      class="select select-bordered select-sm"
+                      size="sm"
+                      variant="bordered"
                     >
-                      <option value="all">All Amounts</option>
-                      <option value="positive">Income Only</option>
-                      <option value="negative">Expenses Only</option>
-                    </select>
+                      <template #options>
+                        <option value="all">All Amounts</option>
+                        <option value="positive">Income Only</option>
+                        <option value="negative">Expenses Only</option>
+                      </template>
+                    </BaseSelect>
                   </div>
 
                   <!-- Sort Options -->
-                  <div class="form-control">
-                    <select
+                  <div>
+                    <BaseSelect
                       v-model="sortBy"
-                      class="select select-bordered select-sm"
+                      size="sm"
+                      variant="bordered"
                     >
-                      <option value="date-desc">Date (Newest)</option>
-                      <option value="date-asc">Date (Oldest)</option>
-                      <option value="amount-desc">Amount (High to Low)</option>
-                      <option value="amount-asc">Amount (Low to High)</option>
-                    </select>
+                      <template #options>
+                        <option value="date-desc">Date (Newest)</option>
+                        <option value="date-asc">Date (Oldest)</option>
+                        <option value="amount-desc">
+                          Amount (High to Low)
+                        </option>
+                        <option value="amount-asc">Amount (Low to High)</option>
+                      </template>
+                    </BaseSelect>
                   </div>
                 </div>
               </div>
@@ -234,16 +191,16 @@
             <!-- Transactions List -->
             <div
               v-if="filteredTransactions.length > 0"
-              class="p-6"
+              class="p-1.5 sm:p-2"
             >
               <div class="space-y-3">
                 <div
                   v-for="transaction in paginatedTransactions"
                   :key="transaction.id"
-                  class="card bg-base-100 hover:bg-base-300 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                  class="card bg-primary hover:bg-tertiary shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
                   @click="selectTransaction(transaction)"
                 >
-                  <div class="card-body p-4">
+                  <div class="p-1.5 sm:p-2">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center space-x-4 flex-1 min-w-0">
                         <!-- Transaction Type Icon -->
@@ -256,24 +213,16 @@
                               ).replace('text-', 'bg-')
                             "
                           >
-                            <svg
+                            <RiArrowUpLine
+                              v-if="
+                                getTransactionIconDirection(transaction.amount)
+                              "
                               class="w-5 h-5"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                v-if="
-                                  getTransactionIconDirection(
-                                    transaction.amount,
-                                  )
-                                "
-                                d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"
-                              />
-                              <path
-                                v-else
-                                d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
-                              />
-                            </svg>
+                            />
+                            <RiArrowDownLine
+                              v-else
+                              class="w-5 h-5"
+                            />
                           </div>
                         </div>
 
@@ -283,22 +232,12 @@
                             <h4 class="font-semibold text-sm truncate">
                               {{ transaction.description || 'No description' }}
                             </h4>
-                            <span class="text-xs text-base-content/60 ml-2">
+                            <span class="text-xs text-muted ml-2">
                               {{ formatDate(transaction.transactionDate) }}
                             </span>
                           </div>
-                          <div
-                            class="flex items-center text-xs text-base-content/60"
-                          >
-                            <svg
-                              class="w-3 h-3 mr-1"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M19,7H5A2,2 0 0,0 3,9V17A2,2 0 0,0 5,19H19A2,2 0 0,0 21,17V9A2,2 0 0,0 19,7M19,17H5V9H19V17Z"
-                              />
-                            </svg>
+                          <div class="flex items-center text-xs text-muted">
+                            <RiWalletLine class="w-3 h-3 mr-1" />
                             <span class="truncate">{{
                               transaction.counterAccount?.name ||
                               'Unknown account'
@@ -334,37 +273,49 @@
                 class="flex justify-center mt-8"
               >
                 <div class="join">
-                  <button
-                    class="join-item btn btn-sm"
+                  <BaseButton
+                    variant="ghost"
+                    size="sm"
+                    class="join-item"
                     :disabled="currentPage === 1"
                     @click="currentPage = 1"
                   >
                     «
-                  </button>
-                  <button
-                    class="join-item btn btn-sm"
+                  </BaseButton>
+                  <BaseButton
+                    variant="ghost"
+                    size="sm"
+                    class="join-item"
                     :disabled="currentPage === 1"
                     @click="currentPage--"
                   >
                     ‹
-                  </button>
-                  <button class="join-item btn btn-sm btn-active">
+                  </BaseButton>
+                  <BaseButton
+                    variant="primary"
+                    size="sm"
+                    class="join-item"
+                  >
                     {{ currentPage }}
-                  </button>
-                  <button
-                    class="join-item btn btn-sm"
+                  </BaseButton>
+                  <BaseButton
+                    variant="ghost"
+                    size="sm"
+                    class="join-item"
                     :disabled="currentPage === totalPages"
                     @click="currentPage++"
                   >
                     ›
-                  </button>
-                  <button
-                    class="join-item btn btn-sm"
+                  </BaseButton>
+                  <BaseButton
+                    variant="ghost"
+                    size="sm"
+                    class="join-item"
                     :disabled="currentPage === totalPages"
                     @click="currentPage = totalPages"
                   >
                     »
-                  </button>
+                  </BaseButton>
                 </div>
               </div>
             </div>
@@ -374,19 +325,11 @@
               v-else
               class="p-12 text-center"
             >
-              <svg
-                class="w-16 h-16 mx-auto text-base-content/20 mb-4"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M3,3H21V5H3V3M3,7H21V9H3V7M3,11H21V13H3V11M3,15H21V17H3V15M3,19H21V21H3V19Z"
-                />
-              </svg>
-              <h3 class="text-lg font-semibold text-base-content/60 mb-2">
+              <RiFileTextLine class="w-16 h-16 mx-auto text-muted mb-4" />
+              <h3 class="text-lg font-semibold text-muted mb-2">
                 {{ t('views.account.noTransactions') }}
               </h3>
-              <p class="text-base-content/40 mb-4">
+              <p class="text-muted mb-4">
                 {{ t('views.account.noTransactionsDescription') }}
               </p>
             </div>
@@ -402,7 +345,7 @@
     >
       <div class="text-center">
         <div class="loading loading-spinner loading-lg text-primary mb-4"></div>
-        <p class="text-base-content/60">{{ t('common.loading') }}</p>
+        <p class="text-muted">{{ t('common.loading') }}</p>
       </div>
     </div>
 
@@ -415,81 +358,91 @@
         v-if="selectedTransaction"
         class="modal-box w-11/12 max-w-2xl"
       >
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="font-bold text-lg">
+        <div class="modal-header">
+          <h3 class="modal-title">
             {{ t('views.account.transactionDetails') }}
           </h3>
-          <button
-            class="btn btn-sm btn-circle btn-ghost"
+          <BaseButton
+            variant="ghost"
+            size="sm"
+            class="h-8 w-8 p-0 rounded-full"
             @click="closeTransactionModal"
           >
-            ✕
-          </button>
+            <RiCloseLine class="w-4 h-4" />
+          </BaseButton>
         </div>
 
-        <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-4">
+        <div class="modal-content">
+          <div class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-medium text-secondary block mb-1">{{
+                  t('views.account.transactions.table.date')
+                }}</label>
+                <p class="text-base text-primary">
+                  {{ formatDate(selectedTransaction.transactionDate) }}
+                </p>
+              </div>
+              <div>
+                <label class="text-sm font-medium text-secondary block mb-1">{{
+                  t('views.account.transactions.table.amount')
+                }}</label>
+                <p
+                  class="text-base font-semibold"
+                  :class="getTransactionColorClass(selectedTransaction.amount)"
+                >
+                  {{
+                    formatCurrency(
+                      parseFloat(selectedTransaction.amount) || 0,
+                      account.currency || 'CHF',
+                    )
+                  }}
+                </p>
+              </div>
+            </div>
+
             <div>
-              <label class="text-sm font-semibold text-base-content/60">{{
-                t('views.account.transactions.table.date')
+              <label class="text-sm font-medium text-secondary block mb-1">{{
+                t('views.account.transactions.table.description')
               }}</label>
-              <p class="text-lg">
-                {{ formatDate(selectedTransaction.transactionDate) }}
+              <p class="text-base text-primary">
+                {{ selectedTransaction.description || 'No description' }}
               </p>
             </div>
+
             <div>
-              <label class="text-sm font-semibold text-base-content/60">{{
-                t('views.account.transactions.table.amount')
+              <label class="text-sm font-medium text-secondary block mb-1">{{
+                t('views.account.transactions.table.otherAccount')
               }}</label>
-              <p
-                class="text-lg font-bold"
-                :class="getTransactionColorClass(selectedTransaction.amount)"
-              >
+              <p class="text-base text-primary">
                 {{
-                  formatCurrency(
-                    parseFloat(selectedTransaction.amount) || 0,
-                    account.currency || 'CHF',
-                  )
+                  selectedTransaction.counterAccount?.name || 'Unknown account'
                 }}
               </p>
             </div>
           </div>
-
-          <div>
-            <label class="text-sm font-semibold text-base-content/60">{{
-              t('views.account.transactions.table.description')
-            }}</label>
-            <p class="text-lg">
-              {{ selectedTransaction.description || 'No description' }}
-            </p>
-          </div>
-
-          <div>
-            <label class="text-sm font-semibold text-base-content/60">{{
-              t('views.account.transactions.table.otherAccount')
-            }}</label>
-            <p class="text-lg">
-              {{
-                selectedTransaction.counterAccount?.name || 'Unknown account'
-              }}
-            </p>
-          </div>
         </div>
 
-        <div class="modal-action">
-          <button
-            class="btn btn-ghost"
+        <div class="modal-footer">
+          <BaseButton
+            variant="primary"
             @click="closeTransactionModal"
           >
             {{ t('common.close') }}
-          </button>
+          </BaseButton>
         </div>
       </div>
       <form
         method="dialog"
         class="modal-backdrop"
       >
-        <button @click="closeTransactionModal">close</button>
+        <BaseButton
+          variant="ghost"
+          class="opacity-0"
+          @click="closeTransactionModal"
+        >
+          close
+        </BaseButton>
       </form>
     </dialog>
   </div>
@@ -499,6 +452,21 @@
 import { useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import {
+  RiArrowLeftLine,
+  RiArrowUpLine,
+  RiArrowDownLine,
+  RiSearchLine,
+  RiPencilLine,
+  RiDeleteBinLine,
+  RiSaveLine,
+  RiCloseLine,
+  RiWalletLine,
+} from '@remixicon/vue';
+import PageHeader from '../components/PageHeader.vue';
+import BaseButton from '../components/BaseButton.vue';
+import BaseInput from '../components/BaseInput.vue';
+import BaseSelect from '../components/BaseSelect.vue';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
 import { useCurrency } from '../composables/useCurrency';

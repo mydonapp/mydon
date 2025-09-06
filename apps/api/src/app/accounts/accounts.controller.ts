@@ -32,20 +32,33 @@ export class AccountsController {
   @UseGuards(AuthGuard)
   @Get('')
   @ApiOperation({ summary: 'Get all accounts for the authenticated user' })
-  @ApiQuery({ name: 'from', type: Date, required: false, description: 'Filter from date' })
-  @ApiQuery({ name: 'to', type: Date, required: false, description: 'Filter to date' })
-  @ApiResponse({ status: 200, description: 'List of accounts retrieved successfully' })
+  @ApiQuery({
+    name: 'from',
+    type: Date,
+    required: false,
+    description: 'Filter from date',
+  })
+  @ApiQuery({
+    name: 'to',
+    type: Date,
+    required: false,
+    description: 'Filter to date',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of accounts retrieved successfully',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAll(
     @Req() req: Request,
     @Query('from', new ParseDatePipe({ optional: true })) from?: Date,
-    @Query('to', new ParseDatePipe({ optional: true })) to?: Date
+    @Query('to', new ParseDatePipe({ optional: true })) to?: Date,
   ) {
     const result = await this.accountsService.findAllGroupedByAccountType(
       req['context'],
       {
         filter: { from, to },
-      }
+      },
     );
     return result;
   }
@@ -59,12 +72,13 @@ export class AccountsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   createAccount(
     @Req() req: Request,
-    @Body() createAccountDto: CreateAccountDto
+    @Body() createAccountDto: CreateAccountDto,
   ) {
     return this.accountsService.createAccount(req['context'], {
       name: createAccountDto.name,
       type: createAccountDto.type,
       openingBalance: createAccountDto.openingBalance,
+      currency: createAccountDto.currency,
     });
   }
 
@@ -72,12 +86,15 @@ export class AccountsController {
   @Get(':accountId')
   @ApiOperation({ summary: 'Get account details by ID' })
   @ApiParam({ name: 'accountId', description: 'Account ID', type: 'string' })
-  @ApiResponse({ status: 200, description: 'Account details retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Account details retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Account not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getAccountTransactions(
     @Req() req: Request,
-    @Param('accountId') accountId: string
+    @Param('accountId') accountId: string,
   ) {
     return this.accountsService.getAccount(req['context'], accountId);
   }

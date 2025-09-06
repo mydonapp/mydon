@@ -29,7 +29,9 @@
     "self-hosted"
   ],
   "scripts": {
-    "start:infra": "docker compose --file docker-compose.dev.yml --env-file .env.local up",
+    "start:infra": "docker compose --file docker-compose.dev.yml --env-file .env up",
+    "start:app": "nx serve app",
+    "start:api": "nx serve api",
     "lint": "nx run-many --all --target=lint",
     "test": "nx run-many --all --target=test",
     "build": "nx run-many --all --target=build"
@@ -42,6 +44,7 @@
     "@nestjs/platform-express": "11.1.2",
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/typeorm": "11.0.0",
+    "@remixicon/vue": "^4.6.0",
     "@tailwindcss/vite": "4.1.8",
     "@tanstack/vue-query": "5.79.0",
     "@tanstack/vue-query-devtools": "5.79.0",
@@ -94,7 +97,6 @@
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
     "autoprefixer": "10.4.21",
-    "daisyui": "5.0.42",
     "eslint": "9.27.0",
     "eslint-config-prettier": "10.1.5",
     "eslint-plugin-vue": "10.1.0",

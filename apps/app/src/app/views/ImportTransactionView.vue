@@ -1,208 +1,134 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen bg-primary">
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-info to-info-content text-info-content">
-      <div class="container mx-auto px-6 py-8">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold mb-2">
-              {{ t('views.importTransactions.title') }}
-            </h1>
-            <p class="text-info-content/80">
-              {{ t('views.importTransactions.subtitle') }}
-            </p>
-          </div>
-          <div class="stats stats-horizontal bg-info-content/10">
+    <PageHeader
+      :title="t('views.importTransactions.title')"
+      :subtitle="t('views.importTransactions.subtitle')"
+    >
+      <template #extra>
+        <div class="flex items-center gap-4">
+          <div class="stats stats-horizontal bg-primary-600/10">
             <div class="stat">
-              <div class="stat-title text-info-content/80">
+              <div class="stat-title text-muted">
                 {{ t('views.importTransactions.pendingTransactions') }}
               </div>
-              <div class="stat-value text-info-content">
+              <div class="stat-value text-primary-400">
                 {{ draftTransactions?.length || 0 }}
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
-    <div class="container mx-auto px-6 py-8">
+    <div
+      class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl"
+    >
       <!-- Import Form Card -->
-      <div class="card bg-base-200 shadow-xl mb-8">
-        <div class="card-body">
+      <div class="card bg-secondary shadow-xl mb-6 sm:mb-8">
+        <div class="p-1.5 sm:p-2">
           <h2 class="card-title text-2xl mb-6">
-            <svg
-              class="w-8 h-8 mr-3"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-              />
-            </svg>
+            <RiFileTextLine class="w-8 h-8 mr-3" />
             {{ t('views.importTransactions.importForm.title') }}
           </h2>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Configuration Section -->
             <div class="space-y-6">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text text-lg font-semibold">{{
-                    t('views.importTransactions.importForm.account.label')
-                  }}</span>
-                </label>
-                <select
+              <div>
+                <BaseSelect
                   v-model="accountId"
-                  class="select select-bordered select-lg w-full"
-                >
-                  <option
-                    value=""
-                    disabled
-                  >
-                    {{
-                      t(
-                        'views.importTransactions.importForm.account.placeholder',
-                      )
-                    }}
-                  </option>
-                  <option
-                    v-for="account in assetsAccounts"
-                    :key="account.id"
-                    :value="account.id"
-                  >
-                    {{ account.name }} ({{ account.currency }})
-                  </option>
-                </select>
-                <label class="label">
-                  <span class="label-text-alt">{{
+                  :label="
+                    t('views.importTransactions.importForm.account.label')
+                  "
+                  :placeholder="
+                    t('views.importTransactions.importForm.account.placeholder')
+                  "
+                  :help-text="
                     t('views.importTransactions.importForm.account.help')
-                  }}</span>
-                </label>
+                  "
+                  size="lg"
+                  variant="bordered"
+                >
+                  <template #options>
+                    <option
+                      v-for="account in assetsAccounts"
+                      :key="account.id"
+                      :value="account.id"
+                    >
+                      {{ account.name }} ({{ account.currency }})
+                    </option>
+                  </template>
+                </BaseSelect>
               </div>
 
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text text-lg font-semibold">{{
-                    t('views.importTransactions.importForm.issuer.label')
-                  }}</span>
-                </label>
-                <select
+              <div>
+                <BaseSelect
                   v-model="importType"
-                  class="select select-bordered select-lg w-full"
+                  :label="t('views.importTransactions.importForm.issuer.label')"
+                  :placeholder="
+                    t('views.importTransactions.importForm.issuer.placeholder')
+                  "
+                  size="lg"
+                  variant="bordered"
                 >
-                  <option
-                    value=""
-                    disabled
+                  <template #options>
+                    <option value="SWISSCARD">Swisscard - Credit Cards</option>
+                    <option value="YUH">Yuh - Banking & Investment</option>
+                    <option value="POSTFINANCE">
+                      PostFinance - Swiss Bank
+                    </option>
+                    <option value="WISE">Wise - International Transfers</option>
+                  </template>
+                </BaseSelect>
+                <p class="text-xs text-muted mt-1">
+                  <i18n-t
+                    tag="span"
+                    keypath="views.importTransactions.importForm.issuer.footer.text"
                   >
-                    {{
-                      t(
-                        'views.importTransactions.importForm.issuer.placeholder',
-                      )
-                    }}
-                  </option>
-                  <option value="SWISSCARD">
-                    <span class="flex items-center">
-                      <span class="font-semibold">Swisscard</span> - Credit
-                      Cards
-                    </span>
-                  </option>
-                  <option value="YUH">
-                    <span class="flex items-center">
-                      <span class="font-semibold">Yuh</span> - Banking &
-                      Investment
-                    </span>
-                  </option>
-                  <option value="POSTFINANCE">
-                    <span class="flex items-center">
-                      <span class="font-semibold">PostFinance</span> - Swiss
-                      Bank
-                    </span>
-                  </option>
-                  <option value="WISE">
-                    <span class="flex items-center">
-                      <span class="font-semibold">Wise</span> - International
-                      Transfers
-                    </span>
-                  </option>
-                </select>
-                <label class="label">
-                  <span class="label-text-alt">
-                    <i18n-t
-                      tag="span"
-                      keypath="views.importTransactions.importForm.issuer.footer.text"
+                    <a
+                      href="https://github.com/mydonapp/mydon/issues"
+                      target="_blank"
+                      class="text-primary-600 hover:text-primary-700 underline"
                     >
-                      <a
-                        href="https://github.com/mydonapp/mydon/issues"
-                        target="_blank"
-                        class="link link-primary"
-                      >
-                        {{
-                          t(
-                            'views.importTransactions.importForm.issuer.footer.link',
-                          )
-                        }}
-                      </a>
-                    </i18n-t>
-                  </span>
-                </label>
+                      {{
+                        t(
+                          'views.importTransactions.importForm.issuer.footer.link',
+                        )
+                      }}
+                    </a>
+                  </i18n-t>
+                </p>
               </div>
             </div>
 
             <!-- File Upload Section -->
             <div class="space-y-6">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text text-lg font-semibold">{{
-                    t('views.importTransactions.importForm.upload.label')
-                  }}</span>
-                </label>
-                <input
-                  type="file"
-                  class="file-input file-input-bordered file-input-lg w-full"
-                  accept=".csv"
-                />
-                <label class="label">
-                  <span class="label-text-alt">{{
-                    t('views.importTransactions.importForm.upload.help')
-                  }}</span>
-                </label>
-              </div>
+              <BaseFileInput
+                :label="t('views.importTransactions.importForm.upload.label')"
+                accept=".csv"
+                :hint="t('views.importTransactions.importForm.upload.help')"
+                size="lg"
+                variant="bordered"
+                @change="handleFileChange"
+              />
 
-              <div class="alert alert-info">
-                <svg
-                  class="w-6 h-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
+              <!-- Button positioned to align with the bottom of the issuer select -->
+              <div class="mt-14">
+                <BaseButton
+                  variant="primary"
+                  size="lg"
+                  class="w-full"
+                  :disabled="
+                    !fileContent || !accountId || !importType || isLoading
+                  "
+                  :loading="isLoading"
+                  @click="importTransactions"
                 >
-                  <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" />
-                </svg>
-                <div>
-                  <h3 class="font-bold">
-                    {{ t('views.importTransactions.importForm.tip.title') }}
-                  </h3>
-                  <div class="text-xs">
-                    {{
-                      t('views.importTransactions.importForm.tip.description')
-                    }}
-                  </div>
-                </div>
+                  <RiUploadLine class="w-5 h-5 mr-2" />
+                  {{ t('views.importTransactions.importForm.submit.label') }}
+                </BaseButton>
               </div>
-
-              <button
-                class="btn btn-primary btn-lg w-full"
-                :disabled="!accountId || !importType"
-                @click="importTransactions"
-              >
-                <svg
-                  class="w-5 h-5 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M5,20H19V18H5M19,9H15L13,7H9V9H5L12,16L19,9Z" />
-                </svg>
-                {{ t('views.importTransactions.importForm.submit.label') }}
-              </button>
             </div>
           </div>
         </div>
@@ -211,20 +137,12 @@
       <!-- Draft Transactions Section -->
       <div
         v-if="draftTransactions && draftTransactions.length > 0"
-        class="card bg-base-200 shadow-xl"
+        class="card bg-secondary shadow-xl"
       >
-        <div class="card-body">
+        <div class="p-1.5 sm:p-2">
           <div class="flex items-center justify-between mb-6">
             <h2 class="card-title text-2xl">
-              <svg
-                class="w-8 h-8 mr-3"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V7H5V5H19M5,19V9H19V19H5M11,11H13V17H11V11M15,11H17V17H15V11M7,11H9V17H7V11Z"
-                />
-              </svg>
+              <RiFileTextLine class="w-8 h-8 mr-3" />
               {{ t('views.importTransactions.draftTransactions.title') }}
               <div class="badge badge-warning">
                 {{ draftTransactions.length }}
@@ -232,8 +150,9 @@
             </h2>
 
             <div class="flex gap-2">
-              <button
-                class="btn btn-outline btn-sm"
+              <BaseButton
+                variant="secondary"
+                size="sm"
                 @click="selectAll = !selectAll"
               >
                 {{
@@ -243,26 +162,17 @@
                       )
                     : t('views.importTransactions.draftTransactions.selectAll')
                 }}
-              </button>
-              <button
-                class="btn btn-success btn-sm"
+              </BaseButton>
+              <BaseButton
+                variant="success"
+                size="sm"
                 :disabled="!transactions.some((t) => t.selected)"
                 @click="updateDraft"
               >
-                <svg
-                  class="w-4 h-4 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
-                  />
-                </svg>
-                {{
-                  t('views.importTransactions.draftTransactions.approve')
-                }}
+                <RiSaveLine class="w-4 h-4 mr-2" />
+                {{ t('views.importTransactions.draftTransactions.approve') }}
                 ({{ transactions.filter((t) => t.selected).length }})
-              </button>
+              </BaseButton>
             </div>
           </div>
 
@@ -346,98 +256,103 @@
                     </span>
                   </td>
                   <td>
-                    <input
+                    <BaseTextarea
                       v-model="transaction.description"
-                      type="text"
-                      class="input input-sm input-ghost w-full max-w-xs"
+                      :rows="2"
+                      class="w-full min-w-64 h-16 text-sm"
+                      :placeholder="
+                        t(
+                          'views.importTransactions.draftTransactions.table.descriptionPlaceholder',
+                        )
+                      "
                     />
                   </td>
                   <td>
-                    <select
+                    <BaseSelect
                       v-model="transaction.creditAccountId"
-                      class="select select-sm select-bordered w-full max-w-xs"
-                      @change="onAccountChange(transaction, 'credit')"
+                      :placeholder="
+                        t(
+                          'views.importTransactions.draftTransactions.table.selectAccount',
+                        )
+                      "
+                      size="sm"
+                      @update:model-value="
+                        onAccountChange(transaction, 'credit')
+                      "
                     >
-                      <option :value="undefined">
-                        {{
-                          t(
-                            'views.importTransactions.draftTransactions.table.selectAccount',
-                          )
-                        }}
-                      </option>
-                      <option
-                        v-for="account in allAccounts"
-                        :key="account.id"
-                        :value="account.id"
-                      >
-                        {{ account.name }}
-                      </option>
-                    </select>
+                      <template #options>
+                        <option
+                          v-for="account in allAccounts"
+                          :key="account.id"
+                          :value="account.id"
+                        >
+                          {{ account.name }}
+                        </option>
+                      </template>
+                    </BaseSelect>
                   </td>
                   <td>
-                    <select
+                    <BaseSelect
                       v-model="transaction.debitAccountId"
-                      class="select select-sm select-bordered w-full max-w-xs"
-                      @change="onAccountChange(transaction, 'debit')"
+                      :placeholder="
+                        t(
+                          'views.importTransactions.draftTransactions.table.selectAccount',
+                        )
+                      "
+                      size="sm"
+                      @update:model-value="
+                        onAccountChange(transaction, 'debit')
+                      "
                     >
-                      <option :value="undefined">
-                        {{
-                          t(
-                            'views.importTransactions.draftTransactions.table.selectAccount',
-                          )
-                        }}
-                      </option>
-                      <option
-                        v-for="account in allAccounts"
-                        :key="account.id"
-                        :value="account.id"
-                      >
-                        {{ account.name }}
-                      </option>
-                    </select>
+                      <template #options>
+                        <option
+                          v-for="account in allAccounts"
+                          :key="account.id"
+                          :value="account.id"
+                        >
+                          {{ account.name }}
+                        </option>
+                      </template>
+                    </BaseSelect>
                   </td>
                   <td>
                     <div v-if="isEqualCurrency(transaction)">
-                      <input
+                      <BaseInput
                         v-model="transaction.amount"
                         type="number"
                         step="0.01"
-                        class="input input-sm input-bordered w-24"
+                        size="sm"
+                        class="w-24"
                       />
                     </div>
                     <div
                       v-else
                       class="flex flex-col gap-1"
                     >
-                      <input
+                      <BaseInput
                         v-model="transaction.creditAmount"
                         type="number"
                         step="0.01"
-                        class="input input-sm input-bordered w-24"
+                        size="sm"
+                        class="w-24"
                       />
-                      <input
+                      <BaseInput
                         v-model="transaction.debitAmount"
                         type="number"
                         step="0.01"
-                        class="input input-sm input-bordered w-24"
+                        size="sm"
+                        class="w-24"
                       />
                     </div>
                   </td>
                   <td>
-                    <button
-                      class="btn btn-error btn-sm"
+                    <BaseButton
+                      variant="danger"
+                      size="sm"
                       @click="deleteTransaction(transaction.id)"
                     >
-                      <svg
-                        class="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
-                        />
-                      </svg>
-                    </button>
+                      <RiDeleteBinLine class="w-4 h-4" />
+                    </BaseButton>
                   </td>
                 </tr>
               </tbody>
@@ -449,18 +364,10 @@
       <!-- Empty State -->
       <div
         v-else-if="draftTransactions"
-        class="card bg-base-200 shadow-xl"
+        class="card bg-secondary shadow-xl"
       >
-        <div class="card-body text-center py-16">
-          <svg
-            class="w-24 h-24 mx-auto text-base-content/30 mb-6"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-            />
-          </svg>
+        <div class="p-1.5 sm:p-2 text-center py-16">
+          <RiFileTextLine class="w-24 h-24 mx-auto text-muted mb-6" />
           <h3 class="text-2xl font-bold mb-4">
             {{ t('views.importTransactions.emptyState.title') }}
           </h3>
@@ -468,7 +375,7 @@
             {{ t('views.importTransactions.emptyState.description') }}
           </p>
           <div class="flex flex-wrap justify-center gap-4">
-            <div class="card bg-base-100 shadow p-4">
+            <div class="card bg-primary shadow p-1.5 sm:p-2">
               <h4 class="font-semibold mb-2">
                 {{ t('views.importTransactions.emptyState.step1.title') }}
               </h4>
@@ -476,7 +383,7 @@
                 {{ t('views.importTransactions.emptyState.step1.description') }}
               </p>
             </div>
-            <div class="card bg-base-100 shadow p-4">
+            <div class="card bg-primary shadow p-1.5 sm:p-2">
               <h4 class="font-semibold mb-2">
                 {{ t('views.importTransactions.emptyState.step2.title') }}
               </h4>
@@ -484,7 +391,7 @@
                 {{ t('views.importTransactions.emptyState.step2.description') }}
               </p>
             </div>
-            <div class="card bg-base-100 shadow p-4">
+            <div class="card bg-primary shadow p-1.5 sm:p-2">
               <h4 class="font-semibold mb-2">
                 {{ t('views.importTransactions.emptyState.step3.title') }}
               </h4>
@@ -499,9 +406,9 @@
       <!-- Loading State -->
       <div
         v-else
-        class="card bg-base-200 shadow-xl"
+        class="card bg-secondary shadow-xl"
       >
-        <div class="card-body">
+        <div class="p-1.5 sm:p-2">
           <div class="flex items-center justify-between mb-6">
             <div class="skeleton h-8 w-64"></div>
             <div class="skeleton h-8 w-32"></div>
@@ -521,6 +428,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useFetch } from '@vueuse/core';
 import { computed, ref, watch, watchEffect } from 'vue';
+import {
+  RiFileTextLine,
+  RiUploadLine,
+  RiDeleteBinLine,
+  RiSaveLine,
+  RiCheckLine,
+  RiErrorWarningLine,
+} from '@remixicon/vue';
+import PageHeader from '../components/PageHeader.vue';
+import BaseButton from '../components/BaseButton.vue';
+import BaseInput from '../components/BaseInput.vue';
+import BaseFileInput from '../components/BaseFileInput.vue';
+import BaseTextarea from '../components/BaseTextarea.vue';
+import BaseSelect from '../components/BaseSelect.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
 import { useConstant } from '../composables/useConstant';
@@ -536,6 +457,8 @@ const queryClient = useQueryClient();
 const accountId = ref('');
 const importType = ref('');
 const selectAll = ref(false);
+const fileContent = ref<File | null>(null);
+const isLoading = ref(false);
 
 const { mutate } = useMutation({
   mutationFn: async (data: FormData) => {
@@ -620,14 +543,19 @@ watch(
   },
 );
 
+const handleFileChange = (files: FileList | null) => {
+  if (files && files.length > 0) {
+    fileContent.value = files[0];
+  } else {
+    fileContent.value = null;
+  }
+};
+
 const importTransactions = async () => {
-  const input = document.querySelector(
-    'input[type="file"]',
-  ) as HTMLInputElement;
-  if (!input.files?.[0]) return;
+  if (!fileContent.value) return;
 
   const data = new FormData();
-  data.append('file', input.files[0]);
+  data.append('file', fileContent.value);
   data.append('accountId', accountId.value);
   data.append('statementIssuer', importType.value);
 

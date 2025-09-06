@@ -109,6 +109,10 @@ export default {
         accountType: {
           label: 'Tipo di Conto',
         },
+        currency: {
+          label: 'Valuta',
+          placeholder: 'Seleziona valuta',
+        },
         submit: {
           label: 'Aggiungi Conto',
         },
@@ -183,11 +187,6 @@ export default {
           label: 'File CSV',
           help: 'Carica il tuo estratto conto in formato CSV',
         },
-        tip: {
-          title: 'Suggerimento: Contabilità a Partita Doppia',
-          description:
-            'Ogni transazione sarà automaticamente abbinata ai conti spese/entrate basati sui pattern di descrizione.',
-        },
         submit: {
           label: 'Importa Transazioni',
         },
@@ -200,6 +199,7 @@ export default {
         table: {
           date: 'Data',
           description: 'Descrizione',
+          descriptionPlaceholder: 'Modifica descrizione transazione',
           creditAccount: 'Conto Creditore',
           debitAccount: 'Conto Debitore',
           amount: 'Importo',
@@ -276,5 +276,12 @@ export default {
     income: 'Entrate',
     expenses: 'Spese',
     cancel: 'Annulla',
+    currencies: {
+      CHF: 'Franco Svizzero (CHF)',
+      EUR: 'Euro (EUR)',
+      USD: 'Dollaro Americano (USD)',
+      GBP: 'Sterlina Britannica (GBP)',
+      KRW: 'Won Sud-Coreano (KRW)',
+    },
   },
 };

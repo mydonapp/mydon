@@ -109,6 +109,10 @@ export default {
         accountType: {
           label: 'Account Type',
         },
+        currency: {
+          label: 'Currency',
+          placeholder: 'Select currency',
+        },
         submit: {
           label: 'Add Account',
         },
@@ -187,11 +191,6 @@ export default {
           label: 'CSV File',
           help: 'Upload your bank statement in CSV format',
         },
-        tip: {
-          title: 'Tip: Double-entry Bookkeeping',
-          description:
-            'Each transaction will be automatically matched to expense/income accounts based on description patterns.',
-        },
         submit: {
           label: 'Import Transactions',
         },
@@ -204,6 +203,7 @@ export default {
         table: {
           date: 'Date',
           description: 'Description',
+          descriptionPlaceholder: 'Edit transaction description',
           creditAccount: 'Credit Account',
           debitAccount: 'Debit Account',
           amount: 'Amount',
@@ -228,6 +228,37 @@ export default {
           description: 'Import your bank statement file',
         },
       },
+    },
+    spendingAnalysis: {
+      title: 'Spending Analysis',
+      subtitle:
+        'Compare and analyze your spending patterns across different time periods',
+      allAccounts: 'All Accounts',
+      monthly: 'Monthly',
+      quarterly: 'Quarterly',
+      yearly: 'Yearly',
+      thisMonth: 'This Month',
+      lastMonth: 'Last Month',
+      thisQuarter: 'This Quarter',
+      lastQuarter: 'Last Quarter',
+      thisYear: 'This Year',
+      lastYear: 'Last Year',
+      currentPeriod: 'Current Period',
+      previousPeriod: 'Previous Period',
+      change: 'Change',
+      percentageChange: '% Change',
+      spendingTrend: 'Spending Trend',
+      accountBreakdown: 'Account Breakdown',
+      budgetComparison: 'Budget Comparison',
+      budgetFeature: 'Budget Comparison Coming Soon',
+      budgetDescription:
+        'Set budgets for your accounts and compare actual spending against your planned budget.',
+      comingSoon: 'Coming Soon',
+      detailedTransactions: 'Recent Transactions',
+      noData: 'No spending data available',
+      noAccountData: 'No account data available',
+      noTransactions: 'No transactions found',
+      showingTransactions: 'Showing {shown} of {total} transactions',
     },
     settings: {
       title: 'Settings',
@@ -266,6 +297,7 @@ export default {
       menu: {
         dashboard: 'Dashboard',
         accounts: 'Accounts',
+        spendingAnalysis: 'Spending Analysis',
         importTransactions: 'Import Transactions',
         settings: 'Settings',
         logout: 'Logout',
@@ -279,5 +311,12 @@ export default {
     income: 'Income',
     expenses: 'Expenses',
     cancel: 'Cancel',
+    currencies: {
+      CHF: 'Swiss Franc (CHF)',
+      EUR: 'Euro (EUR)',
+      USD: 'US Dollar (USD)',
+      GBP: 'British Pound (GBP)',
+      KRW: 'Korean Won (KRW)',
+    },
   },
 };

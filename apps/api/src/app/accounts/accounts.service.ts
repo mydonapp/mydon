@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ForexService } from '../shared/forex/forex.service';
 import { Context } from '../shared/types/context';
-import { Account, AccountType } from './accounts.entity';
+import { Account, AccountType, Currency } from './accounts.entity';
 
 @Injectable()
 export class AccountsService {
@@ -145,12 +145,16 @@ export class AccountsService {
       name: string;
       type: AccountType;
       openingBalance: number;
+      currency?: Currency;
     },
   ) {
     const account = new Account();
     account.name = options.name;
     account.type = options.type;
     account.openingBalance = options.openingBalance;
+    if (options.currency) {
+      account.currency = options.currency;
+    }
     account.setUserId(context.user.id);
     return this.accountsRepository.save(account);
   }

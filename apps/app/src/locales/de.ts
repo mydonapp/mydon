@@ -109,6 +109,10 @@ export default {
         accountType: {
           label: 'Kontotyp',
         },
+        currency: {
+          label: 'Währung',
+          placeholder: 'Währung auswählen',
+        },
         submit: {
           label: 'Konto hinzufügen',
         },
@@ -183,11 +187,6 @@ export default {
           label: 'CSV-Datei',
           help: 'Laden Sie Ihren Kontoauszug im CSV-Format hoch',
         },
-        tip: {
-          title: 'Tipp: Doppelte Buchführung',
-          description:
-            'Jede Transaktion wird automatisch basierend auf Beschreibungsmustern Ausgaben-/Einnahmen-Konten zugeordnet.',
-        },
         submit: {
           label: 'Transaktionen importieren',
         },
@@ -200,6 +199,7 @@ export default {
         table: {
           date: 'Datum',
           description: 'Beschreibung',
+          descriptionPlaceholder: 'Transaktionsbeschreibung bearbeiten',
           creditAccount: 'Kreditkonto',
           debitAccount: 'Debitkonto',
           amount: 'Betrag',
@@ -276,5 +276,12 @@ export default {
     income: 'Einkommen',
     expenses: 'Ausgaben',
     cancel: 'Abbrechen',
+    currencies: {
+      CHF: 'Schweizer Franken (CHF)',
+      EUR: 'Euro (EUR)',
+      USD: 'US-Dollar (USD)',
+      GBP: 'Britisches Pfund (GBP)',
+      KRW: 'Südkoreanischer Won (KRW)',
+    },
   },
 };

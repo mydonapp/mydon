@@ -106,7 +106,6 @@ export class Transaction {
   }
 
   public static create(props: CreateTransaction): Transaction {
-    console.log(props);
     const transaction = new Transaction();
     transaction.creditAmount = props.creditAmount;
     transaction.debitAmount = props.debitAmount;

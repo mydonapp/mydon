@@ -45,7 +45,7 @@ services:
     environment:
       DATABASE_URL: postgres://mydon:mydonpass@db:5432/mydon
       CORS_ORIGINS: http://localhost:4000
-      ENABLE_API_DOCS: false
+      ENABLE_API_DOCS: 'false'
     depends_on:
       - db
     ports:
