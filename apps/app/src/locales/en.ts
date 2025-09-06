@@ -109,6 +109,10 @@ export default {
         accountType: {
           label: 'Account Type',
         },
+        currency: {
+          label: 'Currency',
+          placeholder: 'Select currency',
+        },
         submit: {
           label: 'Add Account',
         },
@@ -307,5 +311,12 @@ export default {
     income: 'Income',
     expenses: 'Expenses',
     cancel: 'Cancel',
+    currencies: {
+      CHF: 'Swiss Franc (CHF)',
+      EUR: 'Euro (EUR)',
+      USD: 'US Dollar (USD)',
+      GBP: 'British Pound (GBP)',
+      KRW: 'Korean Won (KRW)',
+    },
   },
 };

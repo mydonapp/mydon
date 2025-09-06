@@ -7,6 +7,7 @@ interface CreateAccount {
   name: string;
   openingBalance: number;
   type: string;
+  currency?: string;
 }
 
 export const useAccounts = (timeFilter?: Ref<string>) => {

@@ -109,6 +109,10 @@ export default {
         accountType: {
           label: 'Tipo di Conto',
         },
+        currency: {
+          label: 'Valuta',
+          placeholder: 'Seleziona valuta',
+        },
         submit: {
           label: 'Aggiungi Conto',
         },
@@ -272,5 +276,12 @@ export default {
     income: 'Entrate',
     expenses: 'Spese',
     cancel: 'Annulla',
+    currencies: {
+      CHF: 'Franco Svizzero (CHF)',
+      EUR: 'Euro (EUR)',
+      USD: 'Dollaro Americano (USD)',
+      GBP: 'Sterlina Britannica (GBP)',
+      KRW: 'Won Sud-Coreano (KRW)',
+    },
   },
 };

@@ -110,6 +110,10 @@ export default {
         accountType: {
           label: 'Type de Compte',
         },
+        currency: {
+          label: 'Devise',
+          placeholder: 'Sélectionnez la devise',
+        },
         submit: {
           label: 'Ajouter le Compte',
         },
@@ -273,5 +277,12 @@ export default {
     income: 'Revenus',
     expenses: 'Dépenses',
     cancel: 'Annuler',
+    currencies: {
+      CHF: 'Franc Suisse (CHF)',
+      EUR: 'Euro (EUR)',
+      USD: 'Dollar Américain (USD)',
+      GBP: 'Livre Sterling (GBP)',
+      KRW: 'Won Sud-Coréen (KRW)',
+    },
   },
 };

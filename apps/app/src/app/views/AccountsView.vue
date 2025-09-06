@@ -617,6 +617,25 @@
             </div>
 
             <div>
+              <BaseSelect
+                v-model="currency"
+                :label="t('views.accounts.addAccountForm.currency.label')"
+                :placeholder="
+                  t('views.accounts.addAccountForm.currency.placeholder')
+                "
+                required
+              >
+                <template #options>
+                  <option value="CHF">{{ t('words.currencies.CHF') }}</option>
+                  <option value="EUR">{{ t('words.currencies.EUR') }}</option>
+                  <option value="USD">{{ t('words.currencies.USD') }}</option>
+                  <option value="GBP">{{ t('words.currencies.GBP') }}</option>
+                  <option value="KRW">{{ t('words.currencies.KRW') }}</option>
+                </template>
+              </BaseSelect>
+            </div>
+
+            <div>
               <BaseInput
                 v-model="openingBalance"
                 type="number"
@@ -857,6 +876,7 @@ const transactionModal = ref<HTMLDialogElement>();
 const name = ref('');
 const openingBalance = ref(0);
 const accountType = ref('ASSETS');
+const currency = ref('CHF');
 
 const transactionDescription = ref('');
 const creditAccountId = ref('');
@@ -888,6 +908,7 @@ const closeAddAccountModal = () => {
   name.value = '';
   openingBalance.value = 0;
   accountType.value = 'ASSETS';
+  currency.value = 'CHF';
 };
 
 const openTransactionModal = () => {
@@ -913,6 +934,7 @@ const addAccount = async () => {
       name: name.value,
       openingBalance: openingBalance.value,
       type: accountType.value,
+      currency: currency.value,
     });
     closeAddAccountModal();
     success(
