@@ -1,6 +1,6 @@
 <template>
   <div
-    class="text-white sticky top-0 z-50 overflow-hidden border-b border-primary -ml-0.25"
+    class="text-white sticky xl:top-0 top-18.25 z-10 xl:z-50 overflow-hidden border-b border-primary -ml-0.25"
     style="
       background: linear-gradient(
         135deg,

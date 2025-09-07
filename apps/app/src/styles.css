@@ -532,7 +532,7 @@ body {
   z-index: 40;
 }
 
-.drawer-toggle:checked ~ .drawer-side {
+.drawer-toggle:checked ~ .drawer-content ~ .drawer-side {
   transform: translateX(0);
 }
 
@@ -551,7 +551,7 @@ body {
     visibility 0.3s ease;
 }
 
-.drawer-toggle:checked ~ .drawer-overlay {
+.drawer-toggle:checked ~ .drawer-content ~ .drawer-side ~ .drawer-overlay {
   opacity: 1;
   visibility: visible;
 }

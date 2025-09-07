@@ -14,16 +14,13 @@
           class="xl:hidden navbar bg-secondary border-b border-primary sticky top-0 z-20"
         >
           <div class="flex items-center space-x-3">
-            <BaseButton
-              variant="ghost"
-              size="sm"
-              class="p-2"
-              as="label"
+            <label
               for="my-drawer"
               aria-label="Open menu"
+              class="inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 hover:cursor-pointer px-3 py-2 text-sm rounded-lg bg-transparent hover:bg-primary/10 text-secondary hover:text-primary-400 p-2"
             >
               <RiMenuLine class="w-6 h-6" />
-            </BaseButton>
+            </label>
             <h1 class="text-xl font-bold text-primary-400">myDon</h1>
           </div>
         </div>
