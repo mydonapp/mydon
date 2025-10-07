@@ -54,8 +54,8 @@ export class TransactionsController {
         draft: transaction.draft,
         // Amount based on user perception
         amount:
-          transaction.creditAccount.type === AccountType.INCOME ||
-          transaction.creditAccount.type === AccountType.ASSETS
+          transaction.creditAccount?.type === AccountType.INCOME ||
+          transaction.creditAccount?.type === AccountType.ASSETS
             ? transaction.creditAmount
             : transaction.creditAmount * -1,
       };
