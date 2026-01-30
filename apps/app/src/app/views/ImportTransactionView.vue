@@ -512,7 +512,7 @@ const { data: draftTransactions } = useQuery({
 const transactions = ref([]);
 
 watchEffect(() => {
-  if (transactions.value?.length === 0 && draftTransactions.value) {
+  if (draftTransactions.value) {
     transactions.value = draftTransactions?.value
       ?.map((transaction) => {
         return {

@@ -1,5 +1,5 @@
-import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 import { parse } from 'csv-parse/sync';
+import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 
 export interface SwisscardStatement {
   'Transaction date': string;
@@ -45,7 +45,7 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
         transactionDate: new Date(
           parseInt(dmy[2]),
           parseInt(dmy[1]) - 1,
-          parseInt(dmy[0])
+          parseInt(dmy[0]),
         ),
         raw: {
           ...transaction,
@@ -58,14 +58,14 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
   }
 
   protected getCreditAccountIdFromStatement(
-    transaction: MappedTransaction<SwisscardStatementResponse>
+    transaction: MappedTransaction<SwisscardStatementResponse>,
   ): string {
     if (transaction.raw['Debit/Credit'] === 'Credit') {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
-    transaction: MappedTransaction<SwisscardStatementResponse>
+    transaction: MappedTransaction<SwisscardStatementResponse>,
   ): string {
     if (transaction.raw['Debit/Credit'] === 'Debit') {
       return this.accountId;

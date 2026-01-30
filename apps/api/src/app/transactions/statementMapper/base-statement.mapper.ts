@@ -15,7 +15,7 @@ export abstract class StatementMapper<T> {
   constructor(
     protected context: Context,
     protected fileContent: string,
-    protected accountId: string
+    protected accountId: string,
   ) {}
 
   protected abstract mapStatement(): Promise<MappedTransaction<T>[]>;
@@ -45,11 +45,11 @@ export abstract class StatementMapper<T> {
   }
 
   protected abstract getCreditAccountIdFromStatement(
-    transaction: MappedTransaction<T>
+    transaction: MappedTransaction<T>,
   ): string | undefined;
 
   private getCreditAccountId(
-    transaction: MappedTransaction<T>
+    transaction: MappedTransaction<T>,
   ): string | undefined {
     const creditAccountIdFromStatement =
       this.getCreditAccountIdFromStatement(transaction);
@@ -59,11 +59,11 @@ export abstract class StatementMapper<T> {
   }
 
   protected abstract getDebitAccountIdFromStatement(
-    transaction: MappedTransaction<T>
+    transaction: MappedTransaction<T>,
   ): string | undefined;
 
   private getDebitAccountId(
-    transaction: MappedTransaction<T>
+    transaction: MappedTransaction<T>,
   ): string | undefined {
     const debitAccountIdFromStatement =
       this.getDebitAccountIdFromStatement(transaction);
