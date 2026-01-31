@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as argon2 from 'argon2';
 import { randomBytes } from 'crypto';
 import { Raw, Repository } from 'typeorm';
+import { Account, AccountType } from '../accounts/accounts.entity';
 import { AccessToken } from './accessToken.entity';
 import { WrongCredentialsError } from './auth.errors';
 import { RefreshToken } from './refreshToken.entity';
@@ -20,7 +21,9 @@ export class AuthService {
     @InjectRepository(AccessToken)
     private accessTokenRepository: Repository<AccessToken>,
     @InjectRepository(RefreshToken)
-    private refreshTokenRepository: Repository<RefreshToken>
+    private refreshTokenRepository: Repository<RefreshToken>,
+    @InjectRepository(Account)
+    private accountRepository: Repository<Account>,
   ) {}
 
   async userById(id: string): Promise<User | null> {
@@ -43,11 +46,7 @@ export class AuthService {
     });
   }
 
-  async createUser(data: {
-    email: string;
-    password: string;
-    name: string;
-  }): Promise<void> {
+  async createUser(data: { email: string; password: string; name: string }): Promise<void> {
     data.password = await argon2.hash(data.password);
 
     const user = new User();
@@ -56,6 +55,23 @@ export class AuthService {
     user.password = data.password;
 
     await this.userRepository.save(user);
+
+    // Create default accounts
+    const defaultAccounts = [
+      { name: 'Bank', type: AccountType.ASSETS },
+      { name: 'Income', type: AccountType.INCOME },
+      { name: 'Food', type: AccountType.EXPENSE },
+      { name: 'Rent', type: AccountType.EXPENSE },
+    ];
+
+    for (const accountData of defaultAccounts) {
+      const account = new Account();
+      account.name = accountData.name;
+      account.type = accountData.type;
+      account.openingBalance = 0;
+      account.user = user;
+      await this.accountRepository.save(account);
+    }
   }
 
   async logout(refreshToken: string): Promise<void> {
@@ -103,9 +119,7 @@ export class AuthService {
     refreshTokenEntity.userAgent = userAgent;
     refreshTokenEntity.ip = ip;
 
-    refreshTokenEntity = await this.refreshTokenRepository.save(
-      refreshTokenEntity
-    );
+    refreshTokenEntity = await this.refreshTokenRepository.save(refreshTokenEntity);
 
     const accessTokenEntity = new AccessToken();
     accessTokenEntity.token = accessToken;
