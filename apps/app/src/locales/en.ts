@@ -297,6 +297,16 @@ export default {
           version: 'Version',
           buildDate: 'Build Date',
         },
+        export: {
+          title: 'Data Export',
+          description: 'Download all your data',
+          exportButton: 'Export My Data',
+          exportDescription:
+            'Download a complete copy of all your data including accounts, transactions, and profile information as CSV files in a ZIP archive.',
+          downloadInProgress: 'Preparing your export...',
+          downloadSuccess: 'Export downloaded successfully!',
+          downloadError: 'Failed to export data. Please try again.',
+        },
       },
     },
   },

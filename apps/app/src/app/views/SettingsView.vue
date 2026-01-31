@@ -7,9 +7,7 @@
     >
     </PageHeader>
 
-    <div
-      class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl"
-    >
+    <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl">
       <div class="space-y-6">
         <!-- User Information Section -->
         <div class="card bg-secondary shadow p-1.5 sm:p-2 rounded-lg">
@@ -23,12 +21,8 @@
               v-if="loading"
               class="space-y-4"
             >
-              <div
-                class="skeleton h-12 w-full bg-tertiary animate-pulse rounded"
-              ></div>
-              <div
-                class="skeleton h-12 w-full bg-tertiary animate-pulse rounded"
-              ></div>
+              <div class="skeleton h-12 w-full bg-tertiary animate-pulse rounded"></div>
+              <div class="skeleton h-12 w-full bg-tertiary animate-pulse rounded"></div>
             </div>
 
             <div
@@ -37,9 +31,7 @@
             >
               <!-- User Avatar and Basic Info -->
               <div class="flex items-center space-x-6">
-                <div
-                  class="w-20 h-20 bg-accent text-white rounded-full flex items-center justify-center"
-                >
+                <div class="w-20 h-20 bg-accent text-white rounded-full flex items-center justify-center">
                   <span class="text-2xl font-bold leading-none">
                     {{ user.name.charAt(0).toUpperCase() }}
                   </span>
@@ -58,9 +50,7 @@
                       v-model="userName"
                       type="text"
                       :label="t('views.settings.sections.profile.name')"
-                      :placeholder="
-                        t('views.settings.sections.profile.namePlaceholder')
-                      "
+                      :placeholder="t('views.settings.sections.profile.namePlaceholder')"
                     >
                       <template #leftIcon>
                         <RiUserLine class="w-5 h-5" />
@@ -73,9 +63,7 @@
                       v-model="userEmail"
                       type="email"
                       :label="t('views.settings.sections.profile.email')"
-                      :placeholder="
-                        t('views.settings.sections.profile.emailPlaceholder')
-                      "
+                      :placeholder="t('views.settings.sections.profile.emailPlaceholder')"
                     >
                       <template #leftIcon>
                         <RiMailLine class="w-5 h-5" />
@@ -121,16 +109,12 @@
                       @click="toggleDropdown"
                     >
                       <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 mr-3 flex items-center justify-center bg-accent/10 rounded-full"
-                        >
+                        <div class="w-8 h-8 mr-3 flex items-center justify-center bg-accent/10 rounded-full">
                           <span class="text-lg font-semibold text-accent">
                             {{ getLanguageFlag(selectedLanguage) }}
                           </span>
                         </div>
-                        <span class="font-medium">{{
-                          AVAILABLE_LANGUAGES[selectedLanguage]
-                        }}</span>
+                        <span class="font-medium">{{ AVAILABLE_LANGUAGES[selectedLanguage] }}</span>
                       </div>
                       <RiArrowDownLine
                         class="w-5 h-5 transition-transform duration-200"
@@ -147,9 +131,7 @@
                         class="mb-1 last:mb-0"
                       >
                         <BaseButton
-                          :variant="
-                            selectedLanguage === code ? 'primary' : 'ghost'
-                          "
+                          :variant="selectedLanguage === code ? 'primary' : 'ghost'"
                           class="flex items-center p-3 rounded-lg font-medium w-full text-left"
                           @click="selectLanguage(code)"
                         >
@@ -200,9 +182,7 @@
             </h2>
 
             <div class="space-y-4">
-              <div
-                class="flex items-center justify-between p-4 bg-primary rounded-lg"
-              >
+              <div class="flex items-center justify-between p-4 bg-primary rounded-lg">
                 <div class="flex items-center space-x-3">
                   <RiEyeLine class="w-5 h-5 text-gray-400" />
                   <div>
@@ -210,11 +190,7 @@
                       {{ t('views.settings.sections.privacy.privacyMode') }}
                     </p>
                     <p class="text-sm text-gray-400">
-                      {{
-                        t(
-                          'views.settings.sections.privacy.privacyModeDescription',
-                        )
-                      }}
+                      {{ t('views.settings.sections.privacy.privacyModeDescription') }}
                     </p>
                   </div>
                 </div>
@@ -223,6 +199,34 @@
                   size="md"
                   variant="warning"
                 />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Export Section -->
+        <div class="card bg-secondary shadow p-1.5 sm:p-2 rounded-lg">
+          <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 flex items-center text-white">
+              <RiDownloadLine class="w-6 h-6 mr-2" />
+              {{ t('views.settings.sections.export.title') }}
+            </h2>
+
+            <div class="space-y-4">
+              <p class="text-gray-400">
+                {{ t('views.settings.sections.export.exportDescription') }}
+              </p>
+
+              <div class="flex justify-start">
+                <BaseButton
+                  variant="primary"
+                  :disabled="isExporting"
+                  :loading="isExporting"
+                  @click="exportData"
+                >
+                  <RiDownloadLine class="w-5 h-5 mr-2" />
+                  {{ t('views.settings.sections.export.exportButton') }}
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -238,18 +242,12 @@
 
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <span class="font-medium text-white">{{
-                  t('views.settings.sections.about.version')
-                }}</span>
+                <span class="font-medium text-white">{{ t('views.settings.sections.about.version') }}</span>
                 <span class="text-gray-400">1.0.0</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="font-medium text-white">{{
-                  t('views.settings.sections.about.buildDate')
-                }}</span>
-                <span class="text-gray-400">{{
-                  new Date().toLocaleDateString()
-                }}</span>
+                <span class="font-medium text-white">{{ t('views.settings.sections.about.buildDate') }}</span>
+                <span class="text-gray-400">{{ new Date().toLocaleDateString() }}</span>
               </div>
             </div>
           </div>
@@ -270,6 +268,7 @@ import {
   RiEyeLine,
   RiInformationLine,
   RiMailLine,
+  RiDownloadLine,
 } from '@remixicon/vue';
 import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
@@ -278,16 +277,24 @@ import BaseToggle from '../components/BaseToggle.vue';
 import { useUser } from '../composables/useUser';
 import { useLanguage } from '../composables/useLanguage';
 import { usePrivacy } from '../composables/usePrivacy';
+import { useAuth } from '../composables/useAuth';
+import { useConstant } from '../composables/useConstant';
+import { useToast } from '../composables/useToast';
 
 const { user, loading } = useUser();
-const { AVAILABLE_LANGUAGES, changeLanguage, selectedLanguage, t } =
-  useLanguage();
+const { AVAILABLE_LANGUAGES, changeLanguage, selectedLanguage, t } = useLanguage();
 const { isPrivate } = usePrivacy();
+const { getAccessToken } = useAuth();
+const { URI } = useConstant();
+const { success, error } = useToast();
 
 // Form state
 const userName = ref('');
 const userEmail = ref('');
 const isUpdating = ref(false);
+
+// Export state
+const isExporting = ref(false);
 
 // Dropdown state
 const isDropdownOpen = ref(false);
@@ -360,4 +367,48 @@ watch(
   },
   { immediate: true },
 );
+
+// Export function
+const exportData = async () => {
+  isExporting.value = true;
+  try {
+    const response = await fetch(`${URI.API}/v1/export/data`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+
+    const contentDisposition = response.headers.get('Content-Disposition');
+
+    let filename = `mydon-export.zip`;
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+      if (filenameMatch) {
+        filename = filenameMatch[1];
+      }
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    success(t('views.settings.sections.export.downloadSuccess'));
+  } catch (err) {
+    console.error('Export error:', err);
+    error(t('views.settings.sections.export.downloadError'));
+  } finally {
+    isExporting.value = false;
+  }
+};
 </script>

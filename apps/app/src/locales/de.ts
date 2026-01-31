@@ -263,6 +263,17 @@ export default {
           version: 'Version',
           buildDate: 'Build-Datum',
         },
+        export: {
+          title: 'Datenexport',
+          description: 'Laden Sie alle Ihre Daten herunter',
+          exportButton: 'Meine Daten exportieren',
+          exportDescription:
+            'Laden Sie eine vollständige Kopie aller Ihrer Daten herunter, einschließlich Konten, Transaktionen und Profilinformationen als CSV-Dateien in einem ZIP-Archiv.',
+          downloadInProgress: 'Ihr Export wird vorbereitet...',
+          downloadSuccess: 'Export erfolgreich heruntergeladen!',
+          downloadError:
+            'Export fehlgeschlagen. Bitte versuchen Sie es erneut.',
+        },
       },
     },
   },

@@ -259,9 +259,19 @@ export default {
             'Nascondi informazioni finanziarie sensibili quando abilitato',
         },
         about: {
-          title: 'Info su myDon',
+          title: 'Informazioni su myDon',
           version: 'Versione',
           buildDate: 'Data di Compilazione',
+        },
+        export: {
+          title: 'Esportazione Dati',
+          description: 'Scarica tutti i tuoi dati',
+          exportButton: 'Esporta i Miei Dati',
+          exportDescription:
+            'Scarica una copia completa di tutti i tuoi dati, inclusi conti, transazioni e informazioni del profilo come file CSV in un archivio ZIP.',
+          downloadInProgress: 'Preparazione della tua esportazione...',
+          downloadSuccess: 'Esportazione scaricata con successo!',
+          downloadError: 'Impossibile esportare i dati. Per favore riprova.',
         },
       },
     },

@@ -8,16 +8,16 @@
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="alert shadow-lg cursor-pointer max-w-md rounded-lg border"
+        class="alert shadow-lg cursor-pointer max-w-md rounded-lg border flex items-center justify-between gap-3"
         :class="getToastClass(toast.type)"
         @click="removeToast(toast.id)"
       >
-        <div class="flex items-center">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
           <RiCheckLine
             v-if="toast.type === 'success'"
             class="w-6 h-6 shrink-0"
           />
-          <RiCloseLine
+          <RiErrorWarningLine
             v-else-if="toast.type === 'error'"
             class="w-6 h-6 shrink-0"
           />
@@ -32,12 +32,14 @@
           <span class="text-sm font-medium">{{ toast.message }}</span>
         </div>
         <BaseButton
-          variant="ghost"
+          variant="borderless"
           size="sm"
-          class="w-6 h-6 rounded-full flex items-center justify-center ml-2 hover:bg-white/10 p-0"
+          class="w-6 h-6 !min-w-0 !p-0 rounded-full shrink-0 !text-current hover:!text-current"
           @click.stop="removeToast(toast.id)"
         >
-          <RiCloseLine class="w-4 h-4" />
+          <template #icon>
+            <RiCloseLine class="w-5 h-5" />
+          </template>
         </BaseButton>
       </div>
     </TransitionGroup>
@@ -45,12 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  RiCheckLine,
-  RiCloseLine,
-  RiErrorWarningLine,
-  RiInformationLine,
-} from '@remixicon/vue';
+import { RiCheckLine, RiCloseLine, RiErrorWarningLine, RiInformationLine } from '@remixicon/vue';
 import BaseButton from './BaseButton.vue';
 import { useToast } from '../composables/useToast';
 

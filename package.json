@@ -1,10 +1,10 @@
 {
   "name": "@mydonapp/mydon",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MyDon - Your clever finance tracker",
   "license": "MIT",
   "author": {
-    "name": "Maece97",
+    "name": "Marcel Mettler",
     "url": "https://maece.ch"
   },
   "repository": {
@@ -42,14 +42,15 @@
     "@nestjs/config": "4.0.2",
     "@nestjs/core": "11.1.2",
     "@nestjs/platform-express": "11.1.2",
-    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/swagger": "11.2.0",
     "@nestjs/typeorm": "11.0.0",
-    "@remixicon/vue": "^4.6.0",
+    "@remixicon/vue": "4.6.0",
     "@tailwindcss/vite": "4.1.8",
     "@tanstack/vue-query": "5.79.0",
     "@tanstack/vue-query-devtools": "5.79.0",
     "@vueuse/core": "13.3.0",
     "@vueuse/integrations": "13.3.0",
+    "archiver": "7.0.1",
     "argon2": "0.43.0",
     "async-validator": "4.2.5",
     "axios": "1.9.0",
@@ -85,6 +86,7 @@
     "@swc-node/register": "1.10.10",
     "@swc/core": "1.11.29",
     "@swc/helpers": "0.5.17",
+    "@types/archiver": "7.0.0",
     "@types/express": "5.0.2",
     "@types/jest": "29.5.14",
     "@types/multer": "1.4.12",

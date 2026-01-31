@@ -262,7 +262,17 @@ export default {
         about: {
           title: 'À propos de myDon',
           version: 'Version',
-          buildDate: 'Date de Compilation',
+          buildDate: 'Date de Build',
+        },
+        export: {
+          title: 'Export de Données',
+          description: 'Téléchargez toutes vos données',
+          exportButton: 'Exporter Mes Données',
+          exportDescription:
+            'Téléchargez une copie complète de toutes vos données, y compris les comptes, les transactions et les informations de profil sous forme de fichiers CSV dans une archive ZIP.',
+          downloadInProgress: 'Préparation de votre export...',
+          downloadSuccess: 'Export téléchargé avec succès !',
+          downloadError: "Échec de l'export des données. Veuillez réessayer.",
         },
       },
     },

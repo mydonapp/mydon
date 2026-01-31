@@ -25,13 +25,12 @@ async function bootstrap() {
   app.use(helmet());
 
   // Configure CORS with environment-based origins
-  const origins = corsOrigins
-    ? corsOrigins.split(',').map((origin) => origin.trim())
-    : ['http://localhost:4200']; // fallback for local development
+  const origins = corsOrigins ? corsOrigins.split(',').map((origin) => origin.trim()) : ['http://localhost:4200']; // fallback for local development
 
   app.enableCors({
     origin: origins,
     credentials: true,
+    exposedHeaders: ['Content-Disposition'],
   });
 
   // Setup Swagger API documentation (configurable)
@@ -58,7 +57,7 @@ async function bootstrap() {
 
   await app.listen(PORT);
   Logger.log(`🚀 Application is running on: http://localhost:${PORT}`);
-  
+
   if (enableApiDocs) {
     Logger.log(`📚 API Documentation available at: http://localhost:${PORT}/api/docs`);
   }
