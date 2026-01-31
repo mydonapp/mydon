@@ -52,6 +52,9 @@ export class TransactionsController {
         debitAccountId: transaction.debitAccount?.id,
         transactionDate: transaction.transactionDate,
         draft: transaction.draft,
+        creditAccountAISuggested: transaction.creditAccountAISuggested,
+        debitAccountAISuggested: transaction.debitAccountAISuggested,
+        matchedTransactionId: transaction.matchedTransactionId,
         // Amount based on user perception
         amount:
           transaction.creditAccount?.type === AccountType.INCOME ||

@@ -22,6 +22,9 @@ export interface CreateTransaction {
   userId: string;
   draft?: boolean;
   raw?: string;
+  creditAccountAISuggested?: boolean;
+  debitAccountAISuggested?: boolean;
+  matchedTransactionId?: string;
 }
 
 @Entity('transactions')
@@ -51,6 +54,15 @@ export class Transaction {
 
   @Column({ default: false })
   draft: boolean;
+
+  @Column({ default: false })
+  creditAccountAISuggested: boolean;
+
+  @Column({ default: false })
+  debitAccountAISuggested: boolean;
+
+  @Column({ nullable: true })
+  matchedTransactionId: string;
 
   @ManyToOne(() => Account, (account) => account.creditTransactions, {
     nullable: true,
@@ -117,6 +129,11 @@ export class Transaction {
     transaction.transactionDate = props.transactionDate;
     transaction.draft = props.draft || false;
     transaction.raw = props.raw || null;
+    transaction.creditAccountAISuggested =
+      props.creditAccountAISuggested || false;
+    transaction.debitAccountAISuggested =
+      props.debitAccountAISuggested || false;
+    transaction.matchedTransactionId = props.matchedTransactionId || null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     transaction.user = props.userId as any;
     return transaction;

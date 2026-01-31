@@ -172,6 +172,9 @@ export default {
       title: 'Import Transactions',
       subtitle: 'Import your bank statements and CSV files',
       pendingTransactions: 'Pending',
+      aiSuggested: 'AI Suggested - Please verify',
+      aiSuggestedInfo:
+        'Accounts marked with "AI" were automatically suggested based on similar past transactions. Please review and verify before approving.',
       importForm: {
         title: 'Import Bank Statement',
         account: {
@@ -209,6 +212,11 @@ export default {
           amount: 'Amount',
           actions: 'Actions',
           selectAccount: 'Select Account',
+        },
+        aiInfo: {
+          title: 'AI-Assisted Account Assignment',
+          description:
+            'We automatically suggest accounts for transactions based on similar past transactions. Fields marked with an "AI" badge should be reviewed for accuracy.',
         },
       },
       emptyState: {

@@ -167,7 +167,10 @@ export default {
     importTransactions: {
       title: 'Importa Transazioni',
       subtitle: 'Importa i tuoi estratti conto e file CSV',
-      pendingTransactions: 'In sospeso',
+      pendingTransactions: 'In attesa',
+      aiSuggested: "Suggerito dall'IA - Verifica necessaria",
+      aiSuggestedInfo:
+        'I conti contrassegnati con "IA" sono stati suggeriti automaticamente in base a transazioni simili passate. Si prega di rivedere e verificare prima di approvare.',
       importForm: {
         title: 'Importa Estratto Conto',
         account: {
@@ -205,6 +208,11 @@ export default {
           amount: 'Importo',
           actions: 'Azioni',
           selectAccount: 'Seleziona Conto',
+        },
+        aiInfo: {
+          title: "Assegnazione account assistita dall'IA",
+          description:
+            'Suggeriamo automaticamente conti per le transazioni basandoci su transazioni simili passate. I campi contrassegnati con un badge "IA" dovrebbero essere verificati per l\'accuratezza.',
         },
       },
       emptyState: {

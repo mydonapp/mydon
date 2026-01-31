@@ -176,11 +176,54 @@
             </div>
           </div>
 
+          <!-- AI Suggestion Info Alert -->
+          <div
+            v-if="
+              transactions.some(
+                (t) => t.creditAccountAISuggested || t.debitAccountAISuggested,
+              )
+            "
+            class="alert mb-4 border-2 border-transparent bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-orange-500/10"
+            style="
+              border-image: linear-gradient(
+                  to right,
+                  rgb(168, 85, 247),
+                  rgb(236, 72, 153),
+                  rgb(249, 115, 22)
+                )
+                1;
+            "
+          >
+            <div class="flex items-start gap-3">
+              <div
+                class="p-2 rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500"
+              >
+                <RiCheckLine class="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4
+                  class="font-semibold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent"
+                >
+                  {{
+                    t('views.importTransactions.draftTransactions.aiInfo.title')
+                  }}
+                </h4>
+                <p class="text-sm">
+                  {{
+                    t(
+                      'views.importTransactions.draftTransactions.aiInfo.description',
+                    )
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div class="overflow-x-auto">
-            <table class="table table-zebra">
+            <table class="table table-zebra table-compact">
               <thead>
                 <tr>
-                  <th>
+                  <th class="w-12">
                     <label>
                       <input
                         v-model="selectAll"
@@ -189,12 +232,12 @@
                       />
                     </label>
                   </th>
-                  <th>
+                  <th class="w-24">
                     {{
                       t('views.importTransactions.draftTransactions.table.date')
                     }}
                   </th>
-                  <th>
+                  <th class="w-96">
                     {{
                       t(
                         'views.importTransactions.draftTransactions.table.description',
@@ -215,14 +258,14 @@
                       )
                     }}
                   </th>
-                  <th>
+                  <th class="w-32">
                     {{
                       t(
                         'views.importTransactions.draftTransactions.table.amount',
                       )
                     }}
                   </th>
-                  <th>
+                  <th class="w-16">
                     {{
                       t(
                         'views.importTransactions.draftTransactions.table.actions',
@@ -237,7 +280,7 @@
                   :key="transaction.id"
                   :class="{ 'bg-success/10': transaction.selected }"
                 >
-                  <td>
+                  <td class="px-2">
                     <label>
                       <input
                         v-model="transaction.selected"
@@ -246,8 +289,8 @@
                       />
                     </label>
                   </td>
-                  <td>
-                    <span class="text-sm">
+                  <td class="px-2">
+                    <span class="text-sm whitespace-nowrap">
                       {{
                         new Date(
                           transaction.transactionDate,
@@ -255,11 +298,11 @@
                       }}
                     </span>
                   </td>
-                  <td>
+                  <td class="px-2">
                     <BaseTextarea
                       v-model="transaction.description"
                       :rows="2"
-                      class="w-full min-w-64 h-16 text-sm"
+                      class="w-full h-16 text-sm"
                       :placeholder="
                         t(
                           'views.importTransactions.draftTransactions.table.descriptionPlaceholder',
@@ -267,62 +310,110 @@
                       "
                     />
                   </td>
-                  <td>
-                    <BaseSelect
-                      v-model="transaction.creditAccountId"
-                      :placeholder="
-                        t(
-                          'views.importTransactions.draftTransactions.table.selectAccount',
-                        )
-                      "
-                      size="sm"
-                      @update:model-value="
-                        onAccountChange(transaction, 'credit')
-                      "
-                    >
-                      <template #options>
-                        <option
-                          v-for="account in allAccounts"
-                          :key="account.id"
-                          :value="account.id"
+                  <td class="px-2">
+                    <div class="flex items-center gap-1.5 w-full">
+                      <div
+                        class="flex-1"
+                        :class="
+                          transaction.creditAccountAISuggested
+                            ? 'relative p-[2px] rounded-lg ai-gradient-border'
+                            : ''
+                        "
+                      >
+                        <BaseSelect
+                          v-model="transaction.creditAccountId"
+                          :placeholder="
+                            t(
+                              'views.importTransactions.draftTransactions.table.selectAccount',
+                            )
+                          "
+                          size="sm"
+                          :class="[
+                            transaction.creditAccountAISuggested
+                              ? 'bg-base-100'
+                              : '',
+                            'w-full',
+                          ]"
+                          @update:model-value="
+                            onAccountChange(transaction, 'credit')
+                          "
                         >
-                          {{ account.name }}
-                        </option>
-                      </template>
-                    </BaseSelect>
+                          <template #options>
+                            <option
+                              v-for="account in allAccounts"
+                              :key="account.id"
+                              :value="account.id"
+                            >
+                              {{ account.name }}
+                            </option>
+                          </template>
+                        </BaseSelect>
+                      </div>
+                      <span
+                        v-if="transaction.creditAccountAISuggested"
+                        class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold tracking-wide text-white rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 shadow-lg ai-badge-glow uppercase"
+                        :title="t('views.importTransactions.aiSuggested')"
+                      >
+                        AI
+                      </span>
+                    </div>
                   </td>
-                  <td>
-                    <BaseSelect
-                      v-model="transaction.debitAccountId"
-                      :placeholder="
-                        t(
-                          'views.importTransactions.draftTransactions.table.selectAccount',
-                        )
-                      "
-                      size="sm"
-                      @update:model-value="
-                        onAccountChange(transaction, 'debit')
-                      "
-                    >
-                      <template #options>
-                        <option
-                          v-for="account in allAccounts"
-                          :key="account.id"
-                          :value="account.id"
+                  <td class="px-2">
+                    <div class="flex items-center gap-1.5 w-full">
+                      <div
+                        class="flex-1"
+                        :class="
+                          transaction.debitAccountAISuggested
+                            ? 'relative p-[2px] rounded-lg ai-gradient-border'
+                            : ''
+                        "
+                      >
+                        <BaseSelect
+                          v-model="transaction.debitAccountId"
+                          :placeholder="
+                            t(
+                              'views.importTransactions.draftTransactions.table.selectAccount',
+                            )
+                          "
+                          size="sm"
+                          :class="[
+                            transaction.debitAccountAISuggested
+                              ? 'bg-base-100'
+                              : '',
+                            'w-full',
+                          ]"
+                          @update:model-value="
+                            onAccountChange(transaction, 'debit')
+                          "
                         >
-                          {{ account.name }}
-                        </option>
-                      </template>
-                    </BaseSelect>
+                          <template #options>
+                            <option
+                              v-for="account in allAccounts"
+                              :key="account.id"
+                              :value="account.id"
+                            >
+                              {{ account.name }}
+                            </option>
+                          </template>
+                        </BaseSelect>
+                      </div>
+                      <span
+                        v-if="transaction.debitAccountAISuggested"
+                        class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold tracking-wide text-white rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 shadow-lg ai-badge-glow uppercase"
+                        :title="t('views.importTransactions.aiSuggested')"
+                      >
+                        AI
+                      </span>
+                    </div>
                   </td>
-                  <td>
+                  <td class="px-2">
                     <div v-if="isEqualCurrency(transaction)">
                       <BaseInput
                         v-model="transaction.amount"
                         type="number"
                         step="0.01"
                         size="sm"
-                        class="w-24"
+                        class="w-20"
                       />
                     </div>
                     <div
@@ -334,18 +425,18 @@
                         type="number"
                         step="0.01"
                         size="sm"
-                        class="w-24"
+                        class="w-20"
                       />
                       <BaseInput
                         v-model="transaction.debitAmount"
                         type="number"
                         step="0.01"
                         size="sm"
-                        class="w-24"
+                        class="w-20"
                       />
                     </div>
                   </td>
-                  <td>
+                  <td class="px-2">
                     <BaseButton
                       variant="danger"
                       size="sm"
@@ -525,6 +616,10 @@ watchEffect(() => {
           amount: transaction.creditAmount,
           selected: selectAll,
           transactionDate: transaction.transactionDate,
+          creditAccountAISuggested:
+            transaction.creditAccountAISuggested || false,
+          debitAccountAISuggested: transaction.debitAccountAISuggested || false,
+          matchedTransactionId: transaction.matchedTransactionId,
         };
       })
       .sort((a, b) => a.transactionDate.localeCompare(b.transactionDate));
@@ -710,3 +805,48 @@ const updateDraft = async () => {
   }
 };
 </script>
+
+<style scoped>
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.ai-gradient-border {
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    rgb(168, 85, 247),
+    rgb(236, 72, 153),
+    rgb(249, 115, 22),
+    rgb(168, 85, 247)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 15px rgba(168, 85, 247, 0.5),
+      0 0 30px rgba(236, 72, 153, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(168, 85, 247, 0.7),
+      0 0 40px rgba(236, 72, 153, 0.5),
+      0 0 60px rgba(249, 115, 22, 0.3);
+  }
+}
+
+.ai-badge-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+  letter-spacing: 0.5px;
+  min-width: 32px;
+}
+</style>

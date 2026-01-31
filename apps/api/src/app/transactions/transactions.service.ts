@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Context } from '../shared/types/context';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
+import { TransactionMatcherService } from './transaction-matcher.service';
 import { Transaction } from './transactions.entity';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    private transactionMatcher: TransactionMatcherService,
   ) {}
 
   findAll(context: Context, filter?: string) {
@@ -104,6 +106,7 @@ export class TransactionsService {
       fileContent,
       statementIssuer,
       accountId,
+      this.transactionMatcher,
     );
 
     const transactions = await mapper.convertStatement();

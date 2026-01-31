@@ -168,6 +168,9 @@ export default {
       title: 'Transaktionen importieren',
       subtitle: 'Importieren Sie Ihre Kontoauszüge und CSV-Dateien',
       pendingTransactions: 'Ausstehend',
+      aiSuggested: 'KI-Vorschlag - Bitte überprüfen',
+      aiSuggestedInfo:
+        'Konten, die mit "KI" markiert sind, wurden automatisch auf Basis ähnlicher vergangener Transaktionen vorgeschlagen. Bitte überprüfen und verifizieren Sie diese vor der Genehmigung.',
       importForm: {
         title: 'Kontoauszug importieren',
         account: {
@@ -205,6 +208,11 @@ export default {
           amount: 'Betrag',
           actions: 'Aktionen',
           selectAccount: 'Konto auswählen',
+        },
+        aiInfo: {
+          title: 'KI-unterstützte Kontozuordnung',
+          description:
+            'Wir schlagen automatisch Konten für Transaktionen basierend auf ähnlichen vergangenen Transaktionen vor. Felder mit einem "KI"-Badge sollten auf Richtigkeit überprüft werden.',
         },
       },
       emptyState: {

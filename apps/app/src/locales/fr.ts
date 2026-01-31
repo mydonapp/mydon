@@ -169,6 +169,9 @@ export default {
       title: 'Importer des Transactions',
       subtitle: 'Importez vos relevés bancaires et fichiers CSV',
       pendingTransactions: 'En attente',
+      aiSuggested: 'Suggéré par IA - Veuillez vérifier',
+      aiSuggestedInfo:
+        'Les comptes marqués "IA" ont été automatiquement suggérés sur la base de transactions passées similaires. Veuillez examiner et vérifier avant d\'approuver.',
       importForm: {
         title: 'Importer un Relevé Bancaire',
         account: {
@@ -205,7 +208,12 @@ export default {
           debitAccount: 'Compte Débiteur',
           amount: 'Montant',
           actions: 'Actions',
-          selectAccount: 'Sélectionner le Compte',
+          selectAccount: 'Sélectionner un compte',
+        },
+        aiInfo: {
+          title: 'Attribution de compte assistée par IA',
+          description:
+            'Nous suggérons automatiquement des comptes pour les transactions basés sur des transactions passées similaires. Les champs marqués d\'un badge "IA" doivent être vérifiés pour leur exactitude.',
         },
       },
       emptyState: {
