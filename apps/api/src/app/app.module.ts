@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountsModule } from './accounts/accounts.module';
 import { AuthModule } from './auth/auth.module';
 import { ExportModule } from './export/export.module';
+import { StatusModule } from './status/status.module';
 import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
@@ -16,6 +17,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     TransactionsModule,
     AuthModule,
     ExportModule,
+    StatusModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
