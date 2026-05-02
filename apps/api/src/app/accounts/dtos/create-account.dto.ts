@@ -3,6 +3,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Length,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -44,4 +45,9 @@ export class CreateAccountDto {
   @IsOptional()
   @IsEnum(Currency)
   currency?: Currency;
+
+  @ApiProperty({ description: 'Category ID', required: false })
+  @IsOptional()
+  @IsUUID()
+  categoryId?: string;
 }

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseDatePipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -22,6 +23,7 @@ import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dtos/create-account.dto';
+import { UpdateAccountDto } from './dtos/update-account.dto';
 
 @ApiTags('accounts')
 @ApiBearerAuth()
@@ -79,6 +81,25 @@ export class AccountsController {
       type: createAccountDto.type,
       openingBalance: createAccountDto.openingBalance,
       currency: createAccountDto.currency,
+      categoryId: createAccountDto.categoryId,
+    });
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch(':accountId')
+  @ApiOperation({ summary: 'Update an account' })
+  @ApiParam({ name: 'accountId', type: 'string' })
+  @ApiBody({ type: UpdateAccountDto })
+  @ApiResponse({ status: 200, description: 'Account updated successfully' })
+  @ApiResponse({ status: 404, description: 'Account not found' })
+  updateAccount(
+    @Req() req: Request,
+    @Param('accountId') accountId: string,
+    @Body() dto: UpdateAccountDto,
+  ) {
+    return this.accountsService.updateAccount(req['context'], accountId, {
+      name: dto.name,
+      categoryId: dto.categoryId,
     });
   }
 

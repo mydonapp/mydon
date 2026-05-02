@@ -54,6 +54,8 @@ export class AccountsService {
                 new Date(),
               ),
               retirementAccount: account.retirementAccount,
+              categoryId: account.category?.id ?? null,
+              categoryName: account.category?.name ?? null,
             };
           }),
       )
@@ -81,6 +83,7 @@ export class AccountsService {
   ) {
     const query = this.accountsRepository
       .createQueryBuilder('account')
+      .leftJoinAndSelect('account.category', 'category')
       .addSelect(
         `(SELECT COALESCE(SUM("debitTransaction"."debitAmount"), 0)
           FROM transactions "debitTransaction"
@@ -146,6 +149,7 @@ export class AccountsService {
       type: AccountType;
       openingBalance: number;
       currency?: Currency;
+      categoryId?: string;
     },
   ) {
     const account = new Account();
@@ -155,7 +159,27 @@ export class AccountsService {
     if (options.currency) {
       account.currency = options.currency;
     }
+    if (options.categoryId) {
+      account.category = { id: options.categoryId } as any;
+    }
     account.setUserId(context.user.id);
+    return this.accountsRepository.save(account);
+  }
+
+  async updateAccount(
+    context: Context,
+    accountId: string,
+    options: { name?: string; categoryId?: string | null },
+  ) {
+    const account = await this.accountsRepository.findOne({
+      where: { id: accountId, user: { id: context.user.id } },
+    });
+    if (!account) throw new NotFoundException();
+
+    if (options.name !== undefined) account.name = options.name;
+    if (options.categoryId !== undefined) {
+      account.category = options.categoryId ? ({ id: options.categoryId } as any) : null;
+    }
     return this.accountsRepository.save(account);
   }
 

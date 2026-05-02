@@ -6,9 +6,7 @@
       :subtitle="t('views.dashboard.subtitle')"
     />
 
-    <div
-      class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl"
-    >
+    <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl">
       <!-- Quick Actions -->
       <div class="card">
         <div class="p-1.5 sm:p-2">
@@ -26,9 +24,7 @@
               <template #icon>
                 <RiFileTextLine class="w-4 h-4 sm:w-5 sm:h-5" />
               </template>
-              <span class="truncate">{{
-                t('views.dashboard.importTransactions')
-              }}</span>
+              <span class="truncate">{{ t('views.dashboard.importTransactions') }}</span>
             </BaseButton>
             <BaseButton
               tag="router-link"
@@ -40,9 +36,7 @@
               <template #icon>
                 <RiWalletLine class="w-4 h-4 sm:w-5 sm:h-5" />
               </template>
-              <span class="truncate">{{
-                t('views.dashboard.manageAccounts')
-              }}</span>
+              <span class="truncate">{{ t('views.dashboard.manageAccounts') }}</span>
             </BaseButton>
             <BaseButton
               variant="ghost"
@@ -57,9 +51,7 @@
       </div>
 
       <!-- Charts Section -->
-      <div
-        class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8 mt-8"
-      >
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8 mt-8">
         <!-- Account Balance Overview -->
         <div class="card">
           <div class="p-1.5 sm:p-2">
@@ -73,13 +65,10 @@
               <!-- Assets Breakdown -->
               <div>
                 <div class="flex justify-between items-center mb-2">
-                  <span class="font-semibold text-sm sm:text-base truncate">{{
-                    t('words.assets')
+                  <span class="font-semibold text-sm sm:text-base truncate">{{ t('words.assets') }}</span>
+                  <span class="amount-positive font-bold text-sm sm:text-base truncate ml-2">{{
+                    formatCurrency(totalAssets, 'CHF')
                   }}</span>
-                  <span
-                    class="amount-positive font-bold text-sm sm:text-base truncate ml-2"
-                    >{{ formatCurrency(totalAssets, 'CHF') }}</span
-                  >
                 </div>
                 <div class="space-y-2">
                   <div
@@ -95,11 +84,7 @@
                       <span class="truncate">{{ account.name }}</span>
                     </span>
                     <span
-                      :class="
-                        account.balance >= 0
-                          ? 'amount-positive'
-                          : 'amount-negative'
-                      "
+                      :class="account.balance >= 0 ? 'amount-positive' : 'amount-negative'"
                       class="ml-2 flex-shrink-0"
                     >
                       {{ formatCurrency(account.balance, account.currency) }}
@@ -118,15 +103,10 @@
               <!-- Liabilities Breakdown -->
               <div v-if="accounts.liabilities.accounts.length > 0">
                 <div class="flex justify-between items-center mb-2">
-                  <span class="font-semibold text-sm sm:text-base truncate">{{
-                    t('words.liabilities')
+                  <span class="font-semibold text-sm sm:text-base truncate">{{ t('words.liabilities') }}</span>
+                  <span class="text-warning font-bold text-sm sm:text-base truncate ml-2">{{
+                    formatCurrency(Math.abs(totalLiabilities), 'CHF')
                   }}</span>
-                  <span
-                    class="text-warning font-bold text-sm sm:text-base truncate ml-2"
-                    >{{
-                      formatCurrency(Math.abs(totalLiabilities), 'CHF')
-                    }}</span
-                  >
                 </div>
                 <div class="space-y-2">
                   <div
@@ -135,18 +115,11 @@
                     class="flex justify-between items-center text-xs sm:text-sm pl-4"
                   >
                     <span class="flex items-center min-w-0 flex-1">
-                      <div
-                        class="w-2 h-2 bg-warning rounded-full mr-2 flex-shrink-0"
-                      ></div>
+                      <div class="w-2 h-2 bg-warning rounded-full mr-2 flex-shrink-0"></div>
                       <span class="truncate">{{ account.name }}</span>
                     </span>
                     <span class="text-warning ml-2 flex-shrink-0">
-                      {{
-                        formatCurrency(
-                          Math.abs(account.balance),
-                          account.currency,
-                        )
-                      }}
+                      {{ formatCurrency(Math.abs(account.balance), account.currency) }}
                     </span>
                   </div>
                 </div>
@@ -166,9 +139,7 @@
         <!-- Recent Transactions -->
         <div class="card">
           <div class="p-1.5 sm:p-2">
-            <div
-              class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2"
-            >
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
               <h2 class="card-title text-lg sm:text-xl">
                 {{ t('views.dashboard.recentTransactions') }}
               </h2>
@@ -189,28 +160,19 @@
                 class="flex justify-between items-center p-3 bg-primary rounded-lg hover:bg-tertiary transition-colors"
               >
                 <div class="flex-1 min-w-0 pr-3">
-                  <p
-                    class="font-medium text-xs sm:text-sm truncate text-primary"
-                  >
+                  <p class="font-medium text-xs sm:text-sm truncate text-primary">
                     {{ transaction.description }}
                   </p>
                   <p class="text-xs text-muted">
-                    {{
-                      new Date(transaction.transactionDate).toLocaleDateString()
-                    }}
+                    {{ new Date(transaction.transactionDate).toLocaleDateString() }}
                   </p>
                 </div>
                 <div class="text-right flex-shrink-0">
                   <span
-                    :class="
-                      transaction.amount >= 0
-                        ? 'amount-positive'
-                        : 'amount-negative'
-                    "
+                    :class="transaction.amount >= 0 ? 'amount-positive' : 'amount-negative'"
                     class="font-semibold text-xs sm:text-sm"
                   >
-                    {{ transaction.amount >= 0 ? '+' : ''
-                    }}{{ formatCurrency(transaction.amount, 'CHF') }}
+                    {{ transaction.amount >= 0 ? '+' : '' }}{{ formatCurrency(transaction.amount, 'CHF') }}
                   </span>
                 </div>
               </div>
@@ -262,7 +224,7 @@ const { URI } = useConstant();
 const { getAccessToken } = useAuth();
 const queryClient = useQueryClient();
 
-const timeFilter = ref('2025');
+const timeFilter = ref('2026');
 const { accounts } = useAccounts(timeFilter);
 
 // Recent transactions query
@@ -277,9 +239,7 @@ const { data: recentTransactions } = useQuery({
 
 // Computed values for dashboard metrics
 const totalAssets = computed(() => accounts?.value?.assets?.total || 0);
-const totalLiabilities = computed(
-  () => accounts?.value?.liabilities?.total || 0,
-);
+const totalLiabilities = computed(() => accounts?.value?.liabilities?.total || 0);
 
 const refreshData = () => {
   queryClient.invalidateQueries({ queryKey: ['accounts'] });

@@ -6,9 +6,7 @@
       :subtitle="t('views.accounts.subtitle')"
     />
 
-    <div
-      class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl"
-    >
+    <div class="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-none xl:max-w-screen-2xl">
       <div v-if="accounts">
         <!-- Time Filter Section -->
         <div class="mb-6">
@@ -34,12 +32,17 @@
             >
               2025
             </BaseButton>
+            <BaseButton
+              :variant="timeFilter === '2026' ? 'primary' : 'ghost'"
+              size="sm"
+              @click="timeFilter = '2026'"
+            >
+              2026
+            </BaseButton>
           </div>
         </div>
         <!-- Overview Cards -->
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8"
-        >
+        <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <!-- Assets Card -->
           <div class="card hover:card-elevated transition-shadow">
             <div class="p-1.5 sm:p-2">
@@ -47,9 +50,7 @@
                 <h3 class="text-sm font-semibold text-success">
                   {{ t('words.assets') }}
                 </h3>
-                <div
-                  class="bg-success text-white text-xs px-2 py-1 rounded-full"
-                >
+                <div class="bg-success text-white text-xs px-2 py-1 rounded-full">
                   {{ accounts.assets.accounts.length }}
                 </div>
               </div>
@@ -83,16 +84,12 @@
                 <h3 class="text-sm font-semibold text-warning">
                   {{ t('words.liabilities') }}
                 </h3>
-                <div
-                  class="bg-warning text-white text-xs px-2 py-1 rounded-full"
-                >
+                <div class="bg-warning text-white text-xs px-2 py-1 rounded-full">
                   {{ accounts.liabilities.accounts.length }}
                 </div>
               </div>
               <p class="text-2xl font-bold text-warning">
-                {{
-                  formatCurrency(Math.abs(accounts.liabilities.total), 'CHF')
-                }}
+                {{ formatCurrency(Math.abs(accounts.liabilities.total), 'CHF') }}
               </p>
             </div>
           </div>
@@ -193,11 +190,7 @@
                     <div class="text-right ml-4">
                       <span
                         class="font-bold text-sm"
-                        :class="
-                          account.balance >= 0
-                            ? 'amount-positive'
-                            : 'amount-negative'
-                        "
+                        :class="account.balance >= 0 ? 'amount-positive' : 'amount-negative'"
                       >
                         {{ formatCurrency(account.balance, account.currency) }}
                       </span>
@@ -206,16 +199,9 @@
 
                   <!-- Assets Total -->
                   <div class="border-t-2 border-success pt-3 mt-4">
-                    <div
-                      class="flex justify-between items-center font-bold text-success"
-                    >
-                      <span
-                        >{{ t('views.accounts.total') }}
-                        {{ t('words.assets') }}</span
-                      >
-                      <span class="text-lg">{{
-                        formatCurrency(accounts.assets.total, 'CHF')
-                      }}</span>
+                    <div class="flex justify-between items-center font-bold text-success">
+                      <span>{{ t('views.accounts.total') }} {{ t('words.assets') }}</span>
+                      <span class="text-lg">{{ formatCurrency(accounts.assets.total, 'CHF') }}</span>
                     </div>
                   </div>
                 </div>
@@ -284,31 +270,16 @@
                     </div>
                     <div class="text-right ml-4">
                       <span class="font-bold text-sm text-warning">
-                        {{
-                          formatCurrency(
-                            Math.abs(account.balance),
-                            account.currency,
-                          )
-                        }}
+                        {{ formatCurrency(Math.abs(account.balance), account.currency) }}
                       </span>
                     </div>
                   </div>
 
                   <!-- Liabilities Total -->
                   <div class="border-t-2 border-warning pt-3 mt-4">
-                    <div
-                      class="flex justify-between items-center font-bold text-warning"
-                    >
-                      <span
-                        >{{ t('views.accounts.total') }}
-                        {{ t('words.liabilities') }}</span
-                      >
-                      <span class="text-lg">{{
-                        formatCurrency(
-                          Math.abs(accounts.liabilities.total),
-                          'CHF',
-                        )
-                      }}</span>
+                    <div class="flex justify-between items-center font-bold text-warning">
+                      <span>{{ t('views.accounts.total') }} {{ t('words.liabilities') }}</span>
+                      <span class="text-lg">{{ formatCurrency(Math.abs(accounts.liabilities.total), 'CHF') }}</span>
                     </div>
                   </div>
                 </div>
@@ -317,9 +288,7 @@
                   v-else
                   class="text-center py-8"
                 >
-                  <RiErrorWarningLine
-                    class="w-12 h-12 mx-auto text-muted mb-4"
-                  />
+                  <RiErrorWarningLine class="w-12 h-12 mx-auto text-muted mb-4" />
                   <p class="text-muted mb-4">
                     {{ t('views.accounts.noLiabilities') }}
                   </p>
@@ -382,28 +351,16 @@
                     </div>
                     <div class="text-right ml-4">
                       <span class="font-bold text-sm text-info">
-                        {{
-                          formatCurrency(
-                            Math.abs(account.balance),
-                            account.currency,
-                          )
-                        }}
+                        {{ formatCurrency(Math.abs(account.balance), account.currency) }}
                       </span>
                     </div>
                   </div>
 
                   <!-- Income Total -->
                   <div class="border-t-2 border-info pt-3 mt-4">
-                    <div
-                      class="flex justify-between items-center font-bold text-info"
-                    >
-                      <span
-                        >{{ t('views.accounts.total') }}
-                        {{ t('words.income') }}</span
-                      >
-                      <span class="text-lg">{{
-                        formatCurrency(Math.abs(accounts.income.total), 'CHF')
-                      }}</span>
+                    <div class="flex justify-between items-center font-bold text-info">
+                      <span>{{ t('views.accounts.total') }} {{ t('words.income') }}</span>
+                      <span class="text-lg">{{ formatCurrency(Math.abs(accounts.income.total), 'CHF') }}</span>
                     </div>
                   </div>
                 </div>
@@ -472,28 +429,16 @@
                     </div>
                     <div class="text-right ml-4">
                       <span class="font-bold text-sm text-error">
-                        {{
-                          formatCurrency(
-                            Math.abs(account.balance),
-                            account.currency,
-                          )
-                        }}
+                        {{ formatCurrency(Math.abs(account.balance), account.currency) }}
                       </span>
                     </div>
                   </div>
 
                   <!-- Expenses Total -->
                   <div class="border-t-2 border-error pt-3 mt-4">
-                    <div
-                      class="flex justify-between items-center font-bold text-error"
-                    >
-                      <span
-                        >{{ t('views.accounts.total') }}
-                        {{ t('words.expenses') }}</span
-                      >
-                      <span class="text-lg">{{
-                        formatCurrency(Math.abs(accounts.expense.total), 'CHF')
-                      }}</span>
+                    <div class="flex justify-between items-center font-bold text-error">
+                      <span>{{ t('views.accounts.total') }} {{ t('words.expenses') }}</span>
+                      <span class="text-lg">{{ formatCurrency(Math.abs(accounts.expense.total), 'CHF') }}</span>
                     </div>
                   </div>
                 </div>
@@ -524,9 +469,7 @@
         v-else
         class="space-y-8"
       >
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
-        >
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div
             v-for="i in 4"
             :key="i"
@@ -588,9 +531,7 @@
                 v-model="name"
                 type="text"
                 :label="t('views.accounts.addAccountForm.accountName.label')"
-                :placeholder="
-                  t('views.accounts.addAccountForm.accountName.placeholder')
-                "
+                :placeholder="t('views.accounts.addAccountForm.accountName.placeholder')"
                 required
               >
                 <template #leftIcon>
@@ -620,9 +561,7 @@
               <BaseSelect
                 v-model="currency"
                 :label="t('views.accounts.addAccountForm.currency.label')"
-                :placeholder="
-                  t('views.accounts.addAccountForm.currency.placeholder')
-                "
+                :placeholder="t('views.accounts.addAccountForm.currency.placeholder')"
                 required
               >
                 <template #options>
@@ -633,6 +572,21 @@
                   <option value="KRW">{{ t('words.currencies.KRW') }}</option>
                 </template>
               </BaseSelect>
+            </div>
+
+            <div>
+              <CategoryCombobox
+                v-model="categoryId"
+                :categories="categories"
+                :label="t('views.accounts.addAccountForm.category.label')"
+                :placeholder="t('views.accounts.addAccountForm.category.placeholder')"
+                @create="
+                  async (name) => {
+                    const c = await createCategory(name);
+                    categoryId = c.id;
+                  }
+                "
+              />
             </div>
 
             <div>
@@ -718,9 +672,7 @@
                   v-model="transactionAmount"
                   type="number"
                   step="0.01"
-                  :label="
-                    t('views.accounts.createTransactionForm.amount.label')
-                  "
+                  :label="t('views.accounts.createTransactionForm.amount.label')"
                   placeholder="0.00"
                   required
                 >
@@ -735,14 +687,8 @@
               <BaseInput
                 v-model="transactionDescription"
                 type="text"
-                :label="
-                  t('views.accounts.createTransactionForm.description.label')
-                "
-                :placeholder="
-                  t(
-                    'views.accounts.createTransactionForm.description.placeholder',
-                  )
-                "
+                :label="t('views.accounts.createTransactionForm.description.label')"
+                :placeholder="t('views.accounts.createTransactionForm.description.placeholder')"
                 required
               >
                 <template #leftIcon>
@@ -755,16 +701,8 @@
               <div>
                 <BaseSelect
                   v-model="creditAccountId"
-                  :label="
-                    t(
-                      'views.accounts.createTransactionForm.creditAccount.label',
-                    )
-                  "
-                  :placeholder="
-                    t(
-                      'views.accounts.createTransactionForm.creditAccount.placeholder',
-                    )
-                  "
+                  :label="t('views.accounts.createTransactionForm.creditAccount.label')"
+                  :placeholder="t('views.accounts.createTransactionForm.creditAccount.placeholder')"
                   required
                 >
                   <template #options>
@@ -782,14 +720,8 @@
               <div>
                 <BaseSelect
                   v-model="debitAccountId"
-                  :label="
-                    t('views.accounts.createTransactionForm.debitAccount.label')
-                  "
-                  :placeholder="
-                    t(
-                      'views.accounts.createTransactionForm.debitAccount.placeholder',
-                    )
-                  "
+                  :label="t('views.accounts.createTransactionForm.debitAccount.label')"
+                  :placeholder="t('views.accounts.createTransactionForm.debitAccount.placeholder')"
                   required
                 >
                   <template #options>
@@ -852,8 +784,10 @@ import PageHeader from '../components/PageHeader.vue';
 import BaseButton from '../components/BaseButton.vue';
 import BaseInput from '../components/BaseInput.vue';
 import BaseSelect from '../components/BaseSelect.vue';
+import CategoryCombobox from '../components/CategoryCombobox.vue';
 import { useAccounts } from '../composables/useAccounts';
 import { useAuth } from '../composables/useAuth';
+import { useCategories } from '../composables/useCategories/useCategories';
 import { useConstant } from '../composables/useConstant';
 import { useCurrency } from '../composables/useCurrency';
 import { useLanguage } from '../composables/useLanguage';
@@ -865,8 +799,9 @@ const { formatCurrency } = useCurrency();
 const { getAccessToken } = useAuth();
 const queryClient = useQueryClient();
 const { success, error } = useToast();
-const timeFilter = ref('2025');
+const timeFilter = ref('2026');
 const { accounts, createAccount, refetchAccounts } = useAccounts(timeFilter);
+const { categories, createCategory } = useCategories();
 
 // UI State
 const addAccountModal = ref<HTMLDialogElement>();
@@ -877,13 +812,12 @@ const name = ref('');
 const openingBalance = ref(0);
 const accountType = ref('ASSETS');
 const currency = ref('CHF');
+const categoryId = ref('');
 
 const transactionDescription = ref('');
 const creditAccountId = ref('');
 const debitAccountId = ref('');
-const transactionDate = ref(
-  new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString().split('T')[0],
-);
+const transactionDate = ref(new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString().split('T')[0]);
 const transactionAmount = ref(0);
 
 // Computed Properties
@@ -909,6 +843,7 @@ const closeAddAccountModal = () => {
   openingBalance.value = 0;
   accountType.value = 'ASSETS';
   currency.value = 'CHF';
+  categoryId.value = '';
 };
 
 const openTransactionModal = () => {
@@ -921,9 +856,7 @@ const closeTransactionModal = () => {
   transactionDescription.value = '';
   creditAccountId.value = '';
   debitAccountId.value = '';
-  transactionDate.value = new Date(new Date().setUTCHours(0, 0, 0, 0))
-    .toISOString()
-    .split('T')[0];
+  transactionDate.value = new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString().split('T')[0];
   transactionAmount.value = 0;
 };
 
@@ -935,18 +868,13 @@ const addAccount = async () => {
       openingBalance: openingBalance.value,
       type: accountType.value,
       currency: currency.value,
+      categoryId: categoryId.value || undefined,
     });
     closeAddAccountModal();
-    success(
-      t('views.accounts.addAccountForm.success') ||
-        'Account created successfully!',
-    );
+    success(t('views.accounts.addAccountForm.success') || 'Account created successfully!');
   } catch (err) {
     console.error('Failed to create account:', err);
-    error(
-      t('views.accounts.addAccountForm.error') ||
-        'Failed to create account. Please try again.',
-    );
+    error(t('views.accounts.addAccountForm.error') || 'Failed to create account. Please try again.');
   }
 };
 
@@ -964,16 +892,10 @@ const createTransaction = async () => {
     closeTransactionModal();
 
     // Show success feedback to user
-    success(
-      t('views.accounts.createTransactionForm.success') ||
-        'Transaction created successfully!',
-    );
+    success(t('views.accounts.createTransactionForm.success') || 'Transaction created successfully!');
   } catch (err) {
     console.error('Failed to create transaction:', err);
-    error(
-      t('views.accounts.createTransactionForm.error') ||
-        'Failed to create transaction. Please try again.',
-    );
+    error(t('views.accounts.createTransactionForm.error') || 'Failed to create transaction. Please try again.');
   }
 };
 

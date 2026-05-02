@@ -169,6 +169,7 @@ import {
   RiWallet3Line,
   RiFileTextLine,
   RiBarChartBoxLine,
+  RiMoneyDollarCircleLine,
 } from '@remixicon/vue';
 import ToastContainer from './components/ToastContainer.vue';
 import BaseButton from './components/BaseButton.vue';
@@ -203,6 +204,11 @@ const menu: MenuItem[] = [
     name: computed(() => t('components.sidebar.menu.accounts')),
     routeName: 'Accounts',
     icon: RiWallet3Line,
+  },
+  {
+    name: computed(() => t('components.sidebar.menu.budgets')),
+    routeName: 'Budgets',
+    icon: RiMoneyDollarCircleLine,
   },
   // {
   //   name: computed(() => t('components.sidebar.menu.spendingAnalysis')),

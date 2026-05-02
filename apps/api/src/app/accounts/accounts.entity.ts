@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../auth/user.entity';
+import { Category } from '../categories/categories.entity';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
 import { Transaction } from '../transactions/transactions.entity';
 
@@ -96,6 +97,9 @@ export class Account {
     transformer: new ColumnDecimalTransformer(),
   })
   openingBalance: number;
+
+  @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL', eager: false })
+  category: Category | null;
 
   @ManyToOne(() => User, (user) => user.accounts, {})
   user: User;

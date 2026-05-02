@@ -1,13 +1,9 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center p-4"
-  >
+  <div class="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center p-4">
     <div class="w-full max-w-md">
       <!-- Brand Section -->
       <div class="text-center mb-8">
-        <div
-          class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4"
-        >
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
           <RiStarFill class="w-8 h-8 text-primary" />
         </div>
         <h1 class="text-3xl font-bold text-white mb-2">myDon</h1>
@@ -21,9 +17,7 @@
             <h2 class="text-2xl font-bold text-white mb-2">
               {{ t('views.login.title') }}
             </h2>
-            <p class="text-gray-400 text-sm">
-              Enter your credentials to access your account
-            </p>
+            <p class="text-gray-400 text-sm">Enter your credentials to access your account</p>
           </div>
 
           <!-- Error Messages -->
@@ -45,9 +39,7 @@
               type="email"
               :label="t('views.login.loginForm.email.label')"
               :placeholder="t('views.login.loginForm.email.placeholder')"
-              :error="
-                errorFields?.email ? errorFields.email[0].message : undefined
-              "
+              :error="errorFields?.email ? errorFields.email[0].message : undefined"
               autocomplete="username"
               data-form-type="username,email"
               class="bg-primary border-gray-600 text-white placeholder-gray-400"
@@ -63,11 +55,7 @@
               :type="showPassword ? 'text' : 'password'"
               :label="t('views.login.loginForm.password.label')"
               :placeholder="t('views.login.loginForm.password.placeholder')"
-              :error="
-                errorFields?.password
-                  ? errorFields.password[0].message
-                  : undefined
-              "
+              :error="errorFields?.password ? errorFields.password[0].message : undefined"
               autocomplete="current-password"
               data-form-type="password"
               class="bg-primary border-gray-600 text-white placeholder-gray-400"
@@ -143,9 +131,7 @@
 
       <!-- Footer -->
       <div class="text-center mt-8">
-        <p class="text-white/60 text-xs">
-          © 2025 myDon Financial Tracker. Secure & Private.
-        </p>
+        <p class="text-white/60 text-xs">© 2026 myDon Financial Tracker. Secure & Private.</p>
       </div>
     </div>
   </div>
@@ -219,11 +205,7 @@ const authenticate = async () => {
     wrongPassword.value = undefined;
 
     try {
-      const { success, errorMessage } = await login(
-        loginForm.email,
-        loginForm.password,
-        route.query.next as string,
-      );
+      const { success, errorMessage } = await login(loginForm.email, loginForm.password, route.query.next as string);
       if (!success) {
         wrongPassword.value = errorMessage;
       }

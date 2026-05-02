@@ -54,6 +54,16 @@ const router = createRouter({
           name: 'SpendingAnalysis',
         },
         {
+          path: 'budgets',
+          component: () => import('../views/BudgetsView.vue'),
+          name: 'Budgets',
+        },
+        {
+          path: 'budgets/:id',
+          component: () => import('../views/BudgetDetailView.vue'),
+          name: 'BudgetDetail',
+        },
+        {
           path: 'settings',
           component: () => import('../views/SettingsView.vue'),
           name: 'Settings',

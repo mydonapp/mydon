@@ -18,7 +18,7 @@ I created Mydon because I couldn't find a tool that made it easy to import bank 
 - 🏷 **Manual/Automatic categorization and tagging**
 - 📊 **Monthly & category-based spending analytics**
 - 📁 **Data export (CSV/Excel)**
-- 📱 **Mobile-ready** (built with Vue + Capacitor)
+- 📱 **Mobile-ready** 
 - 🐳 **Self-hostable with Docker**
 
 > 💡 Looking for an easy hosted version? Check out [mydon.app](https://mydon.app)

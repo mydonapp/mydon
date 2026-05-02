@@ -1,13 +1,9 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center p-4"
-  >
+  <div class="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center p-4">
     <div class="w-full max-w-md">
       <!-- Brand Section -->
       <div class="text-center mb-8">
-        <div
-          class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4"
-        >
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
           <RiStarFill class="w-8 h-8 text-primary" />
         </div>
         <h1 class="text-3xl font-bold text-white mb-2">myDon</h1>
@@ -21,9 +17,7 @@
             <h2 class="text-2xl font-bold text-white mb-2">
               {{ t('views.signup.title') }}
             </h2>
-            <p class="text-gray-400 text-sm">
-              Create your account to start tracking your finances
-            </p>
+            <p class="text-gray-400 text-sm">Create your account to start tracking your finances</p>
           </div>
 
           <!-- Error Messages -->
@@ -145,8 +139,7 @@
           <!-- Terms and Privacy -->
           <div class="text-center mt-4">
             <p class="text-xs text-gray-400">
-              By creating an account, you agree to our Terms of Service and
-              Privacy Policy
+              By creating an account, you agree to our Terms of Service and Privacy Policy
             </p>
           </div>
 
@@ -178,9 +171,7 @@
 
       <!-- Footer -->
       <div class="text-center mt-8">
-        <p class="text-gray-400 text-xs">
-          © 2025 myDon Financial Tracker. Start your financial journey today.
-        </p>
+        <p class="text-gray-400 text-xs">© 2026 myDon Financial Tracker. Start your financial journey today.</p>
       </div>
     </div>
   </div>
@@ -230,12 +221,7 @@ const isValidPassword = computed(() => {
 });
 
 const isFormValid = computed(() => {
-  return (
-    name.value.trim() !== '' &&
-    email.value.trim() !== '' &&
-    isValidEmail.value &&
-    isValidPassword.value
-  );
+  return name.value.trim() !== '' && email.value.trim() !== '' && isValidEmail.value && isValidPassword.value;
 });
 
 // Watch for form changes to clear errors
@@ -270,8 +256,7 @@ const signup = async () => {
     // Success - user will be redirected by the auth system
   } catch (error: any) {
     console.error('Signup error:', error);
-    signupError.value =
-      error?.message || 'An error occurred during signup. Please try again.';
+    signupError.value = error?.message || 'An error occurred during signup. Please try again.';
   } finally {
     isLoading.value = false;
   }

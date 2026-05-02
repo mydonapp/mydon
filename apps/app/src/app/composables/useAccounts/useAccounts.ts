@@ -8,6 +8,7 @@ interface CreateAccount {
   openingBalance: number;
   type: string;
   currency?: string;
+  categoryId?: string;
 }
 
 export const useAccounts = (timeFilter?: Ref<string>) => {
@@ -19,6 +20,8 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
     toFromQuery = '?from=2024-01-01&to=2024-12-31';
   } else if (timeFilter?.value === '2025') {
     toFromQuery = '?from=2025-01-01&to=2025-12-31';
+  } else if (timeFilter?.value === '2026') {
+    toFromQuery = '?from=2026-01-01&to=2026-12-31';
   }
 
   const url = ref(`${URI.API}/v1/accounts${toFromQuery}`);
@@ -28,6 +31,8 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
       toFromQuery = `?from=2024-01-01&to=2024-12-31`;
     } else if (timeFilter?.value === '2025') {
       toFromQuery = `?from=2025-01-01&to=2025-12-31`;
+    } else if (timeFilter?.value === '2026') {
+      toFromQuery = `?from=2026-01-01&to=2026-12-31`;
     } else {
       toFromQuery = '';
     }
