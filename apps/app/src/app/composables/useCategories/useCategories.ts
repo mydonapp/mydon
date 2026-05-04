@@ -42,7 +42,28 @@ export const useCategories = () => {
     return category;
   };
 
+  const updateCategory = async (id: string, name: string): Promise<Category> => {
+    const res = await fetch(`${URI.API}/v1/categories/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      body: JSON.stringify({ name }),
+    });
+    const updated = await res.json();
+    const idx = categories.value.findIndex((c) => c.id === id);
+    if (idx !== -1) {
+      categories.value = [
+        ...categories.value.slice(0, idx),
+        updated,
+        ...categories.value.slice(idx + 1),
+      ].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return updated;
+  };
+
   fetchCategories();
 
-  return { categories, loading, fetchCategories, createCategory };
+  return { categories, loading, fetchCategories, createCategory, updateCategory };
 };

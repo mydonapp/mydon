@@ -34,8 +34,8 @@ export class Account {
   @Column()
   name: string;
 
-  @Column({ default: true })
-  private isActive: boolean;
+  @Column({ nullable: true, type: 'timestamptz', default: null })
+  deactivatedAt: Date | null;
 
   @Column({ default: false })
   retirementAccount: boolean;
@@ -104,8 +104,8 @@ export class Account {
   @ManyToOne(() => User, (user) => user.accounts, {})
   user: User;
 
-  setInactive() {
-    this.isActive = false;
+  get isActive(): boolean {
+    return this.deactivatedAt === null;
   }
 
   get balance() {

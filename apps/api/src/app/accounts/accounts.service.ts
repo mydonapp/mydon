@@ -13,6 +13,25 @@ export class AccountsService {
     private forexService: ForexService,
   ) {}
 
+  async findAllSimple(context: Context) {
+    const accounts = await this.accountsRepository.find({
+      where: { user: { id: context.user.id } },
+      relations: ['category'],
+      order: { name: 'ASC' },
+    });
+
+    return accounts.map((account) => ({
+      id: account.id,
+      name: account.name,
+      type: account.type,
+      currency: account.currency,
+      isActive: account.deactivatedAt === null,
+      retirementAccount: account.retirementAccount,
+      categoryId: account.category?.id ?? null,
+      categoryName: account.category?.name ?? null,
+    }));
+  }
+
   async findAll() {
     const result = await this.accountsRepository.find();
     return result.map((account) => {
@@ -111,6 +130,13 @@ export class AccountsService {
         'account_creditBalance',
       )
       .where('account."userId" = :userId')
+      .andWhere(`(
+        account."deactivatedAt" IS NULL
+        OR EXISTS (
+          SELECT 1 FROM transactions t
+          WHERE t."creditAccountId" = account.id OR t."debitAccountId" = account.id
+        )
+      )`)
       .setParameters({
         from: options?.filter?.from || new Date('1970-01-01'),
         to: options?.filter?.to
@@ -134,12 +160,6 @@ export class AccountsService {
     };
 
     return grouped;
-  }
-
-  async test() {
-    const a = await this.accountsRepository.findOne({ where: { id: '' } });
-    a.setInactive();
-    return a;
   }
 
   createAccount(
@@ -169,7 +189,7 @@ export class AccountsService {
   async updateAccount(
     context: Context,
     accountId: string,
-    options: { name?: string; categoryId?: string | null },
+    options: { name?: string; categoryId?: string | null; isActive?: boolean },
   ) {
     const account = await this.accountsRepository.findOne({
       where: { id: accountId, user: { id: context.user.id } },
@@ -179,6 +199,13 @@ export class AccountsService {
     if (options.name !== undefined) account.name = options.name;
     if (options.categoryId !== undefined) {
       account.category = options.categoryId ? ({ id: options.categoryId } as any) : null;
+    }
+    if (options.isActive !== undefined) {
+      if (options.isActive) {
+        account.deactivatedAt = null;
+      } else if (account.deactivatedAt === null) {
+        account.deactivatedAt = new Date();
+      }
     }
     return this.accountsRepository.save(account);
   }

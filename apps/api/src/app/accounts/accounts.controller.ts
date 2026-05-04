@@ -34,35 +34,23 @@ export class AccountsController {
   @UseGuards(AuthGuard)
   @Get('')
   @ApiOperation({ summary: 'Get all accounts for the authenticated user' })
-  @ApiQuery({
-    name: 'from',
-    type: Date,
-    required: false,
-    description: 'Filter from date',
-  })
-  @ApiQuery({
-    name: 'to',
-    type: Date,
-    required: false,
-    description: 'Filter to date',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'List of accounts retrieved successfully',
-  })
+  @ApiQuery({ name: 'from', type: Date, required: false })
+  @ApiQuery({ name: 'to', type: Date, required: false })
+  @ApiQuery({ name: 'list', type: Boolean, required: false, description: 'Return flat list including inactive accounts' })
+  @ApiResponse({ status: 200, description: 'List of accounts retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAll(
     @Req() req: Request,
     @Query('from', new ParseDatePipe({ optional: true })) from?: Date,
     @Query('to', new ParseDatePipe({ optional: true })) to?: Date,
+    @Query('list') list?: string,
   ) {
-    const result = await this.accountsService.findAllGroupedByAccountType(
-      req['context'],
-      {
-        filter: { from, to },
-      },
-    );
-    return result;
+    if (list === 'true') {
+      return this.accountsService.findAllSimple(req['context']);
+    }
+    return this.accountsService.findAllGroupedByAccountType(req['context'], {
+      filter: { from, to },
+    });
   }
 
   @UseGuards(AuthGuard)
@@ -100,6 +88,7 @@ export class AccountsController {
     return this.accountsService.updateAccount(req['context'], accountId, {
       name: dto.name,
       categoryId: dto.categoryId,
+      isActive: dto.isActive,
     });
   }
 

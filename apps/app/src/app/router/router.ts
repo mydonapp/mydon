@@ -64,6 +64,11 @@ const router = createRouter({
           name: 'BudgetDetail',
         },
         {
+          path: 'manage',
+          component: () => import('../views/ManageView.vue'),
+          name: 'Manage',
+        },
+        {
           path: 'settings',
           component: () => import('../views/SettingsView.vue'),
           name: 'Settings',

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 
 export class UpdateAccountDto {
   @ApiProperty({ required: false })
@@ -12,4 +12,9 @@ export class UpdateAccountDto {
   @IsOptional()
   @IsUUID()
   categoryId?: string;
+
+  @ApiProperty({ description: 'Whether the account is active', required: false })
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }

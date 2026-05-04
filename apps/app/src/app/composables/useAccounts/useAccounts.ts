@@ -11,6 +11,17 @@ interface CreateAccount {
   categoryId?: string;
 }
 
+export interface AccountSimple {
+  id: string;
+  name: string;
+  type: string;
+  currency: string;
+  isActive: boolean;
+  retirementAccount: boolean;
+  categoryId: string | null;
+  categoryName: string | null;
+}
+
 export const useAccounts = (timeFilter?: Ref<string>) => {
   const { getAccessToken } = useAuth();
   const { URI } = useConstant();
@@ -70,11 +81,35 @@ export const useAccounts = (timeFilter?: Ref<string>) => {
     refetchAccounts();
   };
 
+  const fetchSimple = async (): Promise<AccountSimple[]> => {
+    const res = await fetch(`${URI.API}/v1/accounts?list=true`, {
+      headers: { Authorization: `Bearer ${getAccessToken()}` },
+    });
+    return res.json();
+  };
+
+  const updateAccount = async (
+    id: string,
+    data: { name?: string; categoryId?: string | null; isActive?: boolean },
+  ) => {
+    const res = await fetch(`${URI.API}/v1/accounts/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  };
+
   return {
     accounts: data,
     loading: isFetching,
     error,
     createAccount,
+    updateAccount,
+    fetchSimple,
     refetchAccounts,
   };
 };

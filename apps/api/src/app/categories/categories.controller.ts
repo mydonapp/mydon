@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
@@ -26,5 +26,14 @@ export class CategoriesController {
   @ApiResponse({ status: 201, description: 'Category created' })
   create(@Req() req: Request, @Body() dto: CreateCategoryDto) {
     return this.categoriesService.create(req['context'], dto.name);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch(':id')
+  @ApiOperation({ summary: 'Rename a category' })
+  @ApiBody({ type: CreateCategoryDto })
+  @ApiResponse({ status: 200, description: 'Category updated' })
+  update(@Req() req: Request, @Param('id') id: string, @Body() dto: CreateCategoryDto) {
+    return this.categoriesService.update(req['context'], id, dto.name);
   }
 }

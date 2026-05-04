@@ -170,6 +170,7 @@ import {
   RiFileTextLine,
   RiBarChartBoxLine,
   RiMoneyDollarCircleLine,
+  RiListSettingsLine,
 } from '@remixicon/vue';
 import ToastContainer from './components/ToastContainer.vue';
 import BaseButton from './components/BaseButton.vue';
@@ -215,6 +216,11 @@ const menu: MenuItem[] = [
   //   routeName: 'SpendingAnalysis',
   //   icon: RiBarChartBoxLine,
   // },
+  {
+    name: computed(() => t('components.sidebar.menu.manage')),
+    routeName: 'Manage',
+    icon: RiListSettingsLine,
+  },
   {
     name: computed(() => t('components.sidebar.menu.importTransactions')),
     routeName: 'Import',

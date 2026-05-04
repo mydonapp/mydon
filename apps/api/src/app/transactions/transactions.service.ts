@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Account } from '../accounts/accounts.entity';
 import { Context } from '../shared/types/context';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
 import { TransactionMatcherService } from './transaction-matcher.service';
@@ -11,6 +12,8 @@ export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    @InjectRepository(Account)
+    private accountRepository: Repository<Account>,
     private transactionMatcher: TransactionMatcherService,
   ) {}
 
@@ -30,7 +33,7 @@ export class TransactionsService {
     });
   }
 
-  createTransaction(
+  async createTransaction(
     context: Context,
     options: {
       creditAmount: number;
@@ -41,6 +44,13 @@ export class TransactionsService {
       transactionDate: Date;
     },
   ) {
+    const [credit, debit] = await Promise.all([
+      this.accountRepository.findOne({ where: { id: options.creditAccountId } }),
+      this.accountRepository.findOne({ where: { id: options.debitAccountId } }),
+    ]);
+    if (credit?.deactivatedAt || debit?.deactivatedAt) {
+      throw new BadRequestException('Cannot add transactions to a deactivated account');
+    }
     const transaction = Transaction.create({
       ...options,
       userId: context.user.id,
@@ -101,6 +111,10 @@ export class TransactionsService {
     statementIssuer: string,
     accountId: string,
   ) {
+    const importAccount = await this.accountRepository.findOne({ where: { id: accountId } });
+    if (importAccount?.deactivatedAt) {
+      throw new BadRequestException('Cannot import into a deactivated account');
+    }
     const mapper = StatementMapperFactory.create(
       context,
       fileContent,
