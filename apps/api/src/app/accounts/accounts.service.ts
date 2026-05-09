@@ -32,31 +32,13 @@ export class AccountsService {
     }));
   }
 
-  async findAll() {
-    const result = await this.accountsRepository.find();
-    return result.map((account) => {
-      const creditBalance = account.creditBalance + account.openingBalance;
-
-      return {
-        id: account.id,
-        name: account.name,
-        type: account.type,
-        creditBalance: creditBalance,
-        debitBalance: account.debitBalance,
-        balance: account.balance,
-        currency: account.currency,
-      };
-    });
-  }
-
   async mapAccountsToGrouped(accounts: Account[], accountType: AccountType) {
     const result = (
       await Promise.all(
         accounts
           .filter((account) => account.type === accountType)
           .map(async (account) => {
-            const creditBalance =
-              account.creditBalance + account.openingBalance;
+            const creditBalance = account.creditBalance || 0 + account.openingBalance;
 
             return {
               id: account.id,
@@ -82,13 +64,9 @@ export class AccountsService {
 
     return {
       accounts: result,
-      total: result.reduce(
-        (acc, account) => acc + account.balanceMainCurrency,
-        0,
-      ),
+      total: result.reduce((acc, account) => acc + account.balanceMainCurrency, 0),
       totalWithoutRetirement: result.reduce(
-        (acc, account) =>
-          acc + (account.retirementAccount ? 0 : account.balanceMainCurrency),
+        (acc, account) => acc + (account.retirementAccount ? 0 : account.balanceMainCurrency),
         0,
       ),
     };
@@ -97,7 +75,7 @@ export class AccountsService {
   async findAllGroupedByAccountType(
     context: Context,
     options?: {
-      filter: { from: Date; to: Date };
+      filter: { from?: Date; to?: Date };
     },
   ) {
     const query = this.accountsRepository
@@ -130,18 +108,18 @@ export class AccountsService {
         'account_creditBalance',
       )
       .where('account."userId" = :userId')
-      .andWhere(`(
+      .andWhere(
+        `(
         account."deactivatedAt" IS NULL
         OR EXISTS (
           SELECT 1 FROM transactions t
           WHERE t."creditAccountId" = account.id OR t."debitAccountId" = account.id
         )
-      )`)
+      )`,
+      )
       .setParameters({
         from: options?.filter?.from || new Date('1970-01-01'),
-        to: options?.filter?.to
-          ? new Date(options?.filter?.to?.setUTCHours(23, 59, 59, 999))
-          : new Date('2100-12-31'),
+        to: options?.filter?.to ? new Date(options?.filter?.to?.setUTCHours(23, 59, 59, 999)) : new Date('2100-12-31'),
         filteredTypes: ['EXPENSE', 'INCOME'],
         userId: context.user.id,
       });
@@ -150,10 +128,7 @@ export class AccountsService {
 
     const grouped = {
       assets: await this.mapAccountsToGrouped(result, AccountType.ASSETS),
-      liabilities: await this.mapAccountsToGrouped(
-        result,
-        AccountType.LIABILITIES,
-      ),
+      liabilities: await this.mapAccountsToGrouped(result, AccountType.LIABILITIES),
       equity: await this.mapAccountsToGrouped(result, AccountType.EQUITY),
       income: await this.mapAccountsToGrouped(result, AccountType.INCOME),
       expense: await this.mapAccountsToGrouped(result, AccountType.EXPENSE),
@@ -239,8 +214,7 @@ export class AccountsService {
           transactionDate: x.transactionDate,
           description: x.description,
           amount:
-            account.type === AccountType.INCOME ||
-            account.type === AccountType.LIABILITIES
+            account.type === AccountType.INCOME || account.type === AccountType.LIABILITIES
               ? x.debitAmount
               : x.debitAmount * -1,
           counterAccount: {
@@ -253,8 +227,7 @@ export class AccountsService {
           transactionDate: x.transactionDate,
           description: x.description,
           amount:
-            account.type === AccountType.ASSETS ||
-            account.type === AccountType.EXPENSE
+            account.type === AccountType.ASSETS || account.type === AccountType.EXPENSE
               ? x.creditAmount
               : x.creditAmount * -1,
           counterAccount: {
@@ -262,9 +235,7 @@ export class AccountsService {
             name: x.debitAccount.name,
           },
         })) || []),
-      ].sort(
-        (a, b) => a.transactionDate.getTime() - b.transactionDate.getTime(),
-      ),
+      ].sort((a, b) => a.transactionDate.getTime() - b.transactionDate.getTime()),
     };
   }
 }

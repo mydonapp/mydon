@@ -1,5 +1,5 @@
-import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 import { parse } from 'csv-parse/sync';
+import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 
 export interface YuhStatement {
   DATE: string;
@@ -25,25 +25,19 @@ export class YuhStatementMapper extends StatementMapper<YuhStatement> {
 
   protected mapStatement(): Promise<MappedTransaction<YuhStatementResponse>[]> {
     const mappedStatement: MappedTransaction<YuhStatementResponse>[] = [];
+
+    if (!this.statement) {
+      throw Error('Statement not initialized');
+    }
+
     for (const transaction of this.statement) {
       const dmy = transaction.DATE.split('/');
 
       mappedStatement.push({
-        creditAmount: transaction.CREDIT
-          ? Math.abs(transaction.CREDIT)
-          : Math.abs(transaction.DEBIT),
-        debitAmount: transaction.CREDIT
-          ? Math.abs(transaction.CREDIT)
-          : Math.abs(transaction.DEBIT),
-        description: transaction['ACTIVITY NAME'].substring(
-          1,
-          transaction['ACTIVITY NAME'].length - 1,
-        ),
-        transactionDate: new Date(
-          parseInt(dmy[2]),
-          parseInt(dmy[1]) - 1,
-          parseInt(dmy[0]),
-        ),
+        creditAmount: transaction.CREDIT ? Math.abs(transaction.CREDIT) : Math.abs(transaction.DEBIT),
+        debitAmount: transaction.CREDIT ? Math.abs(transaction.CREDIT) : Math.abs(transaction.DEBIT),
+        description: transaction['ACTIVITY NAME'].substring(1, transaction['ACTIVITY NAME'].length - 1),
+        transactionDate: new Date(parseInt(dmy[2]), parseInt(dmy[1]) - 1, parseInt(dmy[0])),
         raw: {
           ...transaction,
           issuer: 'YUH',
@@ -54,16 +48,12 @@ export class YuhStatementMapper extends StatementMapper<YuhStatement> {
     return Promise.resolve(mappedStatement);
   }
 
-  protected getCreditAccountIdFromStatement(
-    transaction: MappedTransaction<YuhStatementResponse>,
-  ): string {
+  protected getCreditAccountIdFromStatement(transaction: MappedTransaction<YuhStatementResponse>): string | undefined {
     if (transaction.raw.CREDIT) {
       return this.accountId;
     }
   }
-  protected getDebitAccountIdFromStatement(
-    transaction: MappedTransaction<YuhStatementResponse>,
-  ): string {
+  protected getDebitAccountIdFromStatement(transaction: MappedTransaction<YuhStatementResponse>): string | undefined {
     if (transaction.raw.DEBIT) {
       return this.accountId;
     }

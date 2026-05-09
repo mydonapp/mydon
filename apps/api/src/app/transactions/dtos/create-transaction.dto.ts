@@ -1,29 +1,23 @@
-import {
-  IsDateString,
-  IsNumber,
-  IsPositive,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsDateString, IsNumber, IsPositive, IsString, IsUUID } from 'class-validator';
 
 export class CreateTransactionDto {
   @IsNumber()
   @IsPositive()
-  creditAmount: number;
+  declare creditAmount: number;
 
   @IsNumber()
   @IsPositive()
-  debitAmount: number;
+  declare debitAmount: number;
 
   @IsString()
-  description: string;
+  declare description: string;
 
   @IsUUID()
-  creditAccountId: string;
+  declare creditAccountId: string;
 
   @IsUUID()
-  debitAccountId: string;
+  declare debitAccountId: string;
 
   @IsDateString()
-  transactionDate: Date;
+  declare transactionDate: Date;
 }

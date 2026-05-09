@@ -12,16 +12,16 @@ export enum BudgetFrequency {
 @Entity('budget_items')
 export class BudgetItem {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @ManyToOne(() => Budget, (budget) => budget.items, { onDelete: 'CASCADE' })
-  budget: Budget;
+  declare budget: Budget;
 
   @ManyToOne(() => Account, { nullable: true, onDelete: 'SET NULL', eager: false })
-  account: Account | null;
+  declare account: Account | null;
 
   @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL', eager: false })
-  category: Category | null;
+  declare category: Category | null;
 
   @Column({
     type: 'decimal',
@@ -29,8 +29,8 @@ export class BudgetItem {
     scale: 2,
     transformer: new ColumnDecimalTransformer(),
   })
-  amount: number;
+  declare amount: number;
 
   @Column({ enum: BudgetFrequency, type: 'enum', default: BudgetFrequency.MONTHLY })
-  frequency: BudgetFrequency;
+  declare frequency: BudgetFrequency;
 }

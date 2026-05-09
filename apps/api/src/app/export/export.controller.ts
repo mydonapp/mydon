@@ -19,12 +19,11 @@ export class ExportController {
   })
   async exportUserData(@Req() req: Request, @Res() res: Response) {
     try {
-      const { userCsv, accountsCsv, transactionsCsv, filename } = await this.exportService.exportUserData(
-        req['context'],
-      );
+      const { userCsv, accountsCsv, transactionsCsv, budgetsCsv, budgetItemsCsv, categoriesCsv, filename } =
+        await this.exportService.exportUserData(req['context']);
 
       const archive = archiver('zip', {
-        zlib: { level: 9 }, // Maximum compression
+        zlib: { level: 9 },
       });
 
       res.setHeader('Content-Type', 'application/zip');
@@ -35,6 +34,9 @@ export class ExportController {
       archive.append(userCsv, { name: 'user.csv' });
       archive.append(accountsCsv, { name: 'accounts.csv' });
       archive.append(transactionsCsv, { name: 'transactions.csv' });
+      archive.append(budgetsCsv, { name: 'budgets.csv' });
+      archive.append(budgetItemsCsv, { name: 'budget-items.csv' });
+      archive.append(categoriesCsv, { name: 'categories.csv' });
 
       const readme = this.generateReadme();
       archive.append(readme, { name: 'README.txt' });
@@ -45,7 +47,7 @@ export class ExportController {
       });
 
       await archive.finalize();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Export error:', error);
       res.status(500).json({
         message: 'Failed to export data',

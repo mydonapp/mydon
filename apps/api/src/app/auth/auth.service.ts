@@ -188,6 +188,13 @@ export class AuthService {
     return user;
   }
 
+  async updateUser(userId: string, data: { name?: string; email?: string }): Promise<User> {
+    const user = await this.userRepository.findOneOrFail({ where: { id: userId } });
+    if (data.name) user.name = data.name;
+    if (data.email) user.email = data.email;
+    return this.userRepository.save(user);
+  }
+
   async deleteExpiredAccessTokens(): Promise<void> {
     await this.accessTokenRepository.delete({
       expiresAt: Raw((alias) => `${alias} <= NOW()`),

@@ -1,0 +1,62 @@
+<div class="min-h-screen bg-primary flex items-center justify-center p-4">
+  <div class="card bg-secondary shadow-xl w-full max-w-md">
+    <div class="card-body">
+      <div class="text-center mb-6">
+        <div class="flex items-center justify-center bg-primary-600 text-white rounded-xl w-16 h-16 mx-auto mb-4">
+          <span class="text-2xl font-bold">D</span>
+        </div>
+        <h1 class="text-2xl font-bold text-primary-400">myDon</h1>
+        <p class="text-secondary text-sm">{{ 'views.signup.title' | translate }}</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="space-y-4">
+          <app-base-input
+            [value]="name()"
+            (valueChange)="name.set($event)"
+            type="text"
+            [label]="'views.signup.signupForm.name.label' | translate"
+            [placeholder]="'views.signup.signupForm.name.placeholder' | translate"
+            [required]="true"
+            autocomplete="name"
+          />
+          <app-base-input
+            [value]="email()"
+            (valueChange)="email.set($event)"
+            type="email"
+            [label]="'views.signup.signupForm.email.label' | translate"
+            [placeholder]="'views.signup.signupForm.email.placeholder' | translate"
+            [required]="true"
+            autocomplete="email"
+          />
+          <app-base-input
+            [value]="password()"
+            (valueChange)="password.set($event)"
+            type="password"
+            [label]="'views.signup.signupForm.password.label' | translate"
+            [placeholder]="'views.signup.signupForm.password.placeholder' | translate"
+            [required]="true"
+            autocomplete="new-password"
+          />
+
+          <app-base-button
+            type="submit"
+            variant="primary"
+            [block]="true"
+            [loading]="loading()"
+          >
+            {{ 'views.signup.signupForm.submit.label' | translate }}
+          </app-base-button>
+        </div>
+      </form>
+
+      <div class="divider my-4"></div>
+      <p class="text-center text-sm text-secondary">
+        {{ 'views.signup.loginPrompt.text' | translate }}
+        <a routerLink="/auth/login" class="text-primary-400 hover:underline ml-1">
+          {{ 'views.signup.loginPrompt.link' | translate }}
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

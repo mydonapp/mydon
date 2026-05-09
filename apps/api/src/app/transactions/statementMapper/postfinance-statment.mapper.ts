@@ -36,30 +36,24 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
 
     return parsed.map((x) => {
       return {
-        date: Object.entries(x).find(([key, value]) =>
-          headerMappings.date.includes(key),
-        )[1],
-        creditInCHF: Object.entries(x).find(([key, value]) =>
-          headerMappings.creditInCHF.includes(key),
-        )[1],
-        debitInCHF: Object.entries(x).find(([key, value]) =>
-          headerMappings.debitInCHF.includes(key),
-        )[1],
-        notificationText: Object.entries(x).find(([key, value]) =>
-          headerMappings.notificationText.includes(key),
-        )[1],
+        date: Object.entries(x).find(([key, value]) => headerMappings.date.includes(key))?.[1],
+        creditInCHF: Object.entries(x).find(([key, value]) => headerMappings.creditInCHF.includes(key))?.[1],
+        debitInCHF: Object.entries(x).find(([key, value]) => headerMappings.debitInCHF.includes(key))?.[1],
+        notificationText: Object.entries(x).find(([key, value]) => headerMappings.notificationText.includes(key))?.[1],
         typeOfTransactipn: Object.entries(x).find(([key, value]) =>
           headerMappings.typeOfTransactipn.includes(key),
-        )[1],
+        )?.[1],
       };
     });
   }
 
-  protected mapStatement(): Promise<
-    MappedTransaction<PostFinanceStatementResponse>[]
-  > {
-    const mappedStatement: MappedTransaction<PostFinanceStatementResponse>[] =
-      [];
+  protected mapStatement(): Promise<MappedTransaction<PostFinanceStatementResponse>[]> {
+    const mappedStatement: MappedTransaction<PostFinanceStatementResponse>[] = [];
+
+    if (!this.statement) {
+      throw Error('Statement not initialized');
+    }
+
     for (const transaction of this.statement) {
       const dmy = transaction.date.split('.');
 
@@ -75,11 +69,7 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
             : parseFloat(transaction.creditInCHF.toString()),
         ),
         description: transaction.notificationText,
-        transactionDate: new Date(
-          parseInt(dmy[2]),
-          parseInt(dmy[1]) - 1,
-          parseInt(dmy[0]),
-        ),
+        transactionDate: new Date(parseInt(dmy[2]), parseInt(dmy[1]) - 1, parseInt(dmy[0])),
         raw: {
           ...transaction,
           issuer: 'POSTFINANCE',
@@ -92,14 +82,14 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
 
   protected getCreditAccountIdFromStatement(
     transaction: MappedTransaction<PostFinanceStatementResponse>,
-  ): string {
+  ): string | undefined {
     if (transaction.raw.creditInCHF !== '') {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
     transaction: MappedTransaction<PostFinanceStatementResponse>,
-  ): string {
+  ): string | undefined {
     if (transaction.raw.debitInCHF !== '') {
       return this.accountId;
     }

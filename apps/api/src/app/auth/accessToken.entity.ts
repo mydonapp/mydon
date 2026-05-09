@@ -5,21 +5,21 @@ import { User } from './user.entity';
 @Entity('accessToken')
 export class AccessToken {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column({ unique: true })
-  token: string;
+  declare token: string;
 
   @Column({
     type: 'timestamp',
   })
-  expiresAt: Date;
+  declare expiresAt: Date;
 
   @ManyToOne(() => User, (user) => user.accessToken, {})
-  user: User;
+  declare user: User;
 
   @ManyToOne(() => RefreshToken, (refreshToken) => refreshToken.accessToken, {
     onDelete: 'CASCADE',
   })
-  refreshToken: RefreshToken;
+  declare refreshToken: RefreshToken;
 }

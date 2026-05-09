@@ -1,0 +1,102 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-2xl">
+  <app-page-header
+    [title]="'views.settings.title' | translate"
+    [subtitle]="'views.settings.subtitle' | translate"
+  />
+
+  <div class="space-y-6">
+    <!-- Profile -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.profile.title' | translate }}</h2>
+        <div class="space-y-3">
+          <app-base-input
+            [value]="name()"
+            (valueChange)="name.set($event)"
+            [label]="'views.settings.sections.profile.name' | translate"
+            [placeholder]="'views.settings.sections.profile.namePlaceholder' | translate"
+          />
+          <app-base-input
+            [value]="email()"
+            (valueChange)="email.set($event)"
+            type="email"
+            [label]="'views.settings.sections.profile.email' | translate"
+            [placeholder]="'views.settings.sections.profile.emailPlaceholder' | translate"
+          />
+          <app-base-button
+            variant="primary"
+            size="sm"
+            [loading]="savingProfile()"
+            (clicked)="saveProfile()"
+          >
+            {{ 'views.settings.sections.profile.updateButton' | translate }}
+          </app-base-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Language -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.language.title' | translate }}</h2>
+        <app-base-select
+          [value]="languageService.currentLanguage()"
+          (valueChange)="languageService.setLanguage($event)"
+          [label]="'views.settings.sections.language.currentLanguage' | translate"
+          [options]="languageOptions"
+        />
+        <p class="text-muted text-xs mt-2">
+          {{ 'views.settings.sections.language.description' | translate }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Privacy -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.privacy.title' | translate }}</h2>
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-primary text-sm font-medium">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</p>
+            <p class="text-muted text-xs mt-1">{{ 'views.settings.sections.privacy.privacyModeDescription' | translate }}</p>
+          </div>
+          <app-base-toggle
+            [value]="privacyService.isPrivate()"
+            variant="warning"
+            (valueChange)="privacyService.toggle()"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Export -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-2">{{ 'views.settings.sections.export.title' | translate }}</h2>
+        <p class="text-muted text-sm mb-4">{{ 'views.settings.sections.export.exportDescription' | translate }}</p>
+        <app-base-button
+          variant="secondary"
+          size="sm"
+          [loading]="exporting()"
+          (clicked)="exportData()"
+        >
+          <i class="ri-download-line mr-1"></i>
+          {{ 'views.settings.sections.export.exportButton' | translate }}
+        </app-base-button>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.about.title' | translate }}</h2>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-muted">{{ 'views.settings.sections.about.version' | translate }}</span>
+            <span class="text-primary">0.0.2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

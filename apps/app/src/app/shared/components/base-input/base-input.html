@@ -1,0 +1,39 @@
+<div class="form-control w-full">
+  @if (label()) {
+    <label class="label">
+      <span class="label-text text-primary font-medium">
+        {{ label() }}
+        @if (required()) {
+          <span class="text-error ml-1">*</span>
+        }
+      </span>
+    </label>
+  }
+  <div class="relative">
+    <input
+      [type]="type()"
+      [placeholder]="placeholder()"
+      [disabled]="disabled()"
+      [readonly]="readonly()"
+      [required]="required()"
+      [min]="min()"
+      [max]="max()"
+      [step]="step()"
+      [pattern]="pattern()"
+      [autocomplete]="autocomplete()"
+      [ngModel]="value()"
+      (ngModelChange)="valueChange.emit($event)"
+      [class]="inputClasses()"
+    />
+  </div>
+  @if (error()) {
+    <label class="label">
+      <span class="label-text-alt text-error">{{ error() }}</span>
+    </label>
+  }
+  @if (helpText() && !error()) {
+    <label class="label">
+      <span class="label-text-alt text-muted">{{ helpText() }}</span>
+    </label>
+  }
+</div>

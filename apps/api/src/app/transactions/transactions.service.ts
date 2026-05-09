@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Account } from '../accounts/accounts.entity';
 import { Context } from '../shared/types/context';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
@@ -18,7 +18,7 @@ export class TransactionsService {
   ) {}
 
   findAll(context: Context, filter?: string) {
-    const where = {
+    const where: FindOptionsWhere<Transaction> = {
       user: { id: context.user.id },
     };
 
@@ -77,7 +77,7 @@ export class TransactionsService {
       draft?: boolean;
     },
   ) {
-    const transaction = await this.transactionRepository.findOne({
+    const transaction = await this.transactionRepository.findOneOrFail({
       where: { id, user: { id: context.user.id } },
     });
 
@@ -98,19 +98,14 @@ export class TransactionsService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       transaction.debitAccount = options.debitAccountId as any;
     }
-    if ('draft' in options) {
+    if (options.draft !== undefined) {
       transaction.draft = options.draft;
     }
 
     return this.transactionRepository.save(transaction);
   }
 
-  async importStatement(
-    context: Context,
-    fileContent: string,
-    statementIssuer: string,
-    accountId: string,
-  ) {
+  async importStatement(context: Context, fileContent: string, statementIssuer: string, accountId: string) {
     const importAccount = await this.accountRepository.findOne({ where: { id: accountId } });
     if (importAccount?.deactivatedAt) {
       throw new BadRequestException('Cannot import into a deactivated account');

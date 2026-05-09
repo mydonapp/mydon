@@ -5,5 +5,5 @@ export class CreateCategoryDto {
   @ApiProperty({ description: 'Category name', example: 'Food & Dining' })
   @IsString()
   @Length(1, 50)
-  name: string;
+  declare name: string;
 }

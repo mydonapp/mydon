@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Req,
   Res,
@@ -42,6 +43,18 @@ export class AuthController {
       name: user.name,
       email: user.email,
     };
+  }
+
+  @Patch('me')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async updateCurrentUser(
+    @Req() req: Request,
+    @Body() body: { name?: string; email?: string },
+  ) {
+    const user = req['context']?.user;
+    const updated = await this.authService.updateUser(user.id, body);
+    return { id: updated.id, name: updated.name, email: updated.email };
   }
 
   @Post('signup')

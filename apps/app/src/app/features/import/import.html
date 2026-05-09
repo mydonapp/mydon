@@ -1,0 +1,182 @@
+<div class="p-4 sm:p-6 lg:p-8">
+  <app-page-header
+    [title]="'views.importTransactions.title' | translate"
+    [subtitle]="'views.importTransactions.subtitle' | translate"
+  />
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Import Form -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-4">{{ 'views.importTransactions.importForm.title' | translate }}</h2>
+        <form (ngSubmit)="submitImport()">
+          <div class="space-y-4">
+            <app-base-select
+              [value]="selectedAccountId()"
+              (valueChange)="selectedAccountId.set($event)"
+              [label]="'views.importTransactions.importForm.account.label' | translate"
+              [placeholder]="'views.importTransactions.importForm.account.placeholder' | translate"
+              [options]="accountOptions()"
+            />
+            <app-base-select
+              [value]="selectedIssuerId()"
+              (valueChange)="selectedIssuerId.set($event)"
+              [label]="'views.importTransactions.importForm.issuer.label' | translate"
+              [placeholder]="'views.importTransactions.importForm.issuer.placeholder' | translate"
+              [options]="issuerOptions()"
+            />
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-primary font-medium">
+                  {{ 'views.importTransactions.importForm.upload.label' | translate }}
+                </span>
+              </label>
+              <input
+                type="file"
+                accept=".csv"
+                class="file-input file-input-bordered w-full bg-primary text-primary border-primary"
+                (change)="onFileChange($event)"
+              />
+              <label class="label">
+                <span class="label-text-alt text-muted">
+                  {{ 'views.importTransactions.importForm.upload.help' | translate }}
+                </span>
+              </label>
+            </div>
+            <app-base-button
+              type="submit"
+              variant="primary"
+              [block]="true"
+              [loading]="uploading()"
+              [disabled]="!selectedAccountId() || !selectedIssuerId() || !file()"
+            >
+              {{ 'views.importTransactions.importForm.submit.label' | translate }}
+            </app-base-button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Draft Transactions -->
+    <div class="lg:col-span-2">
+      <div class="card bg-secondary">
+        <div class="card-body p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-primary">{{ 'views.importTransactions.draftTransactions.title' | translate }}</h2>
+            <div class="flex items-center gap-2">
+              <span class="badge badge-primary badge-sm">{{ pendingCount() }} {{ 'views.importTransactions.pendingTransactions' | translate }}</span>
+              @if (selectedDrafts().length > 0) {
+                <app-base-button variant="success" size="sm" [loading]="approving()" (clicked)="approveSelected()">
+                  {{ 'views.importTransactions.draftTransactions.approve' | translate }}
+                </app-base-button>
+              }
+            </div>
+          </div>
+
+          @if (draftsLoading()) {
+            <div class="flex justify-center py-8"><span class="loading loading-spinner text-primary-400"></span></div>
+          } @else if (draftTransactions().length === 0) {
+            <div class="text-center py-12">
+              <i class="ri-file-upload-line text-5xl text-muted mb-4"></i>
+              <h3 class="font-semibold text-primary mb-2">{{ 'views.importTransactions.emptyState.title' | translate }}</h3>
+              <p class="text-muted text-sm">{{ 'views.importTransactions.emptyState.description' | translate }}</p>
+              <div class="grid grid-cols-3 gap-4 mt-6">
+                <div class="text-center">
+                  <i class="ri-bank-card-line text-2xl text-primary-400 mb-2"></i>
+                  <p class="text-xs text-primary font-medium">{{ 'views.importTransactions.emptyState.step1.title' | translate }}</p>
+                  <p class="text-xs text-muted">{{ 'views.importTransactions.emptyState.step1.description' | translate }}</p>
+                </div>
+                <div class="text-center">
+                  <i class="ri-building-line text-2xl text-primary-400 mb-2"></i>
+                  <p class="text-xs text-primary font-medium">{{ 'views.importTransactions.emptyState.step2.title' | translate }}</p>
+                  <p class="text-xs text-muted">{{ 'views.importTransactions.emptyState.step2.description' | translate }}</p>
+                </div>
+                <div class="text-center">
+                  <i class="ri-upload-2-line text-2xl text-primary-400 mb-2"></i>
+                  <p class="text-xs text-primary font-medium">{{ 'views.importTransactions.emptyState.step3.title' | translate }}</p>
+                  <p class="text-xs text-muted">{{ 'views.importTransactions.emptyState.step3.description' | translate }}</p>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <!-- Select All -->
+            <div class="flex items-center gap-2 mb-3">
+              <input
+                type="checkbox"
+                class="checkbox checkbox-sm"
+                [checked]="allSelected()"
+                (change)="toggleSelectAll($event)"
+              />
+              <span class="text-sm text-muted">
+                @if (allSelected()) {
+                  {{ 'views.importTransactions.draftTransactions.deselectAll' | translate }}
+                } @else {
+                  {{ 'views.importTransactions.draftTransactions.selectAll' | translate }}
+                }
+              </span>
+            </div>
+
+            <!-- AI Info Banner -->
+            @if (hasAiSuggestions()) {
+              <div class="alert alert-info mb-3 text-sm">
+                <i class="ri-robot-line"></i>
+                <span>{{ 'views.importTransactions.draftTransactions.aiInfo.description' | translate }}</span>
+              </div>
+            }
+
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+              @for (draft of draftTransactions(); track draft.id) {
+                <div class="flex items-start gap-2 p-3 rounded-lg" [class]="selectedDrafts().includes(draft.id) ? 'bg-primary/10' : 'bg-primary'">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm mt-1"
+                    [checked]="selectedDrafts().includes(draft.id)"
+                    (change)="toggleDraft(draft.id, $event)"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="text-xs text-muted">{{ draft.date | date:'shortDate' }}</span>
+                      @if (draft.aiSuggested) {
+                        <span class="badge badge-info badge-xs">AI</span>
+                      }
+                    </div>
+                    <p class="text-sm text-primary font-medium truncate">{{ draft.description }}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <select
+                        class="select select-bordered select-xs bg-secondary text-primary border-primary flex-1"
+                        [ngModel]="draft.creditAccountId"
+                        (ngModelChange)="updateDraft(draft.id, 'creditAccountId', $event)"
+                      >
+                        <option value="">{{ 'views.importTransactions.draftTransactions.table.selectAccount' | translate }}</option>
+                        @for (acc of accountsService.accounts(); track acc.id) {
+                          <option [value]="acc.id">{{ acc.name }}</option>
+                        }
+                      </select>
+                      <i class="ri-arrow-left-right-line text-muted"></i>
+                      <select
+                        class="select select-bordered select-xs bg-secondary text-primary border-primary flex-1"
+                        [ngModel]="draft.debitAccountId"
+                        (ngModelChange)="updateDraft(draft.id, 'debitAccountId', $event)"
+                      >
+                        <option value="">{{ 'views.importTransactions.draftTransactions.table.selectAccount' | translate }}</option>
+                        @for (acc of accountsService.accounts(); track acc.id) {
+                          <option [value]="acc.id">{{ acc.name }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <span class="font-bold text-sm text-primary">{{ draft.amount | number:'1.2-2' }}</span>
+                    <button class="btn btn-ghost btn-xs text-error block mt-1" (click)="deleteDraft(draft.id)">
+                      <i class="ri-delete-bin-line"></i>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

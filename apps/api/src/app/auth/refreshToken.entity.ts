@@ -1,35 +1,29 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AccessToken } from './accessToken.entity';
 import { User } from './user.entity';
 
 @Entity('refreshToken')
 export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column({ unique: true })
-  token: string;
+  declare token: string;
 
   @Column()
-  userAgent: string;
+  declare userAgent: string;
 
   @Column()
-  ip: string;
+  declare ip: string;
 
   @Column({
     type: 'timestamp',
   })
-  expiresAt: Date;
+  declare expiresAt: Date;
 
   @ManyToOne(() => User, (user) => user.refreshToken, {})
-  user: User;
+  declare user: User;
 
   @OneToMany(() => AccessToken, (accessToken) => accessToken.refreshToken)
-  accessToken: AccessToken[];
+  declare accessToken: AccessToken[];
 }

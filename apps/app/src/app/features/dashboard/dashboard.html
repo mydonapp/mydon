@@ -1,0 +1,140 @@
+<div class="p-4 sm:p-6 lg:p-8">
+  <app-page-header
+    [title]="'views.dashboard.title' | translate"
+    [subtitle]="'views.dashboard.subtitle' | translate"
+  />
+
+  <!-- Year Filter -->
+  <div class="flex items-center gap-4 mb-6">
+    <span class="text-secondary text-sm">{{ 'views.dashboard.lastUpdated' | translate }}</span>
+    <select
+      class="select select-bordered select-sm bg-primary text-primary border-primary"
+      [ngModel]="accountsService.timeFilter()"
+      (ngModelChange)="onYearChange($event)"
+    >
+      @for (year of yearOptions; track year) {
+        <option [value]="year">{{ year }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center py-12">
+      <span class="loading loading-spinner loading-lg text-primary-400"></span>
+    </div>
+  } @else {
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div class="card bg-secondary">
+        <div class="card-body p-4">
+          <h3 class="text-secondary text-sm">{{ 'views.dashboard.netWorth' | translate }}</h3>
+          <p class="text-2xl font-bold text-primary-400">
+            {{ currencyService.format(summary()?.netWorth ?? 0, 'CHF') }}
+          </p>
+        </div>
+      </div>
+      <div class="card bg-secondary">
+        <div class="card-body p-4">
+          <h3 class="text-secondary text-sm">{{ 'views.dashboard.totalAssets' | translate }}</h3>
+          <p class="text-2xl font-bold text-success">
+            {{ currencyService.format(summary()?.totalAssets ?? 0, 'CHF') }}
+          </p>
+        </div>
+      </div>
+      <div class="card bg-secondary">
+        <div class="card-body p-4">
+          <h3 class="text-secondary text-sm">{{ 'words.liabilities' | translate }}</h3>
+          <p class="text-2xl font-bold text-error">
+            {{ currencyService.format(summary()?.totalLiabilities ?? 0, 'CHF') }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Balances -->
+    <div class="card bg-secondary mb-6">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-primary">{{ 'views.dashboard.accountBalances' | translate }}</h2>
+          <a routerLink="/app/accounts" class="text-primary-400 text-sm hover:underline">
+            {{ 'views.dashboard.manageAccounts' | translate }}
+          </a>
+        </div>
+        @for (account of accounts().slice(0, 5); track account.id) {
+          <div class="flex items-center justify-between py-2 border-b border-primary last:border-0">
+            <div>
+              <span class="text-primary text-sm font-medium">{{ account.name }}</span>
+              <span class="text-muted text-xs ml-2">{{ account.type }}</span>
+            </div>
+            <span class="text-primary font-medium text-sm">
+              {{ currencyService.format(account.balance ?? 0, account.currency) }}
+            </span>
+          </div>
+        }
+        @if (accounts().length === 0) {
+          <p class="text-muted text-center py-4">
+            {{ 'views.dashboard.noTransactions' | translate }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card bg-secondary mb-6">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-primary">{{ 'views.dashboard.recentTransactions' | translate }}</h2>
+          <a routerLink="/app/import" class="text-primary-400 text-sm hover:underline">
+            {{ 'views.dashboard.importMore' | translate }}
+          </a>
+        </div>
+        @for (tx of recentTransactions().slice(0, 10); track tx.id) {
+          <div class="flex items-center justify-between py-2 border-b border-primary last:border-0">
+            <div class="flex-1 min-w-0">
+              <p class="text-primary text-sm font-medium truncate">{{ tx.description }}</p>
+              <p class="text-muted text-xs">{{ tx.date | date:'mediumDate' }}</p>
+            </div>
+            <span class="text-primary font-medium text-sm ml-2">
+              {{ currencyService.format(tx.amount, 'CHF') }}
+            </span>
+          </div>
+        }
+        @if (recentTransactions().length === 0) {
+          <div class="text-center py-8">
+            <p class="text-muted mb-4">{{ 'views.dashboard.noTransactions' | translate }}</p>
+            <a routerLink="/app/import">
+              <app-base-button variant="primary" size="sm">
+                {{ 'views.dashboard.importFirst' | translate }}
+              </app-base-button>
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-4">{{ 'views.dashboard.quickActions' | translate }}</h2>
+        <div class="flex flex-wrap gap-2">
+          <a routerLink="/app/import">
+            <app-base-button variant="primary" size="sm">
+              <i class="ri-upload-line mr-1"></i>
+              {{ 'views.dashboard.importTransactions' | translate }}
+            </app-base-button>
+          </a>
+          <a routerLink="/app/accounts">
+            <app-base-button variant="secondary" size="sm">
+              <i class="ri-wallet-3-line mr-1"></i>
+              {{ 'views.dashboard.manageAccounts' | translate }}
+            </app-base-button>
+          </a>
+          <app-base-button variant="secondary" size="sm" (clicked)="loadData()">
+            <i class="ri-refresh-line mr-1"></i>
+            {{ 'views.dashboard.refresh' | translate }}
+          </app-base-button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

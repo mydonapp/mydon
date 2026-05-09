@@ -5,17 +5,17 @@ import { BudgetItem } from './budget-item.entity';
 @Entity('budgets')
 export class Budget {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column()
-  name: string;
+  declare name: string;
 
   @Column()
-  year: number;
+  declare year: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user: User;
+  declare user: User;
 
   @OneToMany(() => BudgetItem, (item) => item.budget, { cascade: true })
-  items: BudgetItem[];
+  declare items: BudgetItem[];
 }

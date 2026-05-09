@@ -16,8 +16,8 @@ export interface CreateTransaction {
   creditAmount: number;
   debitAmount: number;
   description: string;
-  creditAccountId: string;
-  debitAccountId: string;
+  creditAccountId?: string;
+  debitAccountId?: string;
   transactionDate: Date;
   userId: string;
   draft?: boolean;
@@ -30,7 +30,7 @@ export interface CreateTransaction {
 @Entity('transactions')
 export class Transaction {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column({
     type: 'decimal',
@@ -38,7 +38,7 @@ export class Transaction {
     scale: 2,
     transformer: new ColumnDecimalTransformer(),
   })
-  creditAmount: number;
+  declare creditAmount: number;
 
   @Column({
     type: 'decimal',
@@ -47,54 +47,54 @@ export class Transaction {
     default: 0,
     transformer: new ColumnDecimalTransformer(),
   })
-  debitAmount: number;
+  declare debitAmount: number;
 
   @Column({ default: '' })
-  description: string;
+  declare description: string;
 
   @Column({ default: false })
-  draft: boolean;
+  declare draft: boolean;
 
   @Column({ default: false })
-  creditAccountAISuggested: boolean;
+  declare creditAccountAISuggested: boolean;
 
   @Column({ default: false })
-  debitAccountAISuggested: boolean;
+  declare debitAccountAISuggested: boolean;
 
   @Column({ nullable: true })
-  matchedTransactionId: string;
+  declare matchedTransactionId: string | null;
 
   @ManyToOne(() => Account, (account) => account.creditTransactions, {
     nullable: true,
   })
-  creditAccount: Account;
+  declare creditAccount: Account;
 
   @ManyToOne(() => Account, (account) => account.debitTransactions, {
     nullable: true,
   })
-  debitAccount: Account;
+  declare debitAccount: Account;
 
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
-  createdAt: Date;
+  declare createdAt: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
-  updatedAt: Date;
+  declare updatedAt: Date;
 
   @Column({ type: 'timestamp' })
-  transactionDate: Date;
+  declare transactionDate: Date;
 
   @Column({ nullable: true })
-  raw: string;
+  declare raw: string | null;
 
   @ManyToOne(() => User, (user) => user.transactions, {})
-  user: User;
+  declare user: User;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -104,10 +104,7 @@ export class Transaction {
     }
 
     if (this.creditAccount || this.creditAccount?.id) {
-      if (
-        (this.creditAccount?.id || this.creditAccount) ===
-        (this.debitAccount?.id || this.debitAccount)
-      ) {
+      if ((this.creditAccount?.id || this.creditAccount) === (this.debitAccount?.id || this.debitAccount)) {
         throw new Error('Credit and debit accounts cannot be the same');
       }
     }
@@ -129,10 +126,8 @@ export class Transaction {
     transaction.transactionDate = props.transactionDate;
     transaction.draft = props.draft || false;
     transaction.raw = props.raw || null;
-    transaction.creditAccountAISuggested =
-      props.creditAccountAISuggested || false;
-    transaction.debitAccountAISuggested =
-      props.debitAccountAISuggested || false;
+    transaction.creditAccountAISuggested = props.creditAccountAISuggested || false;
+    transaction.debitAccountAISuggested = props.debitAccountAISuggested || false;
     transaction.matchedTransactionId = props.matchedTransactionId || null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     transaction.user = props.userId as any;

@@ -1,14 +1,14 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../auth/user.entity';
 
 @Entity('categories')
 export class Category {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column()
-  name: string;
+  declare name: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user: User;
+  declare user: User;
 }

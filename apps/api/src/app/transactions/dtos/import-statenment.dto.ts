@@ -2,8 +2,8 @@ import { IsString, IsUUID } from 'class-validator';
 
 export class ImportStatementDto {
   @IsString()
-  statementIssuer: string;
+  declare statementIssuer: string;
 
   @IsUUID()
-  accountId: string;
+  declare accountId: string;
 }

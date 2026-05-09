@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { Category } from '../categories/categories.entity';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
@@ -29,28 +23,28 @@ export enum Currency {
 @Entity('accounts')
 export class Account {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column()
-  name: string;
+  declare name: string;
 
   @Column({ nullable: true, type: 'timestamptz', default: null })
-  deactivatedAt: Date | null;
+  declare deactivatedAt: Date | null;
 
   @Column({ default: false })
-  retirementAccount: boolean;
+  declare retirementAccount: boolean;
 
   @Column({ enum: AccountType, type: 'enum' })
-  type: AccountType;
+  declare type: AccountType;
 
   @Column({ enum: Currency, type: 'enum', default: Currency.CHF })
-  currency: Currency;
+  declare currency: Currency;
 
   @OneToMany(() => Transaction, (transaction) => transaction.creditAccount)
-  creditTransactions: Transaction[];
+  declare creditTransactions: Transaction[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.debitAccount)
-  debitTransactions: Transaction[];
+  declare debitTransactions: Transaction[];
 
   // @VirtualColumn({
   //   query: (alias) =>
@@ -96,13 +90,13 @@ export class Account {
     default: 0,
     transformer: new ColumnDecimalTransformer(),
   })
-  openingBalance: number;
+  declare openingBalance: number;
 
   @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL', eager: false })
-  category: Category | null;
+  declare category: Category | null;
 
   @ManyToOne(() => User, (user) => user.accounts, {})
-  user: User;
+  declare user: User;
 
   get isActive(): boolean {
     return this.deactivatedAt === null;
@@ -110,9 +104,9 @@ export class Account {
 
   get balance() {
     if (this.type === AccountType.ASSETS || this.type === AccountType.EXPENSE) {
-      return this.creditBalance - this.debitBalance + this.openingBalance;
+      return (this.creditBalance || 0) - (this.debitBalance || 0) + this.openingBalance;
     } else {
-      return this.debitBalance - this.creditBalance + this.openingBalance;
+      return (this.debitBalance || 0) - (this.creditBalance || 0) + this.openingBalance;
     }
   }
 

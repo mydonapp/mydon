@@ -35,6 +35,17 @@ export class TransactionsController {
   ) {}
 
   @UseGuards(AuthGuard)
+  @Get('v1/transactions/issuers')
+  getIssuers() {
+    return [
+      { id: 'POSTFINANCE', name: 'PostFinance' },
+      { id: 'SWISSCARD', name: 'Swisscard' },
+      { id: 'WISE', name: 'Wise' },
+      { id: 'YUH', name: 'Yuh' },
+    ];
+  }
+
+  @UseGuards(AuthGuard)
   @Get('v1/transactions')
   async findAll(@Req() req: Request, @Query('filter') filter: string) {
     const result = await this.transactionsService.findAll(

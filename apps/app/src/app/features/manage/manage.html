@@ -1,0 +1,137 @@
+<div class="p-4 sm:p-6 lg:p-8">
+  <app-page-header
+    [title]="'views.manage.title' | translate"
+    [subtitle]="'views.manage.subtitle' | translate"
+  />
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Categories -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <h2 class="font-semibold text-primary mb-4">{{ 'views.manage.categories.title' | translate }}</h2>
+
+        <!-- Add Category -->
+        <div class="flex gap-2 mb-4">
+          <input
+            type="text"
+            [(ngModel)]="newCategoryName"
+            [placeholder]="'views.manage.categories.namePlaceholder' | translate"
+            class="input input-bordered input-sm flex-1 bg-primary text-primary border-primary"
+            (keyup.enter)="createCategory()"
+          />
+          <app-base-button variant="primary" size="sm" [loading]="creatingCat()" (clicked)="createCategory()">
+            <i class="ri-add-line"></i>
+          </app-base-button>
+        </div>
+
+        @if (categoriesService.categories().length === 0) {
+          <p class="text-muted text-sm text-center py-4">{{ 'views.manage.categories.empty' | translate }}</p>
+        } @else {
+          <div class="space-y-2 max-h-80 overflow-y-auto">
+            @for (cat of categoriesService.categories(); track cat.id) {
+              <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-primary/5">
+                @if (editingCatId() === cat.id) {
+                  <input
+                    type="text"
+                    [(ngModel)]="editCatName"
+                    class="input input-bordered input-xs flex-1 bg-primary text-primary border-primary"
+                    (keyup.enter)="saveCategory(cat)"
+                    (keyup.escape)="editingCatId.set(null)"
+                    #catInput
+                  />
+                  <app-base-button size="xs" variant="success" [loading]="updatingCat()" (clicked)="saveCategory(cat)">
+                    <i class="ri-check-line"></i>
+                  </app-base-button>
+                  <app-base-button size="xs" variant="ghost" (clicked)="editingCatId.set(null)">
+                    <i class="ri-close-line"></i>
+                  </app-base-button>
+                } @else {
+                  <span class="flex-1 text-sm text-primary">{{ cat.name }}</span>
+                  <app-base-button size="xs" variant="ghost" (clicked)="startEditCat(cat)">
+                    <i class="ri-edit-line"></i>
+                  </app-base-button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Accounts -->
+    <div class="card bg-secondary">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-primary">{{ 'views.manage.accounts.title' | translate }}</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-muted">{{ 'views.manage.accounts.showInactive' | translate }}</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-sm"
+              [(ngModel)]="showInactive"
+              (ngModelChange)="filterAccounts()"
+            />
+          </div>
+        </div>
+
+        <!-- Type Filter -->
+        <div class="flex gap-1 mb-3 overflow-x-auto">
+          @for (tab of accountTabs; track tab.value) {
+            <button
+              class="btn btn-xs"
+              [class]="activeTab() === tab.value ? 'btn-primary' : 'btn-ghost'"
+              (click)="activeTab.set(tab.value); filterAccounts()"
+            >
+              {{ tab.label | translate }}
+            </button>
+          }
+        </div>
+
+        @if (filteredAccounts().length === 0) {
+          <p class="text-muted text-sm text-center py-4">{{ 'views.manage.accounts.empty' | translate }}</p>
+        } @else {
+          <div class="space-y-2 max-h-80 overflow-y-auto">
+            @for (account of filteredAccounts(); track account.id) {
+              <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-primary/5" [class]="!account.isActive ? 'opacity-60' : ''">
+                @if (editingAccId() === account.id) {
+                  <input
+                    type="text"
+                    [(ngModel)]="editAccName"
+                    class="input input-bordered input-xs flex-1 bg-primary text-primary border-primary"
+                    (keyup.enter)="saveAccount(account)"
+                    (keyup.escape)="editingAccId.set(null)"
+                  />
+                  <app-base-button size="xs" variant="success" [loading]="updatingAcc()" (clicked)="saveAccount(account)">
+                    <i class="ri-check-line"></i>
+                  </app-base-button>
+                  <app-base-button size="xs" variant="ghost" (clicked)="editingAccId.set(null)">
+                    <i class="ri-close-line"></i>
+                  </app-base-button>
+                } @else {
+                  <div class="flex-1 min-w-0">
+                    <span class="text-sm text-primary">{{ account.name }}</span>
+                    <span class="text-xs text-muted ml-2">{{ account.type }}</span>
+                    @if (!account.isActive) {
+                      <span class="badge badge-ghost badge-xs ml-1">{{ 'views.manage.accounts.inactive' | translate }}</span>
+                    }
+                  </div>
+                  <app-base-button size="xs" variant="ghost" (clicked)="startEditAcc(account)">
+                    <i class="ri-edit-line"></i>
+                  </app-base-button>
+                  <app-base-button
+                    size="xs"
+                    [variant]="account.isActive ? 'warning' : 'success'"
+                    [loading]="togglingAcc() === account.id"
+                    (clicked)="toggleAccount(account)"
+                  >
+                    <i [class]="account.isActive ? 'ri-pause-line' : 'ri-play-line'"></i>
+                  </app-base-button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

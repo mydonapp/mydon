@@ -1,0 +1,44 @@
+<div class="form-control w-full">
+  @if (label()) {
+    <label class="label">
+      <span class="label-text text-primary font-medium">{{ label() }}</span>
+    </label>
+  }
+  <div class="relative">
+    <input
+      type="text"
+      [placeholder]="placeholder() || ('components.categoryCombobox.newCategoryPlaceholder' | translate)"
+      [(ngModel)]="searchText"
+      (ngModelChange)="onSearch($event)"
+      (focus)="showDropdown.set(true)"
+      class="input input-bordered w-full bg-primary text-primary border-primary"
+    />
+    @if (showDropdown()) {
+      <div class="absolute z-50 mt-1 w-full bg-secondary border border-primary rounded-lg shadow-lg max-h-48 overflow-y-auto">
+        @for (cat of filtered(); track cat.id) {
+          <button
+            type="button"
+            class="w-full text-left px-4 py-2 hover:bg-tertiary text-primary text-sm"
+            (click)="selectCategory(cat)"
+          >
+            {{ cat.name }}
+          </button>
+        }
+        @if (canCreate()) {
+          <button
+            type="button"
+            class="w-full text-left px-4 py-2 hover:bg-tertiary text-primary-400 text-sm border-t border-primary"
+            [disabled]="creating()"
+            (click)="createCategory()"
+          >
+            @if (creating()) {
+              {{ 'components.categoryCombobox.creating' | translate }}
+            } @else {
+              {{ 'components.categoryCombobox.createNew' | translate }}: "{{ searchText }}"
+            }
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

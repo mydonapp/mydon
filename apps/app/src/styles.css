@@ -17,6 +17,7 @@
  */
 
 @import 'tailwindcss';
+@import 'remixicon/fonts/remixicon.css';
 
 /* Dark Theme Color Palette for Financial App */
 :root {

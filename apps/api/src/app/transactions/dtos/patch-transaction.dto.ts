@@ -1,36 +1,29 @@
-import {
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsPositive,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsPositive, IsString, IsUUID } from 'class-validator';
 
 export class PatchTransactionDto {
   @IsNumber()
   @IsPositive()
   @IsOptional()
-  debitAmount?: number;
+  declare debitAmount?: number;
 
   @IsNumber()
   @IsPositive()
   @IsOptional()
-  creditAmount?: number;
+  declare creditAmount?: number;
 
   @IsString()
   @IsOptional()
-  description?: string;
+  declare description?: string;
 
   @IsUUID()
   @IsOptional()
-  creditAccountId?: string;
+  declare creditAccountId?: string;
 
   @IsUUID()
   @IsOptional()
-  debitAccountId?: string;
+  declare debitAccountId?: string;
 
   @IsBoolean()
   @IsOptional()
-  draft?: boolean;
+  declare draft?: boolean;
 }

@@ -1,23 +1,33 @@
-import vue from 'eslint-plugin-vue';
+import nx from '@nx/eslint-plugin';
 import baseConfig from '../../eslint.config.mjs';
 
 export default [
+  ...nx.configs['flat/angular'],
+  ...nx.configs['flat/angular-template'],
   ...baseConfig,
-  ...vue.configs['flat/recommended'],
   {
-    files: ['**/*.vue'],
-    languageOptions: {
-      parserOptions: {
-        parser: await import('@typescript-eslint/parser'),
-      },
+    files: ['**/*.ts'],
+    rules: {
+      '@angular-eslint/directive-selector': [
+        'error',
+        {
+          type: 'attribute',
+          prefix: 'app',
+          style: 'camelCase',
+        },
+      ],
+      '@angular-eslint/component-selector': [
+        'error',
+        {
+          type: 'element',
+          prefix: 'app',
+          style: 'kebab-case',
+        },
+      ],
     },
   },
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.vue'],
-    rules: {
-      'vue/multi-word-component-names': 'off',
-      'vue/singleline-html-element-content-newline': 'off',
-      'vue/html-self-closing': 'off',
-    },
+    files: ['**/*.html'],
+    rules: {},
   },
 ];

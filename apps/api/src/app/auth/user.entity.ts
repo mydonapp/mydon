@@ -7,26 +7,26 @@ import { RefreshToken } from './refreshToken.entity';
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column()
-  name: string;
+  declare name: string;
 
   @Column({ unique: true })
-  email: string;
+  declare email: string;
 
   @Column()
-  password: string;
+  declare password: string;
 
   @OneToMany(() => AccessToken, (accessToken) => accessToken.user)
-  accessToken: AccessToken[];
+  declare accessToken: AccessToken[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
-  refreshToken: RefreshToken[];
+  declare refreshToken: RefreshToken[];
 
   @OneToMany(() => Account, (account) => account.user)
-  accounts: Account[];
+  declare accounts: Account[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)
-  transactions: Transaction[];
+  declare transactions: Transaction[];
 }

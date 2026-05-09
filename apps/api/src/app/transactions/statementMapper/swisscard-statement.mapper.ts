@@ -26,10 +26,13 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
     });
   }
 
-  protected mapStatement(): Promise<
-    MappedTransaction<SwisscardStatementResponse>[]
-  > {
+  protected mapStatement(): Promise<MappedTransaction<SwisscardStatementResponse>[]> {
     const mappedStatement: MappedTransaction<SwisscardStatementResponse>[] = [];
+
+    if (!this.statement) {
+      throw Error('Statement not initialized');
+    }
+
     for (const transaction of this.statement) {
       // For now we just add posted transactions as well
       // if (transaction.Status !== 'Posted') {
@@ -42,11 +45,7 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
         creditAmount: Math.abs(transaction.Amount),
         debitAmount: Math.abs(transaction.Amount),
         description: transaction.Description,
-        transactionDate: new Date(
-          parseInt(dmy[2]),
-          parseInt(dmy[1]) - 1,
-          parseInt(dmy[0]),
-        ),
+        transactionDate: new Date(parseInt(dmy[2]), parseInt(dmy[1]) - 1, parseInt(dmy[0])),
         raw: {
           ...transaction,
           issuer: 'SWISSCARD',
@@ -59,14 +58,14 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
 
   protected getCreditAccountIdFromStatement(
     transaction: MappedTransaction<SwisscardStatementResponse>,
-  ): string {
+  ): string | undefined {
     if (transaction.raw['Debit/Credit'] === 'Credit') {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
     transaction: MappedTransaction<SwisscardStatementResponse>,
-  ): string {
+  ): string | undefined {
     if (transaction.raw['Debit/Credit'] === 'Debit') {
       return this.accountId;
     }

@@ -11,7 +11,7 @@ export interface MappedTransaction<T> {
 }
 
 export abstract class StatementMapper<T> {
-  protected statement: T[];
+  protected statement: T[] | null = null;
 
   constructor(
     protected context: Context,
@@ -41,11 +41,7 @@ export abstract class StatementMapper<T> {
       let matchedTransactionId: string | undefined;
 
       // If accounts are not provided from statement, try to find similar transactions
-      if (
-        this.transactionMatcher &&
-        (!creditAccountId || !debitAccountId) &&
-        transaction.description
-      ) {
+      if (this.transactionMatcher && (!creditAccountId || !debitAccountId) && transaction.description) {
         const bestMatch = await this.transactionMatcher.getBestMatch(
           this.context.user.id,
           transaction.description,
@@ -88,29 +84,19 @@ export abstract class StatementMapper<T> {
     return transactions;
   }
 
-  protected abstract getCreditAccountIdFromStatement(
-    transaction: MappedTransaction<T>,
-  ): string | undefined;
+  protected abstract getCreditAccountIdFromStatement(transaction: MappedTransaction<T>): string | undefined;
 
-  private getCreditAccountId(
-    transaction: MappedTransaction<T>,
-  ): string | undefined {
-    const creditAccountIdFromStatement =
-      this.getCreditAccountIdFromStatement(transaction);
+  private getCreditAccountId(transaction: MappedTransaction<T>): string | undefined {
+    const creditAccountIdFromStatement = this.getCreditAccountIdFromStatement(transaction);
     if (creditAccountIdFromStatement) {
       return creditAccountIdFromStatement;
     }
   }
 
-  protected abstract getDebitAccountIdFromStatement(
-    transaction: MappedTransaction<T>,
-  ): string | undefined;
+  protected abstract getDebitAccountIdFromStatement(transaction: MappedTransaction<T>): string | undefined;
 
-  private getDebitAccountId(
-    transaction: MappedTransaction<T>,
-  ): string | undefined {
-    const debitAccountIdFromStatement =
-      this.getDebitAccountIdFromStatement(transaction);
+  private getDebitAccountId(transaction: MappedTransaction<T>): string | undefined {
+    const debitAccountIdFromStatement = this.getDebitAccountIdFromStatement(transaction);
     if (debitAccountIdFromStatement) {
       return debitAccountIdFromStatement;
     }

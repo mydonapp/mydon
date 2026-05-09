@@ -1,0 +1,16 @@
+<div class="toast toast-end toast-bottom z-50">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      [class]="'alert ' + alertClass(toast.type)"
+      role="alert"
+    >
+      <span>{{ toast.message }}</span>
+      <button
+        class="btn btn-ghost btn-xs"
+        (click)="toastService.remove(toast.id)"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+  }
+</div>
