@@ -265,6 +265,13 @@
           "version": "Version",
           "buildDate": "Build Date"
         },
+        "appearance": {
+          "title": "Appearance",
+          "theme": "Color Theme",
+          "light": "Light",
+          "dark": "Dark",
+          "system": "System"
+        },
         "export": {
           "title": "Data Export",
           "description": "Download all your data",

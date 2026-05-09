@@ -1,0 +1,12 @@
+<div
+  class="progress-bar"
+  [class.progress-bar--success]="variant() === 'success'"
+  [class.progress-bar--warning]="variant() === 'warning'"
+  [class.progress-bar--error]="variant() === 'error'"
+  role="progressbar"
+  [attr.aria-valuenow]="clamped()"
+  aria-valuemin="0"
+  aria-valuemax="100"
+>
+  <div class="progress-bar__fill" [style.width.%]="clamped()"></div>
+</div>

@@ -5,8 +5,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
-import { BaseSelectComponent, SelectOption } from '../../shared/components/base-select/base-select';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
+import { FieldComponent } from '../../shared/components/field/field';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-import',
@@ -17,8 +20,11 @@ import { BaseSelectComponent, SelectOption } from '../../shared/components/base-
     FormsModule,
     TranslateModule,
     PageHeaderComponent,
-    BaseButtonComponent,
-    BaseSelectComponent,
+    BtnDirective,
+    SelectDirective,
+    FieldComponent,
+    SpinnerComponent,
+    IconComponent,
   ],
 })
 export class ImportComponent implements OnInit {

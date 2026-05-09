@@ -4,12 +4,13 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
-import { BaseInputComponent } from '../../shared/components/base-input/base-input';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { InputDirective } from '../../shared/directives/input.directive';
+import { FieldComponent } from '../../shared/components/field/field';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink, TranslateModule, BaseButtonComponent, BaseInputComponent],
+  imports: [FormsModule, RouterLink, TranslateModule, BtnDirective, InputDirective, FieldComponent],
   templateUrl: './login.html',
 })
 export class LoginComponent {

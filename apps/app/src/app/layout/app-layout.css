@@ -1,0 +1,250 @@
+@reference "tailwindcss";
+
+/* ── Sidebar shell ────────────────────────────────────────────────────────── */
+/* display handled by Tailwind: hidden md:flex in HTML */
+.sidebar {
+  @apply flex-col fixed left-0 top-0 bottom-0 overflow-hidden z-[30];
+  width: 15rem; /* w-60 — named for clarity in transition */
+  background-color: var(--sys-surface);
+  border-right: 1px solid var(--sys-outline-variant);
+  transition: width 0.2s ease;
+}
+
+/* Mobile: layout shifts to full-width with bottom-nav clearance */
+@media (width < 768px) {
+  .layout-main {
+    margin-left: 0 !important;
+    @apply pb-16;
+  }
+}
+
+.sidebar--collapsed {
+  width: 4rem; /* w-16 */
+}
+
+/* ── Content margin mirrors sidebar width ────────────────────────────────── */
+.layout-main {
+  margin-left: 15rem;
+  transition: margin-left 0.2s ease;
+}
+
+.layout-main--collapsed {
+  margin-left: 4rem;
+}
+
+/* ── Sidebar header ───────────────────────────────────────────────────────── */
+.sidebar-header {
+  @apply flex items-center gap-3 flex-shrink-0 overflow-hidden;
+  padding: 1rem;
+  border-bottom: 1px solid var(--sys-outline-variant);
+  min-height: 3.5rem;
+}
+
+.sidebar--collapsed .sidebar-header {
+  @apply justify-center px-0;
+}
+
+/* ── Nav (the only scrollable region) ────────────────────────────────────── */
+.sidebar-nav {
+  @apply flex-1 overflow-y-auto overflow-x-hidden;
+  padding: 0.5rem;
+  padding-top: 0.625rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sys-outline-variant) transparent;
+}
+
+/* ── Nav item ────────────────────────────────────────────────────────────── */
+.nav-item {
+  @apply flex items-center gap-3 rounded-lg text-sm font-medium no-underline whitespace-nowrap overflow-hidden;
+  padding: 0.5625rem 0.75rem;
+  color: var(--sys-on-surface-variant);
+  transition: background-color 0.15s, color 0.15s;
+  margin-bottom: 1px;
+}
+
+.nav-item:hover {
+  background-color: color-mix(in srgb, var(--sys-primary) 7%, var(--sys-surface));
+  color: var(--sys-on-surface);
+}
+
+.nav-item.active {
+  @apply font-semibold;
+  background-color: var(--sys-primary-container);
+  color: var(--sys-on-primary-container);
+}
+
+.sidebar--collapsed .nav-item {
+  @apply justify-center gap-0;
+  padding: 0.5625rem;
+}
+
+/* ── Collapsible labels ───────────────────────────────────────────────────── */
+.sidebar-label {
+  @apply overflow-hidden flex-shrink-0 opacity-100;
+  max-width: 12rem;
+  transition: opacity 0.15s ease, max-width 0.2s ease;
+}
+
+.sidebar--collapsed .sidebar-label {
+  @apply opacity-0 pointer-events-none;
+  max-width: 0;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.sidebar-footer {
+  @apply flex-shrink-0 flex flex-col;
+  gap: 1px;
+  padding: 0.5rem;
+  border-top: 1px solid var(--sys-outline-variant);
+}
+
+/* ── User wrap ────────────────────────────────────────────────────────────── */
+.sidebar-user-wrap {
+  @apply relative;
+}
+
+/* ── User row ─────────────────────────────────────────────────────────────── */
+.sidebar-user {
+  @apply flex items-center gap-3 rounded-lg cursor-pointer overflow-hidden text-left w-full;
+  padding: 0.625rem 0.75rem;
+  /* button reset */
+  background: none;
+  border: none;
+  font: inherit;
+  transition: background-color 0.15s;
+}
+
+.sidebar-user:hover {
+  background-color: var(--sys-surface-variant);
+}
+
+.sidebar--collapsed .sidebar-user {
+  @apply justify-center gap-0;
+  padding: 0.625rem;
+}
+
+/* ── Avatar ───────────────────────────────────────────────────────────────── */
+.sidebar-avatar {
+  @apply flex items-center justify-center rounded-full flex-shrink-0 font-bold select-none;
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  background-color: var(--sys-primary);
+  color: var(--sys-on-primary);
+}
+
+/* ── User info text ───────────────────────────────────────────────────────── */
+.sidebar-user-info {
+  @apply flex-1 min-w-0 overflow-hidden;
+}
+
+.sidebar-user-name {
+  @apply text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis;
+  color: var(--sys-on-surface);
+  line-height: 1.25;
+}
+
+.sidebar-user-email {
+  @apply whitespace-nowrap overflow-hidden text-ellipsis;
+  font-size: 0.6875rem; /* 11px — smaller than text-xs, intentional */
+  color: var(--sys-on-surface-variant);
+  line-height: 1.3;
+  margin-top: 1px;
+}
+
+/* ── Chevron ──────────────────────────────────────────────────────────────── */
+.sidebar-chevron {
+  margin-left: auto;
+  flex-shrink: 0 !important;
+  color: var(--sys-on-surface-variant);
+  transition: transform 0.15s ease, opacity 0.15s ease, max-width 0.2s ease;
+}
+
+.sidebar-chevron--closed {
+  transform: rotate(180deg);
+}
+
+/* ── User dropdown menu ───────────────────────────────────────────────────── */
+.user-menu {
+  @apply absolute rounded-xl z-[100];
+  bottom: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  padding: 0.25rem;
+  background-color: var(--sys-surface);
+  border: 1px solid var(--sys-outline-variant);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.12), 0 1px 4px rgb(0 0 0 / 0.06);
+}
+
+/* Collapsed: escape overflow:hidden via fixed positioning */
+.sidebar--collapsed .user-menu {
+  @apply fixed;
+  left: calc(4rem + 8px);
+  bottom: 0.75rem;
+  top: auto;
+  right: auto;
+  width: 11rem;
+}
+
+.user-menu-item {
+  @apply flex items-center gap-2 w-full rounded-md text-sm font-medium cursor-pointer text-left;
+  padding: 0.5rem 0.625rem;
+  color: var(--sys-on-surface);
+  background: none;
+  border: none;
+  transition: background-color 0.1s;
+  white-space: nowrap;
+}
+
+.user-menu-item:hover {
+  background-color: var(--sys-surface-variant);
+}
+
+.user-menu-item--danger {
+  color: var(--sys-error);
+}
+
+.user-menu-item--danger:hover {
+  background-color: color-mix(in srgb, var(--sys-error) 8%, var(--sys-surface));
+}
+
+.user-menu-separator {
+  @apply my-1;
+  height: 1px;
+  background-color: var(--sys-outline-variant);
+}
+
+/* ── Collapse toggle ──────────────────────────────────────────────────────── */
+.sidebar-collapse-btn {
+  justify-content: center !important;
+  color: var(--sys-on-surface-variant) !important;
+}
+
+/* ── Bottom navigation (display: flex md:hidden handled by Tailwind in HTML) */
+.bottom-nav {
+  @apply fixed bottom-0 left-0 right-0 items-stretch z-[30];
+  background-color: var(--sys-surface);
+  border-top: 1px solid var(--sys-outline-variant);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-nav-item {
+  @apply flex-1 flex flex-col items-center no-underline;
+  gap: 3px;
+  padding: 0.5rem 0.25rem;
+  justify-content: center;
+  color: var(--sys-on-surface-variant);
+  transition: color 0.15s;
+  min-height: 3.5rem;
+}
+
+.bottom-nav-item.active {
+  color: var(--sys-primary);
+}
+
+.bottom-nav-label {
+  @apply font-medium whitespace-nowrap;
+  font-size: 0.625rem; /* 10px — intentionally smaller than text-xs */
+  line-height: 1;
+}

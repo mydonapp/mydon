@@ -1,24 +1,33 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, LowerCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { PrivacyService } from '../../services/privacy.service';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { InputDirective } from '../../shared/directives/input.directive';
+import { SelectDirective } from '../../shared/directives/select.directive';
+import { ModalComponent } from '../../shared/components/modal/modal';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.html',
   imports: [
     DatePipe,
+    LowerCasePipe,
     RouterLink,
     FormsModule,
     TranslateModule,
-    PageHeaderComponent,
-    BaseButtonComponent,
+    BtnDirective,
+    InputDirective,
+    SelectDirective,
+    ModalComponent,
+    SpinnerComponent,
+    IconComponent,
   ],
 })
 export class AccountComponent implements OnInit {

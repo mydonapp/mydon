@@ -1,58 +1,50 @@
-<div class="min-h-screen bg-primary flex items-center justify-center p-4">
-  <div class="card bg-secondary shadow-xl w-full max-w-md">
-    <div class="card-body">
-      <div class="text-center mb-6">
-        <div class="flex items-center justify-center bg-primary-600 text-white rounded-xl w-16 h-16 mx-auto mb-4">
-          <span class="text-2xl font-bold">D</span>
-        </div>
-        <h1 class="text-2xl font-bold text-primary-400">myDon</h1>
-        <p class="text-secondary text-sm">{{ 'views.login.title' | translate }}</p>
+<div class="min-h-screen bg-background flex items-center justify-center p-4">
+  <div class="surface-elevated rounded-xl border border-outline-variant shadow-md w-full max-w-md p-8">
+    <div class="text-center mb-6">
+      <div class="flex items-center justify-center bg-primary text-on-primary rounded-xl w-16 h-16 mx-auto mb-4">
+        <span class="text-2xl font-bold">D</span>
       </div>
+      <h1 class="text-2xl font-bold text-primary">myDon</h1>
+      <p class="text-on-surface-variant text-sm">{{ 'views.login.title' | translate }}</p>
+    </div>
 
-      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-        <div class="space-y-4">
-          <app-base-input
-            [value]="email()"
-            (valueChange)="email.set($event)"
-            type="email"
-            [label]="'views.login.loginForm.email.label' | translate"
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="space-y-4">
+        <app-field [label]="'views.login.loginForm.email.label' | translate" [required]="true">
+          <input appInput type="email" name="email"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
             [placeholder]="'views.login.loginForm.email.placeholder' | translate"
-            [required]="true"
             autocomplete="email"
           />
-          <div>
-            <app-base-input
-              [value]="password()"
-              (valueChange)="password.set($event)"
+        </app-field>
+        <div>
+          <app-field [label]="'views.login.loginForm.password.label' | translate" [required]="true">
+            <input appInput name="password"
               [type]="showPassword() ? 'text' : 'password'"
-              [label]="'views.login.loginForm.password.label' | translate"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
               [placeholder]="'views.login.loginForm.password.placeholder' | translate"
-              [required]="true"
               autocomplete="current-password"
             />
-            <button type="button" class="text-xs text-secondary mt-1" (click)="showPassword.update(v => !v)">
-              {{ showPassword() ? 'Hide' : 'Show' }} password
-            </button>
-          </div>
-
-          <app-base-button
-            type="submit"
-            variant="primary"
-            [block]="true"
-            [loading]="loading()"
-          >
-            {{ 'views.login.loginForm.submit.label' | translate }}
-          </app-base-button>
+          </app-field>
+          <button type="button" class="text-xs text-on-surface-variant mt-1 hover:text-on-surface" (click)="showPassword.update(v => !v)">
+            {{ showPassword() ? 'Hide' : 'Show' }} password
+          </button>
         </div>
-      </form>
 
-      <div class="divider my-4"></div>
-      <p class="text-center text-sm text-secondary">
-        {{ 'views.login.signupPrompt.text' | translate }}
-        <a routerLink="/auth/signup" class="text-primary-400 hover:underline ml-1">
-          {{ 'views.login.signupPrompt.link' | translate }}
-        </a>
-      </p>
-    </div>
+        <button appBtn type="submit" [block]="true" [loading]="loading()">
+          {{ 'views.login.loginForm.submit.label' | translate }}
+        </button>
+      </div>
+    </form>
+
+    <hr class="border-outline-variant my-4" />
+    <p class="text-center text-sm text-on-surface-variant">
+      {{ 'views.login.signupPrompt.text' | translate }}
+      <a routerLink="/auth/signup" class="text-primary hover:underline ml-1">
+        {{ 'views.login.signupPrompt.link' | translate }}
+      </a>
+    </p>
   </div>
 </div>

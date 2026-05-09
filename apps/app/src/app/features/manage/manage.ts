@@ -5,7 +5,10 @@ import { CategoriesService, Category } from '../../services/categories.service';
 import { AccountsService } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { InputDirective } from '../../shared/directives/input.directive';
+import { ToggleComponent } from '../../shared/components/toggle/toggle';
+import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-manage',
@@ -14,7 +17,10 @@ import { BaseButtonComponent } from '../../shared/components/base-button/base-bu
     FormsModule,
     TranslateModule,
     PageHeaderComponent,
-    BaseButtonComponent,
+    BtnDirective,
+    InputDirective,
+    ToggleComponent,
+    IconComponent,
   ],
 })
 export class ManageComponent implements OnInit {

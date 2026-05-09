@@ -1,14 +1,9 @@
-import {
-  Component,
-  input,
-  output,
-  signal,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { Component, input, output, signal, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { CategoriesService, Category } from '../../../services/categories.service';
+
+let comboboxCounter = 0;
 
 @Component({
   selector: 'app-category-combobox',
@@ -16,57 +11,90 @@ import { CategoriesService, Category } from '../../../services/categories.servic
   imports: [FormsModule, TranslateModule],
 })
 export class CategoryComboboxComponent implements OnInit {
-  value = input<string>('');
-  label = input<string>('');
+  value       = input<string>('');
+  label       = input<string>('');
   placeholder = input<string>('');
 
-  valueChange = output<string>();
+  valueChange     = output<string>();
   categoryCreated = output<Category>();
 
   private categoriesService = inject(CategoriesService);
 
-  searchText = '';
-  showDropdown = signal(false);
-  filtered = signal<Category[]>([]);
-  creating = signal(false);
+  readonly id       = ++comboboxCounter;
+  readonly inputId  = `combobox-input-${this.id}`;
+  readonly listboxId = `combobox-list-${this.id}`;
 
-  get canCreate(): () => boolean {
-    return () =>
+  searchText   = '';
+  showDropdown = signal(false);
+  filtered     = signal<Category[]>([]);
+  creating     = signal(false);
+  activeIndex  = signal(-1);
+
+  get canCreate(): boolean {
+    return (
       !!this.searchText &&
       !this.categoriesService
         .categories()
-        .some(
-          (c) => c.name.toLowerCase() === this.searchText.toLowerCase(),
-        );
+        .some((c) => c.name.toLowerCase() === this.searchText.toLowerCase())
+    );
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (this.value()) {
-      const cat = this.categoriesService
-        .categories()
-        .find((c) => c.id === this.value());
+      const cat = this.categoriesService.categories().find((c) => c.id === this.value());
       if (cat) this.searchText = cat.name;
     }
     this.filtered.set(this.categoriesService.categories());
   }
 
-  onSearch(text: string) {
+  onSearch(text: string): void {
     const lower = text.toLowerCase();
     this.filtered.set(
-      this.categoriesService
-        .categories()
-        .filter((c) => c.name.toLowerCase().includes(lower)),
+      this.categoriesService.categories().filter((c) => c.name.toLowerCase().includes(lower)),
     );
+    this.activeIndex.set(-1);
     this.showDropdown.set(true);
   }
 
-  selectCategory(cat: Category) {
+  open(): void {
+    this.showDropdown.set(true);
+  }
+
+  close(): void {
+    setTimeout(() => this.showDropdown.set(false), 150);
+  }
+
+  onKeydown(event: KeyboardEvent): void {
+    if (!this.showDropdown()) return;
+    const cats = this.filtered();
+
+    if (event.key === 'Escape') {
+      this.showDropdown.set(false);
+      event.preventDefault();
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.activeIndex.update((i) => Math.min(i + 1, cats.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.activeIndex.update((i) => Math.max(i - 1, 0));
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const idx = this.activeIndex();
+      if (idx >= 0 && idx < cats.length) {
+        this.selectCategory(cats[idx]);
+      } else if (this.canCreate) {
+        this.createCategory();
+      }
+    }
+  }
+
+  selectCategory(cat: Category): void {
     this.searchText = cat.name;
     this.showDropdown.set(false);
     this.valueChange.emit(cat.id);
   }
 
-  async createCategory() {
+  async createCategory(): Promise<void> {
     if (!this.searchText || this.creating()) return;
     this.creating.set(true);
     try {

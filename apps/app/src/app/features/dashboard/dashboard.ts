@@ -5,8 +5,9 @@ import { DatePipe } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { SelectDirective } from '../../shared/directives/select.directive';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,8 +16,9 @@ import { BaseButtonComponent } from '../../shared/components/base-button/base-bu
     FormsModule,
     DatePipe,
     TranslateModule,
-    PageHeaderComponent,
-    BaseButtonComponent,
+    BtnDirective,
+    SelectDirective,
+    SpinnerComponent,
   ],
   templateUrl: './dashboard.html',
 })

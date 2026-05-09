@@ -1,305 +1,242 @@
-/*
- * MyDon Financial App - Dark Theme Stylesheet
- * 
- * This stylesheet provides a complete dark theme optimized for a financial application.
- * Features:
- * - Professional dark color scheme with muted teal accents
- * - Financial-specific styling (income/expense colors)
- * - Accessible contrast ratios
- * - Consistent component styling replacing daisyUI
- * 
- * Color Scheme:
- * - Primary: Muted teal (#14b8a6) for professional financial branding
- * - Background: Deep charcoal (#0f0f0f) with layered grays
- * - Success/Income: Green (#22c55e)
- * - Error/Expense: Red (#ef4444)
- * - Text: Light grays with proper contrast
- */
-
+@import '@fontsource-variable/inter';
 @import 'tailwindcss';
-@import 'remixicon/fonts/remixicon.css';
 
-/* Dark Theme Color Palette for Financial App */
-:root {
-  /* Primary Colors - Muted teal for a professional financial feel */
-  --color-primary-50: #f0fdfa;
-  --color-primary-100: #ccfbf1;
-  --color-primary-200: #99f6e4;
-  --color-primary-300: #5eead4;
-  --color-primary-400: #2dd4bf;
-  --color-primary-500: #14b8a6;
-  --color-primary-600: #0d9488;
-  --color-primary-700: #0f766e;
-  --color-primary-800: #115e59;
-  --color-primary-900: #134e4a;
-  --color-primary-950: #042f2e;
+/* ─── Tailwind token registration ─────────────────────────────────────────── */
+/* inline = emit var() references so tokens resolve dynamically at runtime    */
+@theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
-  /* Background Colors - Dark grays and charcoals */
-  --color-background-primary: #0f0f0f;
-  --color-background-secondary: #1a1a1a;
-  --color-background-tertiary: #262626;
-  --color-background-elevated: #2d2d2d;
+  /* M3 color roles as Tailwind utilities */
+  --color-surface: var(--sys-surface);
+  --color-surface-variant: var(--sys-surface-variant);
+  --color-on-surface: var(--sys-on-surface);
+  --color-on-surface-variant: var(--sys-on-surface-variant);
+  --color-outline: var(--sys-outline);
+  --color-outline-variant: var(--sys-outline-variant);
+  --color-background: var(--sys-background);
+  --color-on-background: var(--sys-on-background);
+  --color-primary-container: var(--sys-primary-container);
+  --color-on-primary-container: var(--sys-on-primary-container);
+  --color-primary: var(--sys-primary);
+  --color-on-primary: var(--sys-on-primary);
+  --color-error: var(--sys-error);
+  --color-on-error: var(--sys-on-error);
+  --color-income: var(--sys-income);
+  --color-expense: var(--sys-expense);
 
-  /* Text Colors */
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #d4d4d8;
-  --color-text-muted: #a1a1aa;
-  --color-text-disabled: #71717a;
-
-  /* Border Colors */
-  --color-border-primary: #404040;
-  --color-border-secondary: #525252;
-  --color-border-muted: #737373;
-
-  /* Status Colors */
-  --color-success: #22c55e;
-  --color-success-bg: #0f2114;
-  --color-warning: #f59e0b;
-  --color-warning-bg: #2d1f0a;
-  --color-error: #ef4444;
-  --color-error-bg: #2d0d0d;
-  --color-info: #3b82f6;
-  --color-info-bg: #0f1629;
-
-  /* Financial Status Colors */
-  --color-income: #22c55e;
-  --color-expense: #ef4444;
-  --color-neutral: #6b7280;
+  /* Design scale */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-elevated: 0 4px 12px rgb(0 0 0 / 0.12);
 }
 
-/* Base Styles */
+/* ─── M3 Design Tokens ────────────────────────────────────────────────────── */
+/* Single source of truth using light-dark() — no duplicated dark overrides.  */
+/* .light / .dark only set color-scheme; all values live here via light-dark() */
+:root {
+  color-scheme: light dark;
+
+  /* Primary — blue seed #1667FF */
+  --sys-primary: light-dark(#1667ff, #cce0ff);
+  --sys-on-primary: light-dark(#ffffff, #002882);
+  --sys-primary-container: light-dark(#e6efff, #003cb3);
+  --sys-on-primary-container: light-dark(#001550, #e6efff);
+
+  /* Secondary — teal */
+  --sys-secondary: light-dark(#006a6a, #4fdad2);
+  --sys-on-secondary: light-dark(#ffffff, #004f4f);
+  --sys-secondary-container: light-dark(#93f2e9, #005f5f);
+  --sys-on-secondary-container: light-dark(#002020, #93f2e9);
+
+  /* Surface */
+  --sys-surface: light-dark(#ffffff, #1a1c1e);
+  --sys-surface-variant: light-dark(#dfe3eb, #43474e);
+  --sys-on-surface: light-dark(#1a1c1e, #e3e2e6);
+  --sys-on-surface-variant: light-dark(#43474e, #c3c7cf);
+
+  /* Background (slightly offset from surface) */
+  --sys-background: light-dark(#f0f2f5, #111316);
+  --sys-on-background: light-dark(#1a1c1e, #e3e2e6);
+
+  /* Outline */
+  --sys-outline: light-dark(#73777f, #8d9199);
+  --sys-outline-variant: light-dark(#c3c7cf, #43474e);
+
+  /* Error */
+  --sys-error: light-dark(#ba1a1a, #ffb4ab);
+  --sys-on-error: light-dark(#ffffff, #690005);
+  --sys-error-container: light-dark(#ffdad6, #93000a);
+  --sys-on-error-container: light-dark(#410002, #ffdad6);
+
+  /* Inverse */
+  --sys-inverse-surface: light-dark(#2f3033, #e3e2e6);
+  --sys-inverse-on-surface: light-dark(#f2f0f4, #2f3033);
+  --sys-inverse-primary: light-dark(#cce0ff, #1667ff);
+
+  /* Financial semantic — accessible contrast on both schemes */
+  --sys-income: light-dark(#16a34a, #4ade80);
+  --sys-expense: light-dark(#dc2626, #f87171);
+
+  /* Tonal elevation (M3 surface + primary overlay) */
+  --sys-surface-1: color-mix(in srgb, var(--sys-primary) 5%, var(--sys-surface));
+  --sys-surface-2: color-mix(in srgb, var(--sys-primary) 8%, var(--sys-surface));
+  --sys-surface-3: color-mix(in srgb, var(--sys-primary) 11%, var(--sys-surface));
+
+  /* ── Backward-compat aliases ── (keep existing templates working)          */
+  --color-background-primary: var(--sys-background);
+  --color-background-secondary: var(--sys-surface-1);
+  --color-background-tertiary: var(--sys-surface-variant);
+  --color-background-elevated: var(--sys-surface-2);
+  --color-text-primary: var(--sys-on-background);
+  --color-text-secondary: var(--sys-on-surface);
+  --color-text-muted: var(--sys-on-surface-variant);
+  --color-text-disabled: light-dark(#a8abb0, #5d6168);
+  --color-border-primary: var(--sys-outline-variant);
+  --color-border-secondary: var(--sys-outline);
+  --color-border-muted: var(--sys-outline);
+  --color-primary-400: light-dark(#7aa5ff, #e6efff);
+  --color-primary-500: var(--sys-primary);
+  --color-primary-600: var(--sys-primary);
+  --color-primary-700: light-dark(#003cb3, #a3c2ff);
+  --color-success: var(--sys-income);
+  --color-success-bg: color-mix(in srgb, var(--sys-income) 15%, var(--sys-surface));
+  --color-error: var(--sys-error);
+  --color-error-bg: var(--sys-error-container);
+  --color-warning: light-dark(#d97706, #fcd34d);
+  --color-warning-bg: light-dark(#fffbeb, color-mix(in srgb, #f59e0b 15%, var(--sys-surface)));
+  --color-info: var(--sys-primary);
+  --color-info-bg: var(--sys-primary-container);
+  --color-income: var(--sys-income);
+  --color-expense: var(--sys-expense);
+  --color-neutral: var(--sys-on-surface-variant);
+}
+
+/* Explicit theme overrides — only color-scheme; all values flow from :root */
+.light {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
 html {
-  background-color: var(--color-background-primary);
-  color: var(--color-text-primary);
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    'Noto Sans',
-    sans-serif;
+  font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--sys-background);
+  color: var(--sys-on-background);
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background-color: var(--color-background-primary);
-  color: var(--color-text-primary);
+  background-color: var(--sys-background);
+  color: var(--sys-on-background);
   margin: 0;
   font-family: inherit;
   line-height: inherit;
 }
 
-/* Button Components */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  cursor: pointer;
-  border: 1px solid transparent;
-  text-decoration: none;
-}
-.btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-primary-500);
-}
-.btn:disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
+@import './styles/btn.css';
 
-.btn-primary {
-  background-color: var(--color-primary-600);
-  color: white;
-  border-color: var(--color-primary-600);
-}
-.btn-primary:hover {
-  background-color: var(--color-primary-700);
-  border-color: var(--color-primary-700);
-}
-.btn-primary:focus {
-  box-shadow: 0 0 0 2px var(--color-primary-500);
-}
-
-.btn-secondary {
-  background-color: var(--color-background-secondary);
-  color: var(--color-text-primary);
-  border-color: var(--color-border-primary);
-}
-.btn-secondary:hover {
-  background-color: var(--color-background-tertiary);
-  border-color: var(--color-border-secondary);
-}
-
-.btn-ghost {
-  background-color: transparent;
-  color: var(--color-text-secondary);
-}
-.btn-ghost:hover {
-  background-color: var(--color-background-secondary);
-  color: var(--color-text-primary);
-}
-
-.btn-success {
-  background-color: var(--color-success);
-  color: white;
-}
-.btn-success:hover {
-  background-color: #16a34a;
-}
-
-.btn-error {
-  background-color: var(--color-error);
-  color: white;
-}
-.btn-error:hover {
-  background-color: #dc2626;
-}
-
-/* Card Components */
-.card {
-  background-color: var(--color-background-secondary);
-  border: 1px solid var(--color-border-primary);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.3),
-    0 2px 4px -1px rgba(0, 0, 0, 0.2);
-}
-
-.card-elevated {
-  background-color: var(--color-background-elevated);
-  box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.4),
-    0 4px 6px -2px rgba(0, 0, 0, 0.3);
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin-bottom: 0.5rem;
-}
-
-.card-description {
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-}
-
-/* Input Components */
+/* ─── Inputs ──────────────────────────────────────────────────────────────── */
 .input {
   width: 100%;
   border-radius: 0.5rem;
-  border: 1px solid;
+  border: 1px solid var(--sys-outline);
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  transition: all 0.2s;
-  background-color: var(--color-background-primary);
-  border-color: var(--color-border-primary);
-  color: var(--color-text-primary);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+  background-color: var(--sys-surface);
+  color: var(--sys-on-surface);
 }
 .input:focus {
   outline: none;
-  border-color: var(--color-primary-600);
-  box-shadow: 0 0 0 2px var(--color-primary-500);
+  border-color: var(--sys-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sys-primary) 20%, transparent);
 }
 .input::placeholder {
-  color: var(--color-text-muted);
+  color: var(--sys-on-surface-variant);
 }
-
 .input-error {
-  border-color: var(--color-error);
+  border-color: var(--sys-error);
 }
 
 .label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-primary);
+  color: var(--sys-on-surface);
   margin-bottom: 0.25rem;
   display: block;
 }
 
-/* Select Components */
+/* ─── Selects ─────────────────────────────────────────────────────────────── */
 .select {
   width: 100%;
   border-radius: 0.5rem;
-  border: 1px solid;
+  border: 1px solid var(--sys-outline);
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  transition: all 0.2s;
-  background-color: var(--color-background-primary);
-  border-color: var(--color-border-primary);
-  color: var(--color-text-primary);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+  background-color: var(--sys-surface);
+  color: var(--sys-on-surface);
 }
 .select:focus {
   outline: none;
-  border-color: var(--color-primary-600);
-  box-shadow: 0 0 0 2px var(--color-primary-500);
+  border-color: var(--sys-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sys-primary) 20%, transparent);
 }
 
-/* Navigation Components */
-.navbar {
-  background-color: var(--color-background-secondary);
-  border-bottom: 1px solid var(--color-border-primary);
-  padding: 1rem;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
+/* ─── Navigation ──────────────────────────────────────────────────────────── */
 .nav-link {
-  color: var(--color-text-secondary);
+  color: var(--sys-on-surface-variant);
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  transition: all 0.2s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .nav-link:hover {
-  color: var(--color-text-primary);
-  background-color: var(--color-background-tertiary);
+  color: var(--sys-on-surface);
+  background-color: var(--sys-surface-variant);
 }
 .nav-link.active {
-  color: var(--color-primary-400);
-  background-color: var(--color-background-tertiary);
+  color: var(--sys-on-primary-container);
+  background-color: var(--sys-primary-container);
 }
 
-/* Table Components */
+/* ─── Tables ──────────────────────────────────────────────────────────────── */
 .table {
   width: 100%;
   border-collapse: collapse;
 }
-
 .table th {
-  background-color: var(--color-background-tertiary);
-  color: var(--color-text-primary);
-  font-weight: 600;
-  padding: 0.75rem;
+  color: var(--sys-on-surface-variant);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.625rem 0.75rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-border-primary);
+  border-bottom: 1px solid var(--sys-outline-variant);
 }
-
 .table td {
   padding: 0.75rem;
-  border-bottom: 1px solid var(--color-border-primary);
-  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--sys-outline-variant);
+  color: var(--sys-on-surface-variant);
 }
-
 .table tr:hover {
-  background-color: var(--color-background-tertiary);
+  background-color: var(--sys-surface-variant);
 }
 
-/* Modal Components */
+/* ─── Modals ──────────────────────────────────────────────────────────────── */
 .modal {
   position: fixed;
   top: 0;
@@ -311,392 +248,239 @@ body {
   padding: 0;
   z-index: 50;
 }
-
 .modal::backdrop {
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
+  background-color: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(4px);
 }
-
 .modal[open] {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
 }
-
 .modal-box {
   position: relative;
-  background-color: #3a3a3a; /* Lighter than var(--color-background-elevated) */
-  border: 1px solid #525252; /* Lighter border */
-  border-radius: 0.75rem;
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  background-color: var(--sys-surface-2);
+  border: 1px solid var(--sys-outline-variant);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
   max-height: 90vh;
+  max-width: 32rem;
+  width: 100%;
   overflow-y: auto;
-  color: #fafafa; /* Ensure text is bright */
+  color: var(--sys-on-surface);
   padding: 1.5rem;
 }
-
-/* Modal Header */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #525252; /* Lighter border */
+  border-bottom: 1px solid var(--sys-outline-variant);
 }
-
 .modal-title {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #fafafa; /* Bright white text */
+  color: var(--sys-on-surface);
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-
-/* Modal Content */
 .modal-content {
   margin-bottom: 1.5rem;
 }
-
-/* Modal Footer */
 .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
   padding-top: 1rem;
-  border-top: 1px solid #525252; /* Lighter border */
-} /* Alert Components */
+  border-top: 1px solid var(--sys-outline-variant);
+}
+
+/* Inputs inside modals need slightly different background for contrast */
+.modal-box .input,
+.modal-box .select,
+.modal-box input,
+.modal-box select {
+  background-color: var(--sys-surface);
+  border-color: var(--sys-outline);
+  color: var(--sys-on-surface);
+}
+.modal-box .input::placeholder,
+.modal-box input::placeholder {
+  color: var(--sys-on-surface-variant);
+}
+.modal-box label,
+.modal-box .label {
+  color: var(--sys-on-surface);
+}
+
+/* ─── Alerts ──────────────────────────────────────────────────────────────── */
 .alert {
   padding: 1rem;
   border-radius: 0.5rem;
   border: 1px solid;
   margin-bottom: 1rem;
 }
-
 .alert-success {
-  background-color: var(--color-success-bg);
-  color: var(--color-success);
-  border-color: var(--color-success);
+  background-color: color-mix(in srgb, var(--sys-income) 12%, var(--sys-surface));
+  color: var(--sys-income);
+  border-color: var(--sys-income);
 }
-
 .alert-warning {
   background-color: var(--color-warning-bg);
   color: var(--color-warning);
   border-color: var(--color-warning);
 }
-
 .alert-error {
-  background-color: var(--color-error-bg);
-  color: var(--color-error);
-  border-color: var(--color-error);
+  background-color: var(--sys-error-container);
+  color: var(--sys-error);
+  border-color: var(--sys-error);
 }
-
 .alert-info {
-  background-color: var(--color-info-bg);
-  color: var(--color-info);
-  border-color: var(--color-info);
+  background-color: var(--sys-primary-container);
+  color: var(--sys-primary);
+  border-color: var(--sys-primary);
 }
 
-/* Financial Specific Components */
+/* ─── Financial Utilities ─────────────────────────────────────────────────── */
 .amount-positive {
-  color: var(--color-income);
+  color: var(--sys-income);
 }
-
 .amount-negative {
-  color: var(--color-expense);
+  color: var(--sys-expense);
 }
-
 .amount-neutral {
-  color: var(--color-neutral);
+  color: var(--sys-on-surface-variant);
 }
 
-/* Utility Classes */
-.text-primary {
-  color: var(--color-text-primary);
+/* ─── Badge ───────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-color: var(--sys-surface-variant);
+  color: var(--sys-on-surface-variant);
+  white-space: nowrap;
+}
+.badge--primary {
+  background-color: var(--sys-primary-container);
+  color: var(--sys-on-primary-container);
+}
+.badge--success {
+  background-color: color-mix(in srgb, var(--sys-income) 15%, var(--sys-surface));
+  color: var(--sys-income);
+}
+.badge--error {
+  background-color: var(--sys-error-container);
+  color: var(--sys-error);
+}
+.badge--warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+}
+.badge--info {
+  background-color: var(--sys-primary-container);
+  color: var(--sys-primary);
+}
+.badge--sm {
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.6875rem;
+}
+.badge--xs {
+  padding: 0 0.25rem;
+  font-size: 0.625rem;
 }
 
-.text-secondary {
-  color: var(--color-text-secondary);
+/* ─── Btn loading spinner (CSS ::before) ─────────────────────────────────── */
+button[appBtn][aria-busy='true']::before {
+  content: '';
+  display: inline-block;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.65s linear infinite;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
+/* ─── Semantic color utilities ───────────────────────────────────────────── */
 .text-muted {
-  color: var(--color-text-muted);
+  color: var(--sys-on-surface-variant);
 }
-
 .text-success {
-  color: var(--color-success);
+  color: var(--sys-income);
 }
-
 .text-warning {
   color: var(--color-warning);
 }
-
 .text-error {
-  color: var(--color-error);
+  color: var(--sys-error);
 }
 
-.text-info {
-  color: var(--color-info);
+/* ─── New design system semantic utilities ────────────────────────────────── */
+.surface {
+  background-color: var(--sys-surface);
+  color: var(--sys-on-surface);
+}
+.surface-variant {
+  background-color: var(--sys-surface-variant);
+  color: var(--sys-on-surface-variant);
+}
+.surface-elevated {
+  background-color: var(--sys-surface);
+  color: var(--sys-on-surface);
+  box-shadow:
+    0 1px 3px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0)),
+    0 1px 2px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0));
+}
+.focus-ring:focus-visible {
+  outline: 2px solid var(--sys-primary);
+  outline-offset: 2px;
 }
 
-.bg-primary {
-  background-color: var(--color-background-primary);
-}
-
-.bg-secondary {
-  background-color: var(--color-background-secondary);
-}
-
-.bg-tertiary {
-  background-color: var(--color-background-tertiary);
-}
-
-.bg-elevated {
-  background-color: var(--color-background-elevated);
-}
-
-.bg-success {
-  background-color: var(--color-success);
-}
-
-.bg-warning {
-  background-color: var(--color-warning);
-}
-
-.bg-error {
-  background-color: var(--color-error);
-}
-
-.bg-info {
-  background-color: var(--color-info);
-}
-
-.border-primary {
-  border-color: var(--color-border-primary);
-}
-
-.border-success {
-  border-color: var(--color-success);
-}
-
-.border-warning {
-  border-color: var(--color-warning);
-}
-
-.border-error {
-  border-color: var(--color-error);
-}
-
-.border-info {
-  border-color: var(--color-info);
-}
-
-.divide-border > * + * {
-  border-top: 1px solid var(--color-border-primary);
-}
-
-/* Additional Utility Classes */
-.btn-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
-}
-
-/* Drawer/Sidebar Layout */
-.drawer {
-  position: relative;
-  display: flex;
-  min-height: 100vh;
-}
-
-.drawer-toggle {
-  display: none;
-}
-
-.drawer-content {
-  flex: 1;
-  min-height: 100vh;
-  width: 100%;
-}
-
-.drawer-side {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 20rem;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  z-index: 40;
-}
-
-.drawer-toggle:checked ~ .drawer-content ~ .drawer-side {
-  transform: translateX(0);
-}
-
-.drawer-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 30;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.3s ease,
-    visibility 0.3s ease;
-}
-
-.drawer-toggle:checked ~ .drawer-content ~ .drawer-side ~ .drawer-overlay {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Desktop sidebar always visible */
-@media (min-width: 1280px) {
-  .drawer {
-    flex-direction: row;
-  }
-
-  .drawer .drawer-side {
-    position: sticky;
-    top: 0;
-    transform: translateX(0);
-    z-index: auto;
-    flex-shrink: 0;
-    width: 20rem;
-    height: 100vh;
-    order: -1; /* Ensure sidebar appears first (left side) */
-    overflow-y: auto; /* Allow sidebar content to scroll if needed */
-  }
-
-  .drawer .drawer-content {
-    flex: 1;
-    width: auto;
-    order: 1; /* Ensure content appears after sidebar */
-    min-height: 100vh;
-  }
-
-  .drawer .drawer-overlay {
-    display: none;
-  }
-
-  /* Hide mobile elements on extra large screens - using Tailwind's xl:hidden */
-  .xl\\:hidden {
-    display: none !important;
-  }
-
-  /* Show desktop elements only on extra large screens */
-  .desktop-only {
-    display: flex !important;
-  }
-
-  /* Desktop navbar height to match sidebar logo section */
-  .navbar-desktop-height {
-    min-height: 104px; /* Match sidebar logo section height */
-    display: flex;
-    align-items: center;
-    padding: 1.5rem 1rem;
-  }
-}
-
-/* Mobile/Tablet styles - below xl breakpoint (1280px) */
-@media (max-width: 1279px) {
-  /* Hide desktop elements on mobile/tablet */
-  .desktop-only {
-    display: none !important;
-  }
-}
-
-/* Scrollbar Styling */
+/* ─── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--color-background-secondary);
+  background: var(--sys-surface);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-secondary);
+  background: var(--sys-outline-variant);
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-muted);
+  background: var(--sys-outline);
 }
 
-/* Additional Utility Classes for BaseSelect */
-.bg-background-primary {
-  background-color: #262626; /* Lighter than original --color-background-primary */
-}
-
-.bg-background-secondary {
-  background-color: #3a3a3a; /* Lighter than original --color-background-secondary */
-}
-
-.text-text-primary {
-  color: #fafafa; /* Bright white */
-}
-
-.border-border-primary {
-  border-color: #525252; /* Lighter border */
-}
-
-.focus\:border-primary-600:focus {
-  border-color: var(--color-primary-600);
-}
-
-.focus\:ring-primary-200:focus {
-  --tw-ring-color: rgba(20, 184, 166, 0.3); /* Slightly more visible ring */
-}
-
-/* Modal-specific input and select styling */
-.modal-box input,
-.modal-box select {
-  background-color: #262626 !important; /* Lighter background for inputs in modals */
-  border-color: #525252 !important; /* Lighter border */
-  color: #fafafa !important; /* Bright text */
-}
-
-.modal-box input:focus,
-.modal-box select:focus {
-  background-color: #2d2d2d !important; /* Slightly lighter on focus */
-  border-color: var(--color-primary-600) !important;
-  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3) !important;
-}
-
-/* Ensure placeholder text is visible */
-.modal-box input::placeholder {
-  color: #a1a1aa !important;
-}
-
-/* Modal-specific label styling */
-.modal-box label {
-  color: #e5e5e5 !important; /* Brighter labels in modals */
-}
-
-.modal-box .text-secondary {
-  color: #d1d5db !important; /* Override text-secondary in modals to be lighter */
-}
-
-.modal-box .text-muted {
-  color: #9ca3af !important; /* Override text-muted in modals to be more visible */
-}
-
-/* Placeholder styling for consistent colors */
 input::placeholder,
 select::placeholder {
-  color: var(--color-text-muted);
+  color: var(--sys-on-surface-variant);
 }
 
-/* Fix focus ring for better visibility */
-.focus\:ring-2:focus {
-  box-shadow: 0 0 0 2px var(--tw-ring-color, rgba(20, 184, 166, 0.2));
+/* ─── Financial number utility ───────────────────────────────────────────── */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-positive,
+.amount-negative,
+.amount-neutral {
+  font-variant-numeric: tabular-nums;
 }

@@ -6,29 +6,34 @@ import { LanguageService, AVAILABLE_LANGUAGES } from '../../services/language.se
 import { PrivacyService } from '../../services/privacy.service';
 import { ExportService } from '../../services/export.service';
 import { ToastService } from '../../services/toast.service';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
-import { BaseInputComponent } from '../../shared/components/base-input/base-input';
-import { BaseSelectComponent, SelectOption } from '../../shared/components/base-select/base-select';
-import { BaseToggleComponent } from '../../shared/components/base-toggle/base-toggle';
+import { ThemeService } from '../../services/theme.service';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { InputDirective } from '../../shared/directives/input.directive';
+import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
+import { FieldComponent } from '../../shared/components/field/field';
+import { ToggleComponent } from '../../shared/components/toggle/toggle';
+import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.html',
+  styleUrl: './settings.css',
   imports: [
     FormsModule,
     TranslateModule,
-    PageHeaderComponent,
-    BaseButtonComponent,
-    BaseInputComponent,
-    BaseSelectComponent,
-    BaseToggleComponent,
+    BtnDirective,
+    InputDirective,
+    SelectDirective,
+    FieldComponent,
+    ToggleComponent,
+    IconComponent,
   ],
 })
 export class SettingsComponent implements OnInit {
   private userService = inject(UserService);
   languageService = inject(LanguageService);
   privacyService = inject(PrivacyService);
+  themeService = inject(ThemeService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
 
@@ -36,6 +41,12 @@ export class SettingsComponent implements OnInit {
   email = signal('');
   savingProfile = signal(false);
   exporting = signal(false);
+
+  themeOptions = [
+    { value: 'light' as const, label: 'views.settings.sections.appearance.light' },
+    { value: 'dark' as const, label: 'views.settings.sections.appearance.dark' },
+    { value: 'system' as const, label: 'views.settings.sections.appearance.system' },
+  ];
 
   languageOptions: SelectOption[] = Object.entries(AVAILABLE_LANGUAGES).map(
     ([code, label]) => ({ value: code, label }),

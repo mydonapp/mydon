@@ -1,0 +1,10 @@
+<dialog
+  #dialog
+  class="modal"
+  (close)="onDialogClose()"
+  (click)="onBackdropClick($event)"
+>
+  <div class="modal-box" [class]="boxClass()" (click)="$event.stopPropagation()">
+    <ng-content />
+  </div>
+</dialog>

@@ -1,121 +1,117 @@
-<div class="min-h-screen bg-primary">
-  <div class="drawer xl:drawer-open">
-    <input id="my-drawer" type="checkbox" class="drawer-toggle" [(ngModel)]="drawerOpen" />
+<div class="min-h-screen bg-background">
 
-    <!-- Main Content -->
-    <div class="drawer-content flex flex-col">
-      <!-- Top Navigation Bar (Mobile/Tablet) -->
-      <div class="xl:hidden navbar bg-secondary border-b border-primary sticky top-0 z-20">
-        <div class="flex items-center space-x-3">
-          <label
-            for="my-drawer"
-            aria-label="Open menu"
-            class="btn btn-ghost btn-sm p-2"
-          >
-            <i class="ri-menu-line text-xl"></i>
-          </label>
-          <h1 class="text-xl font-bold text-primary-400">myDon</h1>
-        </div>
+  <!-- Sidebar (desktop only, hidden via Tailwind hidden md:flex) -->
+  <aside
+    class="sidebar hidden md:flex"
+    [class.sidebar--collapsed]="sidebarState.collapsed()"
+    aria-label="Main navigation"
+  >
+    <!-- Logo -->
+    <div class="sidebar-header">
+      <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold"
+        style="background-color: var(--sys-primary); color: var(--sys-on-primary);">
+        D
       </div>
-
-      <!-- Page Content -->
-      <div class="flex-1">
-        <router-outlet />
-      </div>
+      <span class="sidebar-label text-sm font-semibold" style="color: var(--sys-on-surface);">myDon</span>
     </div>
 
-    <!-- Sidebar -->
-    <div class="drawer-side z-40">
-      <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay xl:hidden"></label>
-      <aside class="h-full w-80 bg-secondary flex flex-col border-r border-primary overflow-y-auto">
-        <!-- Logo Section -->
-        <div class="p-4 sm:p-6 border-b border-primary">
-          <div class="flex items-center space-x-3">
-            <div class="flex items-center justify-center bg-primary-600 text-white rounded-xl w-12 h-12 flex-shrink-0">
-              <span class="text-lg font-bold">D</span>
-            </div>
-            <div class="min-w-0 flex-1">
-              <h1 class="text-xl sm:text-2xl font-bold text-primary-400 truncate">myDon</h1>
-              <p class="text-xs sm:text-sm text-secondary truncate">
-                {{ 'app.subtitle' | translate }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Navigation Menu -->
-        <nav class="flex-1 p-3 sm:p-4">
-          <ul class="space-y-1 sm:space-y-2 w-full">
-            @for (item of menu; track item.route) {
-              <li class="w-full">
-                <a
-                  [routerLink]="item.route"
-                  routerLinkActive="active bg-tertiary text-primary-400"
-                  class="nav-link flex items-center space-x-3 p-2 sm:p-3 text-sm sm:text-base w-full text-secondary rounded-lg"
-                  (click)="closeDrawer()"
-                >
-                  <i [class]="item.icon + ' w-5 h-5 flex-shrink-0'"></i>
-                  <span class="font-medium truncate">{{ item.label | translate }}</span>
-                </a>
-              </li>
-            }
-          </ul>
-        </nav>
-
-        <!-- User Section -->
-        <div class="p-3 sm:p-4 border-t border-primary">
-          <div class="space-y-2 sm:space-y-3">
-            <!-- Privacy Toggle -->
-            <div class="flex items-center justify-between p-2 sm:p-3 bg-primary rounded-lg">
-              <div class="flex items-center space-x-2 min-w-0 flex-1">
-                <i class="ri-eye-line text-muted flex-shrink-0"></i>
-                <span class="text-xs sm:text-sm font-medium truncate">
-                  {{ 'accounts.privacy' | translate }}
-                </span>
-              </div>
-              <app-base-toggle
-                [value]="privacyService.isPrivate()"
-                size="sm"
-                variant="warning"
-                (valueChange)="privacyService.toggle()"
-              />
-            </div>
-
-            <!-- User Info -->
-            <div
-              class="flex items-center space-x-3 p-2 sm:p-3 bg-primary rounded-lg cursor-pointer hover:bg-tertiary transition-colors"
-              (click)="router.navigate(['/app/settings'])"
+    <!-- Navigation (scrolls independently) -->
+    <nav class="sidebar-nav" aria-label="Main">
+      <ul class="space-y-px" role="list">
+        @for (item of menu; track item.route) {
+          <li>
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: !!item.exact }"
+              class="nav-item"
             >
-              <div class="flex items-center justify-center bg-secondary text-white rounded-full w-8 sm:w-10 h-8 sm:h-10 flex-shrink-0">
-                <span class="text-xs sm:text-sm font-semibold">
-                  {{ userInitial() }}
-                </span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-xs sm:text-sm truncate text-primary">
-                  {{ userService.user()?.name || ('app.user' | translate) }}
-                </p>
-                <p class="text-xs text-muted truncate">
-                  {{ userService.user()?.email || ('app.userEmail' | translate) }}
-                </p>
-              </div>
-              <i class="ri-settings-3-line text-muted flex-shrink-0"></i>
-            </div>
+              <app-icon [name]="item.icon" [size]="18" />
+              <span class="sidebar-label">{{ item.label | translate }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
 
-            <app-base-button
-              variant="secondary"
-              [block]="true"
-              class="w-full text-xs sm:text-sm"
-              (clicked)="logout()"
-            >
-              <i class="ri-logout-box-r-line mr-1 sm:mr-2"></i>
-              <span class="truncate">{{ 'components.sidebar.menu.logout' | translate }}</span>
-            </app-base-button>
+    <!-- Footer — pinned to bottom by flex layout -->
+    <div class="sidebar-footer">
+      <!-- User profile + dropdown -->
+      <div class="sidebar-user-wrap">
+        @if (userMenuOpen()) {
+          <div class="user-menu" (click)="$event.stopPropagation()">
+            <button class="user-menu-item" (click)="goToSettings()">
+              <app-icon name="settings" [size]="15" />
+              <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
+            </button>
+            <div class="user-menu-separator"></div>
+            <button class="user-menu-item user-menu-item--danger" (click)="logout()">
+              <app-icon name="log-out" [size]="15" />
+              <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
+            </button>
           </div>
-        </div>
-      </aside>
+        }
+
+        <button
+          class="sidebar-user"
+          (click)="toggleUserMenu($event)"
+          [attr.aria-expanded]="userMenuOpen()"
+          aria-haspopup="menu"
+        >
+          <div class="sidebar-avatar">{{ userInitial() }}</div>
+          <div class="sidebar-label sidebar-user-info">
+            <p class="sidebar-user-name">{{ userService.user()?.name || ('app.user' | translate) }}</p>
+            <p class="sidebar-user-email">{{ userService.user()?.email || ('app.userEmail' | translate) }}</p>
+          </div>
+          <app-icon
+            name="chevron-up"
+            [size]="14"
+            class="sidebar-label sidebar-chevron"
+            [class.sidebar-chevron--closed]="!userMenuOpen()"
+          />
+        </button>
+      </div>
+
+      <!-- Collapse toggle -->
+      <button
+        appBtn variant="ghost" [block]="true"
+        class="sidebar-collapse-btn"
+        [attr.aria-label]="sidebarState.collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+        (click)="sidebarState.toggle()"
+      >
+        @if (sidebarState.collapsed()) {
+          <app-icon name="chevron-right" [size]="16" />
+        } @else {
+          <app-icon name="chevron-left" [size]="16" />
+        }
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div
+    class="layout-main flex flex-col min-h-screen"
+    [class.layout-main--collapsed]="sidebarState.collapsed()"
+  >
+    <div class="flex-1">
+      <router-outlet />
     </div>
   </div>
+
+  <!-- Bottom navigation (mobile only, hidden via Tailwind flex md:hidden) -->
+  <nav class="bottom-nav flex md:hidden" aria-label="Main navigation">
+    @for (item of menu; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: !!item.exact }"
+        class="bottom-nav-item"
+      >
+        <app-icon [name]="item.icon" [size]="22" />
+        <span class="bottom-nav-label">{{ item.label | translate }}</span>
+      </a>
+    }
+  </nav>
 
   <app-toast-container />
 </div>

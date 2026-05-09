@@ -1,0 +1,13 @@
+<button
+  type="button"
+  role="switch"
+  [attr.aria-checked]="value()"
+  [disabled]="disabled() || null"
+  class="toggle"
+  [class.toggle--on]="value()"
+  [class.toggle--sm]="size() === 'sm'"
+  [class.toggle--lg]="size() === 'lg'"
+  (click)="toggle()"
+>
+  <span class="toggle__thumb"></span>
+</button>

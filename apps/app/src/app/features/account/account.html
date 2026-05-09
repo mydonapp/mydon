@@ -1,57 +1,48 @@
 <div class="p-4 sm:p-6 lg:p-8">
-  <div class="flex items-center gap-2 mb-4">
-    <a routerLink="/app/accounts" class="btn btn-ghost btn-sm">
-      <i class="ri-arrow-left-line"></i>
+  <div class="flex items-center gap-2 mb-6">
+    <a appBtn variant="ghost" size="sm" routerLink="/app/accounts">
+      <app-icon name="arrow-left" [size]="16" />
     </a>
-    <app-page-header
-      [title]="account()?.name ?? ('views.account.title' | translate)"
-      [subtitle]="'views.account.subtitle' | translate"
-    />
+    <div>
+      <h1 class="text-xl font-semibold text-on-surface">{{ account()?.name ?? ('views.account.title' | translate) }}</h1>
+      <p class="text-sm text-on-surface-variant">{{ 'views.account.subtitle' | translate }}</p>
+    </div>
   </div>
 
   @if (loading()) {
     <div class="flex justify-center py-12">
-      <span class="loading loading-spinner loading-lg text-primary-400"></span>
+      <app-spinner size="lg" />
     </div>
   } @else if (account()) {
-    <!-- Stats -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="card bg-secondary">
-        <div class="card-body p-3">
-          <h3 class="text-muted text-xs">{{ 'views.account.currentBalance' | translate }}</h3>
-          <p class="font-bold text-primary-400">
-            {{ privacyService.isPrivate() ? '***' : currencyService.format(account()!.balance, account()!.currency) }}
-          </p>
-        </div>
+    <!-- Stats row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.currentBalance' | translate }}</p>
+        <p class="text-xl font-bold text-primary tabular-nums">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.balance, account()!.currency) }}
+        </p>
       </div>
-      <div class="card bg-secondary">
-        <div class="card-body p-3">
-          <h3 class="text-muted text-xs">{{ 'views.account.totalTransactions' | translate }}</h3>
-          <p class="font-bold text-primary">{{ account()!.totalTransactions }}</p>
-        </div>
+      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalTransactions' | translate }}</p>
+        <p class="text-xl font-bold text-on-surface tabular-nums">{{ account()!.totalTransactions }}</p>
       </div>
-      <div class="card bg-secondary">
-        <div class="card-body p-3">
-          <h3 class="text-muted text-xs">{{ 'views.account.totalCredit' | translate }}</h3>
-          <p class="font-bold text-success">
-            {{ privacyService.isPrivate() ? '***' : currencyService.format(account()!.totalCredit, account()!.currency) }}
-          </p>
-        </div>
+      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalCredit' | translate }}</p>
+        <p class="text-xl font-bold text-success tabular-nums">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency) }}
+        </p>
       </div>
-      <div class="card bg-secondary">
-        <div class="card-body p-3">
-          <h3 class="text-muted text-xs">{{ 'views.account.totalDebit' | translate }}</h3>
-          <p class="font-bold text-error">
-            {{ privacyService.isPrivate() ? '***' : currencyService.format(account()!.totalDebit, account()!.currency) }}
-          </p>
-        </div>
+      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalDebit' | translate }}</p>
+        <p class="text-xl font-bold text-error tabular-nums">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency) }}
+        </p>
       </div>
     </div>
 
-    <!-- Year Filter + Search -->
-    <div class="flex items-center gap-4 mb-4">
-      <select
-        class="select select-bordered select-sm bg-primary text-primary border-primary"
+    <!-- Filters -->
+    <div class="flex items-center gap-3 mb-4">
+      <select appSelect class="w-auto"
         [ngModel]="accountsService.timeFilter()"
         (ngModelChange)="onYearChange($event)"
       >
@@ -59,93 +50,88 @@
           <option [value]="year">{{ year }}</option>
         }
       </select>
-      <input
-        type="text"
+      <input appInput type="text"
         [(ngModel)]="searchText"
         (ngModelChange)="applyFilters()"
         [placeholder]="'common.search' | translate"
-        class="input input-bordered input-sm bg-primary text-primary border-primary flex-1"
+        class="flex-1"
       />
     </div>
 
-    <!-- Transactions Table -->
-    <div class="card bg-secondary">
-      <div class="card-body p-4">
-        <h2 class="font-semibold text-primary mb-3">{{ 'views.account.transactions.title' | translate }}</h2>
-        @if (filteredTransactions().length === 0) {
-          <p class="text-muted text-center py-8">{{ 'views.account.noTransactions' | translate }}</p>
-        } @else {
-          <div class="overflow-x-auto">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th class="text-muted">{{ 'views.account.transactions.table.date' | translate }}</th>
-                  <th class="text-muted">{{ 'views.account.transactions.table.description' | translate }}</th>
-                  <th class="text-muted">{{ 'views.account.transactions.table.otherAccount' | translate }}</th>
-                  <th class="text-muted text-right">{{ 'views.account.transactions.table.amount' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (tx of paginatedTransactions(); track tx.id) {
-                  <tr class="hover:bg-primary/5 cursor-pointer" (click)="selectedTx.set(tx)">
-                    <td class="text-sm text-muted">{{ tx.date | date:'shortDate' }}</td>
-                    <td class="text-sm text-primary">{{ tx.description }}</td>
-                    <td class="text-sm text-muted">
-                      {{ tx.creditAccountId === accountId() ? tx.debitAccountName : tx.creditAccountName }}
-                    </td>
-                    <td class="text-sm font-medium text-right" [class]="tx.creditAccountId === accountId() ? 'text-success' : 'text-error'">
-                      {{ privacyService.isPrivate() ? '***' : currencyService.format(tx.amount, account()!.currency) }}
-                    </td>
-                  </tr>
+    <!-- Transactions List -->
+    <div class="surface-elevated rounded-xl border border-outline-variant overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-outline-variant">
+        <h2 class="font-semibold text-sm text-on-surface">{{ 'views.account.transactions.title' | translate }}</h2>
+        <span class="text-xs text-on-surface-variant">{{ filteredTransactions().length }} {{ 'views.account.transactions.title' | translate | lowercase }}</span>
+      </div>
+
+      @if (filteredTransactions().length === 0) {
+        <p class="text-on-surface-variant text-center py-12 text-sm">{{ 'views.account.noTransactions' | translate }}</p>
+      } @else {
+        @for (tx of paginatedTransactions(); track tx.id) {
+          <div
+            class="flex items-center gap-4 px-4 py-3 hover:bg-surface-variant border-b border-outline-variant last:border-0 cursor-pointer transition-colors"
+            (click)="selectedTx.set(tx)"
+          >
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
+              <p class="text-xs text-on-surface-variant mt-0.5">
+                {{ tx.date | date:'mediumDate' }}
+                @if (tx.creditAccountId === accountId() ? tx.debitAccountName : tx.creditAccountName; as other) {
+                  · {{ other }}
                 }
-              </tbody>
-            </table>
-          </div>
-          <!-- Pagination -->
-          <div class="flex items-center justify-between mt-3">
-            <span class="text-muted text-xs">
-              {{ paginationStart() }}-{{ paginationEnd() }} / {{ filteredTransactions().length }}
-            </span>
-            <div class="flex gap-1">
-              <app-base-button size="xs" variant="ghost" [disabled]="page() === 1" (clicked)="page.update(p => p - 1)">
-                <i class="ri-arrow-left-s-line"></i>
-              </app-base-button>
-              <app-base-button size="xs" variant="ghost" [disabled]="paginationEnd() >= filteredTransactions().length" (clicked)="page.update(p => p + 1)">
-                <i class="ri-arrow-right-s-line"></i>
-              </app-base-button>
+              </p>
             </div>
+            <span
+              class="text-sm font-semibold tabular-nums flex-shrink-0"
+              [class]="tx.creditAccountId === accountId() ? 'text-success' : 'text-error'"
+            >
+              {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, account()!.currency) }}
+            </span>
           </div>
         }
-      </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-4 py-3 border-t border-outline-variant">
+          <span class="text-xs text-on-surface-variant">
+            {{ paginationStart() }}–{{ paginationEnd() }} of {{ filteredTransactions().length }}
+          </span>
+          <div class="flex gap-1">
+            <button appBtn size="xs" variant="ghost" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
+              <app-icon name="chevron-left" [size]="16" />
+            </button>
+            <button appBtn size="xs" variant="ghost" [disabled]="paginationEnd() >= filteredTransactions().length" (click)="page.update(p => p + 1)">
+              <app-icon name="chevron-right" [size]="16" />
+            </button>
+          </div>
+        </div>
+      }
     </div>
   }
 </div>
 
 <!-- Transaction Detail Modal -->
-@if (selectedTx()) {
-  <div class="modal modal-open">
-    <div class="modal-box bg-secondary">
-      <h3 class="font-bold text-lg text-primary mb-4">{{ 'views.account.transactionDetails' | translate }}</h3>
-      <div class="space-y-3">
-        <div class="flex justify-between">
-          <span class="text-muted text-sm">{{ 'views.account.transactions.table.date' | translate }}</span>
-          <span class="text-primary text-sm">{{ selectedTx()!.date | date:'mediumDate' }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-muted text-sm">{{ 'views.account.transactions.table.description' | translate }}</span>
-          <span class="text-primary text-sm">{{ selectedTx()!.description }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-muted text-sm">{{ 'views.account.transactions.table.amount' | translate }}</span>
-          <span class="text-primary font-bold text-sm">{{ currencyService.format(selectedTx()!.amount, account()!.currency) }}</span>
-        </div>
+<app-modal [open]="!!selectedTx()" (closed)="selectedTx.set(null)">
+  @if (selectedTx()) {
+    <h3 class="font-bold text-lg mb-4">{{ 'views.account.transactionDetails' | translate }}</h3>
+    <div class="space-y-3 mb-4">
+      <div class="flex justify-between">
+        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.date' | translate }}</span>
+        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.date | date:'mediumDate' }}</span>
       </div>
-      <div class="modal-action">
-        <app-base-button variant="ghost" (clicked)="selectedTx.set(null)">
-          {{ 'common.close' | translate }}
-        </app-base-button>
+      <div class="flex justify-between">
+        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.description' | translate }}</span>
+        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.description }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.amount' | translate }}</span>
+        <span class="text-on-surface font-bold text-sm tabular-nums">{{ currencyService.format(selectedTx()!.amount, account()!.currency) }}</span>
       </div>
     </div>
-    <div class="modal-backdrop" (click)="selectedTx.set(null)"></div>
-  </div>
-}
+    <div class="modal-footer">
+      <button appBtn variant="ghost" (click)="selectedTx.set(null)">
+        {{ 'common.close' | translate }}
+      </button>
+    </div>
+  }
+</app-modal>

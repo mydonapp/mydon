@@ -7,10 +7,14 @@ import { CategoriesService } from '../../services/categories.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
-import { BaseInputComponent } from '../../shared/components/base-input/base-input';
-import { BaseSelectComponent, SelectOption } from '../../shared/components/base-select/base-select';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { InputDirective } from '../../shared/directives/input.directive';
+import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
+import { FieldComponent } from '../../shared/components/field/field';
+import { ModalComponent } from '../../shared/components/modal/modal';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { CategoryComboboxComponent } from '../../shared/components/category-combobox/category-combobox';
+import { IconComponent } from '../../shared/components/icon/icon';
 import { PrivacyService } from '../../services/privacy.service';
 
 @Component({
@@ -20,10 +24,14 @@ import { PrivacyService } from '../../services/privacy.service';
     FormsModule,
     TranslateModule,
     PageHeaderComponent,
-    BaseButtonComponent,
-    BaseInputComponent,
-    BaseSelectComponent,
+    BtnDirective,
+    InputDirective,
+    SelectDirective,
+    FieldComponent,
+    ModalComponent,
+    SpinnerComponent,
     CategoryComboboxComponent,
+    IconComponent,
   ],
   templateUrl: './accounts.html',
 })

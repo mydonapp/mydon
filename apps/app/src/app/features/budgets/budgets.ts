@@ -5,8 +5,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BudgetsService, BudgetSummary } from '../../services/budgets.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
-import { BaseInputComponent } from '../../shared/components/base-input/base-input';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { InputDirective } from '../../shared/directives/input.directive';
+import { FieldComponent } from '../../shared/components/field/field';
+import { ModalComponent } from '../../shared/components/modal/modal';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-budgets',
@@ -16,8 +20,12 @@ import { BaseInputComponent } from '../../shared/components/base-input/base-inpu
     FormsModule,
     TranslateModule,
     PageHeaderComponent,
-    BaseButtonComponent,
-    BaseInputComponent,
+    BtnDirective,
+    InputDirective,
+    FieldComponent,
+    ModalComponent,
+    SpinnerComponent,
+    IconComponent,
   ],
 })
 export class BudgetsComponent implements OnInit {

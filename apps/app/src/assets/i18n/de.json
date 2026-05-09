@@ -261,6 +261,13 @@
           "version": "Version",
           "buildDate": "Build-Datum"
         },
+        "appearance": {
+          "title": "Darstellung",
+          "theme": "Farbschema",
+          "light": "Hell",
+          "dark": "Dunkel",
+          "system": "System"
+        },
         "export": {
           "title": "Datenexport",
           "description": "Laden Sie alle Ihre Daten herunter",

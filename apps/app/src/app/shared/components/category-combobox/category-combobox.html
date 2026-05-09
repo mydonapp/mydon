@@ -1,44 +1,58 @@
-<div class="form-control w-full">
+<div class="w-full">
   @if (label()) {
-    <label class="label">
-      <span class="label-text text-primary font-medium">{{ label() }}</span>
-    </label>
+    <label [for]="inputId" class="label">{{ label() }}</label>
   }
   <div class="relative">
     <input
+      [id]="inputId"
       type="text"
+      class="input w-full"
+      role="combobox"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="showDropdown()"
+      [attr.aria-controls]="listboxId"
       [placeholder]="placeholder() || ('components.categoryCombobox.newCategoryPlaceholder' | translate)"
       [(ngModel)]="searchText"
       (ngModelChange)="onSearch($event)"
-      (focus)="showDropdown.set(true)"
-      class="input input-bordered w-full bg-primary text-primary border-primary"
+      (focus)="open()"
+      (blur)="close()"
+      (keydown)="onKeydown($event)"
     />
-    @if (showDropdown()) {
-      <div class="absolute z-50 mt-1 w-full bg-secondary border border-primary rounded-lg shadow-lg max-h-48 overflow-y-auto">
-        @for (cat of filtered(); track cat.id) {
-          <button
-            type="button"
-            class="w-full text-left px-4 py-2 hover:bg-tertiary text-primary text-sm"
+    @if (showDropdown() && (filtered().length > 0 || canCreate)) {
+      <ul
+        [id]="listboxId"
+        role="listbox"
+        class="absolute z-50 mt-1 w-full surface-elevated rounded-lg border border-outline-variant max-h-48 overflow-y-auto py-1"
+        style="box-shadow: var(--shadow-elevated)"
+      >
+        @for (cat of filtered(); track cat.id; let i = $index) {
+          <li
+            role="option"
+            [attr.aria-selected]="cat.id === value()"
+            class="px-3 py-2 text-sm cursor-pointer hover:bg-surface-variant text-on-surface"
+            [class.bg-surface-variant]="i === activeIndex()"
+            (mousedown)="$event.preventDefault()"
             (click)="selectCategory(cat)"
           >
             {{ cat.name }}
-          </button>
+          </li>
         }
-        @if (canCreate()) {
-          <button
-            type="button"
-            class="w-full text-left px-4 py-2 hover:bg-tertiary text-primary-400 text-sm border-t border-primary"
-            [disabled]="creating()"
+        @if (canCreate) {
+          <li
+            role="option"
+            aria-selected="false"
+            class="px-3 py-2 text-sm cursor-pointer hover:bg-surface-variant text-on-surface border-t border-outline-variant"
+            (mousedown)="$event.preventDefault()"
             (click)="createCategory()"
           >
             @if (creating()) {
-              {{ 'components.categoryCombobox.creating' | translate }}
+              <span class="text-on-surface-variant">{{ 'components.categoryCombobox.creating' | translate }}</span>
             } @else {
               {{ 'components.categoryCombobox.createNew' | translate }}: "{{ searchText }}"
             }
-          </button>
+          </li>
         }
-      </div>
+      </ul>
     }
   </div>
 </div>

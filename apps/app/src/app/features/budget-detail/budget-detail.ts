@@ -8,7 +8,13 @@ import { AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BaseButtonComponent } from '../../shared/components/base-button/base-button';
+import { BtnDirective } from '../../shared/directives/btn.directive';
+import { SelectDirective } from '../../shared/directives/select.directive';
+import { InputDirective } from '../../shared/directives/input.directive';
+import { ModalComponent } from '../../shared/components/modal/modal';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar';
+import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-budget-detail',
@@ -17,7 +23,13 @@ import { BaseButtonComponent } from '../../shared/components/base-button/base-bu
     FormsModule,
     TranslateModule,
     PageHeaderComponent,
-    BaseButtonComponent,
+    BtnDirective,
+    SelectDirective,
+    InputDirective,
+    ModalComponent,
+    SpinnerComponent,
+    ProgressBarComponent,
+    IconComponent,
   ],
 })
 export class BudgetDetailComponent implements OnInit {

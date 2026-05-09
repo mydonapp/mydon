@@ -1,15 +1,24 @@
-<div class="toast toast-end toast-bottom z-50">
+<div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
   @for (toast of toastService.toasts(); track toast.id) {
     <div
-      [class]="'alert ' + alertClass(toast.type)"
+      class="pointer-events-auto flex items-start gap-3 surface-elevated rounded-xl border border-outline-variant px-4 py-3 shadow-elevated"
       role="alert"
     >
-      <span>{{ toast.message }}</span>
+      <lucide-angular
+        [img]="iconFor(toast.type)"
+        [size]="16"
+        [strokeWidth]="2"
+        class="flex-shrink-0 mt-0.5"
+        [style.color]="colorFor(toast.type)"
+      />
+      <span class="flex-1 text-sm text-on-surface">{{ toast.message }}</span>
       <button
-        class="btn btn-ghost btn-xs"
+        type="button"
+        class="flex-shrink-0 text-on-surface-variant hover:text-on-surface transition-colors -mr-1 -mt-0.5 p-1 rounded"
         (click)="toastService.remove(toast.id)"
+        aria-label="Close"
       >
-        <i class="ri-close-line"></i>
+        <lucide-angular [img]="closeIcon" [size]="14" [strokeWidth]="2" />
       </button>
     </div>
   }

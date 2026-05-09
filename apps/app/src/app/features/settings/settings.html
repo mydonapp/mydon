@@ -1,102 +1,139 @@
-<div class="p-4 sm:p-6 lg:p-8 max-w-2xl">
-  <app-page-header
-    [title]="'views.settings.title' | translate"
-    [subtitle]="'views.settings.subtitle' | translate"
-  />
+<div class="min-h-screen" style="background-color: var(--sys-background);">
+  <div class="max-w-2xl mx-auto px-4 py-8 sm:px-6">
 
-  <div class="space-y-6">
-    <!-- Profile -->
-    <div class="card bg-secondary">
-      <div class="card-body p-4">
-        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.profile.title' | translate }}</h2>
-        <div class="space-y-3">
-          <app-base-input
-            [value]="name()"
-            (valueChange)="name.set($event)"
-            [label]="'views.settings.sections.profile.name' | translate"
-            [placeholder]="'views.settings.sections.profile.namePlaceholder' | translate"
-          />
-          <app-base-input
-            [value]="email()"
-            (valueChange)="email.set($event)"
-            type="email"
-            [label]="'views.settings.sections.profile.email' | translate"
-            [placeholder]="'views.settings.sections.profile.emailPlaceholder' | translate"
-          />
-          <app-base-button
-            variant="primary"
-            size="sm"
-            [loading]="savingProfile()"
-            (clicked)="saveProfile()"
-          >
+    <!-- Page header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-semibold" style="color: var(--sys-on-surface);">
+        {{ 'views.settings.title' | translate }}
+      </h1>
+      <p class="mt-1 text-sm" style="color: var(--sys-on-surface-variant);">
+        {{ 'views.settings.subtitle' | translate }}
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-4">
+
+      <!-- Profile -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h2 class="settings-card-title">{{ 'views.settings.sections.profile.title' | translate }}</h2>
+        </div>
+        <div class="settings-card-body">
+          <div class="flex flex-col gap-3">
+            <app-field [label]="'views.settings.sections.profile.name' | translate">
+              <input appInput name="profileName"
+                [ngModel]="name()"
+                (ngModelChange)="name.set($event)"
+                [placeholder]="'views.settings.sections.profile.namePlaceholder' | translate"
+              />
+            </app-field>
+            <app-field [label]="'views.settings.sections.profile.email' | translate">
+              <input appInput type="email" name="profileEmail"
+                [ngModel]="email()"
+                (ngModelChange)="email.set($event)"
+                [placeholder]="'views.settings.sections.profile.emailPlaceholder' | translate"
+              />
+            </app-field>
+          </div>
+        </div>
+        <div class="settings-card-footer">
+          <button appBtn variant="primary" size="sm" [loading]="savingProfile()" (click)="saveProfile()">
             {{ 'views.settings.sections.profile.updateButton' | translate }}
-          </app-base-button>
+          </button>
         </div>
       </div>
-    </div>
 
-    <!-- Language -->
-    <div class="card bg-secondary">
-      <div class="card-body p-4">
-        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.language.title' | translate }}</h2>
-        <app-base-select
-          [value]="languageService.currentLanguage()"
-          (valueChange)="languageService.setLanguage($event)"
-          [label]="'views.settings.sections.language.currentLanguage' | translate"
-          [options]="languageOptions"
-        />
-        <p class="text-muted text-xs mt-2">
-          {{ 'views.settings.sections.language.description' | translate }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Privacy -->
-    <div class="card bg-secondary">
-      <div class="card-body p-4">
-        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.privacy.title' | translate }}</h2>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-primary text-sm font-medium">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</p>
-            <p class="text-muted text-xs mt-1">{{ 'views.settings.sections.privacy.privacyModeDescription' | translate }}</p>
-          </div>
-          <app-base-toggle
-            [value]="privacyService.isPrivate()"
-            variant="warning"
-            (valueChange)="privacyService.toggle()"
-          />
+      <!-- Appearance -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h2 class="settings-card-title">{{ 'views.settings.sections.appearance.title' | translate }}</h2>
         </div>
-      </div>
-    </div>
-
-    <!-- Export -->
-    <div class="card bg-secondary">
-      <div class="card-body p-4">
-        <h2 class="font-semibold text-primary mb-2">{{ 'views.settings.sections.export.title' | translate }}</h2>
-        <p class="text-muted text-sm mb-4">{{ 'views.settings.sections.export.exportDescription' | translate }}</p>
-        <app-base-button
-          variant="secondary"
-          size="sm"
-          [loading]="exporting()"
-          (clicked)="exportData()"
-        >
-          <i class="ri-download-line mr-1"></i>
-          {{ 'views.settings.sections.export.exportButton' | translate }}
-        </app-base-button>
-      </div>
-    </div>
-
-    <!-- About -->
-    <div class="card bg-secondary">
-      <div class="card-body p-4">
-        <h2 class="font-semibold text-primary mb-4">{{ 'views.settings.sections.about.title' | translate }}</h2>
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <span class="text-muted">{{ 'views.settings.sections.about.version' | translate }}</span>
-            <span class="text-primary">0.0.2</span>
+        <div class="settings-card-body">
+          <div class="settings-row">
+            <div>
+              <p class="settings-row-label">{{ 'views.settings.sections.appearance.theme' | translate }}</p>
+            </div>
+            <div class="segmented-control">
+              @for (opt of themeOptions; track opt.value) {
+                <button
+                  class="segmented-btn"
+                  [class.segmented-btn--active]="themeService.theme() === opt.value"
+                  (click)="themeService.setTheme(opt.value)"
+                >
+                  {{ opt.label | translate }}
+                </button>
+              }
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Language -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h2 class="settings-card-title">{{ 'views.settings.sections.language.title' | translate }}</h2>
+        </div>
+        <div class="settings-card-body">
+          <app-field [label]="'views.settings.sections.language.currentLanguage' | translate">
+            <select appSelect
+              [ngModel]="languageService.currentLanguage()"
+              (ngModelChange)="languageService.setLanguage($event)"
+              name="language"
+            >
+              @for (opt of languageOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </app-field>
+        </div>
+      </div>
+
+      <!-- Privacy -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h2 class="settings-card-title">{{ 'views.settings.sections.privacy.title' | translate }}</h2>
+        </div>
+        <div class="settings-card-body">
+          <div class="settings-row">
+            <div>
+              <p class="settings-row-label">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</p>
+              <p class="settings-row-description">{{ 'views.settings.sections.privacy.privacyModeDescription' | translate }}</p>
+            </div>
+            <app-toggle
+              [value]="privacyService.isPrivate()"
+              (valueChange)="privacyService.toggle()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h2 class="settings-card-title">{{ 'views.settings.sections.export.title' | translate }}</h2>
+          <p class="settings-card-description">{{ 'views.settings.sections.export.exportDescription' | translate }}</p>
+        </div>
+        <div class="settings-card-footer">
+          <button appBtn variant="secondary" size="sm" [loading]="exporting()" (click)="exportData()">
+            <app-icon name="download" [size]="15" />
+            {{ 'views.settings.sections.export.exportButton' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h2 class="settings-card-title">{{ 'views.settings.sections.about.title' | translate }}</h2>
+        </div>
+        <div class="settings-card-body">
+          <div class="settings-row">
+            <span class="settings-row-description">{{ 'views.settings.sections.about.version' | translate }}</span>
+            <span class="text-sm font-medium" style="color: var(--sys-on-surface);">0.0.2</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

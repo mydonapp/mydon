@@ -4,49 +4,42 @@
       [title]="'views.budgets.title' | translate"
       [subtitle]="'views.budgets.subtitle' | translate"
     />
-    <app-base-button variant="primary" size="sm" (clicked)="showCreate.set(true)">
-      <i class="ri-add-line mr-1"></i>
+    <button appBtn variant="primary" size="sm" (click)="showCreate.set(true)">
+      <app-icon name="plus" [size]="16" class="mr-1" />
       {{ 'views.budgets.addBudget' | translate }}
-    </app-base-button>
+    </button>
   </div>
 
   @if (loading()) {
     <div class="flex justify-center py-12">
-      <span class="loading loading-spinner loading-lg text-primary-400"></span>
+      <app-spinner size="lg" />
     </div>
   } @else if (budgets().length === 0) {
-    <div class="card bg-secondary">
-      <div class="card-body text-center py-12">
-        <i class="ri-money-dollar-circle-line text-5xl text-muted mb-4"></i>
-        <h3 class="font-semibold text-primary mb-2">{{ 'views.budgets.noBudgets' | translate }}</h3>
-        <p class="text-muted text-sm mb-4">{{ 'views.budgets.noBudgetsDescription' | translate }}</p>
-        <app-base-button variant="primary" (clicked)="showCreate.set(true)">
-          {{ 'views.budgets.addFirstBudget' | translate }}
-        </app-base-button>
-      </div>
+    <div class="surface-elevated rounded-xl border border-outline-variant p-8 text-center">
+      <app-icon name="circle-dollar-sign" [size]="48" class="text-on-surface-variant mb-4" />
+      <h3 class="font-semibold text-on-surface mb-2">{{ 'views.budgets.noBudgets' | translate }}</h3>
+      <p class="text-on-surface-variant text-sm mb-4">{{ 'views.budgets.noBudgetsDescription' | translate }}</p>
+      <button appBtn variant="primary" (click)="showCreate.set(true)">
+        {{ 'views.budgets.addFirstBudget' | translate }}
+      </button>
     </div>
   } @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       @for (budget of budgets(); track budget.id) {
-        <div class="card bg-secondary hover:shadow-lg transition-shadow">
-          <div class="card-body p-4">
-            <div class="flex items-start justify-between">
-              <div>
-                <h3 class="font-semibold text-primary">{{ budget.name }}</h3>
-                <p class="text-muted text-sm">{{ budget.year }} · {{ budget.itemCount }} {{ 'views.budgets.items' | translate }}</p>
-              </div>
-              <button
-                class="btn btn-ghost btn-xs text-error"
-                (click)="confirmDelete(budget)"
-              >
-                <i class="ri-delete-bin-line"></i>
-              </button>
+        <div class="surface-elevated rounded-xl border border-outline-variant p-4 hover:shadow-md transition-shadow">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-semibold text-on-surface">{{ budget.name }}</h3>
+              <p class="text-on-surface-variant text-sm">{{ budget.year }} · {{ budget.itemCount }} {{ 'views.budgets.items' | translate }}</p>
             </div>
-            <div class="mt-3">
-              <a [routerLink]="['/app/budgets', budget.id]" class="btn btn-primary btn-sm w-full">
-                {{ 'common.edit' | translate }}
-              </a>
-            </div>
+            <button appBtn variant="ghost" size="xs" class="text-error" (click)="confirmDelete(budget)">
+              <app-icon name="trash-2" [size]="16" />
+            </button>
+          </div>
+          <div class="mt-3">
+            <a appBtn variant="primary" size="sm" [block]="true" [routerLink]="['/app/budgets', budget.id]">
+              {{ 'common.edit' | translate }}
+            </a>
           </div>
         </div>
       }
@@ -55,58 +48,47 @@
 </div>
 
 <!-- Create Budget Modal -->
-@if (showCreate()) {
-  <div class="modal modal-open">
-    <div class="modal-box bg-secondary max-w-sm">
-      <h3 class="font-bold text-lg text-primary mb-4">{{ 'views.budgets.addBudgetForm.title' | translate }}</h3>
-      <form (ngSubmit)="submitCreate()">
-        <div class="space-y-4">
-          <app-base-input
-            [value]="newBudget.name"
-            (valueChange)="newBudget.name = $event"
-            [label]="'views.budgets.addBudgetForm.name.label' | translate"
-            [placeholder]="'views.budgets.addBudgetForm.name.placeholder' | translate"
-            [required]="true"
-          />
-          <app-base-input
-            [value]="newBudget.year"
-            (valueChange)="newBudget.year = $event"
-            type="number"
-            [label]="'views.budgets.addBudgetForm.year.label' | translate"
-            [required]="true"
-          />
-        </div>
-        <div class="modal-action">
-          <app-base-button variant="ghost" type="button" (clicked)="showCreate.set(false)">
-            {{ 'common.cancel' | translate }}
-          </app-base-button>
-          <app-base-button variant="primary" type="submit" [loading]="submitting()">
-            {{ 'views.budgets.addBudgetForm.submit.label' | translate }}
-          </app-base-button>
-        </div>
-      </form>
+<app-modal [open]="showCreate()" (closed)="showCreate.set(false)">
+  <form (ngSubmit)="submitCreate()">
+    <h3 class="font-bold text-lg mb-4">{{ 'views.budgets.addBudgetForm.title' | translate }}</h3>
+    <div class="space-y-4 mb-4">
+      <app-field [label]="'views.budgets.addBudgetForm.name.label' | translate" [required]="true">
+        <input appInput name="budgetName"
+          [(ngModel)]="newBudget.name"
+          [placeholder]="'views.budgets.addBudgetForm.name.placeholder' | translate"
+        />
+      </app-field>
+      <app-field [label]="'views.budgets.addBudgetForm.year.label' | translate" [required]="true">
+        <input appInput type="number" name="budgetYear"
+          [(ngModel)]="newBudget.year"
+        />
+      </app-field>
     </div>
-    <div class="modal-backdrop" (click)="showCreate.set(false)"></div>
-  </div>
-}
+    <div class="modal-footer">
+      <button appBtn variant="ghost" type="button" (click)="showCreate.set(false)">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button appBtn type="submit" [loading]="submitting()">
+        {{ 'views.budgets.addBudgetForm.submit.label' | translate }}
+      </button>
+    </div>
+  </form>
+</app-modal>
 
 <!-- Delete Confirm Modal -->
-@if (budgetToDelete()) {
-  <div class="modal modal-open">
-    <div class="modal-box bg-secondary max-w-sm">
-      <h3 class="font-bold text-lg text-error mb-2">{{ 'common.delete' | translate }}</h3>
-      <p class="text-primary text-sm mb-4">
-        {{ 'views.budgets.confirmDelete' | translate: { name: budgetToDelete()!.name } }}
-      </p>
-      <div class="modal-action">
-        <app-base-button variant="ghost" (clicked)="budgetToDelete.set(null)">
-          {{ 'common.cancel' | translate }}
-        </app-base-button>
-        <app-base-button variant="danger" [loading]="submitting()" (clicked)="deleteBudget()">
-          {{ 'common.delete' | translate }}
-        </app-base-button>
-      </div>
+<app-modal [open]="!!budgetToDelete()" (closed)="budgetToDelete.set(null)">
+  @if (budgetToDelete()) {
+    <h3 class="font-bold text-lg text-error mb-2">{{ 'common.delete' | translate }}</h3>
+    <p class="text-on-surface text-sm mb-4">
+      {{ 'views.budgets.confirmDelete' | translate: { name: budgetToDelete()!.name } }}
+    </p>
+    <div class="modal-footer">
+      <button appBtn variant="ghost" (click)="budgetToDelete.set(null)">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button appBtn variant="danger" [loading]="submitting()" (click)="deleteBudget()">
+        {{ 'common.delete' | translate }}
+      </button>
     </div>
-    <div class="modal-backdrop" (click)="budgetToDelete.set(null)"></div>
-  </div>
-}
+  }
+</app-modal>
