@@ -1,4 +1,5 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
+import { balanceColor } from '../../shared/utils/balance-color';
 import { DatePipe, LowerCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { IconComponent } from '../../shared/components/icon/icon';
 @Component({
   selector: 'app-account',
   templateUrl: './account.html',
+  styleUrl: './account.css',
   imports: [
     DatePipe,
     LowerCasePipe,
@@ -35,6 +37,13 @@ export class AccountComponent implements OnInit {
   currencyService = inject(CurrencyService);
   privacyService = inject(PrivacyService);
   private route = inject(ActivatedRoute);
+
+  scrollY = signal(0);
+  isScrolled = computed(() => this.scrollY() > 60);
+  isScrolling = computed(() => this.scrollY() > 5);
+
+  @HostListener('window:scroll')
+  onScroll() { this.scrollY.set(window.scrollY); }
 
   loading = signal(false);
   account = signal<any>(null);
@@ -75,16 +84,23 @@ export class AccountComponent implements OnInit {
   async loadData() {
     this.loading.set(true);
     try {
-      const [account, txData] = await Promise.all([
-        this.accountsService.fetchAccount(this.accountId()),
-        this.accountsService.fetchTransactions(this.accountId()),
-      ]);
-      this.account.set(account);
-      this.transactions.set(txData.transactions ?? txData ?? []);
+      const raw: any = await this.accountsService.fetchAccount(this.accountId());
+      const txs: any[] = raw.transactions ?? [];
+      this.account.set({
+        ...raw,
+        totalTransactions: txs.length,
+        totalCredit: (raw.creditTransactions ?? []).reduce((s: number, t: any) => s + Number(t.creditAmount), 0),
+        totalDebit: (raw.debitTransactions ?? []).reduce((s: number, t: any) => s + Number(t.debitAmount), 0),
+      });
+      this.transactions.set(txs);
       this.applyFilters();
     } finally {
       this.loading.set(false);
     }
+  }
+
+  txColor(tx: any): string {
+    return balanceColor(this.account()?.type ?? '', tx.amount);
   }
 
   applyFilters() {

@@ -6,7 +6,7 @@
   @apply flex-col fixed left-0 top-0 bottom-0 overflow-hidden z-[30];
   width: 15rem; /* w-60 — named for clarity in transition */
   background-color: var(--sys-surface);
-  border-right: 1px solid var(--sys-outline-variant);
+  box-shadow: 1px 0 0 color-mix(in srgb, var(--sys-outline-variant) 50%, transparent);
   transition: width 0.2s ease;
 }
 
@@ -14,7 +14,7 @@
 @media (width < 768px) {
   .layout-main {
     margin-left: 0 !important;
-    @apply pb-16;
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -36,7 +36,6 @@
 .sidebar-header {
   @apply flex items-center gap-3 flex-shrink-0 overflow-hidden;
   padding: 1rem;
-  border-bottom: 1px solid var(--sys-outline-variant);
   min-height: 3.5rem;
 }
 
@@ -95,7 +94,6 @@
   @apply flex-shrink-0 flex flex-col;
   gap: 1px;
   padding: 0.5rem;
-  border-top: 1px solid var(--sys-outline-variant);
 }
 
 /* ── User wrap ────────────────────────────────────────────────────────────── */
@@ -184,7 +182,7 @@
   bottom: 0.75rem;
   top: auto;
   right: auto;
-  width: 11rem;
+  width: 13rem;
 }
 
 .user-menu-item {
@@ -199,6 +197,14 @@
 
 .user-menu-item:hover {
   background-color: var(--sys-surface-variant);
+}
+
+.user-menu-item--toggle {
+  cursor: pointer;
+}
+
+.user-menu-item--toggle:hover {
+  background-color: transparent;
 }
 
 .user-menu-item--danger {
@@ -221,26 +227,72 @@
   color: var(--sys-on-surface-variant) !important;
 }
 
-/* ── Bottom navigation (display: flex md:hidden handled by Tailwind in HTML) */
+/* ── Bottom nav profile tab ───────────────────────────────────────────────── */
+.bottom-nav-profile {
+  flex: 1;
+  position: relative;
+  display: flex;
+}
+
+.bottom-nav-profile-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.bottom-nav-avatar {
+  @apply flex items-center justify-center rounded-full font-bold select-none flex-shrink-0;
+  width: 1.375rem;
+  height: 1.375rem;
+  font-size: 0.625rem;
+  background-color: var(--sys-primary);
+  color: var(--sys-on-primary);
+}
+
+/* Menu pops up above the nav, right-aligned to the profile tab */
+.bottom-nav .user-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  left: auto;
+  top: auto;
+  width: 13rem;
+}
+
+/* ── Bottom navigation — liquid glass (display: flex md:hidden handled by Tailwind in HTML) */
 .bottom-nav {
-  @apply fixed bottom-0 left-0 right-0 items-stretch z-[30];
-  background-color: var(--sys-surface);
-  border-top: 1px solid var(--sys-outline-variant);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  @apply fixed z-[30] items-stretch;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+  border-radius: 20px;
+  padding: 0.3125rem;
+  background: light-dark(rgb(255 255 255 / 0.72), rgb(30 32 36 / 0.68));
+  backdrop-filter: blur(3px) saturate(120%);
+  -webkit-backdrop-filter: blur(3px) saturate(120%);
+  border: 1px solid light-dark(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.10));
+  box-shadow:
+    0 8px 32px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.52)),
+    0 2px 8px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.28)),
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.08));
 }
 
 .bottom-nav-item {
   @apply flex-1 flex flex-col items-center no-underline;
-  gap: 3px;
-  padding: 0.5rem 0.25rem;
+  gap: 2px;
+  padding: 0.4375rem 0.25rem;
   justify-content: center;
   color: var(--sys-on-surface-variant);
-  transition: color 0.15s;
-  min-height: 3.5rem;
+  transition: color 0.15s, background-color 0.15s;
+  border-radius: 15px;
+  min-height: 2.75rem;
 }
 
 .bottom-nav-item.active {
   color: var(--sys-primary);
+  background-color: light-dark(color-mix(in srgb, var(--sys-primary) 10%, transparent), color-mix(in srgb, var(--sys-primary) 15%, transparent));
 }
 
 .bottom-nav-label {

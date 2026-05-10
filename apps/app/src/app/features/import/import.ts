@@ -5,8 +5,10 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
+import { ComboboxComponent, ComboboxOption } from '../../shared/components/combobox/combobox';
+import { FileUploadComponent } from '../../shared/components/file-upload/file-upload';
 import { BtnDirective } from '../../shared/directives/btn.directive';
-import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
+import { SelectDirective } from '../../shared/directives/select.directive';
 import { FieldComponent } from '../../shared/components/field/field';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { IconComponent } from '../../shared/components/icon/icon';
@@ -20,6 +22,8 @@ import { IconComponent } from '../../shared/components/icon/icon';
     FormsModule,
     TranslateModule,
     PageHeaderComponent,
+    ComboboxComponent,
+    FileUploadComponent,
     BtnDirective,
     SelectDirective,
     FieldComponent,
@@ -63,7 +67,7 @@ export class ImportComponent implements OnInit {
     }));
   }
 
-  issuerOptions(): SelectOption[] {
+  issuerOptions(): ComboboxOption[] {
     return this.issuers().map((i) => ({ value: i.id, label: i.name }));
   }
 
@@ -88,11 +92,6 @@ export class ImportComponent implements OnInit {
     } finally {
       this.draftsLoading.set(false);
     }
-  }
-
-  onFileChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.file.set(input.files?.[0] ?? null);
   }
 
   async submitImport() {

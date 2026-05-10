@@ -1,21 +1,21 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { balanceColor } from '../../shared/utils/balance-color';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
-import { CategoriesService } from '../../services/categories.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
-import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
 import { FieldComponent } from '../../shared/components/field/field';
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner';
-import { CategoryComboboxComponent } from '../../shared/components/category-combobox/category-combobox';
+import { ComboboxComponent } from '../../shared/components/combobox/combobox';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { PrivacyService } from '../../services/privacy.service';
+import { UiService } from '../../services/ui.service';
 
 @Component({
   selector: 'app-accounts',
@@ -26,35 +26,27 @@ import { PrivacyService } from '../../services/privacy.service';
     PageHeaderComponent,
     BtnDirective,
     InputDirective,
-    SelectDirective,
     FieldComponent,
     ModalComponent,
     SpinnerComponent,
-    CategoryComboboxComponent,
+    ComboboxComponent,
     IconComponent,
   ],
   templateUrl: './accounts.html',
+  styleUrl: './accounts.css',
 })
 export class AccountsComponent implements OnInit {
   accountsService = inject(AccountsService);
-  categoriesService = inject(CategoriesService);
   currencyService = inject(CurrencyService);
   privacyService = inject(PrivacyService);
   toastService = inject(ToastService);
 
+  uiService = inject(UiService);
+
   loading = signal(false);
   submitting = signal(false);
-  showAddAccount = signal(false);
   showCreateTransaction = signal(false);
   accountGroups = signal<any[]>([]);
-
-  newAccount = {
-    name: '',
-    type: 'assets',
-    currency: 'CHF',
-    openingBalance: '',
-    categoryId: '',
-  };
 
   newTransaction = {
     date: new Date().toISOString().split('T')[0],
@@ -64,26 +56,6 @@ export class AccountsComponent implements OnInit {
     amount: '',
   };
 
-  yearOptions = Array.from({ length: 5 }, (_, i) =>
-    String(new Date().getFullYear() - i),
-  );
-
-  accountTypeOptions: SelectOption[] = [
-    { value: 'assets', label: 'Assets' },
-    { value: 'liabilities', label: 'Liabilities' },
-    { value: 'equity', label: 'Equity' },
-    { value: 'income', label: 'Income' },
-    { value: 'expenses', label: 'Expenses' },
-  ];
-
-  currencyOptions: SelectOption[] = [
-    { value: 'CHF', label: 'CHF' },
-    { value: 'EUR', label: 'EUR' },
-    { value: 'USD', label: 'USD' },
-    { value: 'GBP', label: 'GBP' },
-    { value: 'KRW', label: 'KRW' },
-  ];
-
   accountOptions() {
     return this.accountsService.accounts().map((a) => ({
       value: a.id,
@@ -92,13 +64,7 @@ export class AccountsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.categoriesService.fetchCategories();
     this.accountsService.fetchSimple();
-    this.loadData();
-  }
-
-  onYearChange(year: string) {
-    this.accountsService.timeFilter.set(year);
     this.loadData();
   }
 
@@ -142,43 +108,8 @@ export class AccountsComponent implements OnInit {
     }
   }
 
-  balanceClass(type: string): string {
-    switch (type) {
-      case 'assets':
-        return 'text-success';
-      case 'liabilities':
-        return 'text-error';
-      case 'income':
-        return 'text-success';
-      case 'expenses':
-        return 'text-error';
-      default:
-        return 'text-primary';
-    }
-  }
-
-  async submitAddAccount() {
-    if (!this.newAccount.name || !this.newAccount.type) return;
-    this.submitting.set(true);
-    try {
-      await this.accountsService.createAccount({
-        name: this.newAccount.name,
-        type: this.newAccount.type,
-        currency: this.newAccount.currency || 'CHF',
-        openingBalance: this.newAccount.openingBalance
-          ? Number(this.newAccount.openingBalance)
-          : undefined,
-        categoryId: this.newAccount.categoryId || undefined,
-      });
-      this.toastService.success('Account created successfully!');
-      this.showAddAccount.set(false);
-      this.newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', categoryId: '' };
-      await this.loadData();
-    } catch {
-      this.toastService.error('Failed to create account.');
-    } finally {
-      this.submitting.set(false);
-    }
+  balanceClass(type: string, value: number): string {
+    return balanceColor(type, value);
   }
 
   async submitCreateTransaction() {

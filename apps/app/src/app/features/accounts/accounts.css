@@ -1,0 +1,29 @@
+/* ── Account group: page-group only on desktop ───────────────────────────── */
+.accounts-group {
+  /* mobile: plain list, no background */
+}
+
+@media (width >= 1024px) {
+  .accounts-group {
+    background-color: var(--sys-surface);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0));
+  }
+}
+
+/* Section label: flush left to match items (override global 0.25rem padding) */
+.page-section-label {
+  padding-left: 0;
+}
+
+/* Mobile: strip horizontal padding from items (no card to indent from) */
+.accounts-group .page-item {
+  padding-inline: 0;
+}
+
+@media (width >= 1024px) {
+  .accounts-group .page-item {
+    padding-inline: 1rem;
+  }
+}

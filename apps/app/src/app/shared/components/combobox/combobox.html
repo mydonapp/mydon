@@ -1,0 +1,81 @@
+<div class="combobox-wrap">
+  <!-- Trigger -->
+  <button
+    #trigger
+    type="button"
+    class="combobox-trigger"
+    [class.combobox-trigger--open]="isOpen()"
+    [disabled]="disabled()"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-controls]="listboxId"
+    aria-haspopup="listbox"
+    (click)="toggle()"
+    (keydown)="onTriggerKeydown($event)"
+  >
+    <span class="combobox-value" [class.combobox-value--placeholder]="!selectedLabel()">
+      {{ selectedLabel() || placeholder() }}
+    </span>
+    <app-icon
+      name="chevron-down"
+      [size]="15"
+      class="combobox-chevron"
+      [class.combobox-chevron--open]="isOpen()"
+    />
+  </button>
+</div>
+
+<!-- Dropdown — rendered fixed so it escapes any overflow:hidden ancestor -->
+@if (isOpen() && dropdownPos()) {
+  <div
+    class="combobox-dropdown"
+    [id]="listboxId"
+    role="listbox"
+    [style.top.px]="dropdownPos()!.top"
+    [style.left.px]="dropdownPos()!.left"
+    [style.width.px]="dropdownPos()!.width"
+  >
+    <!-- Search -->
+    <div class="combobox-search-row">
+      <app-icon name="search" [size]="13" class="combobox-search-icon" />
+      <input
+        #searchInput
+        type="text"
+        class="combobox-search"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event); activeIndex.set(-1)"
+        (keydown)="onKeydown($event)"
+        placeholder="Search…"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Options -->
+    <div class="combobox-list">
+      @if (filtered().length === 0) {
+        <p class="combobox-empty">No results</p>
+      } @else {
+        @for (opt of filtered(); track opt.value; let i = $index) {
+          <div
+            role="option"
+            [attr.aria-selected]="opt.value === value()"
+            class="combobox-option"
+            [class.combobox-option--active]="i === activeIndex()"
+            [class.combobox-option--selected]="opt.value === value()"
+            (mousedown)="$event.preventDefault()"
+            (click)="select(opt)"
+          >
+            <div class="combobox-option-body">
+              <span class="combobox-option-label">{{ opt.label }}</span>
+              @if (opt.subtitle) {
+                <span class="combobox-option-subtitle">{{ opt.subtitle }}</span>
+              }
+            </div>
+            @if (opt.value === value()) {
+              <app-icon name="check" [size]="14" class="combobox-check" />
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+}

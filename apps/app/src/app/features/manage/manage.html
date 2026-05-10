@@ -2,128 +2,211 @@
   <app-page-header
     [title]="'views.manage.title' | translate"
     [subtitle]="'views.manage.subtitle' | translate"
+    class="mb-6 block"
   />
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Categories -->
-    <div class="surface-elevated rounded-xl border border-outline-variant p-4">
-      <h2 class="font-semibold text-on-surface mb-4">{{ 'views.manage.categories.title' | translate }}</h2>
+  <div class="manage-layout">
 
-      <!-- Add Category -->
-      <div class="flex gap-2 mb-4">
-        <input appInput
-          type="text"
-          [(ngModel)]="newCategoryName"
-          [placeholder]="'views.manage.categories.namePlaceholder' | translate"
-          class="flex-1"
-          (keyup.enter)="createCategory()"
-        />
-        <button appBtn variant="primary" size="sm" [loading]="creatingCat()" (click)="createCategory()">
-          <app-icon name="plus" [size]="16" />
-        </button>
-      </div>
+    <!-- ── Secondary nav ──────────────────────────────────────────────── -->
+    <nav class="manage-nav">
+      <button
+        class="manage-nav-item"
+        [class.manage-nav-item--active]="activeSection() === 'accounts'"
+        (click)="activeSection.set('accounts')"
+      >
+        <app-icon name="credit-card" [size]="16" />
+        {{ 'views.manage.accounts.title' | translate }}
+      </button>
+      <button
+        class="manage-nav-item"
+        [class.manage-nav-item--active]="activeSection() === 'categories'"
+        (click)="activeSection.set('categories')"
+      >
+        <app-icon name="tag" [size]="16" />
+        {{ 'views.manage.categories.title' | translate }}
+      </button>
+    </nav>
 
-      @if (categoriesService.categories().length === 0) {
-        <p class="text-on-surface-variant text-sm text-center py-4">{{ 'views.manage.categories.empty' | translate }}</p>
-      } @else {
-        <div class="space-y-2 max-h-80 overflow-y-auto">
-          @for (cat of categoriesService.categories(); track cat.id) {
-            <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-surface-variant">
-              @if (editingCatId() === cat.id) {
-                <input appInput type="text"
-                  [(ngModel)]="editCatName"
-                  class="flex-1"
-                  (keyup.enter)="saveCategory(cat)"
-                  (keyup.escape)="editingCatId.set(null)"
-                />
-                <button appBtn size="xs" variant="success" [loading]="updatingCat()" (click)="saveCategory(cat)">
-                  <app-icon name="check" [size]="16" />
-                </button>
-                <button appBtn size="xs" variant="ghost" (click)="editingCatId.set(null)">
-                  <app-icon name="x" [size]="16" />
-                </button>
-              } @else {
-                <span class="flex-1 text-sm text-on-surface">{{ cat.name }}</span>
-                <button appBtn size="xs" variant="ghost" (click)="startEditCat(cat)">
-                  <app-icon name="pencil" [size]="16" />
-                </button>
-              }
+    <!-- ── Content area ───────────────────────────────────────────────── -->
+    <div class="manage-content">
+
+      <!-- Accounts section -->
+      @if (activeSection() === 'accounts') {
+        <div class="flex items-center justify-between mb-3">
+          <p class="page-section-label">{{ 'views.manage.accounts.title' | translate }}</p>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-on-surface-variant">{{ 'views.manage.accounts.showInactive' | translate }}</span>
+              <app-toggle
+                [value]="showInactive"
+                size="sm"
+                (valueChange)="showInactive = $event; filterAccounts()"
+              />
             </div>
-          }
+            <button appBtn size="sm" (click)="showAddAccount.set(true)">
+              <app-icon name="plus" [size]="14" class="mr-1" />
+              {{ 'views.accounts.addAccount' | translate }}
+            </button>
+          </div>
         </div>
-      }
-    </div>
 
-    <!-- Accounts -->
-    <div class="surface-elevated rounded-xl border border-outline-variant p-4">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-on-surface">{{ 'views.manage.accounts.title' | translate }}</h2>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-on-surface-variant">{{ 'views.manage.accounts.showInactive' | translate }}</span>
-          <app-toggle
-            [value]="showInactive"
-            size="sm"
-            (valueChange)="showInactive = $event; filterAccounts()"
-          />
-        </div>
-      </div>
-
-      <!-- Type Filter -->
-      <div class="flex gap-1 mb-3 overflow-x-auto">
-        @for (tab of accountTabs; track tab.value) {
-          <button appBtn size="xs"
-            [variant]="activeTab() === tab.value ? 'primary' : 'ghost'"
-            (click)="activeTab.set(tab.value); filterAccounts()"
-          >
-            {{ tab.label | translate }}
-          </button>
-        }
-      </div>
-
-      @if (filteredAccounts().length === 0) {
-        <p class="text-on-surface-variant text-sm text-center py-4">{{ 'views.manage.accounts.empty' | translate }}</p>
-      } @else {
-        <div class="space-y-2 max-h-80 overflow-y-auto">
-          @for (account of filteredAccounts(); track account.id) {
-            <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-surface-variant"
-              [class]="!account.isActive ? 'opacity-60' : ''"
+        <!-- Type filter -->
+        <div class="flex gap-1 mb-3 overflow-x-auto">
+          @for (tab of accountTabs; track tab.value) {
+            <button appBtn size="xs"
+              [variant]="activeTab() === tab.value ? 'primary' : 'ghost'"
+              (click)="activeTab.set(tab.value); filterAccounts()"
             >
-              @if (editingAccId() === account.id) {
-                <input appInput type="text"
-                  [(ngModel)]="editAccName"
-                  class="flex-1"
-                  (keyup.enter)="saveAccount(account)"
-                  (keyup.escape)="editingAccId.set(null)"
-                />
-                <button appBtn size="xs" variant="success" [loading]="updatingAcc()" (click)="saveAccount(account)">
-                  <app-icon name="check" [size]="16" />
-                </button>
-                <button appBtn size="xs" variant="ghost" (click)="editingAccId.set(null)">
-                  <app-icon name="x" [size]="16" />
-                </button>
-              } @else {
-                <div class="flex-1 min-w-0">
-                  <span class="text-sm text-on-surface">{{ account.name }}</span>
-                  <span class="text-xs text-on-surface-variant ml-2">{{ account.type }}</span>
-                  @if (!account.isActive) {
-                    <span class="badge badge--sm ml-1">{{ 'views.manage.accounts.inactive' | translate }}</span>
-                  }
-                </div>
-                <button appBtn size="xs" variant="ghost" (click)="startEditAcc(account)">
-                  <app-icon name="pencil" [size]="16" />
-                </button>
-                <button appBtn size="xs"
-                  [variant]="account.isActive ? 'warning' : 'success'"
-                  [loading]="togglingAcc() === account.id"
-                  (click)="toggleAccount(account)"
-                >
-                  <app-icon [name]="account.isActive ? 'pause' : 'play'" [size]="16" />
-                </button>
-              }
-            </div>
+              {{ tab.label | translate }}
+            </button>
           }
         </div>
+
+        @if (filteredAccounts().length === 0) {
+          <p class="text-on-surface-variant text-sm text-center py-8">{{ 'views.manage.accounts.empty' | translate }}</p>
+        } @else {
+          <div class="page-group">
+            @for (account of filteredAccounts(); track account.id) {
+              <div class="page-item" [class.opacity-60]="!account.isActive">
+                @if (editingAccId() === account.id) {
+                  <input appInput type="text"
+                    [(ngModel)]="editAccName"
+                    class="flex-1"
+                    (keyup.enter)="saveAccount(account)"
+                    (keyup.escape)="editingAccId.set(null)"
+                  />
+                  <button appBtn size="xs" variant="success" [loading]="updatingAcc()" (click)="saveAccount(account)">
+                    <app-icon name="check" [size]="16" />
+                  </button>
+                  <button appBtn size="xs" variant="ghost" (click)="editingAccId.set(null)">
+                    <app-icon name="x" [size]="16" />
+                  </button>
+                } @else {
+                  <div class="flex-1 min-w-0">
+                    <span class="text-sm text-on-surface">{{ account.name }}</span>
+                    <span class="text-xs text-on-surface-variant ml-2">{{ account.type }}</span>
+                    @if (!account.isActive) {
+                      <span class="badge badge--sm ml-1">{{ 'views.manage.accounts.inactive' | translate }}</span>
+                    }
+                  </div>
+                  <button appBtn size="xs" variant="ghost" (click)="startEditAcc(account)">
+                    <app-icon name="pencil" [size]="16" />
+                  </button>
+                  <button appBtn size="xs"
+                    [variant]="account.isActive ? 'warning' : 'success'"
+                    [loading]="togglingAcc() === account.id"
+                    (click)="toggleAccount(account)"
+                  >
+                    <app-icon [name]="account.isActive ? 'pause' : 'play'" [size]="16" />
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
       }
+
+      <!-- Categories section -->
+      @if (activeSection() === 'categories') {
+        <div class="flex items-center justify-between mb-3">
+          <p class="page-section-label">{{ 'views.manage.categories.title' | translate }}</p>
+        </div>
+
+        <!-- Add Category -->
+        <div class="flex gap-2 mb-4">
+          <input appInput
+            type="text"
+            [(ngModel)]="newCategoryName"
+            [placeholder]="'views.manage.categories.namePlaceholder' | translate"
+            class="flex-1"
+            (keyup.enter)="createCategory()"
+          />
+          <button appBtn variant="primary" size="sm" [loading]="creatingCat()" (click)="createCategory()">
+            <app-icon name="plus" [size]="16" />
+          </button>
+        </div>
+
+        @if (categoriesService.categories().length === 0) {
+          <p class="text-on-surface-variant text-sm text-center py-8">{{ 'views.manage.categories.empty' | translate }}</p>
+        } @else {
+          <div class="page-group">
+            @for (cat of categoriesService.categories(); track cat.id) {
+              <div class="page-item">
+                @if (editingCatId() === cat.id) {
+                  <input appInput type="text"
+                    [(ngModel)]="editCatName"
+                    class="flex-1"
+                    (keyup.enter)="saveCategory(cat)"
+                    (keyup.escape)="editingCatId.set(null)"
+                  />
+                  <button appBtn size="xs" variant="success" [loading]="updatingCat()" (click)="saveCategory(cat)">
+                    <app-icon name="check" [size]="16" />
+                  </button>
+                  <button appBtn size="xs" variant="ghost" (click)="editingCatId.set(null)">
+                    <app-icon name="x" [size]="16" />
+                  </button>
+                } @else {
+                  <span class="flex-1 text-sm text-on-surface">{{ cat.name }}</span>
+                  <button appBtn size="xs" variant="ghost" (click)="startEditCat(cat)">
+                    <app-icon name="pencil" [size]="16" />
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+
     </div>
   </div>
 </div>
+
+<!-- Add Account Modal -->
+<app-modal [open]="showAddAccount()" (closed)="showAddAccount.set(false)">
+  <form (ngSubmit)="submitAddAccount()">
+    <h3 class="font-bold text-lg mb-4">
+      {{ 'views.accounts.addAccountForm.title' | translate }}
+    </h3>
+    <div class="space-y-4 mb-4">
+      <app-field [label]="'views.accounts.addAccountForm.accountName.label' | translate" [required]="true">
+        <input appInput name="accountName"
+          [(ngModel)]="newAccount.name"
+          [placeholder]="'views.accounts.addAccountForm.accountName.placeholder' | translate"
+        />
+      </app-field>
+      <app-field [label]="'views.accounts.addAccountForm.accountType.label' | translate" [required]="true">
+        <select appSelect [(ngModel)]="newAccount.type" name="accountType">
+          @for (opt of accountTypeOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </app-field>
+      <app-field [label]="'views.accounts.addAccountForm.currency.label' | translate">
+        <select appSelect [(ngModel)]="newAccount.currency" name="currency">
+          @for (opt of currencyOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </app-field>
+      <app-field [label]="'views.accounts.addAccountForm.openingBalance.label' | translate">
+        <input appInput type="number" name="openingBalance"
+          [(ngModel)]="newAccount.openingBalance"
+        />
+      </app-field>
+      <app-category-combobox
+        [value]="newAccount.categoryId"
+        (valueChange)="newAccount.categoryId = $event"
+        [label]="'views.accounts.addAccountForm.category.label' | translate"
+        [placeholder]="'views.accounts.addAccountForm.category.placeholder' | translate"
+      />
+    </div>
+    <div class="modal-footer">
+      <button appBtn variant="ghost" type="button" (click)="showAddAccount.set(false)">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button appBtn type="submit" [loading]="submitting()">
+        {{ 'views.accounts.addAccountForm.submit.label' | translate }}
+      </button>
+    </div>
+  </form>
+</app-modal>

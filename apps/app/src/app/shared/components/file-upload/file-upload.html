@@ -1,0 +1,27 @@
+<input
+  #fileInput
+  type="file"
+  [accept]="accept()"
+  class="file-upload-hidden"
+  (change)="onInputChange($event)"
+/>
+
+@if (value()) {
+  <div class="file-upload-zone file-upload-zone--filled" (click)="openPicker()">
+    <app-icon name="file-text" [size]="20" class="file-upload-file-icon" />
+    <div class="file-upload-file-info">
+      <span class="file-upload-file-name">{{ value()!.name }}</span>
+      <span class="file-upload-file-size">{{ formatSize(value()!.size) }}</span>
+    </div>
+    <button type="button" class="file-upload-clear" (click)="clear($event)" aria-label="Remove file">
+      <app-icon name="x" [size]="13" />
+    </button>
+  </div>
+} @else {
+  <div class="file-upload-zone" [class.file-upload-zone--drag]="isDragging()" (click)="openPicker()">
+    <app-icon name="upload" [size]="22" class="file-upload-upload-icon" />
+    <p class="file-upload-prompt-text">
+      Drop file here or <span class="file-upload-browse-link">browse</span>
+    </p>
+  </div>
+}

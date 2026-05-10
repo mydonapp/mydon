@@ -15,7 +15,7 @@
       <app-spinner size="lg" />
     </div>
   } @else if (budgets().length === 0) {
-    <div class="surface-elevated rounded-xl border border-outline-variant p-8 text-center">
+    <div class="page-group p-8 text-center">
       <app-icon name="circle-dollar-sign" [size]="48" class="text-on-surface-variant mb-4" />
       <h3 class="font-semibold text-on-surface mb-2">{{ 'views.budgets.noBudgets' | translate }}</h3>
       <p class="text-on-surface-variant text-sm mb-4">{{ 'views.budgets.noBudgetsDescription' | translate }}</p>
@@ -26,7 +26,7 @@
   } @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       @for (budget of budgets(); track budget.id) {
-        <div class="surface-elevated rounded-xl border border-outline-variant p-4 hover:shadow-md transition-shadow">
+        <div class="page-group p-4 hover:bg-surface-variant/30 transition-colors">
           <div class="flex items-start justify-between">
             <div>
               <h3 class="font-semibold text-on-surface">{{ budget.name }}</h3>

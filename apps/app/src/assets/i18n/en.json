@@ -35,9 +35,10 @@
       "importMore": "Import More",
       "importFirst": "Import Your First Transactions",
       "quickActions": "Quick Actions",
-      "importTransactions": "Import Transactions",
-      "manageAccounts": "Manage Accounts",
-      "refresh": "Refresh Data"
+      "spending": "Spending",
+      "cashFlow": "Cash Flow",
+      "vsLastMonth": "vs last month",
+      "incomeMinusExpenses": "Income minus expenses"
     },
     "login": {
       "title": "Login to your account",
@@ -96,6 +97,7 @@
       "addFirstAccount": "Add your first account",
       "addAccount": "Add Account",
       "addTransaction": "Add Transaction",
+      "manageAccounts": "Manage accounts",
       "retirement": "Retirement",
       "addAccountForm": {
         "title": "Add Account",
@@ -378,7 +380,7 @@
         "budgets": "Budgets",
         "manage": "Manage",
         "spendingAnalysis": "Spending Analysis",
-        "importTransactions": "Import Transactions",
+        "importTransactions": "Import",
         "settings": "Settings",
         "logout": "Logout"
       }

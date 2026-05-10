@@ -1,113 +1,139 @@
-<div class="p-4 sm:p-6 lg:p-8">
-  <div class="flex items-center gap-2 mb-6">
-    <a appBtn variant="ghost" size="sm" routerLink="/app/accounts">
-      <app-icon name="arrow-left" [size]="16" />
+<!-- Blurred backdrop: appears on scroll behind button + title (mobile only) -->
+<div class="account-header-backdrop" [class.account-header-backdrop--visible]="isScrolling()"></div>
+
+<!-- Back button: always-fixed glass circle (mobile only) -->
+<a routerLink="/app/accounts" class="account-back-circle">
+  <app-icon name="arrow-left" [size]="18" />
+</a>
+
+<!-- Scrolled title: fades in to the RIGHT of the back button (mobile only) -->
+<div class="account-scroll-title" [class.account-scroll-title--visible]="isScrolled()">
+  {{ account()?.name }}
+</div>
+
+<div class="account-root">
+
+  <!-- ── Left panel: header + stats + filters ──────────────────────────── -->
+  <div class="account-left">
+
+    <!-- Desktop back link -->
+    <a routerLink="/app/accounts"
+      class="hidden lg:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5"
+    >
+      <app-icon name="arrow-left" [size]="14" />
+      {{ 'views.accounts.title' | translate }}
     </a>
-    <div>
-      <h1 class="text-xl font-semibold text-on-surface">{{ account()?.name ?? ('views.account.title' | translate) }}</h1>
-      <p class="text-sm text-on-surface-variant">{{ 'views.account.subtitle' | translate }}</p>
+
+    <!-- Title + subtitle (fades on mobile scroll, always visible on desktop) -->
+    <div class="account-header-block mb-1" [class.account-header-block--hidden]="isScrolled()">
+      <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">
+        {{ account()?.name ?? ('views.account.title' | translate) }}
+      </h1>
+      <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>
     </div>
+
+    @if (account()) {
+      <!-- Stats grid: always 2-col in left panel -->
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        <div class="page-group p-4">
+          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.currentBalance' | translate }}</p>
+          <p class="text-lg font-bold text-primary tabular-nums">
+            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.balance, account()!.currency) }}
+          </p>
+        </div>
+        <div class="page-group p-4">
+          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalTransactions' | translate }}</p>
+          <p class="text-lg font-bold text-on-surface tabular-nums">{{ account()!.totalTransactions }}</p>
+        </div>
+        <div class="page-group p-4">
+          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalCredit' | translate }}</p>
+          <p class="text-lg font-bold text-success tabular-nums">
+            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency) }}
+          </p>
+        </div>
+        <div class="page-group p-4">
+          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalDebit' | translate }}</p>
+          <p class="text-lg font-bold text-error tabular-nums">
+            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-col gap-2 mt-4">
+        <select appSelect class="w-full"
+          [ngModel]="accountsService.timeFilter()"
+          (ngModelChange)="onYearChange($event)"
+        >
+          @for (year of yearOptions; track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+        <input appInput type="text"
+          [(ngModel)]="searchText"
+          (ngModelChange)="applyFilters()"
+          [placeholder]="'common.search' | translate"
+        />
+      </div>
+    }
   </div>
 
-  @if (loading()) {
-    <div class="flex justify-center py-12">
-      <app-spinner size="lg" />
-    </div>
-  } @else if (account()) {
-    <!-- Stats row -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
-        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.currentBalance' | translate }}</p>
-        <p class="text-xl font-bold text-primary tabular-nums">
-          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.balance, account()!.currency) }}
-        </p>
+  <!-- ── Right panel: transaction list ─────────────────────────────────── -->
+  <div class="account-right">
+    @if (loading()) {
+      <div class="flex justify-center py-12">
+        <app-spinner size="lg" />
       </div>
-      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
-        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalTransactions' | translate }}</p>
-        <p class="text-xl font-bold text-on-surface tabular-nums">{{ account()!.totalTransactions }}</p>
+    } @else if (account()) {
+      <div class="flex items-center justify-between mb-1.5">
+        <p class="page-section-label">{{ 'views.account.transactions.title' | translate }}</p>
+        <span class="text-xs text-on-surface-variant">
+          {{ filteredTransactions().length }} {{ 'views.account.transactions.title' | translate | lowercase }}
+        </span>
       </div>
-      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
-        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalCredit' | translate }}</p>
-        <p class="text-xl font-bold text-success tabular-nums">
-          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency) }}
-        </p>
-      </div>
-      <div class="surface-elevated rounded-xl border border-outline-variant p-4">
-        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalDebit' | translate }}</p>
-        <p class="text-xl font-bold text-error tabular-nums">
-          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency) }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="flex items-center gap-3 mb-4">
-      <select appSelect class="w-auto"
-        [ngModel]="accountsService.timeFilter()"
-        (ngModelChange)="onYearChange($event)"
-      >
-        @for (year of yearOptions; track year) {
-          <option [value]="year">{{ year }}</option>
-        }
-      </select>
-      <input appInput type="text"
-        [(ngModel)]="searchText"
-        (ngModelChange)="applyFilters()"
-        [placeholder]="'common.search' | translate"
-        class="flex-1"
-      />
-    </div>
-
-    <!-- Transactions List -->
-    <div class="surface-elevated rounded-xl border border-outline-variant overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-outline-variant">
-        <h2 class="font-semibold text-sm text-on-surface">{{ 'views.account.transactions.title' | translate }}</h2>
-        <span class="text-xs text-on-surface-variant">{{ filteredTransactions().length }} {{ 'views.account.transactions.title' | translate | lowercase }}</span>
-      </div>
-
-      @if (filteredTransactions().length === 0) {
-        <p class="text-on-surface-variant text-center py-12 text-sm">{{ 'views.account.noTransactions' | translate }}</p>
-      } @else {
-        @for (tx of paginatedTransactions(); track tx.id) {
-          <div
-            class="flex items-center gap-4 px-4 py-3 hover:bg-surface-variant border-b border-outline-variant last:border-0 cursor-pointer transition-colors"
-            (click)="selectedTx.set(tx)"
-          >
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
-              <p class="text-xs text-on-surface-variant mt-0.5">
-                {{ tx.date | date:'mediumDate' }}
-                @if (tx.creditAccountId === accountId() ? tx.debitAccountName : tx.creditAccountName; as other) {
-                  · {{ other }}
-                }
-              </p>
-            </div>
-            <span
-              class="text-sm font-semibold tabular-nums flex-shrink-0"
-              [class]="tx.creditAccountId === accountId() ? 'text-success' : 'text-error'"
+      <div class="account-tx-list">
+        @if (filteredTransactions().length === 0) {
+          <p class="text-on-surface-variant text-center py-12 text-sm">{{ 'views.account.noTransactions' | translate }}</p>
+        } @else {
+          @for (tx of paginatedTransactions(); track tx.id) {
+            <div
+              class="page-item hover:bg-surface-variant cursor-pointer transition-colors"
+              (click)="selectedTx.set(tx)"
             >
-              {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, account()!.currency) }}
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
+                <p class="text-xs text-on-surface-variant mt-0.5 truncate">
+                  {{ tx.transactionDate | date:'mediumDate' }}
+                  @if (tx.counterAccount?.name; as other) {
+                    · {{ other }}
+                  }
+                </p>
+              </div>
+              <span class="text-sm font-semibold tabular-nums flex-shrink-0" [class]="txColor(tx)">
+                {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, account()!.currency) }}
+              </span>
+            </div>
+          }
+
+          <!-- Pagination -->
+          <div class="page-item">
+            <span class="text-xs text-on-surface-variant">
+              {{ paginationStart() }}–{{ paginationEnd() }} of {{ filteredTransactions().length }}
             </span>
+            <div class="flex gap-1">
+              <button appBtn size="xs" variant="ghost" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
+                <app-icon name="chevron-left" [size]="16" />
+              </button>
+              <button appBtn size="xs" variant="ghost" [disabled]="paginationEnd() >= filteredTransactions().length" (click)="page.update(p => p + 1)">
+                <app-icon name="chevron-right" [size]="16" />
+              </button>
+            </div>
           </div>
         }
+      </div>
+    }
+  </div>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-between px-4 py-3 border-t border-outline-variant">
-          <span class="text-xs text-on-surface-variant">
-            {{ paginationStart() }}–{{ paginationEnd() }} of {{ filteredTransactions().length }}
-          </span>
-          <div class="flex gap-1">
-            <button appBtn size="xs" variant="ghost" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
-              <app-icon name="chevron-left" [size]="16" />
-            </button>
-            <button appBtn size="xs" variant="ghost" [disabled]="paginationEnd() >= filteredTransactions().length" (click)="page.update(p => p + 1)">
-              <app-icon name="chevron-right" [size]="16" />
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  }
 </div>
 
 <!-- Transaction Detail Modal -->
@@ -117,7 +143,7 @@
     <div class="space-y-3 mb-4">
       <div class="flex justify-between">
         <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.date' | translate }}</span>
-        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.date | date:'mediumDate' }}</span>
+        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.transactionDate | date:'mediumDate' }}</span>
       </div>
       <div class="flex justify-between">
         <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.description' | translate }}</span>

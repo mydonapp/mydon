@@ -1,3 +1,8 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
 .toggle {
   position: relative;
   display: inline-flex;
@@ -6,31 +11,34 @@
   height: 1.5rem;
   border-radius: 9999px;
   background-color: var(--sys-surface-variant);
-  border: 2px solid var(--sys-outline);
+  border: none;
   cursor: pointer;
   padding: 0;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color 0.2s;
   flex-shrink: 0;
 }
 
 .toggle--on {
   background-color: var(--sys-primary);
-  border-color: var(--sys-primary);
 }
 
 .toggle__thumb {
   position: absolute;
-  width: 1rem;
-  height: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.125rem;
+  height: 1.125rem;
   border-radius: 9999px;
-  background-color: var(--sys-outline);
-  left: 0.1rem;
-  transition: left 0.2s, background-color 0.2s;
+  background-color: light-dark(#fff, var(--sys-on-surface-variant));
+  left: 0.1875rem;
+  transition: left 0.2s, background-color 0.15s, transform 0s;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
 }
 
 .toggle--on .toggle__thumb {
-  left: calc(100% - 1.1rem);
+  left: calc(100% - 1.3125rem);
   background-color: var(--sys-on-primary);
+  transform: translateY(-50%);
 }
 
 .toggle:focus-visible {
@@ -46,14 +54,16 @@
 /* sm */
 .toggle--sm {
   width: 2.25rem;
-  height: 1.25rem;
+  height: 1.125rem;
 }
 .toggle--sm .toggle__thumb {
-  width: 0.75rem;
-  height: 0.75rem;
+  width: 0.8125rem;
+  height: 0.8125rem;
+  left: 0.15rem;
 }
 .toggle--sm.toggle--on .toggle__thumb {
-  left: calc(100% - 0.85rem);
+  left: calc(100% - 0.9625rem);
+  transform: translateY(-50%);
 }
 
 /* lg */
@@ -62,9 +72,11 @@
   height: 1.75rem;
 }
 .toggle--lg .toggle__thumb {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.3125rem;
+  height: 1.3125rem;
+  left: 0.21875rem;
 }
 .toggle--lg.toggle--on .toggle__thumb {
-  left: calc(100% - 1.35rem);
+  left: calc(100% - 1.53125rem);
+  transform: translateY(-50%);
 }

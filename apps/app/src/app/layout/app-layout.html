@@ -40,9 +40,19 @@
       <div class="sidebar-user-wrap">
         @if (userMenuOpen()) {
           <div class="user-menu" (click)="$event.stopPropagation()">
+            <div class="user-menu-item user-menu-item--toggle" (click)="privacyService.toggle()">
+              <app-icon [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'" [size]="15" />
+              <span class="flex-1">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</span>
+              <app-toggle [value]="privacyService.isPrivate()" class="pointer-events-none flex-shrink-0" />
+            </div>
+            <div class="user-menu-separator"></div>
             <button class="user-menu-item" (click)="goToSettings()">
               <app-icon name="settings" [size]="15" />
               <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
+            </button>
+            <button class="user-menu-item" (click)="goToManage()">
+              <app-icon name="settings-2" [size]="15" />
+              <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
             </button>
             <div class="user-menu-separator"></div>
             <button class="user-menu-item user-menu-item--danger" (click)="logout()">
@@ -111,6 +121,37 @@
         <span class="bottom-nav-label">{{ item.label | translate }}</span>
       </a>
     }
+
+    <!-- Profile / user menu -->
+    <div class="bottom-nav-profile">
+      @if (userMenuOpen()) {
+        <div class="user-menu" (click)="$event.stopPropagation()">
+          <button class="user-menu-item" (click)="goToSettings()">
+            <app-icon name="settings" [size]="15" />
+            <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
+          </button>
+          <button class="user-menu-item" (click)="goToManage()">
+            <app-icon name="settings-2" [size]="15" />
+            <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
+          </button>
+          <div class="user-menu-separator"></div>
+          <button class="user-menu-item user-menu-item--danger" (click)="logout()">
+            <app-icon name="log-out" [size]="15" />
+            <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
+          </button>
+        </div>
+      }
+      <button
+        class="bottom-nav-item bottom-nav-profile-btn"
+        (click)="toggleUserMenu($event)"
+        [class.active]="userMenuOpen()"
+        [attr.aria-expanded]="userMenuOpen()"
+        aria-haspopup="menu"
+      >
+        <div class="bottom-nav-avatar">{{ userInitial() }}</div>
+        <span class="bottom-nav-label">{{ userFirstName() || ('app.user' | translate) }}</span>
+      </button>
+    </div>
   </nav>
 
   <app-toast-container />

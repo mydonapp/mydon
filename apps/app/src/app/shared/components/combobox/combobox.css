@@ -1,0 +1,168 @@
+/* ── Wrapper ─────────────────────────────────────────────────────────────── */
+.combobox-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Trigger button ──────────────────────────────────────────────────────── */
+.combobox-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--sys-outline-variant);
+  background-color: var(--sys-surface);
+  color: var(--sys-on-surface);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-height: 2.375rem;
+}
+
+.combobox-trigger:focus-visible,
+.combobox-trigger--open {
+  outline: none;
+  border-color: var(--sys-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sys-primary) 20%, transparent);
+}
+
+.combobox-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Value / placeholder ─────────────────────────────────────────────────── */
+.combobox-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combobox-value--placeholder {
+  color: var(--sys-on-surface-variant);
+}
+
+/* ── Chevron ─────────────────────────────────────────────────────────────── */
+.combobox-chevron {
+  flex-shrink: 0;
+  color: var(--sys-on-surface-variant);
+  transition: transform 0.15s ease;
+}
+
+.combobox-chevron--open {
+  transform: rotate(180deg);
+}
+
+/* ── Dropdown panel ──────────────────────────────────────────────────────── */
+.combobox-dropdown {
+  position: fixed;
+  z-index: 200;
+  background-color: var(--sys-surface);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.12),
+    0 2px 8px rgb(0 0 0 / 0.06),
+    0 0 0 1px var(--sys-outline-variant);
+}
+
+/* ── Search row ──────────────────────────────────────────────────────────── */
+.combobox-search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--sys-outline-variant);
+}
+
+.combobox-search-icon {
+  flex-shrink: 0;
+  color: var(--sys-on-surface-variant);
+}
+
+.combobox-search {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.8125rem;
+  color: var(--sys-on-surface);
+  font-family: inherit;
+}
+
+.combobox-search::placeholder {
+  color: var(--sys-on-surface-variant);
+}
+
+/* ── Option list ─────────────────────────────────────────────────────────── */
+.combobox-list {
+  max-height: 14rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sys-outline-variant) transparent;
+}
+
+/* ── Option row ──────────────────────────────────────────────────────────── */
+.combobox-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.625rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.combobox-option:hover,
+.combobox-option--active {
+  background-color: var(--sys-surface-variant);
+}
+
+.combobox-option--selected .combobox-option-label {
+  color: var(--sys-primary);
+  font-weight: 500;
+}
+
+/* ── Option body ─────────────────────────────────────────────────────────── */
+.combobox-option-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.combobox-option-label {
+  font-size: 0.875rem;
+  color: var(--sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combobox-option-subtitle {
+  font-size: 0.75rem;
+  color: var(--sys-on-surface-variant);
+  margin-top: 1px;
+}
+
+/* ── Checkmark ───────────────────────────────────────────────────────────── */
+.combobox-check {
+  flex-shrink: 0;
+  color: var(--sys-primary);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.combobox-empty {
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--sys-on-surface-variant);
+}

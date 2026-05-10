@@ -132,6 +132,12 @@ export class AccountsService {
     );
   }
 
+  async fetchRecentTransactions(): Promise<any[]> {
+    return firstValueFrom(
+      this.http.get<any[]>(`${environment.apiUrl}/v1/transactions`),
+    );
+  }
+
   async fetchDraftTransactions(): Promise<any[]> {
     return firstValueFrom(
       this.http.get<any[]>(`${environment.apiUrl}/v1/transactions?filter=draft`),

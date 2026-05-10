@@ -1,0 +1,176 @@
+/* ── Root: mobile stack → desktop two-column grid ─────────────────────────── */
+.account-root {
+  /* top padding aligns with the fixed back button top */
+  padding: calc(env(safe-area-inset-top, 0px) + 0.625rem) 1rem 1rem;
+}
+
+@media (width >= 640px) {
+  .account-root {
+    padding: calc(env(safe-area-inset-top, 0px) + 0.625rem) 1.5rem 1.5rem;
+  }
+}
+
+@media (width >= 1024px) {
+  .account-root {
+    display: grid;
+    grid-template-columns: 22rem 1fr;
+    align-items: start;
+    gap: 2rem;
+    padding: 2rem;
+  }
+}
+
+/* ── Left panel: sticky on desktop ───────────────────────────────────────── */
+/* min-width: 0 prevents grid children from exceeding their track */
+.account-left,
+.account-right {
+  min-width: 0;
+}
+
+@media (width >= 1024px) {
+  .account-left {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+/* ── Header block: sits beside the fixed back button on mobile ───────────── */
+
+/* Indent to clear the fixed circle (left: 0.75rem, size: 1.75rem, gap: 0.5rem) */
+@media (width < 640px) {
+  .account-header-block {
+    /* circle right edge (3rem) − root padding (1rem) + gap (0.5rem) */
+    margin-left: 2.5rem;
+    padding-top: 0.125rem;
+  }
+}
+
+@media (width >= 640px) and (width < 1024px) {
+  .account-header-block {
+    /* circle right edge (3rem) − root padding (1.5rem) + gap (0.5rem) */
+    margin-left: 2rem;
+    padding-top: 0.125rem;
+  }
+}
+
+.account-header-block {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.account-header-block--hidden {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+/* Never hide on desktop */
+@media (width >= 1024px) {
+  .account-header-block--hidden {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}
+
+/* ── Blurred backdrop: full-width bar behind button + title on scroll ────── */
+.account-header-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top, 0px) + 3.5rem);
+  z-index: 38;
+  background: linear-gradient(to bottom, rgb(240 242 245 / 1) 0%, rgb(240 242 245 / 0.95) 70%, rgb(240 242 245 / 0) 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .account-header-backdrop {
+    background: linear-gradient(to bottom, rgb(17 19 22 / 1) 0%, rgb(17 19 22 / 0.95) 70%, rgb(17 19 22 / 0) 100%);
+  }
+}
+
+.account-header-backdrop--visible {
+  opacity: 1;
+}
+
+@media (width >= 1024px) {
+  .account-header-backdrop { display: none; }
+}
+
+/* ── Fixed glass circle: always-visible back button (mobile only) ────────── */
+.account-back-circle {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+  left: 0.75rem;
+  z-index: 40;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sys-on-surface);
+  text-decoration: none;
+  flex-shrink: 0;
+  background: light-dark(rgb(255 255 255 / 0.72), rgb(30 32 36 / 0.68));
+  backdrop-filter: blur(3px) saturate(120%);
+  -webkit-backdrop-filter: blur(3px) saturate(120%);
+  border: 1px solid light-dark(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.10));
+  box-shadow: 0 2px 8px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.36));
+  transition: background-color 0.15s;
+}
+
+.account-back-circle:hover {
+  background: light-dark(rgb(255 255 255 / 0.90), rgb(40 43 48 / 0.80));
+}
+
+@media (width >= 1024px) {
+  .account-back-circle { display: none; }
+}
+
+/* ── Transaction list: page-group only on desktop ────────────────────────── */
+.account-tx-list {
+  /* mobile: plain list, no background */
+}
+
+@media (width >= 1024px) {
+  .account-tx-list {
+    background-color: var(--sys-surface);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0));
+  }
+}
+
+/* ── Scrolled title: plain text to the RIGHT of the back circle ──────────── */
+/* left = circle left (0.75rem) + circle width (2.25rem) + gap (0.625rem) */
+.account-scroll-title {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 0.625rem);
+  left: 3.625rem;
+  right: 1rem;
+  z-index: 40;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.account-scroll-title--visible {
+  opacity: 1;
+}
+
+@media (width >= 1024px) {
+  .account-scroll-title { display: none; }
+}

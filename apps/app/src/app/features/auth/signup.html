@@ -1,11 +1,11 @@
 <div class="min-h-screen bg-background flex items-center justify-center p-4">
-  <div class="surface-elevated rounded-xl border border-outline-variant shadow-md w-full max-w-md p-8">
-    <div class="text-center mb-6">
+  <div class="surface-elevated rounded-xl w-full max-w-md p-8 sm:p-10">
+    <div class="text-center mb-8">
       <div class="flex items-center justify-center bg-primary text-on-primary rounded-xl w-16 h-16 mx-auto mb-4">
         <span class="text-2xl font-bold">D</span>
       </div>
       <h1 class="text-2xl font-bold text-primary">myDon</h1>
-      <p class="text-on-surface-variant text-sm">{{ 'views.signup.title' | translate }}</p>
+      <p class="text-on-surface-variant text-sm mt-1">{{ 'views.signup.title' | translate }}</p>
     </div>
 
     <form (ngSubmit)="onSubmit()">
@@ -41,7 +41,7 @@
       </div>
     </form>
 
-    <hr class="border-outline-variant my-4" />
+    <div class="h-px bg-outline-variant/50 my-6"></div>
     <p class="text-center text-sm text-on-surface-variant">
       {{ 'views.signup.loginPrompt.text' | translate }}
       <a routerLink="/auth/login" class="text-primary hover:underline ml-1">

@@ -5,17 +5,17 @@
       [subtitle]="budget()?.year?.toString() ?? ''"
     />
     <div class="flex gap-2">
-      <div class="flex border border-outline-variant rounded-lg overflow-hidden">
+      <div class="segmented-control">
         <button
-          class="px-3 py-1 text-sm transition-colors"
-          [class]="viewType() === 'yearly' ? 'bg-primary text-on-primary' : 'bg-surface text-on-surface-variant'"
+          class="segmented-btn"
+          [class.segmented-btn--active]="viewType() === 'yearly'"
           (click)="viewType.set('yearly'); loadProgress()"
         >
           {{ 'views.budgets.yearlyView' | translate }}
         </button>
         <button
-          class="px-3 py-1 text-sm transition-colors"
-          [class]="viewType() === 'monthly' ? 'bg-primary text-on-primary' : 'bg-surface text-on-surface-variant'"
+          class="segmented-btn"
+          [class.segmented-btn--active]="viewType() === 'monthly'"
           (click)="viewType.set('monthly'); loadProgress()"
         >
           {{ 'views.budgets.monthlyView' | translate }}
@@ -47,7 +47,7 @@
   } @else {
     <div class="space-y-4">
       @for (item of progressItems(); track item.id) {
-        <div class="surface-elevated rounded-xl border border-outline-variant p-4">
+        <div class="page-group p-4">
           <div class="flex items-center justify-between mb-2">
             <h3 class="font-medium text-on-surface">{{ item.name }}</h3>
             <div class="text-right">
@@ -80,7 +80,7 @@
         </div>
       }
       @if (progressItems().length === 0) {
-        <div class="surface-elevated rounded-xl border border-outline-variant p-8 text-center">
+        <div class="page-group p-8 text-center">
           <p class="text-on-surface-variant">{{ 'views.budgets.budgetItems.noItems' | translate }}</p>
         </div>
       }

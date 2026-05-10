@@ -1,0 +1,73 @@
+/* ── Two-column layout: nav | content ───────────────────────────────────── */
+.manage-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (width >= 1024px) {
+  .manage-layout {
+    display: grid;
+    grid-template-columns: 13rem 1fr;
+    align-items: start;
+    gap: 1.5rem;
+  }
+}
+
+/* ── Secondary nav ───────────────────────────────────────────────────────── */
+.manage-nav {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  overflow-x: auto;
+}
+
+@media (width >= 1024px) {
+  .manage-nav {
+    flex-direction: column;
+    gap: 0.125rem;
+    position: sticky;
+    top: 1.5rem;
+    background-color: var(--sys-surface);
+    border-radius: 14px;
+    padding: 0.375rem;
+    box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0));
+    overflow: visible;
+  }
+}
+
+.manage-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--sys-on-surface-variant);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.manage-nav-item:hover {
+  background-color: var(--sys-surface-variant);
+  color: var(--sys-on-surface);
+}
+
+.manage-nav-item--active {
+  background-color: var(--sys-primary-container);
+  color: var(--sys-on-primary-container);
+}
+
+.manage-nav-item--active:hover {
+  background-color: var(--sys-primary-container);
+}
+
+/* ── Content area ────────────────────────────────────────────────────────── */
+.manage-content {
+  min-width: 0;
+}

@@ -12,9 +12,9 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import {
   LUCIDE_ICONS, LucideIconProvider,
   LayoutDashboard, Wallet, CircleDollarSign, Settings2, FileText, Settings,
-  LogOut, Eye, Menu, ChevronRight, ChevronLeft, ChevronUp, FileUp, CreditCard, Building,
-  Upload, Bot, ArrowLeftRight, Trash2, Download, ArrowLeft, RefreshCw,
-  Plus, Check, X, Pencil, Pause, Play,
+  LogOut, Eye, EyeOff, Menu, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, FileUp, CreditCard, Building,
+  Upload, Bot, ArrowLeftRight, ArrowRight, Trash2, Download, ArrowLeft, RefreshCw,
+  Plus, Check, X, Pencil, Pause, Play, Search, AlignJustify, LayoutList, Tag,
 } from 'lucide-angular';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -37,9 +37,9 @@ export const appConfig: ApplicationConfig = {
       multi: true,
       useValue: new LucideIconProvider({
         LayoutDashboard, Wallet, CircleDollarSign, Settings2, FileText, Settings,
-        LogOut, Eye, Menu, ChevronRight, ChevronLeft, ChevronUp, FileUp, CreditCard, Building,
-        Upload, Bot, ArrowLeftRight, Trash2, Download, ArrowLeft, RefreshCw,
-        Plus, Check, X, Pencil, Pause, Play,
+        LogOut, Eye, EyeOff, Search, Menu, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, FileUp, CreditCard, Building,
+        Upload, Bot, ArrowLeftRight, ArrowRight, Trash2, Download, ArrowLeft, RefreshCw,
+        Plus, Check, X, Pencil, Pause, Play, AlignJustify, LayoutList, Tag,
       }),
     },
   ],

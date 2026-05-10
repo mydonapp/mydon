@@ -11,24 +11,25 @@
       </p>
     </div>
 
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-6">
 
       <!-- Profile -->
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <h2 class="settings-card-title">{{ 'views.settings.sections.profile.title' | translate }}</h2>
-        </div>
-        <div class="settings-card-body">
-          <div class="flex flex-col gap-3">
+      <div>
+        <p class="page-section-label">{{ 'views.settings.sections.profile.title' | translate }}</p>
+        <div class="page-group p-4">
+          <div class="space-y-4">
             <app-field [label]="'views.settings.sections.profile.name' | translate">
-              <input appInput name="profileName"
+              <input appInput
+                name="profileName"
                 [ngModel]="name()"
                 (ngModelChange)="name.set($event)"
                 [placeholder]="'views.settings.sections.profile.namePlaceholder' | translate"
               />
             </app-field>
             <app-field [label]="'views.settings.sections.profile.email' | translate">
-              <input appInput type="email" name="profileEmail"
+              <input appInput
+                type="email"
+                name="profileEmail"
                 [ngModel]="email()"
                 (ngModelChange)="email.set($event)"
                 [placeholder]="'views.settings.sections.profile.emailPlaceholder' | translate"
@@ -36,7 +37,7 @@
             </app-field>
           </div>
         </div>
-        <div class="settings-card-footer">
+        <div class="flex justify-end pt-2.5">
           <button appBtn variant="primary" size="sm" [loading]="savingProfile()" (click)="saveProfile()">
             {{ 'views.settings.sections.profile.updateButton' | translate }}
           </button>
@@ -44,15 +45,11 @@
       </div>
 
       <!-- Appearance -->
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <h2 class="settings-card-title">{{ 'views.settings.sections.appearance.title' | translate }}</h2>
-        </div>
-        <div class="settings-card-body">
-          <div class="settings-row">
-            <div>
-              <p class="settings-row-label">{{ 'views.settings.sections.appearance.theme' | translate }}</p>
-            </div>
+      <div>
+        <p class="page-section-label">{{ 'views.settings.sections.appearance.title' | translate }}</p>
+        <div class="page-group">
+          <div class="page-item">
+            <span class="settings-item-label">{{ 'views.settings.sections.appearance.theme' | translate }}</span>
             <div class="segmented-control">
               @for (opt of themeOptions; track opt.value) {
                 <button
@@ -69,11 +66,9 @@
       </div>
 
       <!-- Language -->
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <h2 class="settings-card-title">{{ 'views.settings.sections.language.title' | translate }}</h2>
-        </div>
-        <div class="settings-card-body">
+      <div>
+        <p class="page-section-label">{{ 'views.settings.sections.language.title' | translate }}</p>
+        <div class="page-group p-4">
           <app-field [label]="'views.settings.sections.language.currentLanguage' | translate">
             <select appSelect
               [ngModel]="languageService.currentLanguage()"
@@ -89,15 +84,13 @@
       </div>
 
       <!-- Privacy -->
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <h2 class="settings-card-title">{{ 'views.settings.sections.privacy.title' | translate }}</h2>
-        </div>
-        <div class="settings-card-body">
-          <div class="settings-row">
+      <div>
+        <p class="page-section-label">{{ 'views.settings.sections.privacy.title' | translate }}</p>
+        <div class="page-group">
+          <div class="page-item">
             <div>
-              <p class="settings-row-label">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</p>
-              <p class="settings-row-description">{{ 'views.settings.sections.privacy.privacyModeDescription' | translate }}</p>
+              <p class="settings-item-label">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</p>
+              <p class="settings-item-description">{{ 'views.settings.sections.privacy.privacyModeDescription' | translate }}</p>
             </div>
             <app-toggle
               [value]="privacyService.isPrivate()"
@@ -108,13 +101,13 @@
       </div>
 
       <!-- Export -->
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <h2 class="settings-card-title">{{ 'views.settings.sections.export.title' | translate }}</h2>
-          <p class="settings-card-description">{{ 'views.settings.sections.export.exportDescription' | translate }}</p>
-        </div>
-        <div class="settings-card-footer">
-          <button appBtn variant="secondary" size="sm" [loading]="exporting()" (click)="exportData()">
+      <div>
+        <p class="page-section-label">{{ 'views.settings.sections.export.title' | translate }}</p>
+        <div class="page-group p-4">
+          <p class="text-sm mb-4" style="color: var(--sys-on-surface-variant);">
+            {{ 'views.settings.sections.export.exportDescription' | translate }}
+          </p>
+          <button appBtn variant="secondary" [loading]="exporting()" (click)="exportData()">
             <app-icon name="download" [size]="15" />
             {{ 'views.settings.sections.export.exportButton' | translate }}
           </button>
@@ -122,13 +115,11 @@
       </div>
 
       <!-- About -->
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <h2 class="settings-card-title">{{ 'views.settings.sections.about.title' | translate }}</h2>
-        </div>
-        <div class="settings-card-body">
-          <div class="settings-row">
-            <span class="settings-row-description">{{ 'views.settings.sections.about.version' | translate }}</span>
+      <div>
+        <p class="page-section-label">{{ 'views.settings.sections.about.title' | translate }}</p>
+        <div class="page-group">
+          <div class="page-item">
+            <span class="settings-item-label">{{ 'views.settings.sections.about.version' | translate }}</span>
             <span class="text-sm font-medium" style="color: var(--sys-on-surface);">0.0.2</span>
           </div>
         </div>
