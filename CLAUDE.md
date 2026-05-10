@@ -93,6 +93,10 @@ layout/app-layout.ts            # sidebar + router-outlet shell
 
 **Styling**: Tailwind CSS v4 via `@tailwindcss/postcss`. DaisyUI component classes (`btn`, `card`, `modal`, `alert`, `toggle`, etc.) are defined in `apps/app/src/styles.css`. RemixIcon used for icons: `<i class="ri-icon-name">`.
 
+## Design System
+
+All UI decisions — color tokens, typography, spacing, component patterns, dark mode rules, and what to avoid — are documented in [`DESIGN.md`](./DESIGN.md). Read it before making any frontend changes.
+
 ## Key Conventions
 
 **Double-entry bookkeeping**: Every `Transaction` has exactly one credit account and one debit account. Never create single-sided entries.
