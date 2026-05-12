@@ -3,5 +3,9 @@ export interface Context {
     id: string;
     email: string;
     name: string;
+    language: string;
+    theme: string;
+    listStyle: string;
+    privacyMode: boolean;
   };
 }

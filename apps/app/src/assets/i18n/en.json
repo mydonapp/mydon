@@ -272,7 +272,10 @@
           "theme": "Color Theme",
           "light": "Light",
           "dark": "Dark",
-          "system": "System"
+          "system": "System",
+          "listStyle": "List Style",
+          "listStyleNormal": "Normal",
+          "listStyleCompact": "Compact"
         },
         "export": {
           "title": "Data Export",
@@ -303,9 +306,16 @@
       "deleteError": "Failed to delete budget.",
       "addBudgetForm": {
         "title": "New Budget",
-        "name": { "label": "Budget Name", "placeholder": "e.g. Conservative 2026" },
-        "year": { "label": "Year" },
-        "submit": { "label": "Create" },
+        "name": {
+          "label": "Budget Name",
+          "placeholder": "e.g. Conservative 2026"
+        },
+        "year": {
+          "label": "Year"
+        },
+        "submit": {
+          "label": "Create"
+        },
         "success": "Budget created!",
         "error": "Failed to create budget."
       },
@@ -324,7 +334,9 @@
           "category": "Category",
           "account": "Account"
         },
-        "amount": { "label": "Amount" },
+        "amount": {
+          "label": "Amount"
+        },
         "frequency": {
           "label": "Frequency",
           "monthly": "Monthly",

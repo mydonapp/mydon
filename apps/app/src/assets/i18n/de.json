@@ -266,7 +266,10 @@
           "theme": "Farbschema",
           "light": "Hell",
           "dark": "Dunkel",
-          "system": "System"
+          "system": "System",
+          "listStyle": "Listenstil",
+          "listStyleNormal": "Normal",
+          "listStyleCompact": "Kompakt"
         },
         "export": {
           "title": "Datenexport",
@@ -297,9 +300,16 @@
       "deleteError": "Budget konnte nicht gelöscht werden.",
       "addBudgetForm": {
         "title": "Neues Budget",
-        "name": { "label": "Budgetname", "placeholder": "z.B. Konservativ 2026" },
-        "year": { "label": "Jahr" },
-        "submit": { "label": "Erstellen" },
+        "name": {
+          "label": "Budgetname",
+          "placeholder": "z.B. Konservativ 2026"
+        },
+        "year": {
+          "label": "Jahr"
+        },
+        "submit": {
+          "label": "Erstellen"
+        },
         "success": "Budget erstellt!",
         "error": "Budget konnte nicht erstellt werden."
       },
@@ -318,7 +328,9 @@
           "category": "Kategorie",
           "account": "Konto"
         },
-        "amount": { "label": "Betrag" },
+        "amount": {
+          "label": "Betrag"
+        },
         "frequency": {
           "label": "Häufigkeit",
           "monthly": "Monatlich",

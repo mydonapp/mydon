@@ -1,7 +1,7 @@
-import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { AppConfigService } from './app-config.service';
 
 export interface AccountSimple {
   id: string;
@@ -42,15 +42,14 @@ export interface Transaction {
 @Injectable({ providedIn: 'root' })
 export class AccountsService {
   private http = inject(HttpClient);
+  private appConfig = inject(AppConfigService);
 
   accounts = signal<AccountSimple[]>([]);
   timeFilter = signal(new Date().getFullYear().toString());
 
   async fetchSimple(): Promise<void> {
     const accounts = await firstValueFrom(
-      this.http.get<AccountSimple[]>(
-        `${environment.apiUrl}/v1/accounts?list=true`,
-      ),
+      this.http.get<AccountSimple[]>(`${this.appConfig.apiUrl}/v1/accounts?list=true`),
     );
     this.accounts.set(accounts);
   }
@@ -60,9 +59,7 @@ export class AccountsService {
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
     const query = new URLSearchParams({ from, to, ...params }).toString();
-    return firstValueFrom(
-      this.http.get<any>(`${environment.apiUrl}/v1/accounts?${query}`),
-    );
+    return firstValueFrom(this.http.get<any>(`${this.appConfig.apiUrl}/v1/accounts?${query}`));
   }
 
   async fetchAccount(id: string): Promise<AccountDetail> {
@@ -70,24 +67,17 @@ export class AccountsService {
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
     return firstValueFrom(
-      this.http.get<AccountDetail>(
-        `${environment.apiUrl}/v1/accounts/${id}?from=${from}&to=${to}`,
-      ),
+      this.http.get<AccountDetail>(`${this.appConfig.apiUrl}/v1/accounts/${id}?from=${from}&to=${to}`),
     );
   }
 
-  async fetchTransactions(
-    accountId: string,
-    params?: Record<string, string>,
-  ): Promise<any> {
+  async fetchTransactions(accountId: string, params?: Record<string, string>): Promise<any> {
     const year = this.timeFilter();
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
     const query = new URLSearchParams({ from, to, ...params }).toString();
     return firstValueFrom(
-      this.http.get<any>(
-        `${environment.apiUrl}/v1/accounts/${accountId}/transactions?${query}`,
-      ),
+      this.http.get<any>(`${this.appConfig.apiUrl}/v1/accounts/${accountId}/transactions?${query}`),
     );
   }
 
@@ -98,9 +88,7 @@ export class AccountsService {
     openingBalance?: number;
     categoryId?: string;
   }): Promise<void> {
-    await firstValueFrom(
-      this.http.post(`${environment.apiUrl}/v1/accounts`, account),
-    );
+    await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/accounts`, account));
     await this.fetchSimple();
   }
 
@@ -114,9 +102,7 @@ export class AccountsService {
       categoryId: string;
     }>,
   ): Promise<void> {
-    await firstValueFrom(
-      this.http.patch(`${environment.apiUrl}/v1/accounts/${id}`, data),
-    );
+    await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/accounts/${id}`, data));
     await this.fetchSimple();
   }
 
@@ -127,28 +113,22 @@ export class AccountsService {
     debitAccountId: string;
     amount: number;
   }): Promise<void> {
-    await firstValueFrom(
-      this.http.post(`${environment.apiUrl}/v1/transactions`, data),
-    );
+    await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions`, data));
   }
 
   async fetchRecentTransactions(): Promise<any[]> {
-    return firstValueFrom(
-      this.http.get<any[]>(`${environment.apiUrl}/v1/transactions`),
-    );
+    return firstValueFrom(this.http.get<any[]>(`${this.appConfig.apiUrl}/v1/transactions`));
   }
 
   async fetchDraftTransactions(): Promise<any[]> {
-    return firstValueFrom(
-      this.http.get<any[]>(`${environment.apiUrl}/v1/transactions?filter=draft`),
-    );
+    return firstValueFrom(this.http.get<any[]>(`${this.appConfig.apiUrl}/v1/transactions?filter=draft`));
   }
 
   async approveDraftTransactions(ids: string[]): Promise<void> {
     await Promise.all(
       ids.map((id) =>
         firstValueFrom(
-          this.http.patch(`${environment.apiUrl}/v1/transactions/${id}`, {
+          this.http.patch(`${this.appConfig.apiUrl}/v1/transactions/${id}`, {
             draft: false,
           }),
         ),
@@ -157,46 +137,27 @@ export class AccountsService {
   }
 
   async updateDraftTransaction(id: string, data: any): Promise<void> {
-    await firstValueFrom(
-      this.http.patch(`${environment.apiUrl}/v1/transactions/${id}`, data),
-    );
+    await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/transactions/${id}`, data));
   }
 
   async deleteDraftTransaction(id: string): Promise<void> {
-    await firstValueFrom(
-      this.http.delete(`${environment.apiUrl}/v1/transactions/${id}`),
-    );
+    await firstValueFrom(this.http.delete(`${this.appConfig.apiUrl}/v1/transactions/${id}`));
   }
 
-  async importTransactions(
-    accountId: string,
-    issuerId: string,
-    file: File,
-  ): Promise<void> {
+  async importTransactions(accountId: string, issuerId: string, file: File): Promise<void> {
     const formData = new FormData();
     formData.append('accountId', accountId);
     formData.append('issuerId', issuerId);
     formData.append('file', file);
-    await firstValueFrom(
-      this.http.post(
-        `${environment.apiUrl}/v1/transactions/import`,
-        formData,
-      ),
-    );
+    await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions/import`, formData));
   }
 
   async fetchIssuers(): Promise<any[]> {
-    return firstValueFrom(
-      this.http.get<any[]>(`${environment.apiUrl}/v1/transactions/issuers`),
-    );
+    return firstValueFrom(this.http.get<any[]>(`${this.appConfig.apiUrl}/v1/transactions/issuers`));
   }
 
   async fetchSpendingAnalysis(params: Record<string, string>): Promise<any> {
     const query = new URLSearchParams(params).toString();
-    return firstValueFrom(
-      this.http.get<any>(
-        `${environment.apiUrl}/v1/transactions/analysis?${query}`,
-      ),
-    );
+    return firstValueFrom(this.http.get<any>(`${this.appConfig.apiUrl}/v1/transactions/analysis?${query}`));
   }
 }

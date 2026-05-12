@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { AppConfigService } from './app-config.service';
 
 interface TokenResponse {
   accessToken: string;
@@ -13,13 +13,14 @@ interface TokenResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private appConfig = inject(AppConfigService);
 
   private accessToken: string | null = null;
   private accessTokenExpiry: Date | null = null;
   private initialized = false;
 
   private get apiUrl() {
-    return environment.apiUrl;
+    return this.appConfig.apiUrl;
   }
 
   getAccessToken(): string | null {
@@ -43,11 +44,7 @@ export class AuthService {
   async fetchAccessToken(): Promise<void> {
     try {
       const res = await firstValueFrom(
-        this.http.post<TokenResponse>(
-          `${this.apiUrl}/v1/auth/refresh`,
-          {},
-          { withCredentials: true },
-        ),
+        this.http.post<TokenResponse>(`${this.apiUrl}/v1/auth/refresh`, {}, { withCredentials: true }),
       );
       this.setToken(res.accessToken, res.expiry);
     } catch {
@@ -86,13 +83,7 @@ export class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await firstValueFrom(
-        this.http.post(
-          `${this.apiUrl}/v1/auth/logout`,
-          {},
-          { withCredentials: true },
-        ),
-      );
+      await firstValueFrom(this.http.post(`${this.apiUrl}/v1/auth/logout`, {}, { withCredentials: true }));
     } finally {
       this.accessToken = null;
       this.accessTokenExpiry = null;
@@ -100,10 +91,7 @@ export class AuthService {
     }
   }
 
-  async changePassword(
-    currentPassword: string,
-    newPassword: string,
-  ): Promise<void> {
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
     await firstValueFrom(
       this.http.put(
         `${this.apiUrl}/v1/auth/account/password`,

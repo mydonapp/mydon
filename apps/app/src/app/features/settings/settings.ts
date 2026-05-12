@@ -7,6 +7,7 @@ import { PrivacyService } from '../../services/privacy.service';
 import { ExportService } from '../../services/export.service';
 import { ToastService } from '../../services/toast.service';
 import { ThemeService } from '../../services/theme.service';
+import { ListStyleService } from '../../services/list-style.service';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
@@ -30,12 +31,13 @@ import { IconComponent } from '../../shared/components/icon/icon';
   ],
 })
 export class SettingsComponent implements OnInit {
-  private userService = inject(UserService);
-  languageService = inject(LanguageService);
-  privacyService = inject(PrivacyService);
-  themeService = inject(ThemeService);
-  private exportService = inject(ExportService);
-  private toastService = inject(ToastService);
+  private readonly userService = inject(UserService);
+  protected readonly languageService = inject(LanguageService);
+  protected readonly privacyService = inject(PrivacyService);
+  protected readonly themeService = inject(ThemeService);
+  protected readonly listStyleService = inject(ListStyleService);
+  private readonly exportService = inject(ExportService);
+  private readonly toastService = inject(ToastService);
 
   name = signal('');
   email = signal('');
@@ -46,6 +48,11 @@ export class SettingsComponent implements OnInit {
     { value: 'light' as const, label: 'views.settings.sections.appearance.light' },
     { value: 'dark' as const, label: 'views.settings.sections.appearance.dark' },
     { value: 'system' as const, label: 'views.settings.sections.appearance.system' },
+  ];
+
+  listStyleOptions = [
+    { value: 'normal' as const, label: 'views.settings.sections.appearance.listStyleNormal' },
+    { value: 'compact' as const, label: 'views.settings.sections.appearance.listStyleCompact' },
   ];
 
   languageOptions: SelectOption[] = Object.entries(AVAILABLE_LANGUAGES).map(
@@ -71,6 +78,39 @@ export class SettingsComponent implements OnInit {
       this.toastService.error('Failed to update profile.');
     } finally {
       this.savingProfile.set(false);
+    }
+  }
+
+  async onThemeChange(theme: 'light' | 'dark' | 'system') {
+    this.themeService.setTheme(theme);
+    await this.savePreference('theme', theme);
+  }
+
+  async onLanguageChange(language: string) {
+    this.languageService.setLanguage(language);
+    await this.savePreference('language', language);
+  }
+
+  async onListStyleChange(style: 'normal' | 'compact') {
+    this.listStyleService.set(style);
+    await this.savePreference('listStyle', style);
+  }
+
+  private async savePreference(key: string, value: string) {
+    try {
+      await this.userService.updatePreferences({ [key]: value });
+    } catch (err) {
+      this.toastService.error('Failed to save preference.');
+      console.error('savePreference failed', key, err);
+    }
+  }
+
+  async onPrivacyToggle() {
+    this.privacyService.toggle();
+    try {
+      await this.userService.updatePreferences({ privacyMode: this.privacyService.isPrivate() });
+    } catch {
+      // Local change already applied; backend sync failed silently
     }
   }
 

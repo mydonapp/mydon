@@ -107,4 +107,4 @@ All UI decisions — color tokens, typography, spacing, component patterns, dark
 
 **API responses**: NestJS controllers return plain objects/arrays; TypeORM entities are not serialized directly — use DTOs or mapped response objects.
 
-**Environment config**: API URL for the frontend comes from `apps/app/src/environments/environment.ts` (`environment.apiUrl`). Default is `http://localhost:3000` for dev.
+**Environment config**: API URL for the frontend comes from `apps/app/src/environments/environment.ts` (`this.appConfig.apiUrl`). Default is `http://localhost:3000` for dev.

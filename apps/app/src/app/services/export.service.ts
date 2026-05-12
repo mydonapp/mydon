@@ -1,15 +1,16 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { AppConfigService } from './app-config.service';
 
 @Injectable({ providedIn: 'root' })
 export class ExportService {
   private http = inject(HttpClient);
+  private appConfig = inject(AppConfigService);
 
   async exportData(): Promise<void> {
     const blob = await firstValueFrom(
-      this.http.get(`${environment.apiUrl}/v1/export/data`, {
+      this.http.get(`${this.appConfig.apiUrl}/v1/export/data`, {
         responseType: 'blob',
       }),
     );

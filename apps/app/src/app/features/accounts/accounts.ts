@@ -6,6 +6,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
+import { UserService } from '../../services/user.service';
+import { ListStyleService } from '../../services/list-style.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
@@ -15,7 +17,6 @@ import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { ComboboxComponent } from '../../shared/components/combobox/combobox';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { PrivacyService } from '../../services/privacy.service';
-import { UiService } from '../../services/ui.service';
 
 @Component({
   selector: 'app-accounts',
@@ -36,12 +37,12 @@ import { UiService } from '../../services/ui.service';
   styleUrl: './accounts.css',
 })
 export class AccountsComponent implements OnInit {
-  accountsService = inject(AccountsService);
-  currencyService = inject(CurrencyService);
-  privacyService = inject(PrivacyService);
-  toastService = inject(ToastService);
-
-  uiService = inject(UiService);
+  protected readonly accountsService = inject(AccountsService);
+  protected readonly currencyService = inject(CurrencyService);
+  protected readonly privacyService = inject(PrivacyService);
+  protected readonly listStyleService = inject(ListStyleService);
+  private readonly userService = inject(UserService);
+  private readonly toastService = inject(ToastService);
 
   loading = signal(false);
   submitting = signal(false);
@@ -61,6 +62,16 @@ export class AccountsComponent implements OnInit {
       value: a.id,
       label: `${a.name} (${a.currency})`,
     }));
+  }
+
+  async toggleListStyle() {
+    const next = this.listStyleService.listStyle() === 'compact' ? 'normal' : 'compact';
+    this.listStyleService.set(next);
+    try {
+      await this.userService.updatePreferences({ listStyle: next });
+    } catch (err) {
+      console.error('toggleListStyle failed', err);
+    }
   }
 
   ngOnInit() {

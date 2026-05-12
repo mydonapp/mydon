@@ -33,11 +33,11 @@ interface MenuItem {
   styleUrl: './app-layout.css',
 })
 export class AppLayoutComponent implements OnInit {
-  authService   = inject(AuthService);
-  userService   = inject(UserService);
-  privacyService = inject(PrivacyService);
-  sidebarState  = inject(SidebarStateService);
-  router       = inject(Router);
+  private readonly authService = inject(AuthService);
+  protected readonly userService = inject(UserService);
+  protected readonly privacyService = inject(PrivacyService);
+  protected readonly sidebarState = inject(SidebarStateService);
+  private readonly router = inject(Router);
 
   userMenuOpen = signal(false);
 
@@ -75,6 +75,15 @@ export class AppLayoutComponent implements OnInit {
   goToManage() {
     this.userMenuOpen.set(false);
     this.router.navigate(['/app/manage']);
+  }
+
+  async togglePrivacy() {
+    this.privacyService.toggle();
+    try {
+      await this.userService.updatePreferences({ privacyMode: this.privacyService.isPrivate() });
+    } catch (err) {
+      console.error('togglePrivacy failed', err);
+    }
   }
 
   async logout() {

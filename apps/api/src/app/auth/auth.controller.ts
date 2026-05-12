@@ -42,6 +42,10 @@ export class AuthController {
       id: user.id,
       name: user.name,
       email: user.email,
+      language: user.language ?? 'en',
+      theme: user.theme ?? 'system',
+      listStyle: user.listStyle ?? 'normal',
+      privacyMode: user.privacyMode ?? false,
     };
   }
 
@@ -50,11 +54,19 @@ export class AuthController {
   @ApiBearerAuth()
   async updateCurrentUser(
     @Req() req: Request,
-    @Body() body: { name?: string; email?: string },
+    @Body() body: { name?: string; email?: string; language?: string; theme?: string; listStyle?: string; privacyMode?: boolean },
   ) {
     const user = req['context']?.user;
     const updated = await this.authService.updateUser(user.id, body);
-    return { id: updated.id, name: updated.name, email: updated.email };
+    return {
+      id: updated.id,
+      name: updated.name,
+      email: updated.email,
+      language: updated.language ?? 'en',
+      theme: updated.theme ?? 'system',
+      listStyle: updated.listStyle ?? 'normal',
+      privacyMode: updated.privacyMode ?? false,
+    };
   }
 
   @Post('signup')

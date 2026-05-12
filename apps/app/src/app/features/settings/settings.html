@@ -55,7 +55,21 @@
                 <button
                   class="segmented-btn"
                   [class.segmented-btn--active]="themeService.theme() === opt.value"
-                  (click)="themeService.setTheme(opt.value)"
+                  (click)="onThemeChange(opt.value)"
+                >
+                  {{ opt.label | translate }}
+                </button>
+              }
+            </div>
+          </div>
+          <div class="page-item">
+            <span class="settings-item-label">{{ 'views.settings.sections.appearance.listStyle' | translate }}</span>
+            <div class="segmented-control">
+              @for (opt of listStyleOptions; track opt.value) {
+                <button
+                  class="segmented-btn"
+                  [class.segmented-btn--active]="listStyleService.listStyle() === opt.value"
+                  (click)="onListStyleChange(opt.value)"
                 >
                   {{ opt.label | translate }}
                 </button>
@@ -72,7 +86,7 @@
           <app-field [label]="'views.settings.sections.language.currentLanguage' | translate">
             <select appSelect
               [ngModel]="languageService.currentLanguage()"
-              (ngModelChange)="languageService.setLanguage($event)"
+              (ngModelChange)="onLanguageChange($event)"
               name="language"
             >
               @for (opt of languageOptions; track opt.value) {
@@ -94,7 +108,7 @@
             </div>
             <app-toggle
               [value]="privacyService.isPrivate()"
-              (valueChange)="privacyService.toggle()"
+              (valueChange)="onPrivacyToggle()"
             />
           </div>
         </div>

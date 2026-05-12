@@ -1,4 +1,4 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 const STORAGE_KEY = 'don.privacy';
 
@@ -8,13 +8,14 @@ export class PrivacyService {
     localStorage.getItem(STORAGE_KEY) === 'true',
   );
 
-  constructor() {
-    effect(() => {
-      localStorage.setItem(STORAGE_KEY, String(this.isPrivate()));
-    });
+  setFromBackend(value: boolean): void {
+    this.isPrivate.set(value);
+    localStorage.setItem(STORAGE_KEY, String(value));
   }
 
   toggle() {
-    this.isPrivate.update((v) => !v);
+    const next = !this.isPrivate();
+    this.isPrivate.set(next);
+    localStorage.setItem(STORAGE_KEY, String(next));
   }
 }

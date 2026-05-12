@@ -18,6 +18,18 @@ export class User {
   @Column()
   declare password: string;
 
+  @Column({ default: 'en' })
+  declare language: string;
+
+  @Column({ default: 'system' })
+  declare theme: string;
+
+  @Column({ name: 'list_style', default: 'normal' })
+  declare listStyle: string;
+
+  @Column({ name: 'privacy_mode', default: false })
+  declare privacyMode: boolean;
+
   @OneToMany(() => AccessToken, (accessToken) => accessToken.user)
   declare accessToken: AccessToken[];
 

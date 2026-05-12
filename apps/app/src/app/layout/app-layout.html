@@ -40,7 +40,7 @@
       <div class="sidebar-user-wrap">
         @if (userMenuOpen()) {
           <div class="user-menu" (click)="$event.stopPropagation()">
-            <div class="user-menu-item user-menu-item--toggle" (click)="privacyService.toggle()">
+            <div class="user-menu-item user-menu-item--toggle" (click)="togglePrivacy()">
               <app-icon [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'" [size]="15" />
               <span class="flex-1">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</span>
               <app-toggle [value]="privacyService.isPrivate()" class="pointer-events-none flex-shrink-0" />
