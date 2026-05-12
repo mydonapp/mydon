@@ -1,14 +1,14 @@
 <!-- Blurred backdrop: appears on scroll behind button + title (mobile only) -->
 <div class="account-header-backdrop" [class.account-header-backdrop--visible]="isScrolling()"></div>
 
-<!-- Back button: always-fixed glass circle (mobile only) -->
-<a routerLink="/app/accounts" class="account-back-circle">
-  <app-icon name="arrow-left" [size]="18" />
-</a>
-
-<!-- Scrolled title: fades in to the RIGHT of the back button (mobile only) -->
-<div class="account-scroll-title" [class.account-scroll-title--visible]="isScrolled()">
-  {{ account()?.name }}
+<!-- Fixed header row: back circle + title that fades in to its right (mobile only) -->
+<div class="account-fixed-header lg:hidden">
+  <a routerLink="/app/accounts" class="account-back-circle">
+    <app-icon name="arrow-left" [size]="18" />
+  </a>
+  <div class="account-scroll-title" [class.account-scroll-title--visible]="isScrolled()">
+    {{ account()?.name }}
+  </div>
 </div>
 
 <div class="account-root">

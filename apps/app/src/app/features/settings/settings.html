@@ -1,12 +1,12 @@
-<div class="min-h-screen" style="background-color: var(--sys-background);">
-  <div class="max-w-2xl mx-auto px-4 py-8 sm:px-6">
+<div class="page-content">
+  <div class="max-w-2xl mx-auto">
 
     <!-- Page header -->
     <div class="mb-8">
-      <h1 class="text-2xl font-semibold" style="color: var(--sys-on-surface);">
+      <h1 class="text-2xl font-semibold text-on-surface">
         {{ 'views.settings.title' | translate }}
       </h1>
-      <p class="mt-1 text-sm" style="color: var(--sys-on-surface-variant);">
+      <p class="mt-1 text-sm text-on-surface-variant">
         {{ 'views.settings.subtitle' | translate }}
       </p>
     </div>
@@ -104,7 +104,7 @@
       <div>
         <p class="page-section-label">{{ 'views.settings.sections.export.title' | translate }}</p>
         <div class="page-group p-4">
-          <p class="text-sm mb-4" style="color: var(--sys-on-surface-variant);">
+          <p class="text-sm mb-4 text-on-surface-variant">
             {{ 'views.settings.sections.export.exportDescription' | translate }}
           </p>
           <button appBtn variant="secondary" [loading]="exporting()" (click)="exportData()">
@@ -120,7 +120,7 @@
         <div class="page-group">
           <div class="page-item">
             <span class="settings-item-label">{{ 'views.settings.sections.about.version' | translate }}</span>
-            <span class="text-sm font-medium" style="color: var(--sys-on-surface);">0.0.2</span>
+            <span class="text-sm font-medium text-on-surface">0.0.2</span>
           </div>
         </div>
       </div>

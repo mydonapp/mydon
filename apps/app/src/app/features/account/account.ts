@@ -39,7 +39,7 @@ export class AccountComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   scrollY = signal(0);
-  isScrolled = computed(() => this.scrollY() > 60);
+  isScrolled = computed(() => this.scrollY() > 20);
   isScrolling = computed(() => this.scrollY() > 5);
 
   @HostListener('window:scroll')

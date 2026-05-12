@@ -12,6 +12,7 @@ import { FieldComponent } from '../../shared/components/field/field';
   selector: 'app-signup',
   imports: [FormsModule, RouterLink, TranslateModule, BtnDirective, InputDirective, FieldComponent],
   templateUrl: './signup.html',
+  styleUrl: './auth.css',
 })
 export class SignupComponent {
   private authService = inject(AuthService);

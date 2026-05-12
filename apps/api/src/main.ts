@@ -25,7 +25,9 @@ async function bootstrap() {
   app.use(helmet());
 
   // Configure CORS with environment-based origins
-  const origins = corsOrigins ? corsOrigins.split(',').map((origin) => origin.trim()) : ['http://localhost:4200']; // fallback for local development
+  const origins = corsOrigins
+    ? corsOrigins.split(',').map((origin) => origin.trim())
+    : ['http://localhost:4200', 'tauri://localhost']; // fallback for local development
 
   app.enableCors({
     origin: origins,

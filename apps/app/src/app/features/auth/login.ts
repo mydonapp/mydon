@@ -4,14 +4,15 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { FieldComponent } from '../../shared/components/field/field';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
-import { FieldComponent } from '../../shared/components/field/field';
 
 @Component({
   selector: 'app-login',
   imports: [FormsModule, RouterLink, TranslateModule, BtnDirective, InputDirective, FieldComponent],
   templateUrl: './login.html',
+  styleUrl: './auth.css',
 })
 export class LoginComponent {
   private authService = inject(AuthService);

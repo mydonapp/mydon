@@ -1,0 +1,13 @@
+// Shared Xcode build configuration.
+// To set your Apple Developer Team ID, create a local file alongside this one:
+//
+//   XcodeConfig/DevelopmentTeam.xcconfig
+//
+// with the contents:
+//   DEVELOPMENT_TEAM = YOUR_TEAM_ID
+//
+// That file is gitignored and never committed.
+
+DEVELOPMENT_TEAM =
+
+#include? "DevelopmentTeam.xcconfig"

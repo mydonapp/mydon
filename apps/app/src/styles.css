@@ -537,6 +537,23 @@ button[appBtn][aria-busy='true']::before {
   margin-bottom: 0.375rem;
 }
 
+/* ─── Standard page content wrapper ─────────────────────────────────────── */
+.page-content {
+  padding: 0.25rem 1rem 1rem;
+}
+
+@media (width >= 640px) {
+  .page-content {
+    padding: 1.5rem;
+  }
+}
+
+@media (width >= 1024px) {
+  .page-content {
+    padding: 2rem;
+  }
+}
+
 /* ─── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 8px;
@@ -556,6 +573,13 @@ button[appBtn][aria-busy='true']::before {
 input::placeholder,
 select::placeholder {
   color: var(--sys-on-surface-variant);
+}
+
+/* Prevent iOS/WebKit auto-zoom on input focus (triggers when font-size < 16px) */
+@media (pointer: coarse) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* ─── Financial number utility ───────────────────────────────────────────── */
