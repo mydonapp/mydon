@@ -94,7 +94,7 @@
 /* ── Fixed header row: back circle + scroll title in one fixed container ──── */
 .account-fixed-header {
   position: fixed;
-  top: 0.25rem;
+  top: calc(env(safe-area-inset-top, 0px) + 0.25rem);
   left: 0.75rem;
   right: 1rem;
   z-index: 40;
@@ -146,6 +146,18 @@
     overflow: hidden;
     box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.07), rgb(0 0 0 / 0));
   }
+}
+
+/* ── Skeleton loader ─────────────────────────────────────────────────────── */
+.account-skeleton {
+  background-color: var(--sys-surface-variant);
+  border-radius: 6px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* ── Scroll title: flex child inside the fixed header row ────────────────── */

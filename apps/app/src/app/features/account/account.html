@@ -26,13 +26,26 @@
 
     <!-- Title + subtitle (fades on mobile scroll, always visible on desktop) -->
     <div class="account-header-block mb-1" [class.account-header-block--hidden]="isScrolled()">
-      <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">
-        {{ account()?.name ?? ('views.account.title' | translate) }}
-      </h1>
-      <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>
+      @if (loading()) {
+        <div class="account-skeleton h-7 w-44 rounded-lg"></div>
+        <div class="account-skeleton h-4 w-28 rounded mt-2"></div>
+      } @else {
+        <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">{{ account()?.name }}</h1>
+        <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>
+      }
     </div>
 
-    @if (account()) {
+    @if (loading()) {
+      <!-- Skeleton stat cards -->
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="page-group p-4">
+            <div class="account-skeleton h-3 w-16 rounded mb-2"></div>
+            <div class="account-skeleton h-6 w-20 rounded"></div>
+          </div>
+        }
+      </div>
+    } @else if (account()) {
       <!-- Stats grid: always 2-col in left panel -->
       <div class="grid grid-cols-2 gap-3 mt-5">
         <div class="page-group p-4">
@@ -81,8 +94,16 @@
   <!-- ── Right panel: transaction list ─────────────────────────────────── -->
   <div class="account-right">
     @if (loading()) {
-      <div class="flex justify-center py-12">
-        <app-spinner size="lg" />
+      <div class="account-tx-list">
+        @for (i of [1,2,3,4,5,6,7,8]; track i) {
+          <div class="page-item">
+            <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+              <div class="account-skeleton h-4 w-48 rounded"></div>
+              <div class="account-skeleton h-3 w-28 rounded"></div>
+            </div>
+            <div class="account-skeleton h-4 w-16 rounded flex-shrink-0"></div>
+          </div>
+        }
       </div>
     } @else if (account()) {
       <div class="flex items-center justify-between mb-1.5">

@@ -11,7 +11,6 @@ import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective } from '../../shared/directives/select.directive';
 import { ModalComponent } from '../../shared/components/modal/modal';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
@@ -28,7 +27,6 @@ import { IconComponent } from '../../shared/components/icon/icon';
     InputDirective,
     SelectDirective,
     ModalComponent,
-    SpinnerComponent,
     IconComponent,
   ],
 })

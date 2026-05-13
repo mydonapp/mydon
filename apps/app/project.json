@@ -25,10 +25,17 @@
       },
       "configurations": {
         "production": {
-          "fileReplacements": [
+          "assets": [
             {
-              "replace": "apps/app/src/assets/config.json",
-              "with": "apps/app/src/assets/config.production.json"
+              "glob": "**/*",
+              "input": "apps/app/src/assets",
+              "ignore": ["config.json"],
+              "output": "assets"
+            },
+            {
+              "glob": "config.json",
+              "input": "apps/app/src/assets-prod",
+              "output": "assets"
             }
           ],
           "budgets": [
