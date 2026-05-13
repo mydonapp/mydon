@@ -48,8 +48,7 @@
   pointer-events: none;
 }
 
-/* Never hide on desktop */
-@media (width >= 1024px) {
+@media (width >= 768px) {
   .account-header-block--hidden {
     opacity: 1;
     transform: none;
@@ -86,7 +85,7 @@
   opacity: 1;
 }
 
-@media (width >= 1024px) {
+@media (width >= 768px) {
   .account-header-backdrop {
     display: none;
   }
@@ -103,6 +102,12 @@
   align-items: center;
   gap: 0.5rem;
   pointer-events: none;
+}
+
+@media (width >= 768px) {
+  .account-fixed-header {
+    display: none;
+  }
 }
 
 /* ── Back circle inside the fixed header ─────────────────────────────────── */

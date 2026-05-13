@@ -2,7 +2,7 @@
 <div class="account-header-backdrop" [class.account-header-backdrop--visible]="isScrolling()"></div>
 
 <!-- Fixed header row: back circle + title that fades in to its right (mobile only) -->
-<div class="account-fixed-header lg:hidden">
+<div class="account-fixed-header md:hidden">
   <a routerLink="/app/accounts" class="account-back-circle">
     <app-icon name="arrow-left" [size]="18" />
   </a>
@@ -18,7 +18,7 @@
 
     <!-- Desktop back link -->
     <a routerLink="/app/accounts"
-      class="hidden lg:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5"
+      class="hidden md:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5"
     >
       <app-icon name="arrow-left" [size]="14" />
       {{ 'views.accounts.title' | translate }}

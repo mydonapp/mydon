@@ -1,22 +1,22 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { balanceColor } from '../../shared/utils/balance-color';
-import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
+import { ListStyleService } from '../../services/list-style.service';
+import { PrivacyService } from '../../services/privacy.service';
 import { ToastService } from '../../services/toast.service';
 import { UserService } from '../../services/user.service';
-import { ListStyleService } from '../../services/list-style.service';
+import { ComboboxComponent } from '../../shared/components/combobox/combobox';
+import { FieldComponent } from '../../shared/components/field/field';
+import { IconComponent } from '../../shared/components/icon/icon';
+import { ModalComponent } from '../../shared/components/modal/modal';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
-import { FieldComponent } from '../../shared/components/field/field';
-import { ModalComponent } from '../../shared/components/modal/modal';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
-import { ComboboxComponent } from '../../shared/components/combobox/combobox';
-import { IconComponent } from '../../shared/components/icon/icon';
-import { PrivacyService } from '../../services/privacy.service';
+import { balanceColor } from '../../shared/utils/balance-color';
 
 @Component({
   selector: 'app-accounts',
@@ -127,11 +127,12 @@ export class AccountsComponent implements OnInit {
     this.submitting.set(true);
     try {
       await this.accountsService.createTransaction({
-        date: this.newTransaction.date,
+        transactionDate: this.newTransaction.date,
         description: this.newTransaction.description,
         creditAccountId: this.newTransaction.creditAccountId,
         debitAccountId: this.newTransaction.debitAccountId,
-        amount: Number(this.newTransaction.amount),
+        debitAmount: Number(this.newTransaction.amount),
+        creditAmount: Number(this.newTransaction.amount),
       });
       this.toastService.success('Transaction created successfully!');
       this.showCreateTransaction.set(false);

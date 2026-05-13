@@ -107,11 +107,12 @@ export class AccountsService {
   }
 
   async createTransaction(data: {
-    date: string;
+    transactionDate: string;
     description: string;
     creditAccountId: string;
     debitAccountId: string;
-    amount: number;
+    creditAmount: number;
+    debitAmount: number;
   }): Promise<void> {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions`, data));
   }

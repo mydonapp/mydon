@@ -277,6 +277,7 @@
 				);
 				INFOPLIST_FILE = app_iOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = myDon;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -296,7 +297,7 @@
 					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.mydon.app;
-				PRODUCT_NAME = "myDon";
+				PRODUCT_NAME = myDon;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
@@ -376,6 +377,7 @@
 				);
 				INFOPLIST_FILE = app_iOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = myDon;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -395,7 +397,7 @@
 					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.mydon.app;
-				PRODUCT_NAME = "myDon";
+				PRODUCT_NAME = myDon;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = arm64;
