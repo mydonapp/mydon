@@ -56,6 +56,8 @@
     "@nestjs/typeorm": "11.0.0",
     "@ngx-translate/core": "17.0.0",
     "@ngx-translate/http-loader": "17.0.0",
+    "@tauri-apps/api": "2.11.0",
+    "@tauri-apps/plugin-store": "2.4.3",
     "archiver": "7.0.1",
     "argon2": "0.43.0",
     "axios": "1.16.0",

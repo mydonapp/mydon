@@ -36,11 +36,11 @@
 		81E326B61ED92E1D1EECF952 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9FACFFCB6E3743955F72464C /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		AF1DE57E7D9CF13BB2E0E038 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CC000000000000000000CC01 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 		CE1209BFDECB28E00189B168 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		D8F57162F5CC7AEDD55F173D /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		F3673D372C5ABDD1AD6E7067 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		FBC720DFA1D01F55B0A32344 /* myDon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myDon.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CC000000000000000000CC01 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +135,14 @@
 			path = Externals;
 			sourceTree = "<group>";
 		};
+		CC000000000000000000CC02 /* XcodeConfig */ = {
+			isa = PBXGroup;
+			children = (
+				CC000000000000000000CC01 /* Shared.xcconfig */,
+			);
+			path = XcodeConfig;
+			sourceTree = "<group>";
+		};
 		EE72B6AC647386A11F795E44 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -150,14 +158,6 @@
 				329C38BE5E8B40354375D0D0 /* bindings */,
 			);
 			path = app;
-			sourceTree = "<group>";
-		};
-		CC000000000000000000CC02 /* XcodeConfig */ = {
-			isa = PBXGroup;
-			children = (
-				CC000000000000000000CC01 /* Shared.xcconfig */,
-			);
-			path = XcodeConfig;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -276,6 +276,7 @@
 					"\".\"",
 				);
 				INFOPLIST_FILE = app_iOS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = myDon;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -374,6 +375,7 @@
 					"\".\"",
 				);
 				INFOPLIST_FILE = app_iOS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = myDon;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

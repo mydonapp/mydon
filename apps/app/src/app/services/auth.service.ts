@@ -11,9 +11,9 @@ interface TokenResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private appConfig = inject(AppConfigService);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly appConfig = inject(AppConfigService);
 
   private accessToken: string | null = null;
   private accessTokenExpiry: Date | null = null;

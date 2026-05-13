@@ -1,5 +1,17 @@
 <div class="auth-page h-screen overflow-y-auto bg-background flex items-center justify-center">
-  <div class="surface-elevated rounded-xl w-full max-w-md p-8 sm:p-10">
+  <div class="surface-elevated rounded-xl w-full max-w-md p-8 sm:p-10 relative">
+
+    @if (appConfig.isNativeApp()) {
+      <button type="button"
+        class="absolute top-3 right-3 p-1.5 rounded-lg transition-colors"
+        [class]="showApiSettings() ? 'text-primary bg-primary/10' : 'text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-variant'"
+        (click)="toggleApiSettings()"
+        title="Server settings"
+      >
+        <app-icon name="settings" [size]="14" />
+      </button>
+    }
+
     <div class="text-center mb-8">
       <div class="flex items-center justify-center bg-primary text-on-primary rounded-xl w-16 h-16 mx-auto mb-4">
         <span class="text-2xl font-bold">D</span>
@@ -7,6 +19,29 @@
       <h1 class="text-2xl font-bold text-primary">myDon</h1>
       <p class="text-on-surface-variant text-sm mt-1">{{ 'views.signup.title' | translate }}</p>
     </div>
+
+    @if (showApiSettings()) {
+      <div class="mb-6 p-3 rounded-xl bg-surface-variant/40">
+        <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Server URL</p>
+        <div class="flex gap-2">
+          <input appInput type="url" name="apiUrl"
+            [ngModel]="editApiUrl()"
+            (ngModelChange)="editApiUrl.set($event)"
+            placeholder="https://api.example.com"
+            class="flex-1"
+          />
+          <button appBtn variant="secondary" size="sm" type="button" (click)="saveApiUrl()">Save</button>
+        </div>
+        @if (appConfig.customApiUrl()) {
+          <button type="button"
+            class="text-xs text-on-surface-variant mt-2 hover:text-on-surface transition-colors"
+            (click)="clearApiUrl()"
+          >
+            Reset to default
+          </button>
+        }
+      </div>
+    }
 
     <form (ngSubmit)="onSubmit()">
       <div class="space-y-4">

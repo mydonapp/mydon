@@ -25,6 +25,12 @@
       },
       "configurations": {
         "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/app/src/assets/config.json",
+              "with": "apps/app/src/assets/config.production.json"
+            }
+          ],
           "budgets": [
             {
               "type": "initial",

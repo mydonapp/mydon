@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "app.mydon.app",
   "build": {
-    "frontendDist": "../../dist/apps/app/browser",
+    "frontendDist": "../../../dist/apps/app/browser",
     "devUrl": "http://localhost:4200",
     "beforeDevCommand": "pnpm start:app",
     "beforeBuildCommand": "pnpm nx build app"
