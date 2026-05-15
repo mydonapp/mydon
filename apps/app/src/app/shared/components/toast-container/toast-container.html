@@ -1,25 +1,25 @@
 <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
   @for (toast of toastService.toasts(); track toast.id) {
-    <div
-      class="pointer-events-auto flex items-start gap-3 surface-elevated rounded-xl border border-outline-variant px-4 py-3 shadow-elevated"
-      role="alert"
+  <div
+    class="pointer-events-auto flex items-start gap-3 surface-elevated rounded-xl border border-outline-variant px-4 py-3 shadow-elevated"
+    role="alert"
+  >
+    <app-icon
+      [name]="iconFor(toast.type)"
+      [size]="16"
+      [strokeWidth]="2"
+      class="flex-shrink-0 mt-0.5"
+      [style.color]="colorFor(toast.type)"
+    />
+    <span class="flex-1 text-sm text-on-surface">{{ toast.message }}</span>
+    <button
+      type="button"
+      class="flex-shrink-0 text-on-surface-variant hover:text-on-surface transition-colors -mr-1 -mt-0.5 p-1 rounded"
+      (click)="toastService.remove(toast.id)"
+      aria-label="Close"
     >
-      <lucide-angular
-        [img]="iconFor(toast.type)"
-        [size]="16"
-        [strokeWidth]="2"
-        class="flex-shrink-0 mt-0.5"
-        [style.color]="colorFor(toast.type)"
-      />
-      <span class="flex-1 text-sm text-on-surface">{{ toast.message }}</span>
-      <button
-        type="button"
-        class="flex-shrink-0 text-on-surface-variant hover:text-on-surface transition-colors -mr-1 -mt-0.5 p-1 rounded"
-        (click)="toastService.remove(toast.id)"
-        aria-label="Close"
-      >
-        <lucide-angular [img]="closeIcon" [size]="14" [strokeWidth]="2" />
-      </button>
-    </div>
+      <app-icon name="x" [size]="14" [strokeWidth]="2" />
+    </button>
+  </div>
   }
 </div>

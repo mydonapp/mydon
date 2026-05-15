@@ -1,35 +1,21 @@
 import { Component, inject } from '@angular/core';
-import {
-  LucideAngularModule,
-  CheckCircle2,
-  AlertCircle,
-  AlertTriangle,
-  Info,
-  X,
-  LucideIconData,
-} from 'lucide-angular';
 import { ToastService, ToastType } from '../../../services/toast.service';
+import { IconComponent } from '../icon/icon';
 
 @Component({
   selector: 'app-toast-container',
-  imports: [LucideAngularModule],
+  imports: [IconComponent],
   templateUrl: './toast-container.html',
 })
 export class ToastContainerComponent {
   toastService = inject(ToastService);
 
-  readonly checkIcon: LucideIconData   = CheckCircle2;
-  readonly errorIcon: LucideIconData   = AlertCircle;
-  readonly warningIcon: LucideIconData = AlertTriangle;
-  readonly infoIcon: LucideIconData    = Info;
-  readonly closeIcon: LucideIconData   = X;
-
-  iconFor(type: ToastType): LucideIconData {
+  iconFor(type: ToastType): string {
     switch (type) {
-      case 'success': return this.checkIcon;
-      case 'error':   return this.errorIcon;
-      case 'warning': return this.warningIcon;
-      default:        return this.infoIcon;
+      case 'success': return 'check-circle-2';
+      case 'error':   return 'alert-circle';
+      case 'warning': return 'alert-triangle';
+      default:        return 'info';
     }
   }
 
