@@ -33,9 +33,24 @@
   </div>
 
   @if (loading()) {
-  <div class="flex justify-center py-12">
-    <app-spinner size="lg" />
-  </div>
+    @for (i of [1, 2]; track i) {
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-1.5">
+          <app-skeleton class="h-3 w-20" />
+          <app-skeleton class="h-4 w-16" />
+        </div>
+        <div class="accounts-group">
+          @for (j of [1, 2, 3]; track j) {
+            <div class="page-item">
+              <div class="flex-1 min-w-0">
+                <app-skeleton class="h-4 w-36" />
+              </div>
+              <app-skeleton class="h-4 w-20 flex-shrink-0" />
+            </div>
+          }
+        </div>
+      </div>
+    }
   } @else { @for (group of accountGroups(); track group.type) {
   <div class="mb-4">
     <div class="flex items-center justify-between mb-1.5">

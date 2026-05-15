@@ -11,7 +11,7 @@ import { ComboboxComponent, ComboboxOption } from '../../shared/components/combo
 import { DetailHeaderComponent } from '../../shared/components/detail-header/detail-header';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective } from '../../shared/directives/select.directive';
@@ -25,7 +25,7 @@ import { SelectDirective } from '../../shared/directives/select.directive';
     BtnDirective,
     SelectDirective,
     InputDirective,
-    SpinnerComponent,
+    SkeletonComponent,
     ProgressBarComponent,
     IconComponent,
     ComboboxComponent,

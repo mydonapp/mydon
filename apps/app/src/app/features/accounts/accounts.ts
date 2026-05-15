@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountsService } from '../../services/accounts.service';
+import { AccountBalance, AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ListStyleService } from '../../services/list-style.service';
 import { PrivacyService } from '../../services/privacy.service';
@@ -13,10 +13,18 @@ import { FieldComponent } from '../../shared/components/field/field';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { balanceColor } from '../../shared/utils/balance-color';
+
+interface AccountGroupRow {
+  type: string;
+  label: string;
+  emptyLabel: string;
+  accounts: AccountBalance[];
+  total: number;
+}
 
 @Component({
   selector: 'app-accounts',
@@ -29,7 +37,7 @@ import { balanceColor } from '../../shared/utils/balance-color';
     InputDirective,
     FieldComponent,
     ModalComponent,
-    SpinnerComponent,
+    SkeletonComponent,
     ComboboxComponent,
     IconComponent,
   ],
@@ -47,7 +55,7 @@ export class AccountsComponent implements OnInit {
   loading = signal(false);
   submitting = signal(false);
   showCreateTransaction = signal(false);
-  accountGroups = signal<any[]>([]);
+  accountGroups = signal<AccountGroupRow[]>([]);
 
   newTransaction = {
     date: new Date().toISOString().split('T')[0],

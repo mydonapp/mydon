@@ -1,269 +1,271 @@
 {
   "common": {
-    "loading": "Loading...",
-    "close": "Close",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "search": "Search",
-    "filter": "Filter",
-    "sort": "Sort"
+    "loading": "Chargement...",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier"
   },
   "app": {
-    "subtitle": "Finance Tracker",
-    "user": "User Account",
-    "userEmail": "user@example.com"
+    "subtitle": "Gestionnaire de finances",
+    "user": "Compte utilisateur",
+    "userEmail": "utilisateur@exemple.com"
   },
   "views": {
     "dashboard": {
-      "title": "Financial Dashboard",
-      "subtitle": "Welcome to myDon - Your Personal Finance Tracker",
-      "lastUpdated": "Last Updated",
-      "netWorth": "Net Worth",
-      "totalAssets": "Total Assets",
-      "assets": "Assets",
-      "liabilities": "Liabilities",
-      "monthlyFlow": "Monthly Cash Flow",
-      "thisMonth": "This month",
-      "accounts": "accounts",
-      "accountBalances": "Account Balances",
-      "moreAccounts": "more accounts",
-      "recentTransactions": "Recent Transactions",
-      "noTransactions": "No recent transactions found",
-      "importMore": "Import More",
-      "importFirst": "Import Your First Transactions",
-      "quickActions": "Quick Actions",
-      "importTransactions": "Import Transactions",
-      "manageAccounts": "Manage Accounts",
-      "refresh": "Refresh Data"
+      "title": "Tableau de bord financier",
+      "subtitle": "Bienvenue sur myDon - Votre gestionnaire de finances personnel",
+      "lastUpdated": "Dernière mise à jour",
+      "netWorth": "Valeur nette",
+      "totalAssets": "Total des actifs",
+      "assets": "Actifs",
+      "liabilities": "Passifs",
+      "monthlyFlow": "Flux de trésorerie mensuel",
+      "thisMonth": "Ce mois",
+      "accounts": "comptes",
+      "accountBalances": "Soldes des comptes",
+      "moreAccounts": "autres comptes",
+      "recentTransactions": "Transactions récentes",
+      "noTransactions": "Aucune transaction récente trouvée",
+      "importMore": "Importer plus",
+      "importFirst": "Importer vos premières transactions",
+      "quickActions": "Actions rapides",
+      "spending": "Dépenses",
+      "cashFlow": "Flux de trésorerie",
+      "vsLastMonth": "vs mois dernier",
+      "incomeMinusExpenses": "Revenus moins dépenses"
     },
     "login": {
-      "title": "Login to your account",
+      "title": "Se connecter à votre compte",
       "loginForm": {
         "email": {
           "label": "Email",
           "placeholder": "Email"
         },
         "password": {
-          "label": "Password",
-          "placeholder": "Password"
+          "label": "Mot de passe",
+          "placeholder": "Mot de passe"
         },
         "submit": {
-          "label": "Login"
+          "label": "Connexion"
         }
       },
       "signupPrompt": {
-        "text": "Not a member?",
-        "link": "Create an account now"
+        "text": "Pas encore membre ?",
+        "link": "Créer un compte maintenant"
       }
     },
     "signup": {
-      "title": "Create an account",
+      "title": "Créer un compte",
       "signupForm": {
         "name": {
-          "label": "Name",
-          "placeholder": "Name"
+          "label": "Nom",
+          "placeholder": "Nom"
         },
         "email": {
           "label": "Email",
           "placeholder": "Email"
         },
         "password": {
-          "label": "Password",
-          "placeholder": "Password"
+          "label": "Mot de passe",
+          "placeholder": "Mot de passe"
         },
         "submit": {
-          "label": "Create Account"
+          "label": "Créer un compte"
         }
       },
       "loginPrompt": {
-        "text": "Already a member?",
-        "link": "Login now"
+        "text": "Déjà membre ?",
+        "link": "Se connecter"
       }
     },
     "accounts": {
-      "title": "Accounts Overview",
-      "subtitle": "Manage your financial accounts and track balances",
-      "privacy": "Privacy Mode",
+      "title": "Aperçu des comptes",
+      "subtitle": "Gérez vos comptes financiers et suivez les soldes",
+      "privacy": "Mode confidentialité",
       "total": "Total",
-      "moreAccounts": "more accounts",
-      "noLiabilities": "No liabilities found",
-      "noAssets": "No assets found",
-      "noIncome": "No income accounts found",
-      "noExpenses": "No expense accounts found",
-      "addFirstAccount": "Add your first account",
-      "addAccount": "Add Account",
-      "addTransaction": "Add Transaction",
-      "retirement": "Retirement",
+      "moreAccounts": "autres comptes",
+      "noLiabilities": "Aucun passif trouvé",
+      "noAssets": "Aucun actif trouvé",
+      "noIncome": "Aucun compte de revenus trouvé",
+      "noExpenses": "Aucun compte de dépenses trouvé",
+      "addFirstAccount": "Ajouter votre premier compte",
+      "addAccount": "Ajouter un compte",
+      "addTransaction": "Ajouter une transaction",
+      "manageAccounts": "Gérer les comptes",
+      "retirement": "Retraite",
       "addAccountForm": {
-        "title": "Add Account",
+        "title": "Ajouter un compte",
         "accountName": {
-          "label": "Account Name",
-          "placeholder": "Enter account name"
+          "label": "Nom du compte",
+          "placeholder": "Saisir le nom du compte"
         },
         "openingBalance": {
-          "label": "Opening Balance"
+          "label": "Solde d'ouverture"
         },
         "accountType": {
-          "label": "Account Type"
+          "label": "Type de compte"
         },
         "currency": {
-          "label": "Currency",
-          "placeholder": "Select currency"
+          "label": "Devise",
+          "placeholder": "Sélectionner une devise"
         },
         "category": {
-          "label": "Category",
-          "placeholder": "Select or create a category"
+          "label": "Catégorie",
+          "placeholder": "Sélectionner ou créer une catégorie"
         },
         "submit": {
-          "label": "Add Account"
+          "label": "Ajouter un compte"
         },
-        "success": "Account created successfully!",
-        "error": "Failed to create account. Please try again."
+        "success": "Compte créé avec succès !",
+        "error": "Échec de la création du compte. Veuillez réessayer."
       },
       "createTransactionForm": {
-        "title": "Create Transaction",
+        "title": "Créer une transaction",
         "date": {
           "label": "Date"
         },
         "description": {
           "label": "Description",
-          "placeholder": "Enter transaction description"
+          "placeholder": "Saisir la description de la transaction"
         },
         "creditAccount": {
-          "label": "Credit Account",
-          "placeholder": "Select Credit Account"
+          "label": "Compte créditeur",
+          "placeholder": "Sélectionner le compte créditeur"
         },
         "debitAccount": {
-          "label": "Debit Account",
-          "placeholder": "Select Debit Account"
+          "label": "Compte débiteur",
+          "placeholder": "Sélectionner le compte débiteur"
         },
         "amount": {
-          "label": "Amount"
+          "label": "Montant"
         },
         "submit": {
-          "label": "Create Transaction"
+          "label": "Créer une transaction"
         },
-        "success": "Transaction created successfully!",
-        "error": "Failed to create transaction. Please try again."
+        "success": "Transaction créée avec succès !",
+        "error": "Échec de la création de la transaction. Veuillez réessayer."
       }
     },
     "account": {
-      "title": "Account: {{accountName}}",
-      "subtitle": "Detailed view of account transactions and balance",
-      "currentBalance": "Current Balance",
-      "totalTransactions": "Total Transactions",
-      "totalCredit": "Total Credit",
-      "totalDebit": "Total Debit",
-      "totalIncome": "Total Income",
-      "totalExpenses": "Total Expenses",
-      "noTransactions": "No transactions found",
-      "noTransactionsDescription": "This account has no transactions yet.",
-      "transactionDetails": "Transaction Details",
+      "title": "Compte : {{accountName}}",
+      "subtitle": "Vue détaillée des transactions et du solde du compte",
+      "currentBalance": "Solde actuel",
+      "totalTransactions": "Total des transactions",
+      "totalCredit": "Total des crédits",
+      "totalDebit": "Total des débits",
+      "totalIncome": "Total des revenus",
+      "totalExpenses": "Total des dépenses",
+      "noTransactions": "Aucune transaction trouvée",
+      "noTransactionsDescription": "Ce compte n'a pas encore de transactions.",
+      "transactionDetails": "Détails de la transaction",
       "transactions": {
         "title": "Transactions",
         "table": {
-          "date": "Transaction Date",
+          "date": "Date de transaction",
           "description": "Description",
-          "otherAccount": "Opposite Account",
-          "amount": "Amount"
+          "otherAccount": "Compte opposé",
+          "amount": "Montant"
         }
       }
     },
     "importTransactions": {
-      "title": "Import Transactions",
-      "subtitle": "Import your bank statements and CSV files",
-      "pendingTransactions": "Pending",
-      "aiSuggested": "AI Suggested - Please verify",
-      "aiSuggestedInfo": "Accounts marked with \"AI\" were automatically suggested based on similar past transactions. Please review and verify before approving.",
+      "title": "Importer des transactions",
+      "subtitle": "Importez vos relevés bancaires et fichiers CSV",
+      "pendingTransactions": "En attente",
+      "aiSuggested": "Suggéré par IA - Veuillez vérifier",
+      "aiSuggestedInfo": "Les comptes marqués \"IA\" ont été automatiquement suggérés sur la base de transactions passées similaires. Veuillez vérifier avant d'approuver.",
       "importForm": {
-        "title": "Import Bank Statement",
+        "title": "Importer un relevé bancaire",
         "account": {
-          "label": "Import Account",
-          "placeholder": "Select the account to import into",
-          "help": "Choose the account that matches your bank statement"
+          "label": "Compte d'importation",
+          "placeholder": "Sélectionner le compte à importer",
+          "help": "Choisissez le compte qui correspond à votre relevé bancaire"
         },
         "issuer": {
-          "label": "Bank/Provider",
-          "placeholder": "Select your bank or financial provider",
+          "label": "Banque/Fournisseur",
+          "placeholder": "Sélectionnez votre banque ou fournisseur financier",
           "footer": {
-            "text": "Need support for a new provider? Request it {0}",
-            "link": "here"
+            "text": "Besoin de support pour un nouveau fournisseur ? Demandez-le {0}",
+            "link": "ici"
           }
         },
         "upload": {
-          "label": "CSV File",
-          "help": "Upload your bank statement in CSV format"
+          "label": "Fichier CSV",
+          "help": "Téléchargez votre relevé bancaire au format CSV"
         },
         "submit": {
-          "label": "Import Transactions"
+          "label": "Importer des transactions"
         }
       },
       "draftTransactions": {
-        "title": "Review Draft Transactions",
-        "selectAll": "Select All",
-        "deselectAll": "Deselect All",
-        "approve": "Approve Selected",
+        "title": "Réviser les brouillons de transactions",
+        "selectAll": "Tout sélectionner",
+        "deselectAll": "Tout désélectionner",
+        "approve": "Approuver la sélection",
         "table": {
           "date": "Date",
           "description": "Description",
-          "descriptionPlaceholder": "Edit transaction description",
-          "creditAccount": "Credit Account",
-          "debitAccount": "Debit Account",
-          "amount": "Amount",
+          "descriptionPlaceholder": "Modifier la description de la transaction",
+          "creditAccount": "Compte créditeur",
+          "debitAccount": "Compte débiteur",
+          "amount": "Montant",
           "actions": "Actions",
-          "selectAccount": "Select Account"
+          "selectAccount": "Sélectionner un compte"
         },
         "aiInfo": {
-          "title": "AI-Assisted Account Assignment",
-          "description": "We automatically suggest accounts for transactions based on similar past transactions. Fields marked with an \"AI\" badge should be reviewed for accuracy."
+          "title": "Attribution de compte assistée par IA",
+          "description": "Nous suggérons automatiquement des comptes pour les transactions basées sur des transactions passées similaires. Les champs marqués du badge \"IA\" doivent être vérifiés."
         }
       },
       "emptyState": {
-        "title": "No Transactions to Review",
-        "description": "Import your first bank statement to get started with transaction management.",
+        "title": "Aucune transaction à réviser",
+        "description": "Importez votre premier relevé bancaire pour commencer la gestion des transactions.",
         "step1": {
-          "title": "1. Select Account",
-          "description": "Choose the account to import into"
+          "title": "1. Sélectionner un compte",
+          "description": "Choisissez le compte à importer"
         },
         "step2": {
-          "title": "2. Choose Provider",
-          "description": "Select your bank or financial provider"
+          "title": "2. Choisir un fournisseur",
+          "description": "Sélectionnez votre banque ou fournisseur financier"
         },
         "step3": {
-          "title": "3. Upload CSV",
-          "description": "Import your bank statement file"
+          "title": "3. Télécharger le CSV",
+          "description": "Importez votre fichier de relevé bancaire"
         }
       }
     },
     "settings": {
-      "title": "Settings",
-      "subtitle": "Manage your account preferences and application settings",
+      "title": "Paramètres",
+      "subtitle": "Gérez vos préférences de compte et les paramètres de l'application",
       "sections": {
         "profile": {
-          "title": "Profile Information",
-          "name": "Full Name",
-          "namePlaceholder": "Enter your full name",
-          "email": "Email Address",
-          "emailPlaceholder": "Enter your email address",
-          "updateButton": "Update Profile"
+          "title": "Informations de profil",
+          "name": "Nom complet",
+          "namePlaceholder": "Saisir votre nom complet",
+          "email": "Adresse email",
+          "emailPlaceholder": "Saisir votre adresse email",
+          "updateButton": "Mettre à jour le profil"
         },
         "language": {
-          "title": "Language & Region",
-          "currentLanguage": "Display Language",
-          "description": "Select your preferred language for the application interface"
+          "title": "Langue et région",
+          "currentLanguage": "Langue d'affichage",
+          "description": "Sélectionnez votre langue préférée pour l'interface de l'application"
         },
         "privacy": {
-          "title": "Privacy Settings",
-          "privacyMode": "Privacy Mode",
-          "privacyModeDescription": "Hide sensitive financial information when enabled"
+          "title": "Paramètres de confidentialité",
+          "privacyMode": "Mode confidentialité",
+          "privacyModeDescription": "Masque les informations financières sensibles lorsqu'il est activé"
         },
         "about": {
-          "title": "About myDon",
+          "title": "À propos de myDon",
           "version": "Version",
-          "buildDate": "Build Date"
+          "buildDate": "Date de compilation"
         },
         "appearance": {
           "title": "Apparence",
@@ -276,29 +278,29 @@
           "listStyleCompact": "Compact"
         },
         "export": {
-          "title": "Data Export",
-          "description": "Download all your data",
-          "exportButton": "Export My Data",
-          "exportDescription": "Download a complete copy of all your data including accounts, transactions, and profile information as CSV files in a ZIP archive.",
-          "downloadInProgress": "Preparing your export...",
-          "downloadSuccess": "Export downloaded successfully!",
-          "downloadError": "Failed to export data. Please try again."
+          "title": "Export de données",
+          "description": "Téléchargez toutes vos données",
+          "exportButton": "Exporter mes données",
+          "exportDescription": "Téléchargez une copie complète de toutes vos données incluant comptes, transactions et informations de profil sous forme de fichiers CSV dans une archive ZIP.",
+          "downloadInProgress": "Préparation de votre export...",
+          "downloadSuccess": "Export téléchargé avec succès !",
+          "downloadError": "Échec de l'export des données. Veuillez réessayer."
         }
       }
     },
     "budgets": {
       "title": "Budgets",
-      "subtitle": "Plan and track your financial goals",
-      "addBudget": "New Budget",
+      "subtitle": "Planifiez et suivez vos objectifs financiers",
+      "addBudget": "Nouveau budget",
       "budgetCount": "budgets",
-      "items": "items",
-      "fiscalYear": "Year",
-      "noBudgets": "No budgets yet",
-      "noBudgetsDescription": "Create a budget to plan and track your financial goals.",
-      "addFirstBudget": "Create your first budget",
-      "yearlyView": "Yearly",
-      "monthlyView": "Monthly",
-      "editItems": "Edit Items",
+      "items": "éléments",
+      "fiscalYear": "Année",
+      "noBudgets": "Aucun budget pour l'instant",
+      "noBudgetsDescription": "Créez un budget pour planifier et suivre vos objectifs financiers.",
+      "addFirstBudget": "Créer votre premier budget",
+      "yearlyView": "Annuel",
+      "monthlyView": "Mensuel",
+      "editItems": "Modifier les éléments",
       "backToBudgets": "Retour aux budgets",
       "overview": "Aperçu",
       "totalBudgeted": "Budgété",
@@ -311,121 +313,121 @@
       "editBudget": "Modifier le budget",
       "saveChanges": "Enregistrer",
       "budgetName": "Nom du budget",
-      "confirmDelete": "Delete budget \"{{name}}\"?",
-      "deleteSuccess": "Budget deleted.",
-      "deleteError": "Failed to delete budget.",
+      "confirmDelete": "Supprimer le budget « {{name}} » ?",
+      "deleteSuccess": "Budget supprimé.",
+      "deleteError": "Échec de la suppression du budget.",
       "addBudgetForm": {
-        "title": "New Budget",
+        "title": "Nouveau budget",
         "name": {
-          "label": "Budget Name",
-          "placeholder": "e.g. Conservative 2026"
+          "label": "Nom du budget",
+          "placeholder": "ex. Conservateur 2026"
         },
         "year": {
-          "label": "Year"
+          "label": "Année"
         },
         "submit": {
-          "label": "Create"
+          "label": "Créer"
         },
-        "success": "Budget created!",
-        "error": "Failed to create budget."
+        "success": "Budget créé !",
+        "error": "Échec de la création du budget."
       },
       "budgetItems": {
-        "title": "Budget Items",
-        "noItems": "No budget items defined.",
-        "addItem": "Add Item",
-        "addToList": "Add to list",
-        "budgetBy": "Budget by",
-        "saveItems": "Save",
-        "saveSuccess": "Budget items saved!",
-        "saveError": "Failed to save budget items.",
-        "selectCategory": "Select a category",
-        "selectAccount": "Select an account",
+        "title": "Éléments du budget",
+        "noItems": "Aucun élément de budget défini.",
+        "addItem": "Ajouter un élément",
+        "addToList": "Ajouter à la liste",
+        "budgetBy": "Budgéter par",
+        "saveItems": "Enregistrer",
+        "saveSuccess": "Éléments du budget enregistrés !",
+        "saveError": "Échec de l'enregistrement des éléments du budget.",
+        "selectCategory": "Sélectionner une catégorie",
+        "selectAccount": "Sélectionner un compte",
         "type": {
-          "category": "Category",
-          "account": "Account"
+          "category": "Catégorie",
+          "account": "Compte"
         },
         "amount": {
-          "label": "Amount"
+          "label": "Montant"
         },
         "frequency": {
-          "label": "Frequency",
-          "monthly": "Monthly",
-          "yearly": "Yearly"
+          "label": "Fréquence",
+          "monthly": "Mensuel",
+          "yearly": "Annuel"
         }
       },
       "progress": {
-        "of": "of",
-        "monthlyBudget": "/month",
-        "yearlyBudget": "/year",
-        "projectedYearly": "Projected yearly:",
-        "vsLastPeriod": "vs previous period",
-        "accounts": "accounts",
+        "of": "sur",
+        "monthlyBudget": "/mois",
+        "yearlyBudget": "/an",
+        "projectedYearly": "Projection annuelle :",
+        "vsLastPeriod": "vs période précédente",
+        "accounts": "comptes",
         "recommendations": {
-          "on_pace_to_exceed": "On pace to exceed yearly budget",
-          "over_budget": "Over monthly budget"
+          "on_pace_to_exceed": "En passe de dépasser le budget annuel",
+          "over_budget": "Dépassement du budget mensuel"
         }
       }
     },
     "manage": {
-      "title": "Manage",
-      "subtitle": "Manage your accounts and categories",
+      "title": "Gérer",
+      "subtitle": "Gérez vos comptes et catégories",
       "categories": {
-        "title": "Categories",
-        "namePlaceholder": "Category name",
-        "empty": "No categories yet",
-        "createSuccess": "Category created.",
-        "createError": "Failed to create category.",
-        "updateSuccess": "Category updated.",
-        "updateError": "Failed to update category."
+        "title": "Catégories",
+        "namePlaceholder": "Nom de la catégorie",
+        "empty": "Aucune catégorie pour l'instant",
+        "createSuccess": "Catégorie créée.",
+        "createError": "Échec de la création de la catégorie.",
+        "updateSuccess": "Catégorie mise à jour.",
+        "updateError": "Échec de la mise à jour de la catégorie."
       },
       "accounts": {
-        "title": "Accounts",
-        "showInactive": "Show inactive",
-        "all": "All",
-        "inactive": "Inactive",
-        "empty": "No accounts found",
-        "name": "Name",
-        "deactivate": "Deactivate",
-        "activate": "Activate",
-        "updateSuccess": "Account updated.",
-        "updateError": "Failed to update account.",
-        "deactivateSuccess": "Account deactivated.",
-        "activateSuccess": "Account activated."
+        "title": "Comptes",
+        "showInactive": "Afficher les inactifs",
+        "all": "Tous",
+        "inactive": "Inactif",
+        "empty": "Aucun compte trouvé",
+        "name": "Nom",
+        "deactivate": "Désactiver",
+        "activate": "Activer",
+        "updateSuccess": "Compte mis à jour.",
+        "updateError": "Échec de la mise à jour du compte.",
+        "deactivateSuccess": "Compte désactivé.",
+        "activateSuccess": "Compte activé."
       }
     }
   },
   "components": {
     "sidebar": {
       "menu": {
-        "dashboard": "Dashboard",
-        "accounts": "Accounts",
+        "dashboard": "Tableau de bord",
+        "accounts": "Comptes",
         "budgets": "Budgets",
-        "manage": "Manage",
-        "spendingAnalysis": "Spending Analysis",
-        "importTransactions": "Import",
-        "settings": "Settings",
-        "logout": "Logout"
+        "manage": "Gérer",
+        "spendingAnalysis": "Analyse des dépenses",
+        "importTransactions": "Importer",
+        "settings": "Paramètres",
+        "logout": "Déconnexion"
       }
     },
     "categoryCombobox": {
-      "createNew": "Create new category",
-      "newCategoryPlaceholder": "New category name",
-      "creating": "Creating..."
+      "createNew": "Créer une nouvelle catégorie",
+      "newCategoryPlaceholder": "Nom de la nouvelle catégorie",
+      "creating": "Création..."
     }
   },
   "words": {
-    "assets": "Assets",
-    "liabilities": "Liabilities",
-    "equity": "Equity",
-    "income": "Income",
-    "expenses": "Expenses",
-    "cancel": "Cancel",
+    "assets": "Actifs",
+    "liabilities": "Passifs",
+    "equity": "Capitaux propres",
+    "income": "Revenus",
+    "expenses": "Dépenses",
+    "cancel": "Annuler",
     "currencies": {
-      "CHF": "Swiss Franc (CHF)",
+      "CHF": "Franc suisse (CHF)",
       "EUR": "Euro (EUR)",
-      "USD": "US Dollar (USD)",
-      "GBP": "British Pound (GBP)",
-      "KRW": "Korean Won (KRW)"
+      "USD": "Dollar américain (USD)",
+      "GBP": "Livre sterling (GBP)",
+      "KRW": "Won coréen (KRW)"
     }
   }
 }

@@ -9,7 +9,7 @@ import { IconComponent } from '../icon/icon';
   imports: [RouterLink, IconComponent],
 })
 export class DetailHeaderComponent {
-  readonly backLink = input.required<string | any[]>();
+  readonly backLink = input.required<string | unknown[]>();
   readonly backLabel = input.required<string>();
   readonly title = input.required<string>();
 

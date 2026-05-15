@@ -57,12 +57,14 @@
         @for (opt of filtered(); track opt.value; let i = $index) {
           <div
             role="option"
+            tabindex="-1"
             [attr.aria-selected]="opt.value === value()"
             class="combobox-option"
             [class.combobox-option--active]="i === activeIndex()"
             [class.combobox-option--selected]="opt.value === value()"
             (mousedown)="$event.preventDefault()"
             (click)="select(opt)"
+            (keydown.enter)="select(opt)"
           >
             <div class="combobox-option-body">
               <span class="combobox-option-label">{{ opt.label }}</span>

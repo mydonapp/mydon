@@ -7,8 +7,8 @@
       [title]="account()?.name ?? ''"
     >
       @if (loading()) {
-        <div class="account-skeleton h-7 w-44 rounded-lg"></div>
-        <div class="account-skeleton h-4 w-28 rounded mt-2"></div>
+        <app-skeleton class="h-7 w-44" />
+        <app-skeleton class="h-4 w-28 mt-2" />
       } @else {
         <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">{{ account()?.name }}</h1>
         <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>
@@ -20,8 +20,8 @@
       <div class="grid grid-cols-2 gap-3 mt-5">
         @for (i of [1, 2, 3, 4]; track i) {
           <div class="page-group p-4">
-            <div class="account-skeleton h-3 w-16 rounded mb-2"></div>
-            <div class="account-skeleton h-6 w-20 rounded"></div>
+            <app-skeleton class="h-3 w-16 mb-2" />
+            <app-skeleton class="h-6 w-20" />
           </div>
         }
       </div>
@@ -80,12 +80,14 @@
     @if (loading()) {
       <div class="account-tx-list">
         @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
-          <div class="page-item">
+          <div class="page-item" [class.page-item--compact]="listStyleService.listStyle() === 'compact'">
             <div class="flex-1 min-w-0 flex flex-col gap-1.5">
-              <div class="account-skeleton h-4 w-48 rounded"></div>
-              <div class="account-skeleton h-3 w-28 rounded"></div>
+              <app-skeleton class="h-4 w-48" />
+              @if (listStyleService.listStyle() !== 'compact') {
+                <app-skeleton class="h-3 w-28" />
+              }
             </div>
-            <div class="account-skeleton h-4 w-16 rounded flex-shrink-0"></div>
+            <app-skeleton class="h-4 w-16 flex-shrink-0" />
           </div>
         }
       </div>
@@ -105,16 +107,23 @@
           @for (tx of paginatedTransactions(); track tx.id) {
             <div
               class="page-item hover:bg-surface-variant cursor-pointer transition-colors"
+              [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+              role="button"
+              tabindex="0"
               (click)="selectedTx.set(tx)"
+              (keydown.enter)="selectedTx.set(tx)"
+              (keydown.space)="$event.preventDefault(); selectedTx.set(tx)"
             >
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
-                <p class="text-xs text-on-surface-variant mt-0.5 truncate">
-                  {{ tx.transactionDate | date: 'mediumDate' }}
-                  @if (tx.counterAccount?.name; as other) {
-                    · {{ other }}
-                  }
-                </p>
+                @if (listStyleService.listStyle() !== 'compact') {
+                  <p class="text-xs text-on-surface-variant mt-0.5 truncate">
+                    {{ tx.transactionDate | date: 'mediumDate' }}
+                    @if (tx.counterAccount?.name; as other) {
+                      · {{ other }}
+                    }
+                  </p>
+                }
               </div>
               <span
                 class="text-sm font-semibold tabular-nums flex-shrink-0"

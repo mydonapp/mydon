@@ -35,9 +35,10 @@
       "importMore": "Mehr importieren",
       "importFirst": "Ihre ersten Transaktionen importieren",
       "quickActions": "Schnellaktionen",
-      "importTransactions": "Transaktionen importieren",
-      "manageAccounts": "Konten verwalten",
-      "refresh": "Daten aktualisieren"
+      "spending": "Ausgaben",
+      "cashFlow": "Cashflow",
+      "vsLastMonth": "ggü. letztem Monat",
+      "incomeMinusExpenses": "Einnahmen minus Ausgaben"
     },
     "login": {
       "title": "In Ihr Konto einloggen",
@@ -96,6 +97,7 @@
       "addFirstAccount": "Erstes Konto hinzufügen",
       "addAccount": "Konto hinzufügen",
       "addTransaction": "Transaktion hinzufügen",
+      "manageAccounts": "Konten verwalten",
       "retirement": "Rente",
       "addAccountForm": {
         "title": "Konto hinzufügen",
@@ -119,7 +121,9 @@
         },
         "submit": {
           "label": "Konto hinzufügen"
-        }
+        },
+        "success": "Konto erfolgreich erstellt!",
+        "error": "Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
       },
       "createTransactionForm": {
         "title": "Transaktion erstellen",
@@ -143,7 +147,9 @@
         },
         "submit": {
           "label": "Transaktion erstellen"
-        }
+        },
+        "success": "Transaktion erfolgreich erstellt!",
+        "error": "Transaktion konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
       }
     },
     "account": {
@@ -397,6 +403,7 @@
         "accounts": "Konten",
         "budgets": "Budgets",
         "manage": "Verwalten",
+        "spendingAnalysis": "Ausgabenanalyse",
         "importTransactions": "Importieren",
         "settings": "Einstellungen",
         "logout": "Abmelden"

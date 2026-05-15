@@ -105,6 +105,8 @@ All UI decisions — color tokens, typography, spacing, component patterns, dark
 
 **Angular components**: `standalone: true` is the default — omit it. Use `input()` / `output()` signal-based APIs for new component inputs/outputs. Use `@if` / `@for` control flow syntax, not `*ngIf` / `*ngFor`. Use `inject()` for DI, not constructor injection. File naming omits `.component`: `login.ts` / `login.html` / `login.css` (not `login.component.ts`). Split every component into separate `.ts`, `.html`, and `.css` files — no inline templates or styles.
 
+**Loading states**: Always use content-shaped skeletons, never spinners. Use `<app-skeleton>` (`shared/components/skeleton/skeleton.ts`) with `class="h-X w-X"` to match the dimensions of the content being loaded. Mirror the real layout — one skeleton per content block — so the page doesn't shift when data arrives.
+
 **API responses**: NestJS controllers return plain objects/arrays; TypeORM entities are not serialized directly — use DTOs or mapped response objects.
 
 **Environment config**: API URL for the frontend comes from `apps/app/src/environments/environment.ts` (`this.appConfig.apiUrl`). Default is `http://localhost:3000` for dev.

@@ -65,8 +65,27 @@
       </div>
 
       @if (draftsLoading()) {
-        <div class="flex justify-center py-8">
-          <app-spinner />
+        <div class="space-y-2">
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <div class="flex items-start gap-3 p-3 rounded-lg">
+              <app-skeleton class="w-4 h-4 mt-1 shrink-0" />
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <app-skeleton class="h-3 w-16" />
+                  <app-skeleton class="h-3 w-40" />
+                </div>
+                <div class="flex items-center gap-2">
+                  <app-skeleton class="h-8 flex-1" />
+                  <app-skeleton class="h-4 w-4 shrink-0" />
+                  <app-skeleton class="h-8 flex-1" />
+                </div>
+              </div>
+              <div class="flex items-center gap-3 shrink-0 mt-0.5">
+                <app-skeleton class="h-4 w-16" />
+                <app-skeleton class="h-6 w-6" />
+              </div>
+            </div>
+          }
         </div>
       } @else if (draftTransactions().length === 0) {
         <div class="text-center py-12">

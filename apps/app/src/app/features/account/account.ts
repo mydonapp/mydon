@@ -4,8 +4,9 @@ import { DatePipe, LowerCasePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountsService } from '../../services/accounts.service';
+import { AccountDetail, AccountsService, TransactionRecord } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
+import { ListStyleService } from '../../services/list-style.service';
 import { PrivacyService } from '../../services/privacy.service';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
@@ -13,6 +14,19 @@ import { SelectDirective } from '../../shared/directives/select.directive';
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { DetailHeaderComponent } from '../../shared/components/detail-header/detail-header';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
+
+type AccountTransaction = TransactionRecord & {
+  creditAccountName?: string;
+  debitAccountName?: string;
+  counterAccount?: { name: string } | null;
+};
+
+type RawAccountResponse = AccountDetail & {
+  transactions?: AccountTransaction[];
+  creditTransactions?: AccountTransaction[];
+  debitTransactions?: AccountTransaction[];
+};
 
 @Component({
   selector: 'app-account',
@@ -29,19 +43,21 @@ import { DetailHeaderComponent } from '../../shared/components/detail-header/det
     ModalComponent,
     IconComponent,
     DetailHeaderComponent,
+    SkeletonComponent,
   ],
 })
 export class AccountComponent implements OnInit {
   accountsService = inject(AccountsService);
   currencyService = inject(CurrencyService);
+  readonly listStyleService = inject(ListStyleService);
   privacyService = inject(PrivacyService);
   private route = inject(ActivatedRoute);
 
   loading = signal(false);
-  account = signal<any>(null);
-  transactions = signal<any[]>([]);
-  filteredTransactions = signal<any[]>([]);
-  selectedTx = signal<any>(null);
+  account = signal<AccountDetail | null>(null);
+  transactions = signal<AccountTransaction[]>([]);
+  filteredTransactions = signal<AccountTransaction[]>([]);
+  selectedTx = signal<AccountTransaction | null>(null);
   searchText = '';
   page = signal(1);
   pageSize = 25;
@@ -76,13 +92,13 @@ export class AccountComponent implements OnInit {
   async loadData() {
     this.loading.set(true);
     try {
-      const raw: any = await this.accountsService.fetchAccount(this.accountId());
-      const txs: any[] = raw.transactions ?? [];
+      const raw = (await this.accountsService.fetchAccount(this.accountId())) as RawAccountResponse;
+      const txs: AccountTransaction[] = raw.transactions ?? [];
       this.account.set({
         ...raw,
         totalTransactions: txs.length,
-        totalCredit: (raw.creditTransactions ?? []).reduce((s: number, t: any) => s + Number(t.creditAmount), 0),
-        totalDebit: (raw.debitTransactions ?? []).reduce((s: number, t: any) => s + Number(t.debitAmount), 0),
+        totalCredit: (raw.creditTransactions ?? []).reduce((s: number, t: AccountTransaction) => s + Number(t.creditAmount), 0),
+        totalDebit: (raw.debitTransactions ?? []).reduce((s: number, t: AccountTransaction) => s + Number(t.debitAmount), 0),
       });
       this.transactions.set(txs);
       this.applyFilters();
@@ -91,7 +107,7 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  txColor(tx: any): string {
+  txColor(tx: AccountTransaction): string {
     return balanceColor(this.account()?.type ?? '', tx.amount);
   }
 

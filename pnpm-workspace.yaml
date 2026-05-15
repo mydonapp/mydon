@@ -6,3 +6,16 @@ ignoreWorkspaceRootCheck: true
 packages:
   - 'apps/*'
   - 'libs/*'
+
+allowBuilds:
+  '@nestjs/core': false
+  '@parcel/watcher': false
+  '@scarf/scarf': false
+  '@swc/core': false
+  '@tailwindcss/oxide': set this to true or false
+  argon2: false
+  esbuild: false
+  lmdb: false
+  msgpackr-extract: false
+  nx: false
+  unrs-resolver: false

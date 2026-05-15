@@ -7,7 +7,7 @@ import { CurrencyService } from '../../services/currency.service';
 import { PrivacyService } from '../../services/privacy.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { BtnDirective } from '../../shared/directives/btn.directive';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 import { IconComponent } from '../../shared/components/icon/icon';
 
 interface DashboardStats {
@@ -23,15 +23,7 @@ interface DashboardStats {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [
-    RouterLink,
-    DatePipe,
-    TranslateModule,
-    PageHeaderComponent,
-    BtnDirective,
-    SpinnerComponent,
-    IconComponent,
-  ],
+  imports: [RouterLink, DatePipe, TranslateModule, PageHeaderComponent, BtnDirective, SkeletonComponent, IconComponent],
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent implements OnInit {
@@ -52,9 +44,9 @@ export class DashboardComponent implements OnInit {
     try {
       const now = new Date();
       const thisStart = this.toDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
-      const today    = this.toDateStr(now);
+      const today = this.toDateStr(now);
       const lastStart = this.toDateStr(new Date(now.getFullYear(), now.getMonth() - 1, 1));
-      const lastEnd   = this.toDateStr(new Date(now.getFullYear(), now.getMonth(), 0));
+      const lastEnd = this.toDateStr(new Date(now.getFullYear(), now.getMonth(), 0));
 
       const [thisPeriod, lastPeriod, txs] = await Promise.all([
         this.accountsService.fetchAccounts({ from: thisStart, to: today }),
@@ -62,12 +54,12 @@ export class DashboardComponent implements OnInit {
         this.accountsService.fetchRecentTransactions(),
       ]);
 
-      const assets      = thisPeriod.assets?.total      ?? 0;
+      const assets = thisPeriod.assets?.total ?? 0;
       const liabilities = thisPeriod.liabilities?.total ?? 0;
-      const thisExpense = thisPeriod.expense?.total      ?? 0;
-      const thisIncome  = thisPeriod.income?.total       ?? 0;
-      const lastExpense = lastPeriod.expense?.total      ?? 0;
-      const lastIncome  = lastPeriod.income?.total       ?? 0;
+      const thisExpense = thisPeriod.expense?.total ?? 0;
+      const thisIncome = thisPeriod.income?.total ?? 0;
+      const lastExpense = lastPeriod.expense?.total ?? 0;
+      const lastIncome = lastPeriod.income?.total ?? 0;
 
       this.stats.set({
         netWorth: assets - liabilities,
@@ -77,7 +69,7 @@ export class DashboardComponent implements OnInit {
         thisIncome,
         cashFlow: thisIncome - thisExpense,
         expenseChange: lastExpense !== 0 ? ((thisExpense - lastExpense) / Math.abs(lastExpense)) * 100 : null,
-        incomeChange:  lastIncome  !== 0 ? ((thisIncome  - lastIncome)  / Math.abs(lastIncome))  * 100 : null,
+        incomeChange: lastIncome !== 0 ? ((thisIncome - lastIncome) / Math.abs(lastIncome)) * 100 : null,
       });
 
       this.recentTransactions.set(txs.filter((tx: any) => !tx.draft).slice(0, 5));

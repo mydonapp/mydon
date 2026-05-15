@@ -39,6 +39,65 @@ export interface Transaction {
   debitAccountName: string;
 }
 
+export interface AccountBalance {
+  id: string;
+  name: string;
+  type: string;
+  creditBalance: number;
+  debitBalance: number;
+  balance: number;
+  currency: string;
+  balanceMainCurrency: number;
+  retirementAccount: boolean;
+  categoryId: string | null;
+  categoryName: string | null;
+}
+
+export interface AccountGroup {
+  accounts: AccountBalance[];
+  total: number;
+  totalWithoutRetirement?: number;
+}
+
+export interface AccountsResponse {
+  assets: AccountGroup;
+  liabilities: AccountGroup;
+  equity: AccountGroup;
+  income: AccountGroup;
+  expense: AccountGroup;
+}
+
+export interface TransactionRecord {
+  id: string;
+  creditAmount: number;
+  debitAmount: number;
+  amount: number;
+  description: string;
+  creditAccountId: string;
+  debitAccountId: string;
+  transactionDate: string;
+  draft: boolean;
+  creditAccountAISuggested?: boolean;
+  debitAccountAISuggested?: boolean;
+  matchedTransactionId?: string | null;
+}
+
+export interface Issuer {
+  id: string;
+  name: string;
+}
+
+export type PatchTransactionData = Partial<{
+  debitAmount: number;
+  creditAmount: number;
+  description: string;
+  creditAccountId: string;
+  debitAccountId: string;
+  draft: boolean;
+}>;
+
+export type SpendingAnalysis = Record<string, unknown>;
+
 @Injectable({ providedIn: 'root' })
 export class AccountsService {
   private http = inject(HttpClient);
@@ -54,12 +113,12 @@ export class AccountsService {
     this.accounts.set(accounts);
   }
 
-  async fetchAccounts(params?: Record<string, string>): Promise<any> {
+  async fetchAccounts(params?: Record<string, string>): Promise<AccountsResponse> {
     const year = this.timeFilter();
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
     const query = new URLSearchParams({ from, to, ...params }).toString();
-    return firstValueFrom(this.http.get<any>(`${this.appConfig.apiUrl}/v1/accounts?${query}`));
+    return firstValueFrom(this.http.get<AccountsResponse>(`${this.appConfig.apiUrl}/v1/accounts?${query}`));
   }
 
   async fetchAccount(id: string): Promise<AccountDetail> {
@@ -71,13 +130,13 @@ export class AccountsService {
     );
   }
 
-  async fetchTransactions(accountId: string, params?: Record<string, string>): Promise<any> {
+  async fetchTransactions(accountId: string, params?: Record<string, string>): Promise<TransactionRecord[]> {
     const year = this.timeFilter();
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
     const query = new URLSearchParams({ from, to, ...params }).toString();
     return firstValueFrom(
-      this.http.get<any>(`${this.appConfig.apiUrl}/v1/accounts/${accountId}/transactions?${query}`),
+      this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/accounts/${accountId}/transactions?${query}`),
     );
   }
 
@@ -117,12 +176,12 @@ export class AccountsService {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions`, data));
   }
 
-  async fetchRecentTransactions(): Promise<any[]> {
-    return firstValueFrom(this.http.get<any[]>(`${this.appConfig.apiUrl}/v1/transactions`));
+  async fetchRecentTransactions(): Promise<TransactionRecord[]> {
+    return firstValueFrom(this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/transactions`));
   }
 
-  async fetchDraftTransactions(): Promise<any[]> {
-    return firstValueFrom(this.http.get<any[]>(`${this.appConfig.apiUrl}/v1/transactions?filter=draft`));
+  async fetchDraftTransactions(): Promise<TransactionRecord[]> {
+    return firstValueFrom(this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/transactions?filter=draft`));
   }
 
   async approveDraftTransactions(ids: string[]): Promise<void> {
@@ -137,7 +196,7 @@ export class AccountsService {
     );
   }
 
-  async updateDraftTransaction(id: string, data: any): Promise<void> {
+  async updateDraftTransaction(id: string, data: PatchTransactionData): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/transactions/${id}`, data));
   }
 
@@ -153,12 +212,12 @@ export class AccountsService {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions/import`, formData));
   }
 
-  async fetchIssuers(): Promise<any[]> {
-    return firstValueFrom(this.http.get<any[]>(`${this.appConfig.apiUrl}/v1/transactions/issuers`));
+  async fetchIssuers(): Promise<Issuer[]> {
+    return firstValueFrom(this.http.get<Issuer[]>(`${this.appConfig.apiUrl}/v1/transactions/issuers`));
   }
 
-  async fetchSpendingAnalysis(params: Record<string, string>): Promise<any> {
+  async fetchSpendingAnalysis(params: Record<string, string>): Promise<SpendingAnalysis> {
     const query = new URLSearchParams(params).toString();
-    return firstValueFrom(this.http.get<any>(`${this.appConfig.apiUrl}/v1/transactions/analysis?${query}`));
+    return firstValueFrom(this.http.get<SpendingAnalysis>(`${this.appConfig.apiUrl}/v1/transactions/analysis?${query}`));
   }
 }

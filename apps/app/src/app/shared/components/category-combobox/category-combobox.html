@@ -28,11 +28,13 @@
         @for (cat of filtered(); track cat.id; let i = $index) {
           <li
             role="option"
+            tabindex="-1"
             [attr.aria-selected]="cat.id === value()"
             class="px-3 py-2 text-sm cursor-pointer hover:bg-surface-variant text-on-surface"
             [class.bg-surface-variant]="i === activeIndex()"
             (mousedown)="$event.preventDefault()"
             (click)="selectCategory(cat)"
+            (keydown.enter)="selectCategory(cat)"
           >
             {{ cat.name }}
           </li>
@@ -40,10 +42,12 @@
         @if (canCreate) {
           <li
             role="option"
+            tabindex="-1"
             aria-selected="false"
             class="px-3 py-2 text-sm cursor-pointer hover:bg-surface-variant text-on-surface border-t border-outline-variant"
             (mousedown)="$event.preventDefault()"
             (click)="createCategory()"
+            (keydown.enter)="createCategory()"
           >
             @if (creating()) {
               <span class="text-on-surface-variant">{{ 'components.categoryCombobox.creating' | translate }}</span>

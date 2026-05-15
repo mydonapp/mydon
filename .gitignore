@@ -49,6 +49,6 @@ vitest.config.*.timestamp*
 
 .angular/
 
-.angular
-
 __screenshots__/
+
+.pnpm-store/

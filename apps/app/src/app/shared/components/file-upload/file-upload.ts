@@ -6,6 +6,7 @@ import {
   ViewChild,
   ElementRef,
   HostListener,
+  inject,
 } from '@angular/core';
 import { IconComponent } from '../icon/icon';
 
@@ -16,6 +17,8 @@ import { IconComponent } from '../icon/icon';
   imports: [IconComponent],
 })
 export class FileUploadComponent {
+  private elementRef = inject(ElementRef);
+
   accept = input('');
   value = input<File | null>(null);
   fileChange = output<File | null>();
@@ -65,6 +68,4 @@ export class FileUploadComponent {
     const file = e.dataTransfer?.files?.[0];
     if (file) this.fileChange.emit(file);
   }
-
-  constructor(private elementRef: ElementRef) {}
 }

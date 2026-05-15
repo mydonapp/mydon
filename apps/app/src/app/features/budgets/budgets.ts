@@ -9,7 +9,7 @@ import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { FieldComponent } from '../../shared/components/field/field';
 import { ModalComponent } from '../../shared/components/modal/modal';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
@@ -24,7 +24,7 @@ import { IconComponent } from '../../shared/components/icon/icon';
     InputDirective,
     FieldComponent,
     ModalComponent,
-    SpinnerComponent,
+    SkeletonComponent,
     IconComponent,
   ],
 })

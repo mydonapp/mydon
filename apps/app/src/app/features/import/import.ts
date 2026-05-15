@@ -10,7 +10,7 @@ import { FileUploadComponent } from '../../shared/components/file-upload/file-up
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { SelectDirective } from '../../shared/directives/select.directive';
 import { FieldComponent } from '../../shared/components/field/field';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 import { IconComponent } from '../../shared/components/icon/icon';
 
 @Component({
@@ -27,7 +27,7 @@ import { IconComponent } from '../../shared/components/icon/icon';
     BtnDirective,
     SelectDirective,
     FieldComponent,
-    SpinnerComponent,
+    SkeletonComponent,
     IconComponent,
   ],
 })

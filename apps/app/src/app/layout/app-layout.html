@@ -39,8 +39,21 @@
       <!-- User profile + dropdown -->
       <div class="sidebar-user-wrap">
         @if (userMenuOpen()) {
-          <div class="user-menu" (click)="$event.stopPropagation()">
-            <div class="user-menu-item user-menu-item--toggle" (click)="togglePrivacy()">
+          <div
+            class="user-menu"
+            role="menu"
+            tabindex="-1"
+            (click)="$event.stopPropagation()"
+            (keydown)="$event.stopPropagation()"
+          >
+            <div
+              class="user-menu-item user-menu-item--toggle"
+              role="menuitem"
+              tabindex="0"
+              (click)="togglePrivacy()"
+              (keydown.enter)="togglePrivacy()"
+              (keydown.space)="togglePrivacy(); $event.preventDefault()"
+            >
               <app-icon [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'" [size]="15" />
               <span class="flex-1">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</span>
               <app-toggle [value]="privacyService.isPrivate()" class="pointer-events-none flex-shrink-0" />
@@ -125,7 +138,13 @@
     <!-- Profile / user menu -->
     <div class="bottom-nav-profile">
       @if (userMenuOpen()) {
-        <div class="user-menu" (click)="$event.stopPropagation()">
+        <div
+          class="user-menu"
+          role="menu"
+          tabindex="-1"
+          (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
+        >
           <button class="user-menu-item" (click)="goToSettings()">
             <app-icon name="settings" [size]="15" />
             <span>{{ 'components.sidebar.menu.settings' | translate }}</span>

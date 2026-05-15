@@ -6,139 +6,185 @@
   />
 
   @if (loading()) {
-    <div class="flex justify-center py-16">
-      <app-spinner size="lg" />
+  <!-- Net worth hero skeleton -->
+  <div class="page-group p-5 mb-6">
+    <app-skeleton class="h-3 w-20 mb-2" />
+    <app-skeleton class="h-10 w-48 mt-1" />
+    <div class="flex gap-6 mt-4 pt-4 border-t border-outline-variant">
+      <div>
+        <app-skeleton class="h-3 w-20 mb-1.5" />
+        <app-skeleton class="h-5 w-28" />
+      </div>
+      <div>
+        <app-skeleton class="h-3 w-20 mb-1.5" />
+        <app-skeleton class="h-5 w-28" />
+      </div>
     </div>
+  </div>
+  <!-- This month section -->
+  <app-skeleton class="h-3 w-24 mb-2" />
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+    @for (i of [1, 2, 3]; track i) {
+    <div class="page-group p-4">
+      <app-skeleton class="h-3 w-20 mb-2" />
+      <app-skeleton class="h-7 w-32" />
+      <app-skeleton class="h-3 w-24 mt-2" />
+    </div>
+    }
+  </div>
+  <!-- Recent transactions section -->
+  <app-skeleton class="h-3 w-36 mb-2" />
+  <div class="page-group">
+    @for (i of [1, 2, 3, 4, 5]; track i) {
+    <div class="page-item">
+      <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+        <app-skeleton class="h-4 w-48" />
+        <app-skeleton class="h-3 w-28" />
+      </div>
+      <app-skeleton class="h-4 w-16 flex-shrink-0" />
+    </div>
+    }
+  </div>
   } @else {
-    <!-- Net Worth Hero -->
-    <div class="page-group p-5 mb-6">
+  <!-- Net Worth Hero -->
+  <div class="page-group p-5 mb-6">
+    <div class="flex items-center justify-between">
       <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
         {{ 'views.dashboard.netWorth' | translate }}
       </p>
-      <p class="text-4xl font-bold text-on-surface mt-1 tabular-nums tracking-tight">
-        {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.netWorth ?? 0, 'CHF') }}
-      </p>
-      <div class="flex gap-6 mt-4 pt-4 border-t border-outline-variant">
-        <div>
-          <p class="text-xs text-on-surface-variant">{{ 'views.dashboard.totalAssets' | translate }}</p>
-          <p class="text-base font-semibold text-success tabular-nums mt-0.5">
-            {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.totalAssets ?? 0, 'CHF') }}
-          </p>
-        </div>
-        <div>
-          <p class="text-xs text-on-surface-variant">{{ 'words.liabilities' | translate }}</p>
-          <p class="text-base font-semibold text-error tabular-nums mt-0.5">
-            {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.totalLiabilities ?? 0, 'CHF') }}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- This month trend tiles -->
-    <p class="page-section-label mb-2">{{ 'views.dashboard.thisMonth' | translate }}</p>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-      <!-- Spending -->
-      <div class="page-group p-4">
-        <p class="text-xs text-on-surface-variant mb-1.5">{{ 'views.dashboard.spending' | translate }}</p>
-        <p class="text-xl font-bold tabular-nums text-on-surface">
-          {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.thisExpense ?? 0, 'CHF') }}
-        </p>
-        @if (stats()?.expenseChange != null) {
-          <div class="flex items-center gap-1 mt-2">
-            <app-icon
-              [name]="stats()!.expenseChange! > 0 ? 'chevron-up' : 'chevron-down'"
-              [size]="12"
-              [class]="spendingChangeClass(stats()!.expenseChange!)"
-            />
-            <span
-              class="text-xs font-semibold"
-              [class]="spendingChangeClass(stats()!.expenseChange!)"
-            >
-              {{ formatPct(stats()!.expenseChange!) }}
-            </span>
-            <span class="text-xs text-on-surface-variant">{{ 'views.dashboard.vsLastMonth' | translate }}</span>
-          </div>
-        } @else {
-          <p class="text-xs text-on-surface-variant mt-2">—</p>
-        }
-      </div>
-
-      <!-- Income -->
-      <div class="page-group p-4">
-        <p class="text-xs text-on-surface-variant mb-1.5">{{ 'words.income' | translate }}</p>
-        <p class="text-xl font-bold tabular-nums text-on-surface">
-          {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.thisIncome ?? 0, 'CHF') }}
-        </p>
-        @if (stats()?.incomeChange != null) {
-          <div class="flex items-center gap-1 mt-2">
-            <app-icon
-              [name]="stats()!.incomeChange! > 0 ? 'chevron-up' : 'chevron-down'"
-              [size]="12"
-              [class]="incomeChangeClass(stats()!.incomeChange!)"
-            />
-            <span
-              class="text-xs font-semibold"
-              [class]="incomeChangeClass(stats()!.incomeChange!)"
-            >
-              {{ formatPct(stats()!.incomeChange!) }}
-            </span>
-            <span class="text-xs text-on-surface-variant">{{ 'views.dashboard.vsLastMonth' | translate }}</span>
-          </div>
-        } @else {
-          <p class="text-xs text-on-surface-variant mt-2">—</p>
-        }
-      </div>
-
-      <!-- Cash Flow -->
-      <div class="page-group p-4">
-        <p class="text-xs text-on-surface-variant mb-1.5">{{ 'views.dashboard.cashFlow' | translate }}</p>
-        <p
-          class="text-xl font-bold tabular-nums"
-          [class]="(stats()?.cashFlow ?? 0) >= 0 ? 'text-success' : 'text-error'"
-        >
-          {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.cashFlow ?? 0, 'CHF') }}
-        </p>
-        <p class="text-xs text-on-surface-variant mt-2">{{ 'views.dashboard.incomeMinusExpenses' | translate }}</p>
-      </div>
-    </div>
-
-    <!-- Recent Transactions -->
-    <div class="flex items-center justify-between mb-1.5">
-      <p class="page-section-label">{{ 'views.dashboard.recentTransactions' | translate }}</p>
-      <a
-        routerLink="/app/import"
-        class="text-primary text-xs no-underline hover:underline"
+      <button
+        type="button"
+        class="md:hidden flex items-center justify-center w-7 h-7 rounded-md text-on-surface-variant hover:bg-surface-variant transition-colors"
+        (click)="privacyService.toggle()"
       >
-        {{ 'views.dashboard.importMore' | translate }}
-      </a>
+        <app-icon
+          [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'"
+          [size]="16"
+        />
+      </button>
     </div>
-    <div class="page-group">
-      @if (recentTransactions().length === 0) {
-        <div class="text-center py-10">
-          <p class="text-on-surface-variant text-sm mb-4">{{ 'views.dashboard.noTransactions' | translate }}</p>
-          <a routerLink="/app/import">
-            <button
-              appBtn
-              variant="primary"
-              size="sm"
-            >
-              {{ 'views.dashboard.importFirst' | translate }}
-            </button>
-          </a>
-        </div>
+    <p class="text-4xl font-bold text-on-surface mt-1 tabular-nums tracking-tight">
+      {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.netWorth ?? 0, 'CHF') }}
+    </p>
+    <div class="flex gap-6 mt-4 pt-4 border-t border-outline-variant">
+      <div>
+        <p class="text-xs text-on-surface-variant">{{ 'views.dashboard.totalAssets' | translate }}</p>
+        <p class="text-base font-semibold text-success tabular-nums mt-0.5">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.totalAssets ?? 0, 'CHF') }}
+        </p>
+      </div>
+      <div>
+        <p class="text-xs text-on-surface-variant">{{ 'words.liabilities' | translate }}</p>
+        <p class="text-base font-semibold text-error tabular-nums mt-0.5">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.totalLiabilities ?? 0, 'CHF') }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- This month trend tiles -->
+  <p class="page-section-label mb-2">{{ 'views.dashboard.thisMonth' | translate }}</p>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+    <!-- Spending -->
+    <div class="page-group p-4">
+      <p class="text-xs text-on-surface-variant mb-1.5">{{ 'views.dashboard.spending' | translate }}</p>
+      <p class="text-xl font-bold tabular-nums text-on-surface">
+        {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.thisExpense ?? 0, 'CHF') }}
+      </p>
+      @if (stats()?.expenseChange !== null) {
+      <div class="flex items-center gap-1 mt-2">
+        <app-icon
+          [name]="stats()!.expenseChange! > 0 ? 'chevron-up' : 'chevron-down'"
+          [size]="12"
+          [class]="spendingChangeClass(stats()!.expenseChange!)"
+        />
+        <span
+          class="text-xs font-semibold"
+          [class]="spendingChangeClass(stats()!.expenseChange!)"
+        >
+          {{ formatPct(stats()!.expenseChange!) }}
+        </span>
+        <span class="text-xs text-on-surface-variant">{{ 'views.dashboard.vsLastMonth' | translate }}</span>
+      </div>
       } @else {
-        @for (tx of recentTransactions(); track tx.id) {
-          <div class="page-item">
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
-              <p class="text-xs text-on-surface-variant mt-0.5">{{ tx.transactionDate | date: 'mediumDate' }}</p>
-            </div>
-            <span class="text-sm font-medium text-on-surface tabular-nums ml-4 flex-shrink-0">
-              {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, 'CHF') }}
-            </span>
-          </div>
-        }
+      <p class="text-xs text-on-surface-variant mt-2">—</p>
       }
     </div>
+
+    <!-- Income -->
+    <div class="page-group p-4">
+      <p class="text-xs text-on-surface-variant mb-1.5">{{ 'words.income' | translate }}</p>
+      <p class="text-xl font-bold tabular-nums text-on-surface">
+        {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.thisIncome ?? 0, 'CHF') }}
+      </p>
+      @if (stats()?.incomeChange !== null) {
+      <div class="flex items-center gap-1 mt-2">
+        <app-icon
+          [name]="stats()!.incomeChange! > 0 ? 'chevron-up' : 'chevron-down'"
+          [size]="12"
+          [class]="incomeChangeClass(stats()!.incomeChange!)"
+        />
+        <span
+          class="text-xs font-semibold"
+          [class]="incomeChangeClass(stats()!.incomeChange!)"
+        >
+          {{ formatPct(stats()!.incomeChange!) }}
+        </span>
+        <span class="text-xs text-on-surface-variant">{{ 'views.dashboard.vsLastMonth' | translate }}</span>
+      </div>
+      } @else {
+      <p class="text-xs text-on-surface-variant mt-2">—</p>
+      }
+    </div>
+
+    <!-- Cash Flow -->
+    <div class="page-group p-4">
+      <p class="text-xs text-on-surface-variant mb-1.5">{{ 'views.dashboard.cashFlow' | translate }}</p>
+      <p
+        class="text-xl font-bold tabular-nums"
+        [class]="(stats()?.cashFlow ?? 0) >= 0 ? 'text-success' : 'text-error'"
+      >
+        {{ privacyService.isPrivate() ? '···' : currencyService.format(stats()?.cashFlow ?? 0, 'CHF') }}
+      </p>
+      <p class="text-xs text-on-surface-variant mt-2">{{ 'views.dashboard.incomeMinusExpenses' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div class="flex items-center justify-between mb-1.5">
+    <p class="page-section-label">{{ 'views.dashboard.recentTransactions' | translate }}</p>
+    <a
+      routerLink="/app/import"
+      class="text-primary text-xs no-underline hover:underline"
+    >
+      {{ 'views.dashboard.importMore' | translate }}
+    </a>
+  </div>
+  <div class="page-group">
+    @if (recentTransactions().length === 0) {
+    <div class="text-center py-10">
+      <p class="text-on-surface-variant text-sm mb-4">{{ 'views.dashboard.noTransactions' | translate }}</p>
+      <a routerLink="/app/import">
+        <button
+          appBtn
+          variant="primary"
+          size="sm"
+        >
+          {{ 'views.dashboard.importFirst' | translate }}
+        </button>
+      </a>
+    </div>
+    } @else { @for (tx of recentTransactions(); track tx.id) {
+    <div class="page-item">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">{{ tx.transactionDate | date: 'mediumDate' }}</p>
+      </div>
+      <span class="text-sm font-medium text-on-surface tabular-nums ml-4 flex-shrink-0">
+        {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, 'CHF') }}
+      </span>
+    </div>
+    } }
+  </div>
   }
 </div>

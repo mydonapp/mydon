@@ -72,7 +72,11 @@ export class ComboboxComponent {
 
   toggle() {
     if (this.disabled()) return;
-    this.isOpen() ? this.close() : this.open();
+    if (this.isOpen()) {
+      this.close();
+    } else {
+      this.open();
+    }
   }
 
   open() {
@@ -106,11 +110,12 @@ export class ComboboxComponent {
         e.preventDefault();
         this.activeIndex.update(i => Math.max(i - 1, 0));
         break;
-      case 'Enter':
+      case 'Enter': {
         e.preventDefault();
         const idx = this.activeIndex();
         if (idx >= 0 && idx < opts.length) this.select(opts[idx]);
         break;
+      }
     }
   }
 
