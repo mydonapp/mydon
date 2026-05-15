@@ -32,6 +32,7 @@ export interface BudgetProgressItem {
   id: string;
   name: string;
   type: 'category' | 'account';
+  accountType: string | null;
   amount: number;
   frequency: 'monthly' | 'yearly';
   monthlyBudget: number;
@@ -39,7 +40,8 @@ export interface BudgetProgressItem {
   actual: number;
   percentage: number;
   projectedYearly: number;
-  vsLastPeriod: number;
+  prevActual: number;
+  monthOverMonthChange: number | null;
   accounts?: { id: string; name: string; actual: number }[];
 }
 

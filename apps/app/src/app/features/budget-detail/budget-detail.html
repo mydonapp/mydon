@@ -1,163 +1,268 @@
 <div class="page-content">
-  <div class="flex items-start justify-between mb-6">
-    <app-page-header
-      [title]="budget()?.name ?? ''"
-      [subtitle]="budget()?.year?.toString() ?? ''"
-    />
-    <div class="flex gap-2">
-      <div class="segmented-control">
-        <button
-          class="segmented-btn"
-          [class.segmented-btn--active]="viewType() === 'yearly'"
-          (click)="viewType.set('yearly'); loadProgress()"
-        >
-          {{ 'views.budgets.yearlyView' | translate }}
-        </button>
-        <button
-          class="segmented-btn"
-          [class.segmented-btn--active]="viewType() === 'monthly'"
-          (click)="viewType.set('monthly'); loadProgress()"
-        >
-          {{ 'views.budgets.monthlyView' | translate }}
-        </button>
-      </div>
-      <button appBtn variant="secondary" size="sm" (click)="showEditItems.set(true)">
-        {{ 'views.budgets.editItems' | translate }}
-      </button>
-    </div>
-  </div>
 
-  @if (viewType() === 'monthly') {
-    <div class="flex items-center gap-2 mb-4">
-      <select appSelect class="w-auto"
-        [ngModel]="selectedMonth()"
-        (ngModelChange)="selectedMonth.set(+$event); loadProgress()"
-      >
-        @for (m of months; track m.value) {
-          <option [value]="m.value">{{ m.label }}</option>
-        }
-      </select>
-    </div>
-  }
-
-  @if (progressLoading()) {
-    <div class="flex justify-center py-8">
-      <app-spinner />
+  @if (loading()) {
+    <div class="flex justify-center py-12">
+      <app-spinner size="lg" />
     </div>
   } @else {
-    <div class="space-y-4">
-      @for (item of progressItems(); track item.id) {
-        <div class="page-group p-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-medium text-on-surface">{{ item.name }}</h3>
-            <div class="text-right">
-              <span class="text-sm font-bold" [class]="item.percentage > 100 ? 'text-error' : 'text-on-surface'">
-                {{ currencyService.format(item.actual, 'CHF') }}
+
+    <!-- Back link (desktop) -->
+    <div class="mb-4 hidden md:block">
+      <a routerLink="/app/budgets"
+         class="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-on-surface transition-colors no-underline">
+        <app-icon name="arrow-left" [size]="14" />
+        {{ 'views.budgets.backToBudgets' | translate }}
+      </a>
+    </div>
+
+    @if (!editMode()) {
+
+      <!-- ===== VIEW MODE ===== -->
+      <div class="flex items-start justify-between mb-1">
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-bold text-on-surface">{{ budget()?.name }}</h1>
+          <button
+            type="button"
+            class="flex items-center justify-center w-7 h-7 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors"
+            (click)="enterEditMode()"
+            title="Edit budget"
+          >
+            <app-icon name="pencil" [size]="14" />
+          </button>
+        </div>
+        <div class="segmented-control shrink-0">
+          <button
+            class="segmented-btn"
+            [class.segmented-btn--active]="viewType() === 'yearly'"
+            (click)="viewType.set('yearly'); loadProgress()"
+          >
+            {{ 'views.budgets.yearlyView' | translate }}
+          </button>
+          <button
+            class="segmented-btn"
+            [class.segmented-btn--active]="viewType() === 'monthly'"
+            (click)="viewType.set('monthly'); loadProgress()"
+          >
+            {{ 'views.budgets.monthlyView' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <p class="text-sm text-on-surface-variant mb-4">{{ budget()?.year }}</p>
+
+      <!-- Summary stats row -->
+      @if (progressItems().length > 0) {
+        <div class="page-group p-3 mb-4 space-y-2 text-sm">
+          @if (incomeItems().length > 0) {
+            <div class="flex flex-wrap gap-x-6 gap-y-1">
+              <span class="text-on-surface-variant font-medium w-20 shrink-0">{{ 'views.budgets.income' | translate }}</span>
+              <span>
+                <span class="text-on-surface-variant">{{ 'views.budgets.totalBudgeted' | translate }}:</span>
+                <span class="font-semibold text-on-surface ml-1">{{ currencyService.format(incomeBudgeted(), 'CHF') }}</span>
               </span>
-              <span class="text-on-surface-variant text-xs ml-1">
-                {{ 'views.budgets.progress.of' | translate }} {{ currencyService.format(viewType() === 'monthly' ? item.monthlyBudget : item.yearlyBudget, 'CHF') }}
+              <span>
+                <span class="text-on-surface-variant">{{ 'views.budgets.totalActual' | translate }}:</span>
+                <span class="font-semibold text-income ml-1">{{ currencyService.format(incomeActual(), 'CHF') }}</span>
               </span>
             </div>
-          </div>
-          <app-progress-bar
-            [value]="Math.min(item.percentage, 100)"
-            [variant]="item.percentage > 100 ? 'error' : item.percentage > 80 ? 'warning' : 'success'"
-          />
-          <div class="flex items-center justify-between mt-1">
-            <span class="text-xs text-on-surface-variant">{{ item.percentage.toFixed(0) }}%</span>
-            @if (viewType() === 'monthly') {
-              <span class="text-xs text-on-surface-variant">
-                {{ 'views.budgets.progress.projectedYearly' | translate }}
-                {{ currencyService.format(item.projectedYearly, 'CHF') }}
+          }
+          @if (expenseItems().length > 0) {
+            <div class="flex flex-wrap gap-x-6 gap-y-1">
+              <span class="text-on-surface-variant font-medium w-20 shrink-0">{{ 'views.budgets.expenses' | translate }}</span>
+              <span>
+                <span class="text-on-surface-variant">{{ 'views.budgets.totalBudgeted' | translate }}:</span>
+                <span class="font-semibold text-on-surface ml-1">{{ currencyService.format(expenseBudgeted(), 'CHF') }}</span>
               </span>
-            }
-          </div>
-          @if (item.percentage > 100) {
-            <span class="badge badge--error badge--sm mt-1">
-              {{ 'views.budgets.progress.recommendations.over_budget' | translate }}
-            </span>
+              <span>
+                <span class="text-on-surface-variant">{{ 'views.budgets.totalActual' | translate }}:</span>
+                <span class="font-semibold text-error ml-1">{{ currencyService.format(expenseActual(), 'CHF') }}</span>
+              </span>
+            </div>
+          }
+          @if (incomeItems().length > 0 && expenseItems().length > 0) {
+            <div class="flex flex-wrap gap-x-6 gap-y-1 border-t border-outline-variant pt-2">
+              <span class="text-on-surface-variant font-medium w-20 shrink-0">{{ 'views.budgets.net' | translate }}</span>
+              <span>
+                <span class="text-on-surface-variant">{{ 'views.budgets.totalBudgeted' | translate }}:</span>
+                <span class="font-semibold text-on-surface ml-1">{{ currencyService.format(netBudgeted(), 'CHF') }}</span>
+              </span>
+              <span>
+                <span class="text-on-surface-variant">{{ 'views.budgets.totalActual' | translate }}:</span>
+                <span class="font-semibold ml-1"
+                  [class.text-income]="netActual() >= 0"
+                  [class.text-error]="netActual() < 0"
+                >{{ currencyService.format(netActual(), 'CHF') }}</span>
+              </span>
+            </div>
           }
         </div>
       }
-      @if (progressItems().length === 0) {
-        <div class="page-group p-8 text-center">
-          <p class="text-on-surface-variant">{{ 'views.budgets.budgetItems.noItems' | translate }}</p>
+
+      <!-- Month selector -->
+      @if (viewType() === 'monthly') {
+        <div class="flex items-center gap-2 mb-4">
+          <select appSelect class="w-auto"
+            [ngModel]="selectedMonth()"
+            (ngModelChange)="selectedMonth.set(+$event); loadProgress()"
+          >
+            @for (m of months; track m.value) {
+              <option [value]="m.value">{{ m.label }}</option>
+            }
+          </select>
         </div>
       }
-    </div>
-  }
-</div>
 
-<!-- Edit Items Modal -->
-<app-modal [open]="showEditItems()" (closed)="showEditItems.set(false)" boxClass="max-w-2xl max-h-screen overflow-y-auto">
-  <h3 class="font-bold text-lg mb-4">{{ 'views.budgets.budgetItems.title' | translate }}</h3>
+      <!-- Progress items -->
+      @if (progressLoading()) {
+        <div class="flex justify-center py-8"><app-spinner /></div>
+      } @else {
+        <div class="space-y-4">
+          @for (item of progressItems(); track item.id) {
+            <div class="page-group p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-medium text-on-surface">{{ item.name }}</h3>
+                <div class="text-right">
+                  <span class="text-sm font-bold" [class]="item.percentage > 100 ? 'text-error' : 'text-on-surface'">
+                    {{ currencyService.format(item.actual, 'CHF') }}
+                  </span>
+                  <span class="text-on-surface-variant text-xs ml-1">
+                    {{ 'views.budgets.progress.of' | translate }}
+                    {{ currencyService.format(viewType() === 'monthly' ? item.monthlyBudget : item.yearlyBudget, 'CHF') }}
+                  </span>
+                </div>
+              </div>
+              <app-progress-bar
+                [value]="Math.min(item.percentage, 100)"
+                [variant]="item.percentage > 100 ? 'error' : item.percentage > 80 ? 'warning' : 'success'"
+              />
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-xs text-on-surface-variant">{{ item.percentage.toFixed(0) }}%</span>
+                @if (viewType() === 'monthly') {
+                  <span class="text-xs text-on-surface-variant">
+                    {{ 'views.budgets.progress.projectedYearly' | translate }}
+                    {{ currencyService.format(item.projectedYearly, 'CHF') }}
+                  </span>
+                }
+              </div>
+              @if (item.percentage > 100) {
+                <span class="badge badge--error badge--sm mt-1">
+                  {{ 'views.budgets.progress.recommendations.over_budget' | translate }}
+                </span>
+              }
+            </div>
+          }
 
-  <div class="space-y-3 mb-4">
-    @for (item of editItems(); track $index) {
-      <div class="flex items-center gap-2 p-3 bg-surface rounded-lg border border-outline-variant">
-        <select appSelect class="w-auto"
-          [ngModel]="item.type"
-          (ngModelChange)="item.type = $event; item.categoryId = undefined; item.accountId = undefined"
-        >
-          <option value="category">{{ 'views.budgets.budgetItems.type.category' | translate }}</option>
-          <option value="account">{{ 'views.budgets.budgetItems.type.account' | translate }}</option>
-        </select>
+          @if (progressItems().length === 0) {
+            <div class="page-group p-8 text-center">
+              <p class="text-on-surface-variant mb-4">{{ 'views.budgets.budgetItems.noItems' | translate }}</p>
+              <button appBtn variant="secondary" size="sm" (click)="enterEditMode()">
+                {{ 'views.budgets.editBudget' | translate }}
+              </button>
+            </div>
+          }
+        </div>
 
-        @if (item.type === 'category') {
-          <select appSelect class="flex-1"
-            [ngModel]="item.categoryId"
-            (ngModelChange)="item.categoryId = $event"
-          >
-            <option value="">{{ 'views.budgets.budgetItems.selectCategory' | translate }}</option>
-            @for (cat of categoriesService.categories(); track cat.id) {
-              <option [value]="cat.id">{{ cat.name }}</option>
-            }
-          </select>
-        } @else {
-          <select appSelect class="flex-1"
-            [ngModel]="item.accountId"
-            (ngModelChange)="item.accountId = $event"
-          >
-            <option value="">{{ 'views.budgets.budgetItems.selectAccount' | translate }}</option>
-            @for (acc of accountsService.accounts(); track acc.id) {
-              <option [value]="acc.id">{{ acc.name }}</option>
-            }
-          </select>
+        @if (progressItems().length > 0) {
+          <div class="mt-6 flex justify-end">
+            <button appBtn variant="secondary" (click)="enterEditMode()">
+              {{ 'views.budgets.editBudget' | translate }}
+            </button>
+          </div>
         }
+      }
 
-        <input appInput type="number"
-          class="w-28"
-          [ngModel]="item.amount"
-          (ngModelChange)="item.amount = +$event"
-          placeholder="Amount"
-        />
+    } @else {
 
-        <select appSelect class="w-auto"
-          [ngModel]="item.frequency"
-          (ngModelChange)="item.frequency = $event"
-        >
-          <option value="monthly">{{ 'views.budgets.budgetItems.frequency.monthly' | translate }}</option>
-          <option value="yearly">{{ 'views.budgets.budgetItems.frequency.yearly' | translate }}</option>
-        </select>
+      <!-- ===== EDIT MODE ===== -->
+      <div class="mb-6">
+        <div class="flex items-end gap-3">
+          <div class="flex-1">
+            <label class="label mb-1 block">{{ 'views.budgets.budgetName' | translate }}</label>
+            <input appInput
+              [ngModel]="editName()"
+              (ngModelChange)="editName.set($event)"
+            />
+          </div>
+          <div class="w-28">
+            <label class="label mb-1 block">{{ 'views.budgets.addBudgetForm.year.label' | translate }}</label>
+            <input appInput type="number"
+              [ngModel]="editYear()"
+              (ngModelChange)="editYear.set(+$event)"
+            />
+          </div>
+        </div>
+      </div>
 
-        <button appBtn variant="ghost" size="xs" class="text-error flex-shrink-0" (click)="removeItem($index)">
-          <app-icon name="trash-2" [size]="16" />
+      <p class="page-section-label mb-2">{{ 'views.budgets.budgetItems.title' | translate }}</p>
+
+      <div class="space-y-2 mb-3">
+        @for (item of editItems(); track $index) {
+          <div class="page-group p-3">
+            <div class="flex flex-wrap items-center gap-2">
+
+              <select appSelect class="w-28 shrink-0"
+                [ngModel]="item.type"
+                (ngModelChange)="item.type = $event; item.categoryId = undefined; item.accountId = undefined"
+              >
+                <option value="category">{{ 'views.budgets.budgetItems.type.category' | translate }}</option>
+                <option value="account">{{ 'views.budgets.budgetItems.type.account' | translate }}</option>
+              </select>
+
+              @if (item.type === 'category') {
+                <app-combobox
+                  class="flex-1 min-w-0 block"
+                  [options]="categoryOptions()"
+                  [value]="item.categoryId ?? ''"
+                  [placeholder]="item.categoryName || ('views.budgets.budgetItems.selectCategory' | translate)"
+                  (valueChange)="item.categoryId = $event; item.categoryName = undefined"
+                />
+              } @else {
+                <app-combobox
+                  class="flex-1 min-w-0 block"
+                  [options]="accountOptions()"
+                  [value]="item.accountId ?? ''"
+                  [placeholder]="item.accountName || ('views.budgets.budgetItems.selectAccount' | translate)"
+                  (valueChange)="item.accountId = $event; item.accountName = undefined"
+                />
+              }
+
+              <input appInput type="number" class="w-28 shrink-0"
+                [ngModel]="item.amount"
+                (ngModelChange)="item.amount = +$event"
+                placeholder="0.00"
+              />
+
+              <select appSelect class="w-28 shrink-0"
+                [ngModel]="item.frequency"
+                (ngModelChange)="item.frequency = $event"
+              >
+                <option value="monthly">{{ 'views.budgets.budgetItems.frequency.monthly' | translate }}</option>
+                <option value="yearly">{{ 'views.budgets.budgetItems.frequency.yearly' | translate }}</option>
+              </select>
+
+              <button appBtn variant="ghost" size="xs" class="text-error shrink-0" (click)="removeItem($index)">
+                <app-icon name="trash-2" [size]="16" />
+              </button>
+
+            </div>
+          </div>
+        }
+      </div>
+
+      <button appBtn variant="ghost" size="sm" class="mb-6" (click)="addItem()">
+        <app-icon name="plus" [size]="16" class="mr-1" />
+        {{ 'views.budgets.budgetItems.addItem' | translate }}
+      </button>
+
+      <div class="flex items-center justify-end gap-2 pt-4 border-t border-outline-variant">
+        <button appBtn variant="ghost" (click)="cancelEdit()">
+          {{ 'common.cancel' | translate }}
+        </button>
+        <button appBtn variant="primary" [loading]="submitting()" (click)="saveAll()">
+          {{ 'views.budgets.saveChanges' | translate }}
         </button>
       </div>
+
     }
-  </div>
-
-  <button appBtn variant="ghost" size="sm" (click)="addItem()">
-    <app-icon name="plus" [size]="16" class="mr-1" />
-    {{ 'views.budgets.budgetItems.addItem' | translate }}
-  </button>
-
-  <div class="modal-footer">
-    <button appBtn variant="ghost" (click)="showEditItems.set(false)">
-      {{ 'common.cancel' | translate }}
-    </button>
-    <button appBtn [loading]="submitting()" (click)="saveItems()">
-      {{ 'views.budgets.budgetItems.saveItems' | translate }}
-    </button>
-  </div>
-</app-modal>
+  }
+</div>

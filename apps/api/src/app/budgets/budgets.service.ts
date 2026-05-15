@@ -151,6 +151,7 @@ export class BudgetsService {
 
         let actual = 0;
         let prevActual = 0;
+        let accountType: string | null = null;
         let accountBreakdown: { id: string; name: string; actual: number }[] = [];
 
         if (item.category) {
@@ -158,10 +159,12 @@ export class BudgetsService {
           const prev = await this.getCategoryActual(item.category.id, context.user.id, prevFrom, prevTo);
           actual = curr.total;
           prevActual = prev.total;
+          accountType = curr.accountType;
           accountBreakdown = curr.accounts;
         } else if (item.account) {
           actual = await this.getAccountActual(item.account, context.user.id, from, to);
           prevActual = await this.getAccountActual(item.account, context.user.id, prevFrom, prevTo);
+          accountType = item.account.type;
         }
 
         const percentage =
@@ -183,7 +186,9 @@ export class BudgetsService {
 
         return {
           id: item.id,
+          name: item.category?.name ?? item.account?.name ?? '',
           type: item.category ? 'category' : 'account',
+          accountType,
           categoryId: item.category?.id ?? null,
           categoryName: item.category?.name ?? null,
           accountId: item.account?.id ?? null,
@@ -239,7 +244,7 @@ export class BudgetsService {
     userId: string,
     from: Date,
     to: Date,
-  ): Promise<{ total: number; accounts: { id: string; name: string; actual: number }[] }> {
+  ): Promise<{ total: number; accountType: string | null; accounts: { id: string; name: string; actual: number }[] }> {
     const rows = await this.dataSource.query(
       `SELECT
         a.id,
@@ -269,6 +274,7 @@ export class BudgetsService {
     });
 
     const total = accounts.reduce((sum: number, a: { actual: number }) => sum + a.actual, 0);
-    return { total, accounts };
+    const accountType: string | null = rows[0]?.type ?? null;
+    return { total, accountType, accounts };
   }
 }

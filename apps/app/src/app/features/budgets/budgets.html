@@ -24,24 +24,27 @@
       </button>
     </div>
   } @else {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="page-group">
       @for (budget of budgets(); track budget.id) {
-        <div class="page-group p-4 hover:bg-surface-variant/30 transition-colors">
-          <div class="flex items-start justify-between">
-            <div>
-              <h3 class="font-semibold text-on-surface">{{ budget.name }}</h3>
-              <p class="text-on-surface-variant text-sm">{{ budget.year }} · {{ budget.itemCount }} {{ 'views.budgets.items' | translate }}</p>
-            </div>
-            <button appBtn variant="ghost" size="xs" class="text-error" (click)="confirmDelete(budget)">
-              <app-icon name="trash-2" [size]="16" />
-            </button>
-          </div>
-          <div class="mt-3">
-            <a appBtn variant="primary" size="sm" [block]="true" [routerLink]="['/app/budgets', budget.id]">
-              {{ 'common.edit' | translate }}
-            </a>
-          </div>
-        </div>
+        <a
+          class="page-item hover:bg-surface-variant/30 transition-colors no-underline"
+          [routerLink]="['/app/budgets', budget.id]"
+        >
+          <span class="font-medium text-on-surface flex-1 truncate">{{ budget.name }}</span>
+          <span class="text-xs bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full shrink-0">
+            {{ budget.year }}
+          </span>
+          <span class="text-sm text-on-surface-variant shrink-0">
+            {{ budget.itemCount }} {{ 'views.budgets.items' | translate }}
+          </span>
+          <button
+            appBtn variant="ghost" size="xs"
+            class="text-error shrink-0"
+            (click)="$event.preventDefault(); $event.stopPropagation(); confirmDelete(budget)"
+          >
+            <app-icon name="trash-2" [size]="16" />
+          </button>
+        </a>
       }
     </div>
   }
@@ -50,8 +53,10 @@
 <!-- Create Budget Modal -->
 <app-modal [open]="showCreate()" (closed)="showCreate.set(false)">
   <form (ngSubmit)="submitCreate()">
-    <h3 class="font-bold text-lg mb-4">{{ 'views.budgets.addBudgetForm.title' | translate }}</h3>
-    <div class="space-y-4 mb-4">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ 'views.budgets.addBudgetForm.title' | translate }}</h3>
+    </div>
+    <div class="space-y-4 py-1">
       <app-field [label]="'views.budgets.addBudgetForm.name.label' | translate" [required]="true">
         <input appInput name="budgetName"
           [(ngModel)]="newBudget.name"
@@ -64,7 +69,7 @@
         />
       </app-field>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer mt-6">
       <button appBtn variant="ghost" type="button" (click)="showCreate.set(false)">
         {{ 'common.cancel' | translate }}
       </button>
@@ -78,8 +83,10 @@
 <!-- Delete Confirm Modal -->
 <app-modal [open]="!!budgetToDelete()" (closed)="budgetToDelete.set(null)">
   @if (budgetToDelete()) {
-    <h3 class="font-bold text-lg text-error mb-2">{{ 'common.delete' | translate }}</h3>
-    <p class="text-on-surface text-sm mb-4">
+    <div class="modal-header">
+      <h3 class="modal-title text-error">{{ 'common.delete' | translate }}</h3>
+    </div>
+    <p class="text-on-surface text-sm py-1 mb-2">
       {{ 'views.budgets.confirmDelete' | translate: { name: budgetToDelete()!.name } }}
     </p>
     <div class="modal-footer">

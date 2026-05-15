@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { BudgetsService, BudgetSummary } from '../../services/budgets.service';
@@ -29,13 +29,14 @@ import { IconComponent } from '../../shared/components/icon/icon';
   ],
 })
 export class BudgetsComponent implements OnInit {
-  private budgetsService = inject(BudgetsService);
-  private toastService = inject(ToastService);
+  private readonly budgetsService = inject(BudgetsService);
+  private readonly toastService   = inject(ToastService);
+  private readonly router         = inject(Router);
 
-  loading = signal(false);
+  loading    = signal(false);
   submitting = signal(false);
   showCreate = signal(false);
-  budgets = signal<BudgetSummary[]>([]);
+  budgets    = signal<BudgetSummary[]>([]);
   budgetToDelete = signal<BudgetSummary | null>(null);
 
   newBudget = {
@@ -80,14 +81,14 @@ export class BudgetsComponent implements OnInit {
     if (!this.newBudget.name || !this.newBudget.year) return;
     this.submitting.set(true);
     try {
-      await this.budgetsService.createBudget({
+      const created = await this.budgetsService.createBudget({
         name: this.newBudget.name,
         year: Number(this.newBudget.year),
       });
       this.toastService.success('Budget created!');
       this.showCreate.set(false);
       this.newBudget = { name: '', year: String(new Date().getFullYear()) };
-      await this.loadData();
+      this.router.navigate(['/app/budgets', created.id]);
     } catch {
       this.toastService.error('Failed to create budget.');
     } finally {
