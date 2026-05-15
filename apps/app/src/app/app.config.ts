@@ -11,6 +11,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import {
   AlignJustify,
+  ArrowDown,
   ArrowLeft,
   ArrowLeftRight,
   ArrowRight,
@@ -91,6 +92,7 @@ export const appConfig: ApplicationConfig = {
         Building,
         Upload,
         Bot,
+        ArrowDown,
         ArrowLeftRight,
         ArrowRight,
         Trash2,

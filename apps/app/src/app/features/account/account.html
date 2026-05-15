@@ -1,31 +1,48 @@
 <!-- Blurred backdrop: appears on scroll behind button + title (mobile only) -->
-<div class="account-header-backdrop" [class.account-header-backdrop--visible]="isScrolling()"></div>
+<div
+  class="account-header-backdrop"
+  [class.account-header-backdrop--visible]="isScrolling()"
+></div>
 
 <!-- Fixed header row: back circle + title that fades in to its right (mobile only) -->
 <div class="account-fixed-header md:hidden">
-  <a routerLink="/app/accounts" class="account-back-circle">
-    <app-icon name="arrow-left" [size]="18" />
+  <a
+    routerLink="/app/accounts"
+    class="account-back-circle"
+  >
+    <app-icon
+      name="arrow-left"
+      [size]="18"
+    />
   </a>
-  <div class="account-scroll-title" [class.account-scroll-title--visible]="isScrolled()">
+  <div
+    class="account-scroll-title"
+    [class.account-scroll-title--visible]="isScrolled()"
+  >
     {{ account()?.name }}
   </div>
 </div>
 
 <div class="account-root">
-
   <!-- ── Left panel: header + stats + filters ──────────────────────────── -->
   <div class="account-left">
-
     <!-- Desktop back link -->
-    <a routerLink="/app/accounts"
+    <a
+      routerLink="/app/accounts"
       class="hidden md:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5"
     >
-      <app-icon name="arrow-left" [size]="14" />
+      <app-icon
+        name="arrow-left"
+        [size]="14"
+      />
       {{ 'views.accounts.title' | translate }}
     </a>
 
     <!-- Title + subtitle (fades on mobile scroll, always visible on desktop) -->
-    <div class="account-header-block mb-1" [class.account-header-block--hidden]="isScrolled()">
+    <div
+      class="account-header-block mb-1"
+      [class.account-header-block--hidden]="isScrolled()"
+    >
       @if (loading()) {
         <div class="account-skeleton h-7 w-44 rounded-lg"></div>
         <div class="account-skeleton h-4 w-28 rounded mt-2"></div>
@@ -38,7 +55,7 @@
     @if (loading()) {
       <!-- Skeleton stat cards -->
       <div class="grid grid-cols-2 gap-3 mt-5">
-        @for (i of [1,2,3,4]; track i) {
+        @for (i of [1, 2, 3, 4]; track i) {
           <div class="page-group p-4">
             <div class="account-skeleton h-3 w-16 rounded mb-2"></div>
             <div class="account-skeleton h-6 w-20 rounded"></div>
@@ -61,20 +78,26 @@
         <div class="page-group p-4">
           <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalCredit' | translate }}</p>
           <p class="text-lg font-bold text-success tabular-nums">
-            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency) }}
+            {{
+              privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency)
+            }}
           </p>
         </div>
         <div class="page-group p-4">
           <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalDebit' | translate }}</p>
           <p class="text-lg font-bold text-error tabular-nums">
-            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency) }}
+            {{
+              privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency)
+            }}
           </p>
         </div>
       </div>
 
       <!-- Filters -->
       <div class="flex flex-col gap-2 mt-4">
-        <select appSelect class="w-full"
+        <select
+          appSelect
+          class="w-full"
           [ngModel]="accountsService.timeFilter()"
           (ngModelChange)="onYearChange($event)"
         >
@@ -82,7 +105,9 @@
             <option [value]="year">{{ year }}</option>
           }
         </select>
-        <input appInput type="text"
+        <input
+          appInput
+          type="text"
           [(ngModel)]="searchText"
           (ngModelChange)="applyFilters()"
           [placeholder]="'common.search' | translate"
@@ -95,7 +120,7 @@
   <div class="account-right">
     @if (loading()) {
       <div class="account-tx-list">
-        @for (i of [1,2,3,4,5,6,7,8]; track i) {
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
           <div class="page-item">
             <div class="flex-1 min-w-0 flex flex-col gap-1.5">
               <div class="account-skeleton h-4 w-48 rounded"></div>
@@ -114,7 +139,9 @@
       </div>
       <div class="account-tx-list">
         @if (filteredTransactions().length === 0) {
-          <p class="text-on-surface-variant text-center py-12 text-sm">{{ 'views.account.noTransactions' | translate }}</p>
+          <p class="text-on-surface-variant text-center py-12 text-sm">
+            {{ 'views.account.noTransactions' | translate }}
+          </p>
         } @else {
           @for (tx of paginatedTransactions(); track tx.id) {
             <div
@@ -124,13 +151,16 @@
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
                 <p class="text-xs text-on-surface-variant mt-0.5 truncate">
-                  {{ tx.transactionDate | date:'mediumDate' }}
+                  {{ tx.transactionDate | date: 'mediumDate' }}
                   @if (tx.counterAccount?.name; as other) {
                     · {{ other }}
                   }
                 </p>
               </div>
-              <span class="text-sm font-semibold tabular-nums flex-shrink-0" [class]="txColor(tx)">
+              <span
+                class="text-sm font-semibold tabular-nums flex-shrink-0"
+                [class]="txColor(tx)"
+              >
                 {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, account()!.currency) }}
               </span>
             </div>
@@ -142,11 +172,29 @@
               {{ paginationStart() }}–{{ paginationEnd() }} of {{ filteredTransactions().length }}
             </span>
             <div class="flex gap-1">
-              <button appBtn size="xs" variant="ghost" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
-                <app-icon name="chevron-left" [size]="16" />
+              <button
+                appBtn
+                size="xs"
+                variant="ghost"
+                [disabled]="page() === 1"
+                (click)="page.update(p => p - 1)"
+              >
+                <app-icon
+                  name="chevron-left"
+                  [size]="16"
+                />
               </button>
-              <button appBtn size="xs" variant="ghost" [disabled]="paginationEnd() >= filteredTransactions().length" (click)="page.update(p => p + 1)">
-                <app-icon name="chevron-right" [size]="16" />
+              <button
+                appBtn
+                size="xs"
+                variant="ghost"
+                [disabled]="paginationEnd() >= filteredTransactions().length"
+                (click)="page.update(p => p + 1)"
+              >
+                <app-icon
+                  name="chevron-right"
+                  [size]="16"
+                />
               </button>
             </div>
           </div>
@@ -154,29 +202,41 @@
       </div>
     }
   </div>
-
 </div>
 
 <!-- Transaction Detail Modal -->
-<app-modal [open]="!!selectedTx()" (closed)="selectedTx.set(null)">
+<app-modal
+  [open]="!!selectedTx()"
+  (closed)="selectedTx.set(null)"
+>
   @if (selectedTx()) {
     <h3 class="font-bold text-lg mb-4">{{ 'views.account.transactionDetails' | translate }}</h3>
     <div class="space-y-3 mb-4">
       <div class="flex justify-between">
         <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.date' | translate }}</span>
-        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.transactionDate | date:'mediumDate' }}</span>
+        <span class="text-on-surface text-sm font-medium">{{
+          selectedTx()!.transactionDate | date: 'mediumDate'
+        }}</span>
       </div>
       <div class="flex justify-between">
-        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.description' | translate }}</span>
+        <span class="text-on-surface-variant text-sm">{{
+          'views.account.transactions.table.description' | translate
+        }}</span>
         <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.description }}</span>
       </div>
       <div class="flex justify-between">
         <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.amount' | translate }}</span>
-        <span class="text-on-surface font-bold text-sm tabular-nums">{{ currencyService.format(selectedTx()!.amount, account()!.currency) }}</span>
+        <span class="text-on-surface font-bold text-sm tabular-nums">{{
+          currencyService.format(selectedTx()!.amount, account()!.currency)
+        }}</span>
       </div>
     </div>
     <div class="modal-footer">
-      <button appBtn variant="ghost" (click)="selectedTx.set(null)">
+      <button
+        appBtn
+        variant="ghost"
+        (click)="selectedTx.set(null)"
+      >
         {{ 'common.close' | translate }}
       </button>
     </div>

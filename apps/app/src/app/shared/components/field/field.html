@@ -1,5 +1,8 @@
 @if (label()) {
-  <label [for]="fieldId" class="label">
+  <label
+    [for]="fieldId"
+    class="label"
+  >
     {{ label() }}
     @if (required()) {
       <span class="text-error ml-0.5">*</span>

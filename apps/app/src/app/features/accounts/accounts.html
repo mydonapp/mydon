@@ -5,69 +5,98 @@
       [subtitle]="'views.accounts.subtitle' | translate"
     />
     <div class="flex items-center gap-2 flex-shrink-0">
-      <button type="button"
+      <button
+        type="button"
         class="flex items-center justify-center w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors"
         (click)="toggleListStyle()"
         [title]="listStyleService.listStyle() === 'compact' ? 'Switch to normal view' : 'Switch to compact view'"
       >
-        <app-icon [name]="listStyleService.listStyle() === 'compact' ? 'layout-list' : 'align-justify'" [size]="16" />
+        <app-icon
+          [name]="listStyleService.listStyle() === 'compact' ? 'layout-list' : 'align-justify'"
+          [size]="16"
+        />
       </button>
-      <button appBtn variant="secondary" size="sm" (click)="showCreateTransaction.set(true)">
-        <app-icon name="arrow-left-right" [size]="16" class="sm:mr-1" />
+      <button
+        appBtn
+        variant="secondary"
+        size="sm"
+        (click)="showCreateTransaction.set(true)"
+      >
+        <app-icon
+          name="arrow-left-right"
+          [size]="16"
+          class="sm:mr-1"
+        />
         <span class="hidden sm:inline">{{ 'views.accounts.addTransaction' | translate }}</span>
       </button>
     </div>
   </div>
 
   @if (loading()) {
-    <div class="flex justify-center py-12">
-      <app-spinner size="lg" />
+  <div class="flex justify-center py-12">
+    <app-spinner size="lg" />
+  </div>
+  } @else { @for (group of accountGroups(); track group.type) {
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-1.5">
+      <p class="page-section-label">{{ group.label | translate }}</p>
+      <span
+        class="font-bold text-sm tabular-nums lg:pr-4"
+        [class]="balanceClass(group.type, group.total)"
+      >
+        {{ currencyService.format(group.total, 'CHF') }}
+      </span>
     </div>
-  } @else {
-    @for (group of accountGroups(); track group.type) {
-      <div class="mb-4">
-        <div class="flex items-center justify-between mb-1.5">
-          <p class="page-section-label">{{ group.label | translate }}</p>
-          <span class="font-bold text-sm tabular-nums lg:pr-4" [class]="balanceClass(group.type, group.total)">
-            {{ currencyService.format(group.total, 'CHF') }}
-          </span>
-        </div>
-        <div class="accounts-group">
-          @if (group.accounts.length === 0) {
-            <p class="text-on-surface-variant text-center" [class]="listStyleService.listStyle() === 'compact' ? 'text-xs py-2' : 'text-sm py-6'">{{ group.emptyLabel | translate }}</p>
-          } @else {
-            @for (account of group.accounts; track account.id) {
-              <a
-                [routerLink]="['/app/accounts', account.id]"
-                class="page-item hover:bg-surface-variant transition-colors group no-underline"
-                [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
-              >
-                <div class="min-w-0">
-                  <p class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors truncate">{{ account.name }}</p>
-                  @if (listStyleService.listStyle() !== 'compact') {
-                    <p class="text-xs text-on-surface-variant mt-0.5">{{ account.currency }}</p>
-                  }
-                </div>
-                <span class="font-semibold text-sm ml-4 tabular-nums flex-shrink-0" [class]="balanceClass(group.type, account.balance ?? 0)">
-                  {{ privacyService.isPrivate() ? '···' : currencyService.format(account.balance ?? 0, account.currency) }}
-                </span>
-              </a>
-            }
+    <div class="accounts-group">
+      @if (group.accounts.length === 0) {
+      <p
+        class="text-on-surface-variant text-center"
+        [class]="listStyleService.listStyle() === 'compact' ? 'text-xs py-2' : 'text-sm py-6'"
+      >
+        {{ group.emptyLabel | translate }}
+      </p>
+      } @else { @for (account of group.accounts; track account.id) {
+      <a
+        [routerLink]="['/app/accounts', account.id]"
+        class="page-item hover:bg-surface-variant transition-colors group no-underline"
+        [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+      >
+        <div class="min-w-0">
+          <p class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors truncate">
+            {{ account.name }}
+          </p>
+          @if (listStyleService.listStyle() !== 'compact') {
+          <p class="text-xs text-on-surface-variant mt-0.5">{{ account.currency }}</p>
           }
         </div>
-      </div>
-    }
-
-    <div class="mt-6 pb-2 text-center">
-      <a routerLink="/app/manage" class="text-xs text-on-surface-variant hover:text-on-surface transition-colors no-underline">
-        {{ 'views.accounts.manageAccounts' | translate }}
+        <span
+          class="font-semibold text-sm ml-4 tabular-nums flex-shrink-0"
+          [class]="balanceClass(group.type, account.balance ?? 0)"
+        >
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account.balance ?? 0, account.currency) }}
+        </span>
       </a>
+      } }
     </div>
+  </div>
+  }
+
+  <div class="mt-6 pb-2 text-center">
+    <a
+      routerLink="/app/manage"
+      class="text-xs text-on-surface-variant hover:text-on-surface transition-colors no-underline"
+    >
+      {{ 'views.accounts.manageAccounts' | translate }}
+    </a>
+  </div>
   }
 </div>
 
 <!-- Create Transaction Modal -->
-<app-modal [open]="showCreateTransaction()" (closed)="showCreateTransaction.set(false)">
+<app-modal
+  [open]="showCreateTransaction()"
+  (closed)="showCreateTransaction.set(false)"
+>
   <form (ngSubmit)="submitCreateTransaction()">
     <div class="modal-header">
       <h3 class="modal-title">{{ 'views.accounts.createTransactionForm.title' | translate }}</h3>
@@ -75,25 +104,46 @@
 
     <div class="space-y-5 py-1">
       <!-- Date + Amount -->
-      <div class="grid grid-cols-2 gap-4">
-        <app-field [label]="'views.accounts.createTransactionForm.date.label' | translate" [required]="true">
-          <input appInput type="date" name="txDate" [(ngModel)]="newTransaction.date" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <app-field
+          [label]="'views.accounts.createTransactionForm.date.label' | translate"
+          [required]="true"
+        >
+          <input
+            appInput
+            type="date"
+            name="txDate"
+            [(ngModel)]="newTransaction.date"
+          />
         </app-field>
-        <app-field [label]="'views.accounts.createTransactionForm.amount.label' | translate" [required]="true">
-          <input appInput type="number" name="txAmount" [(ngModel)]="newTransaction.amount" placeholder="0.00" />
+        <app-field
+          [label]="'views.accounts.createTransactionForm.amount.label' | translate"
+          [required]="true"
+        >
+          <input
+            appInput
+            type="number"
+            name="txAmount"
+            [(ngModel)]="newTransaction.amount"
+            placeholder="0.00"
+          />
         </app-field>
       </div>
 
       <!-- Description -->
       <app-field [label]="'views.accounts.createTransactionForm.description.label' | translate">
-        <input appInput name="txDesc"
+        <textarea
+          appInput
+          name="txDesc"
           [(ngModel)]="newTransaction.description"
           [placeholder]="'views.accounts.createTransactionForm.description.placeholder' | translate"
-        />
+          rows="1"
+          style="resize: vertical"
+        ></textarea>
       </app-field>
 
       <!-- Accounts — credit → debit flow -->
-      <div class="flex items-end gap-3">
+      <div class="flex flex-col sm:flex-row sm:items-end gap-3">
         <app-field
           class="flex-1 min-w-0 block"
           [label]="'views.accounts.createTransactionForm.creditAccount.label' | translate"
@@ -105,8 +155,17 @@
             [placeholder]="'views.accounts.createTransactionForm.creditAccount.placeholder' | translate"
           />
         </app-field>
-        <div class="pb-2 flex-shrink-0 text-on-surface-variant">
-          <app-icon name="arrow-right" [size]="16" />
+        <div class="flex justify-center text-on-surface-variant sm:pb-2 sm:flex-shrink-0">
+          <span class="sm:hidden"
+            ><app-icon
+              name="arrow-down"
+              [size]="16"
+          /></span>
+          <span class="hidden sm:inline-flex"
+            ><app-icon
+              name="arrow-right"
+              [size]="16"
+          /></span>
         </div>
         <app-field
           class="flex-1 min-w-0 block"
@@ -123,10 +182,19 @@
     </div>
 
     <div class="modal-footer mt-6">
-      <button appBtn variant="ghost" type="button" (click)="showCreateTransaction.set(false)">
+      <button
+        appBtn
+        variant="ghost"
+        type="button"
+        (click)="showCreateTransaction.set(false)"
+      >
         {{ 'common.cancel' | translate }}
       </button>
-      <button appBtn type="submit" [loading]="submitting()">
+      <button
+        appBtn
+        type="submit"
+        [loading]="submitting()"
+      >
         {{ 'views.accounts.createTransactionForm.submit.label' | translate }}
       </button>
     </div>

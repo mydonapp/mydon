@@ -1,4 +1,4 @@
-import { Component, ElementRef, effect, input, output, viewChild } from '@angular/core';
+import { Component, DestroyRef, HostListener, effect, inject, input, output } from '@angular/core';
 
 @Component({
   selector: 'app-modal',
@@ -10,36 +10,35 @@ export class ModalComponent {
   boxClass = input('');
   closed   = output<void>();
 
-  private readonly dialogEl =
-    viewChild<ElementRef<HTMLDialogElement>>('dialog');
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     effect(() => {
-      const el = this.dialogEl()?.nativeElement;
-      if (!el) return;
       if (this.open()) {
-        if (!el.open) el.showModal();
+        this.lockScroll();
       } else {
-        if (el.open) el.close();
+        this.unlockScroll();
       }
     });
+
+    this.destroyRef.onDestroy(() => this.unlockScroll());
   }
 
-  onDialogClose(): void {
-    this.closed.emit();
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.open()) this.closed.emit();
   }
 
-  onBackdropClick(event: MouseEvent): void {
-    const el = this.dialogEl()?.nativeElement;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    if (
-      event.clientX < rect.left ||
-      event.clientX > rect.right ||
-      event.clientY < rect.top ||
-      event.clientY > rect.bottom
-    ) {
-      this.closed.emit();
+  private lockScroll(): void {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     }
+  }
+
+  private unlockScroll(): void {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
   }
 }

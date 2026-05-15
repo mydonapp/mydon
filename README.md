@@ -5,21 +5,24 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/mydon/mydon?logo=docker)
 ![GitHub stars](https://img.shields.io/github/stars/mydonapp/mydon?style=social)
 
-**Mydon** is an open-source personal finance tracker built for efficient and structured money management.
+**MyDon** is an open-source personal finance tracker built for efficient and structured money management.
 It helps individuals take control of their finances with a clean, simple interface—while still supporting advanced use cases like double-entry accounting.
-I created Mydon because I couldn't find a tool that made it easy to import bank statements and manage finances with proper bookkeeping principles.
+I created MyDon because I couldn't find a tool that made it easy to import bank statements and manage finances with proper bookkeeping principles.
 
 ---
 
 ## 📦 Features
 
-- 📥 **Bank CSV Import**
-- 💼 **Double-entry bookkeeping**
-- 🏷 **Manual/Automatic categorization and tagging**
-- 📊 **Monthly & category-based spending analytics**
-- 📁 **Data export (CSV/Excel)**
-- 📱 **Mobile-ready** 
-- 🐳 **Self-hostable with Docker**
+- 📥 **Bank CSV Import** — upload bank statements with automatic parsing
+- 💼 **Double-entry bookkeeping** — proper assets, liabilities, income & expense accounts
+- 🤖 **AI-assisted categorization** — automatic account suggestions during import
+- 🏷 **Budgeting** — set monthly or yearly budgets per category with progress tracking
+- 📊 **Spending analytics** — balance history, credit/debit totals per account
+- 📁 **Data export** — full export as CSV/ZIP
+- 🌍 **Multi-language** — English, German, French, Italian
+- 🎨 **Theming** — light, dark and system theme with persisted user preferences
+- 📱 **Native app** — iOS and desktop via Tauri, with configurable self-hosted API URL
+- 🐳 **Self-hostable** — single Docker Compose stack
 
 > 💡 Looking for an easy hosted version? Check out [mydon.app](https://mydon.app)
 
@@ -41,7 +44,7 @@ services:
       - '5432:5432'
 
   backend:
-    image: mydon/mydon-api:latest
+    image: maece/mydon.api:latest
     environment:
       DATABASE_URL: postgres://mydon:mydonpass@db:5432/mydon
       CORS_ORIGINS: http://localhost:4000
@@ -52,13 +55,22 @@ services:
       - '3000:3000'
 
   frontend:
-    image: mydon/mydon-app:latest
-    environment:
-      VITE_API_URL: http://localhost:3000
+    image: maece/mydon.app:latest
+    volumes:
+      # Point the frontend at your API — replace with your actual API URL
+      - ./config.json:/usr/share/nginx/html/assets/config.json
     depends_on:
       - backend
     ports:
       - '4000:80'
+```
+
+Create a `config.json` next to your `docker-compose.yml`:
+
+```json
+{
+  "apiUrl": "http://localhost:3000"
+}
 ```
 
 Then run:
@@ -73,9 +85,7 @@ Once running:
 
 ⚙️ API → http://localhost:3000
 
-📚 API Documentation → http://localhost:3000/api/docs
-
-> **Note:** API documentation can be disabled in production by setting `ENABLE_API_DOCS=false`.
+📚 API Documentation → http://localhost:3000/api/docs (set `ENABLE_API_DOCS=true`)
 
 ---
 
@@ -108,13 +118,13 @@ pnpm start:infra
 4. **Start the backend API (NestJS):**
 
 ```bash
-nx serve api
+pnpm nx run api:serve:development
 ```
 
-5. **Start the frontend app (Vue):**
+5. **Start the frontend app (Angular):**
 
 ```bash
-nx serve app
+pnpm nx run app:serve:development
 ```
 
 Once running:
@@ -124,6 +134,15 @@ API: http://localhost:3000
 API Documentation: http://localhost:3000/api/docs
 
 Frontend: http://localhost:4200
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Angular 21, Tailwind CSS v4, Tauri v2 |
+| Backend | NestJS 11, TypeORM, PostgreSQL |
+| Monorepo | Nx |
+| Native | Tauri v2 (iOS + desktop) |
 
 ## 📜 License
 
@@ -135,7 +154,7 @@ This project is licensed under the [MIT License](./LICENSE).
 
 If you find MyDon useful, please consider supporting its development:
 
-- ⭐ **Star this repository** - It helps others discover the project
-- 🐛 **Report bugs** - Help us improve by reporting issues
-- 💡 **Suggest features** - Share your ideas for new functionality
-- 🔧 **Contribute code** - Submit pull requests with improvements
+- ⭐ **Star this repository** — it helps others discover the project
+- 🐛 **Report bugs** — help us improve by reporting issues
+- 💡 **Suggest features** — share your ideas for new functionality
+- 🔧 **Contribute code** — submit pull requests with improvements

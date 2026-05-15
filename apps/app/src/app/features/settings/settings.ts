@@ -1,4 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { APP_VERSION } from '../../../version';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { UserService } from '../../services/user.service';
@@ -31,6 +32,7 @@ import { IconComponent } from '../../shared/components/icon/icon';
   ],
 })
 export class SettingsComponent implements OnInit {
+  protected readonly appVersion = APP_VERSION;
   private readonly userService = inject(UserService);
   protected readonly languageService = inject(LanguageService);
   protected readonly privacyService = inject(PrivacyService);
