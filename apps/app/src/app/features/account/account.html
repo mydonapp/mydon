@@ -1,47 +1,10 @@
-<!-- Blurred backdrop: appears on scroll behind button + title (mobile only) -->
-<div
-  class="account-header-backdrop"
-  [class.account-header-backdrop--visible]="isScrolling()"
-></div>
-
-<!-- Fixed header row: back circle + title that fades in to its right (mobile only) -->
-<div class="account-fixed-header md:hidden">
-  <a
-    routerLink="/app/accounts"
-    class="account-back-circle"
-  >
-    <app-icon
-      name="arrow-left"
-      [size]="18"
-    />
-  </a>
-  <div
-    class="account-scroll-title"
-    [class.account-scroll-title--visible]="isScrolled()"
-  >
-    {{ account()?.name }}
-  </div>
-</div>
-
 <div class="account-root">
   <!-- ── Left panel: header + stats + filters ──────────────────────────── -->
   <div class="account-left">
-    <!-- Desktop back link -->
-    <a
-      routerLink="/app/accounts"
-      class="hidden md:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5"
-    >
-      <app-icon
-        name="arrow-left"
-        [size]="14"
-      />
-      {{ 'views.accounts.title' | translate }}
-    </a>
-
-    <!-- Title + subtitle (fades on mobile scroll, always visible on desktop) -->
-    <div
-      class="account-header-block mb-1"
-      [class.account-header-block--hidden]="isScrolled()"
+    <app-detail-header
+      backLink="/app/accounts"
+      [backLabel]="'views.accounts.title' | translate"
+      [title]="account()?.name ?? ''"
     >
       @if (loading()) {
         <div class="account-skeleton h-7 w-44 rounded-lg"></div>
@@ -50,7 +13,7 @@
         <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">{{ account()?.name }}</h1>
         <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>
       }
-    </div>
+    </app-detail-header>
 
     @if (loading()) {
       <!-- Skeleton stat cards -->
@@ -78,17 +41,13 @@
         <div class="page-group p-4">
           <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalCredit' | translate }}</p>
           <p class="text-lg font-bold text-success tabular-nums">
-            {{
-              privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency)
-            }}
+            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency) }}
           </p>
         </div>
         <div class="page-group p-4">
           <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalDebit' | translate }}</p>
           <p class="text-lg font-bold text-error tabular-nums">
-            {{
-              privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency)
-            }}
+            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency) }}
           </p>
         </div>
       </div>
@@ -172,29 +131,15 @@
               {{ paginationStart() }}–{{ paginationEnd() }} of {{ filteredTransactions().length }}
             </span>
             <div class="flex gap-1">
-              <button
-                appBtn
-                size="xs"
-                variant="ghost"
-                [disabled]="page() === 1"
-                (click)="page.update(p => p - 1)"
-              >
-                <app-icon
-                  name="chevron-left"
-                  [size]="16"
-                />
+              <button appBtn size="xs" variant="ghost" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
+                <app-icon name="chevron-left" [size]="16" />
               </button>
               <button
-                appBtn
-                size="xs"
-                variant="ghost"
+                appBtn size="xs" variant="ghost"
                 [disabled]="paginationEnd() >= filteredTransactions().length"
                 (click)="page.update(p => p + 1)"
               >
-                <app-icon
-                  name="chevron-right"
-                  [size]="16"
-                />
+                <app-icon name="chevron-right" [size]="16" />
               </button>
             </div>
           </div>
@@ -205,40 +150,25 @@
 </div>
 
 <!-- Transaction Detail Modal -->
-<app-modal
-  [open]="!!selectedTx()"
-  (closed)="selectedTx.set(null)"
->
+<app-modal [open]="!!selectedTx()" (closed)="selectedTx.set(null)">
   @if (selectedTx()) {
     <h3 class="font-bold text-lg mb-4">{{ 'views.account.transactionDetails' | translate }}</h3>
     <div class="space-y-3 mb-4">
       <div class="flex justify-between">
         <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.date' | translate }}</span>
-        <span class="text-on-surface text-sm font-medium">{{
-          selectedTx()!.transactionDate | date: 'mediumDate'
-        }}</span>
+        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.transactionDate | date: 'mediumDate' }}</span>
       </div>
       <div class="flex justify-between">
-        <span class="text-on-surface-variant text-sm">{{
-          'views.account.transactions.table.description' | translate
-        }}</span>
+        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.description' | translate }}</span>
         <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.description }}</span>
       </div>
       <div class="flex justify-between">
         <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.amount' | translate }}</span>
-        <span class="text-on-surface font-bold text-sm tabular-nums">{{
-          currencyService.format(selectedTx()!.amount, account()!.currency)
-        }}</span>
+        <span class="text-on-surface font-bold text-sm tabular-nums">{{ currencyService.format(selectedTx()!.amount, account()!.currency) }}</span>
       </div>
     </div>
     <div class="modal-footer">
-      <button
-        appBtn
-        variant="ghost"
-        (click)="selectedTx.set(null)"
-      >
-        {{ 'common.close' | translate }}
-      </button>
+      <button appBtn variant="ghost" (click)="selectedTx.set(null)">{{ 'common.close' | translate }}</button>
     </div>
   }
 </app-modal>

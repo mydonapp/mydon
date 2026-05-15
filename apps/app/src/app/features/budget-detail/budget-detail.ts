@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { BudgetDetail, BudgetProgressItem, BudgetsService } from '../../services/budgets.service';
@@ -8,6 +8,7 @@ import { CategoriesService } from '../../services/categories.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
 import { ComboboxComponent, ComboboxOption } from '../../shared/components/combobox/combobox';
+import { DetailHeaderComponent } from '../../shared/components/detail-header/detail-header';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner';
@@ -19,7 +20,6 @@ import { SelectDirective } from '../../shared/directives/select.directive';
   selector: 'app-budget-detail',
   templateUrl: './budget-detail.html',
   imports: [
-    RouterLink,
     FormsModule,
     TranslateModule,
     BtnDirective,
@@ -29,11 +29,11 @@ import { SelectDirective } from '../../shared/directives/select.directive';
     ProgressBarComponent,
     IconComponent,
     ComboboxComponent,
+    DetailHeaderComponent,
   ],
 })
 export class BudgetDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly budgetsService = inject(BudgetsService);
   readonly categoriesService = inject(CategoriesService);
   readonly accountsService = inject(AccountsService);

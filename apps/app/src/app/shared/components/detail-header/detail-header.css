@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+/* ── Blurred backdrop: full-width bar behind button + title on scroll ────── */
+.detail-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top, 0px) + 3.5rem);
+  z-index: 38;
+  background: linear-gradient(
+    to bottom,
+    light-dark(rgb(240 242 245 / 1), rgb(17 19 22 / 1)) 0%,
+    light-dark(rgb(240 242 245 / 0.95), rgb(17 19 22 / 0.95)) 70%,
+    light-dark(rgb(240 242 245 / 0), rgb(17 19 22 / 0)) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.detail-backdrop--visible {
+  opacity: 1;
+}
+
+@media (width >= 768px) {
+  .detail-backdrop {
+    display: none;
+  }
+}
+
+/* ── Fixed header row: back circle + scroll title ─────────────────────────── */
+.detail-fixed-header {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 0.25rem);
+  left: 0.75rem;
+  right: 1rem;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+@media (width >= 768px) {
+  .detail-fixed-header {
+    display: none;
+  }
+}
+
+/* ── Action slot wrapper: positions projected action on the right ─────────── */
+.detail-header-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+  margin-left: auto;
+}
+
+/* ── Scroll title: fades in beside the back circle on scroll ─────────────── */
+.detail-scroll-title {
+  flex: 1;
+  min-width: 0;
+  height: 2.25rem;
+  line-height: 2.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.detail-scroll-title--visible {
+  opacity: 1;
+}
+
+/* ── Title block: fades out on mobile scroll ──────────────────────────────── */
+.detail-title-block {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.detail-title-block--hidden {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+@media (width >= 768px) {
+  .detail-title-block--hidden {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}

@@ -1,7 +1,7 @@
-import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { balanceColor } from '../../shared/utils/balance-color';
 import { DatePipe, LowerCasePipe } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
@@ -12,6 +12,7 @@ import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective } from '../../shared/directives/select.directive';
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { IconComponent } from '../../shared/components/icon/icon';
+import { DetailHeaderComponent } from '../../shared/components/detail-header/detail-header';
 
 @Component({
   selector: 'app-account',
@@ -20,7 +21,6 @@ import { IconComponent } from '../../shared/components/icon/icon';
   imports: [
     DatePipe,
     LowerCasePipe,
-    RouterLink,
     FormsModule,
     TranslateModule,
     BtnDirective,
@@ -28,6 +28,7 @@ import { IconComponent } from '../../shared/components/icon/icon';
     SelectDirective,
     ModalComponent,
     IconComponent,
+    DetailHeaderComponent,
   ],
 })
 export class AccountComponent implements OnInit {
@@ -35,13 +36,6 @@ export class AccountComponent implements OnInit {
   currencyService = inject(CurrencyService);
   privacyService = inject(PrivacyService);
   private route = inject(ActivatedRoute);
-
-  scrollY = signal(0);
-  isScrolled = computed(() => this.scrollY() > 20);
-  isScrolling = computed(() => this.scrollY() > 5);
-
-  @HostListener('window:scroll')
-  onScroll() { this.scrollY.set(window.scrollY); }
 
   loading = signal(false);
   account = signal<any>(null);
