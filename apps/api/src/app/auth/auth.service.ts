@@ -5,6 +5,8 @@ import { randomBytes } from 'crypto';
 import { Raw, Repository } from 'typeorm';
 import { Account, AccountType } from '../accounts/accounts.entity';
 import { Category } from '../categories/categories.entity';
+import { LedgersService } from '../ledgers/ledgers.service';
+import { OrganizationsService } from '../organizations/organizations.service';
 import { AccessToken } from './accessToken.entity';
 import { WrongCredentialsError } from './auth.errors';
 import { RefreshToken } from './refreshToken.entity';
@@ -27,6 +29,8 @@ export class AuthService {
     private accountRepository: Repository<Account>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    private organizationsService: OrganizationsService,
+    private ledgersService: LedgersService,
   ) {}
 
   async userById(id: string): Promise<User | null> {
@@ -58,6 +62,11 @@ export class AuthService {
     user.password = data.password;
 
     await this.userRepository.save(user);
+
+    // Provision personal organization + default ledger for the new user.
+    // Phase 1/2 model: every user gets one PERSONAL org with an OWNER membership and one "Main" ledger.
+    const organization = await this.organizationsService.createPersonalOrganization(user);
+    await this.ledgersService.createDefaultLedger(organization.id);
 
     // Create default categories
     const categoryNames = ['Banking', 'Income', 'Food', 'Housing'];
