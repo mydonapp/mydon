@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ExportModule } from './export/export.module';
+import { OrganizationsModule } from './organizations/organizations.module';
 import { StatusModule } from './status/status.module';
 import { TransactionsModule } from './transactions/transactions.module';
 
@@ -18,6 +19,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     CategoriesModule,
     BudgetsModule,
     ExportModule,
+    OrganizationsModule,
     StatusModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
