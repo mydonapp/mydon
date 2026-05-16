@@ -48,10 +48,7 @@ export class TransactionsController {
   @UseGuards(AuthGuard)
   @Get('v1/transactions')
   async findAll(@Req() req: Request, @Query('filter') filter: string) {
-    const result = await this.transactionsService.findAll(
-      req['context'],
-      filter,
-    );
+    const result = await this.transactionsService.findAll(req['context'], filter);
 
     return result.map((transaction) => {
       return {
@@ -78,10 +75,7 @@ export class TransactionsController {
 
   @UseGuards(AuthGuard)
   @Post('v1/transactions')
-  createTransaction(
-    @Req() req: Request,
-    @Body() createTransactionDto: CreateTransactionDto,
-  ) {
+  createTransaction(@Req() req: Request, @Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionsService.createTransaction(req['context'], {
       creditAmount: createTransactionDto.creditAmount,
       debitAmount: createTransactionDto.debitAmount,
@@ -94,11 +88,7 @@ export class TransactionsController {
 
   @UseGuards(AuthGuard)
   @Patch('v1/transactions/:id')
-  patchTransaction(
-    @Req() req: Request,
-    @Param('id') id: string,
-    @Body() patchTransactionDto: PatchTransactionDto,
-  ) {
+  patchTransaction(@Req() req: Request, @Param('id') id: string, @Body() patchTransactionDto: PatchTransactionDto) {
     return this.transactionsService.patchTransaction(req['context'], id, {
       creditAmount: patchTransactionDto.creditAmount,
       debitAmount: patchTransactionDto.debitAmount,
@@ -146,15 +136,7 @@ export class TransactionsController {
 
   @UseGuards(AuthGuard)
   @Get('v1/currency/convert')
-  convertAmount(
-    @Req() req: Request,
-    @Query() query: { amount: number; from: string; to: string; date: string },
-  ) {
-    return this.forexService.convertCurrency(
-      query.amount,
-      query.from,
-      query.to,
-      new Date(query.date),
-    );
+  convertAmount(@Req() req: Request, @Query() query: { amount: number; from: string; to: string; date: string }) {
+    return this.forexService.convertCurrency(query.amount, query.from, query.to, new Date(query.date));
   }
 }

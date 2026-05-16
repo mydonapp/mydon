@@ -26,7 +26,9 @@ export class LanguageService {
 
   private readSavedLanguage(): string {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return 'en';
+    if (!stored) {
+      return 'en';
+    }
     try {
       const parsed = JSON.parse(stored);
       return typeof parsed === 'string' ? parsed : (parsed?.language ?? 'en');

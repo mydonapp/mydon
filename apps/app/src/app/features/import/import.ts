@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountsService } from '../../services/accounts.service';
+import { AccountsService, Issuer, TransactionRecord } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ComboboxComponent, ComboboxOption } from '../../shared/components/combobox/combobox';
@@ -41,23 +41,20 @@ export class ImportComponent implements OnInit {
   selectedAccountId = signal('');
   selectedIssuerId = signal('');
   file = signal<File | null>(null);
-  draftTransactions = signal<any[]>([]);
+  draftTransactions = signal<TransactionRecord[]>([]);
   selectedDrafts = signal<string[]>([]);
-  issuers = signal<any[]>([]);
+  issuers = signal<Issuer[]>([]);
 
   pendingCount() {
     return this.draftTransactions().length;
   }
 
   allSelected() {
-    return (
-      this.draftTransactions().length > 0 &&
-      this.selectedDrafts().length === this.draftTransactions().length
-    );
+    return this.draftTransactions().length > 0 && this.selectedDrafts().length === this.draftTransactions().length;
   }
 
   hasAiSuggestions() {
-    return this.draftTransactions().some((d) => d.aiSuggested);
+    return this.draftTransactions().some((d) => d.creditAccountAISuggested || d.debitAccountAISuggested);
   }
 
   accountOptions() {
@@ -96,14 +93,12 @@ export class ImportComponent implements OnInit {
 
   async submitImport() {
     const f = this.file();
-    if (!f || !this.selectedAccountId() || !this.selectedIssuerId()) return;
+    if (!f || !this.selectedAccountId() || !this.selectedIssuerId()) {
+      return;
+    }
     this.uploading.set(true);
     try {
-      await this.accountsService.importTransactions(
-        this.selectedAccountId(),
-        this.selectedIssuerId(),
-        f,
-      );
+      await this.accountsService.importTransactions(this.selectedAccountId(), this.selectedIssuerId(), f);
       this.toastService.success('Import successful!');
       this.file.set(null);
       await this.loadDrafts();
@@ -116,24 +111,18 @@ export class ImportComponent implements OnInit {
 
   toggleSelectAll(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.selectedDrafts.set(
-      checked ? this.draftTransactions().map((d) => d.id) : [],
-    );
+    this.selectedDrafts.set(checked ? this.draftTransactions().map((d) => d.id) : []);
   }
 
   toggleDraft(id: string, event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.selectedDrafts.update((ids) =>
-      checked ? [...ids, id] : ids.filter((i) => i !== id),
-    );
+    this.selectedDrafts.update((ids) => (checked ? [...ids, id] : ids.filter((i) => i !== id)));
   }
 
   async updateDraft(id: string, field: string, value: string) {
     try {
       await this.accountsService.updateDraftTransaction(id, { [field]: value });
-      this.draftTransactions.update((drafts) =>
-        drafts.map((d) => (d.id === id ? { ...d, [field]: value } : d)),
-      );
+      this.draftTransactions.update((drafts) => drafts.map((d) => (d.id === id ? { ...d, [field]: value } : d)));
     } catch {
       this.toastService.error('Failed to update transaction.');
     }
@@ -150,7 +139,9 @@ export class ImportComponent implements OnInit {
   }
 
   async approveSelected() {
-    if (this.selectedDrafts().length === 0) return;
+    if (this.selectedDrafts().length === 0) {
+      return;
+    }
     this.approving.set(true);
     try {
       await this.accountsService.approveDraftTransactions(this.selectedDrafts());

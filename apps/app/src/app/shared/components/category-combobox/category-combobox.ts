@@ -11,47 +11,45 @@ let comboboxCounter = 0;
   imports: [FormsModule, TranslateModule],
 })
 export class CategoryComboboxComponent implements OnInit {
-  value       = input<string>('');
-  label       = input<string>('');
+  value = input<string>('');
+  label = input<string>('');
   placeholder = input<string>('');
 
-  valueChange     = output<string>();
+  valueChange = output<string>();
   categoryCreated = output<Category>();
 
   private categoriesService = inject(CategoriesService);
 
-  readonly id       = ++comboboxCounter;
-  readonly inputId  = `combobox-input-${this.id}`;
+  readonly id = ++comboboxCounter;
+  readonly inputId = `combobox-input-${this.id}`;
   readonly listboxId = `combobox-list-${this.id}`;
 
-  searchText   = '';
+  searchText = '';
   showDropdown = signal(false);
-  filtered     = signal<Category[]>([]);
-  creating     = signal(false);
-  activeIndex  = signal(-1);
+  filtered = signal<Category[]>([]);
+  creating = signal(false);
+  activeIndex = signal(-1);
 
   get canCreate(): boolean {
     return (
       !!this.searchText &&
-      !this.categoriesService
-        .categories()
-        .some((c) => c.name.toLowerCase() === this.searchText.toLowerCase())
+      !this.categoriesService.categories().some((c) => c.name.toLowerCase() === this.searchText.toLowerCase())
     );
   }
 
   ngOnInit(): void {
     if (this.value()) {
       const cat = this.categoriesService.categories().find((c) => c.id === this.value());
-      if (cat) this.searchText = cat.name;
+      if (cat) {
+        this.searchText = cat.name;
+      }
     }
     this.filtered.set(this.categoriesService.categories());
   }
 
   onSearch(text: string): void {
     const lower = text.toLowerCase();
-    this.filtered.set(
-      this.categoriesService.categories().filter((c) => c.name.toLowerCase().includes(lower)),
-    );
+    this.filtered.set(this.categoriesService.categories().filter((c) => c.name.toLowerCase().includes(lower)));
     this.activeIndex.set(-1);
     this.showDropdown.set(true);
   }
@@ -65,7 +63,9 @@ export class CategoryComboboxComponent implements OnInit {
   }
 
   onKeydown(event: KeyboardEvent): void {
-    if (!this.showDropdown()) return;
+    if (!this.showDropdown()) {
+      return;
+    }
     const cats = this.filtered();
 
     if (event.key === 'Escape') {
@@ -95,7 +95,9 @@ export class CategoryComboboxComponent implements OnInit {
   }
 
   async createCategory(): Promise<void> {
-    if (!this.searchText || this.creating()) return;
+    if (!this.searchText || this.creating()) {
+      return;
+    }
     this.creating.set(true);
     try {
       const cat = await this.categoriesService.createCategory(this.searchText);

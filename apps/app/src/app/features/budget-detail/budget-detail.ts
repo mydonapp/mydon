@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
-import { BudgetDetail, BudgetProgressItem, BudgetsService } from '../../services/budgets.service';
+import { AccountNumbersService } from '../../services/account-numbers.service';
+import { BudgetDetail, BudgetItem, BudgetProgressItem, BudgetsService } from '../../services/budgets.service';
 import { CategoriesService } from '../../services/categories.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
@@ -37,6 +38,7 @@ export class BudgetDetailComponent implements OnInit {
   private readonly budgetsService = inject(BudgetsService);
   readonly categoriesService = inject(CategoriesService);
   readonly accountsService = inject(AccountsService);
+  readonly accountNumbersService = inject(AccountNumbersService);
   readonly currencyService = inject(CurrencyService);
   private readonly toastService = inject(ToastService);
 
@@ -49,7 +51,7 @@ export class BudgetDetailComponent implements OnInit {
   progressItems = signal<BudgetProgressItem[]>([]);
   viewType = signal<'yearly' | 'monthly'>('yearly');
   selectedMonth = signal(new Date().getMonth() + 1);
-  editItems = signal<any[]>([]);
+  editItems = signal<Omit<BudgetItem, 'id'>[]>([]);
   editMode = signal(false);
   editName = signal('');
   editYear = signal(0);
@@ -64,7 +66,10 @@ export class BudgetDetailComponent implements OnInit {
   );
 
   accountOptions = computed<ComboboxOption[]>(() =>
-    this.accountsService.accounts().map((a) => ({ value: a.id, label: a.name })),
+    this.accountsService.accounts().map((a) => ({
+      value: a.id,
+      label: this.accountNumbersService.show() && a.accountNumber !== null ? `${a.accountNumber} ${a.name}` : a.name,
+    })),
   );
 
   incomeItems = computed(() => this.progressItems().filter((i) => i.accountType === 'INCOME'));
@@ -104,11 +109,18 @@ export class BudgetDetailComponent implements OnInit {
 
   async loadProgress() {
     const b = this.budget();
-    if (!b) return;
+    if (!b) {
+      return;
+    }
     this.progressLoading.set(true);
     try {
-      const params: any = { viewType: this.viewType(), year: b.year };
-      if (this.viewType() === 'monthly') params.month = this.selectedMonth();
+      const params: { viewType: 'yearly' | 'monthly'; year: number; month?: number } = {
+        viewType: this.viewType(),
+        year: b.year,
+      };
+      if (this.viewType() === 'monthly') {
+        params.month = this.selectedMonth();
+      }
       const progress = await this.budgetsService.fetchProgress(b.id, params);
       this.progressItems.set(progress.items);
     } catch {
@@ -120,7 +132,9 @@ export class BudgetDetailComponent implements OnInit {
 
   enterEditMode() {
     const b = this.budget();
-    if (!b) return;
+    if (!b) {
+      return;
+    }
     this.editName.set(b.name);
     this.editYear.set(b.year);
     this.editItems.set(b.items.map((i) => ({ ...i })));
@@ -129,7 +143,9 @@ export class BudgetDetailComponent implements OnInit {
 
   cancelEdit() {
     const b = this.budget();
-    if (!b) return;
+    if (!b) {
+      return;
+    }
     this.editName.set(b.name);
     this.editYear.set(b.year);
     this.editItems.set(b.items.map((i) => ({ ...i })));
@@ -138,7 +154,9 @@ export class BudgetDetailComponent implements OnInit {
 
   async saveAll() {
     const b = this.budget();
-    if (!b) return;
+    if (!b) {
+      return;
+    }
     this.submitting.set(true);
     try {
       const nameChanged = this.editName() !== b.name;

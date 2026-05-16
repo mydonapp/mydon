@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-background">
-
   <!-- Sidebar (desktop only, hidden via Tailwind hidden md:flex) -->
   <aside
     class="sidebar hidden md:flex"
@@ -8,28 +7,43 @@
   >
     <!-- Logo -->
     <div class="sidebar-header">
-      <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold"
-        style="background-color: var(--sys-primary); color: var(--sys-on-primary);">
+      <div
+        class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold"
+        style="background-color: var(--sys-primary); color: var(--sys-on-primary)"
+      >
         D
       </div>
-      <span class="sidebar-label text-sm font-semibold" style="color: var(--sys-on-surface);">myDon</span>
+      <span
+        class="sidebar-label text-sm font-semibold"
+        style="color: var(--sys-on-surface)"
+        >myDon</span
+      >
     </div>
 
     <!-- Navigation (scrolls independently) -->
-    <nav class="sidebar-nav" aria-label="Main">
-      <ul class="space-y-px" role="list">
+    <nav
+      class="sidebar-nav"
+      aria-label="Main"
+    >
+      <ul
+        class="space-y-px"
+        role="list"
+      >
         @for (item of menu; track item.route) {
-          <li>
-            <a
-              [routerLink]="item.route"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: !!item.exact }"
-              class="nav-item"
-            >
-              <app-icon [name]="item.icon" [size]="18" />
-              <span class="sidebar-label">{{ item.label | translate }}</span>
-            </a>
-          </li>
+        <li>
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: !!item.exact }"
+            class="nav-item"
+          >
+            <app-icon
+              [name]="item.icon"
+              [size]="18"
+            />
+            <span class="sidebar-label">{{ item.label | translate }}</span>
+          </a>
+        </li>
         }
       </ul>
     </nav>
@@ -39,40 +53,64 @@
       <!-- User profile + dropdown -->
       <div class="sidebar-user-wrap">
         @if (userMenuOpen()) {
+        <div
+          class="user-menu"
+          role="menu"
+          tabindex="-1"
+          (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
+        >
           <div
-            class="user-menu"
-            role="menu"
-            tabindex="-1"
-            (click)="$event.stopPropagation()"
-            (keydown)="$event.stopPropagation()"
+            class="user-menu-item user-menu-item--toggle"
+            role="menuitem"
+            tabindex="0"
+            (click)="togglePrivacy()"
+            (keydown.enter)="togglePrivacy()"
+            (keydown.space)="togglePrivacy(); $event.preventDefault()"
           >
-            <div
-              class="user-menu-item user-menu-item--toggle"
-              role="menuitem"
-              tabindex="0"
-              (click)="togglePrivacy()"
-              (keydown.enter)="togglePrivacy()"
-              (keydown.space)="togglePrivacy(); $event.preventDefault()"
-            >
-              <app-icon [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'" [size]="15" />
-              <span class="flex-1">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</span>
-              <app-toggle [value]="privacyService.isPrivate()" class="pointer-events-none flex-shrink-0" />
-            </div>
-            <div class="user-menu-separator"></div>
-            <button class="user-menu-item" (click)="goToSettings()">
-              <app-icon name="settings" [size]="15" />
-              <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
-            </button>
-            <button class="user-menu-item" (click)="goToManage()">
-              <app-icon name="settings-2" [size]="15" />
-              <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
-            </button>
-            <div class="user-menu-separator"></div>
-            <button class="user-menu-item user-menu-item--danger" (click)="logout()">
-              <app-icon name="log-out" [size]="15" />
-              <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
-            </button>
+            <app-icon
+              [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'"
+              [size]="15"
+            />
+            <span class="flex-1">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</span>
+            <app-toggle
+              [value]="privacyService.isPrivate()"
+              class="pointer-events-none flex-shrink-0"
+            />
           </div>
+          <div class="user-menu-separator"></div>
+          <button
+            class="user-menu-item"
+            (click)="goToSettings()"
+          >
+            <app-icon
+              name="settings"
+              [size]="15"
+            />
+            <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
+          </button>
+          <button
+            class="user-menu-item"
+            (click)="goToManage()"
+          >
+            <app-icon
+              name="settings-2"
+              [size]="15"
+            />
+            <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
+          </button>
+          <div class="user-menu-separator"></div>
+          <button
+            class="user-menu-item user-menu-item--danger"
+            (click)="logout()"
+          >
+            <app-icon
+              name="log-out"
+              [size]="15"
+            />
+            <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
+          </button>
+        </div>
         }
 
         <button
@@ -97,15 +135,23 @@
 
       <!-- Collapse toggle -->
       <button
-        appBtn variant="ghost" [block]="true"
+        appBtn
+        variant="ghost"
+        [block]="true"
         class="sidebar-collapse-btn"
         [attr.aria-label]="sidebarState.collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
         (click)="sidebarState.toggle()"
       >
         @if (sidebarState.collapsed()) {
-          <app-icon name="chevron-right" [size]="16" />
+        <app-icon
+          name="chevron-right"
+          [size]="16"
+        />
         } @else {
-          <app-icon name="chevron-left" [size]="16" />
+        <app-icon
+          name="chevron-left"
+          [size]="16"
+        />
         }
       </button>
     </div>
@@ -122,43 +168,67 @@
   </div>
 
   <!-- Bottom navigation (mobile only, hidden via Tailwind flex md:hidden) -->
-  <nav class="bottom-nav flex md:hidden" aria-label="Main navigation">
+  <nav
+    class="bottom-nav flex md:hidden"
+    aria-label="Main navigation"
+  >
     @for (item of menu; track item.route) {
-      <a
-        [routerLink]="item.route"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: !!item.exact }"
-        class="bottom-nav-item"
-      >
-        <app-icon [name]="item.icon" [size]="22" />
-        <span class="bottom-nav-label">{{ item.label | translate }}</span>
-      </a>
+    <a
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: !!item.exact }"
+      class="bottom-nav-item"
+    >
+      <app-icon
+        [name]="item.icon"
+        [size]="22"
+      />
+      <span class="bottom-nav-label">{{ item.label | translate }}</span>
+    </a>
     }
 
     <!-- Profile / user menu -->
     <div class="bottom-nav-profile">
       @if (userMenuOpen()) {
-        <div
-          class="user-menu"
-          role="menu"
-          tabindex="-1"
-          (click)="$event.stopPropagation()"
-          (keydown)="$event.stopPropagation()"
+      <div
+        class="user-menu"
+        role="menu"
+        tabindex="-1"
+        (click)="$event.stopPropagation()"
+        (keydown)="$event.stopPropagation()"
+      >
+        <button
+          class="user-menu-item"
+          (click)="goToSettings()"
         >
-          <button class="user-menu-item" (click)="goToSettings()">
-            <app-icon name="settings" [size]="15" />
-            <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
-          </button>
-          <button class="user-menu-item" (click)="goToManage()">
-            <app-icon name="settings-2" [size]="15" />
-            <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
-          </button>
-          <div class="user-menu-separator"></div>
-          <button class="user-menu-item user-menu-item--danger" (click)="logout()">
-            <app-icon name="log-out" [size]="15" />
-            <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
-          </button>
-        </div>
+          <app-icon
+            name="settings"
+            [size]="15"
+          />
+          <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
+        </button>
+        <button
+          class="user-menu-item"
+          (click)="goToManage()"
+        >
+          <app-icon
+            name="settings-2"
+            [size]="15"
+          />
+          <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
+        </button>
+        <div class="user-menu-separator"></div>
+        <button
+          class="user-menu-item user-menu-item--danger"
+          (click)="logout()"
+        >
+          <app-icon
+            name="log-out"
+            [size]="15"
+          />
+          <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
+        </button>
+      </div>
       }
       <button
         class="bottom-nav-item bottom-nav-profile-btn"

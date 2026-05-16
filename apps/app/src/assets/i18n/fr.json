@@ -275,7 +275,9 @@
           "system": "Système",
           "listStyle": "Style de liste",
           "listStyleNormal": "Normal",
-          "listStyleCompact": "Compact"
+          "listStyleCompact": "Compact",
+          "showAccountNumbers": "Afficher les numéros de compte",
+          "showAccountNumbersDescription": "Afficher les numéros de compte dans toute l'application pour une identification et un tri plus faciles"
         },
         "export": {
           "title": "Export de données",
@@ -382,11 +384,14 @@
       },
       "accounts": {
         "title": "Comptes",
+        "editAccount": "Modifier le compte",
         "showInactive": "Afficher les inactifs",
         "all": "Tous",
         "inactive": "Inactif",
         "empty": "Aucun compte trouvé",
         "name": "Nom",
+        "accountNumber": "Numéro de compte",
+        "accountNumberPlaceholder": "ex. 1010",
         "deactivate": "Désactiver",
         "activate": "Activer",
         "updateSuccess": "Compte mis à jour.",

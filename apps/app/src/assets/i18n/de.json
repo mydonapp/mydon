@@ -275,7 +275,9 @@
           "system": "System",
           "listStyle": "Listenstil",
           "listStyleNormal": "Normal",
-          "listStyleCompact": "Kompakt"
+          "listStyleCompact": "Kompakt",
+          "showAccountNumbers": "Kontonummern anzeigen",
+          "showAccountNumbersDescription": "Kontonummern in der gesamten App anzeigen für einfachere Identifikation und Sortierung"
         },
         "export": {
           "title": "Datenexport",
@@ -382,11 +384,14 @@
       },
       "accounts": {
         "title": "Konten",
+        "editAccount": "Konto bearbeiten",
         "showInactive": "Inaktive anzeigen",
         "all": "Alle",
         "inactive": "Inaktiv",
         "empty": "Keine Konten gefunden",
         "name": "Name",
+        "accountNumber": "Kontonummer",
+        "accountNumberPlaceholder": "z.B. 1010",
         "deactivate": "Deaktivieren",
         "activate": "Aktivieren",
         "updateSuccess": "Konto aktualisiert.",

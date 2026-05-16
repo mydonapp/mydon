@@ -4,18 +4,16 @@ export type Theme = 'light' | 'dark' | 'system';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private _theme = signal<Theme>(
-    (localStorage.getItem('theme') as Theme | null) ?? 'system',
-  );
+  private _theme = signal<Theme>((localStorage.getItem('theme') as Theme | null) ?? 'system');
 
   readonly theme = this._theme.asReadonly();
 
   readonly resolvedTheme = computed<'light' | 'dark'>(() => {
     const t = this._theme();
-    if (t !== 'system') return t;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+    if (t !== 'system') {
+      return t;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
   constructor() {

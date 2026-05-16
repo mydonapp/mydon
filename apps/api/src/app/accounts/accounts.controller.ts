@@ -1,24 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseDatePipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiBody,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseDatePipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 import { AccountsService } from './accounts.service';
@@ -36,7 +17,12 @@ export class AccountsController {
   @ApiOperation({ summary: 'Get all accounts for the authenticated user' })
   @ApiQuery({ name: 'from', type: Date, required: false })
   @ApiQuery({ name: 'to', type: Date, required: false })
-  @ApiQuery({ name: 'list', type: Boolean, required: false, description: 'Return flat list including inactive accounts' })
+  @ApiQuery({
+    name: 'list',
+    type: Boolean,
+    required: false,
+    description: 'Return flat list including inactive accounts',
+  })
   @ApiResponse({ status: 200, description: 'List of accounts retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAll(
@@ -60,10 +46,7 @@ export class AccountsController {
   @ApiResponse({ status: 201, description: 'Account created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  createAccount(
-    @Req() req: Request,
-    @Body() createAccountDto: CreateAccountDto,
-  ) {
+  createAccount(@Req() req: Request, @Body() createAccountDto: CreateAccountDto) {
     return this.accountsService.createAccount(req['context'], {
       name: createAccountDto.name,
       type: createAccountDto.type,
@@ -80,15 +63,13 @@ export class AccountsController {
   @ApiBody({ type: UpdateAccountDto })
   @ApiResponse({ status: 200, description: 'Account updated successfully' })
   @ApiResponse({ status: 404, description: 'Account not found' })
-  updateAccount(
-    @Req() req: Request,
-    @Param('accountId') accountId: string,
-    @Body() dto: UpdateAccountDto,
-  ) {
+  updateAccount(@Req() req: Request, @Param('accountId') accountId: string, @Body() dto: UpdateAccountDto) {
     return this.accountsService.updateAccount(req['context'], accountId, {
       name: dto.name,
       categoryId: dto.categoryId,
       isActive: dto.isActive,
+      accountNumber: dto.accountNumber,
+      openingBalance: dto.openingBalance,
     });
   }
 
@@ -102,10 +83,7 @@ export class AccountsController {
   })
   @ApiResponse({ status: 404, description: 'Account not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getAccountTransactions(
-    @Req() req: Request,
-    @Param('accountId') accountId: string,
-  ) {
+  getAccountTransactions(@Req() req: Request, @Param('accountId') accountId: string) {
     return this.accountsService.getAccount(req['context'], accountId);
   }
 }

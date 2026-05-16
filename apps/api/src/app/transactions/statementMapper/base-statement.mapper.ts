@@ -33,7 +33,6 @@ export abstract class StatementMapper<T> {
     const transactions: Transaction[] = [];
 
     for (const transaction of mappedStatement) {
-      console.log('transacvtions', transactions);
       let creditAccountId = this.getCreditAccountId(transaction);
       let debitAccountId = this.getDebitAccountId(transaction);
       let creditAccountAISuggested = false;

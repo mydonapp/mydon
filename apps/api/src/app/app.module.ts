@@ -11,10 +11,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      cache: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true, cache: true }),
     AccountsModule,
     TransactionsModule,
     AuthModule,
@@ -24,18 +21,15 @@ import { TransactionsModule } from './transactions/transactions.module';
     StatusModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        return {
-          type: 'postgres',
-          host: configService.get('DB_POSTGRES_HOST'),
-          port: configService.get('DB_POSTGRES_PORT'),
-          username: 'postgres',
-          password: configService.get('DB_POSTGRES_PASSWORD'),
-          database: 'don',
-          autoLoadEntities: true,
-          synchronize: false,
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_POSTGRES_HOST'),
+        port: configService.get('DB_POSTGRES_PORT'),
+        username: 'postgres',
+        password: configService.get('DB_POSTGRES_PASSWORD'),
+        database: 'don',
+        autoLoadEntities: true,
+      }),
       inject: [ConfigService],
     }),
   ],

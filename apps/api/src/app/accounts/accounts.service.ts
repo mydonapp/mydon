@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ForexService } from '../shared/forex/forex.service';
 import { Context } from '../shared/types/context';
+import { Category } from '../categories/categories.entity';
 import { Account, AccountType, Currency } from './accounts.entity';
 
 @Injectable()
@@ -17,7 +18,19 @@ export class AccountsService {
     const accounts = await this.accountsRepository.find({
       where: { user: { id: context.user.id } },
       relations: ['category'],
-      order: { name: 'ASC' },
+    });
+
+    accounts.sort((a, b) => {
+      if (a.accountNumber !== null && b.accountNumber !== null) {
+        return a.accountNumber - b.accountNumber;
+      }
+      if (a.accountNumber !== null) {
+        return -1;
+      }
+      if (b.accountNumber !== null) {
+        return 1;
+      }
+      return a.name.localeCompare(b.name);
     });
 
     return accounts.map((account) => ({
@@ -27,6 +40,8 @@ export class AccountsService {
       currency: account.currency,
       isActive: account.deactivatedAt === null,
       retirementAccount: account.retirementAccount,
+      openingBalance: account.openingBalance,
+      accountNumber: account.accountNumber,
       categoryId: account.category?.id ?? null,
       categoryName: account.category?.name ?? null,
     }));
@@ -44,6 +59,7 @@ export class AccountsService {
               id: account.id,
               name: account.name,
               type: account.type,
+              accountNumber: account.accountNumber,
               creditBalance: creditBalance,
               debitBalance: account.debitBalance,
               balance: account.balance,
@@ -155,7 +171,7 @@ export class AccountsService {
       account.currency = options.currency;
     }
     if (options.categoryId) {
-      account.category = { id: options.categoryId } as any;
+      account.category = { id: options.categoryId } as Category;
     }
     account.setUserId(context.user.id);
     return this.accountsRepository.save(account);
@@ -164,16 +180,32 @@ export class AccountsService {
   async updateAccount(
     context: Context,
     accountId: string,
-    options: { name?: string; categoryId?: string | null; isActive?: boolean },
+    options: {
+      name?: string;
+      categoryId?: string | null;
+      openingBalance?: number;
+      isActive?: boolean;
+      accountNumber?: number | null;
+    },
   ) {
     const account = await this.accountsRepository.findOne({
       where: { id: accountId, user: { id: context.user.id } },
     });
-    if (!account) throw new NotFoundException();
+    if (!account) {
+      throw new NotFoundException();
+    }
 
-    if (options.name !== undefined) account.name = options.name;
+    if (options.name !== undefined) {
+      account.name = options.name;
+    }
+    if (options.openingBalance !== undefined) {
+      account.openingBalance = options.openingBalance;
+    }
     if (options.categoryId !== undefined) {
-      account.category = options.categoryId ? ({ id: options.categoryId } as any) : null;
+      account.category = options.categoryId ? ({ id: options.categoryId } as Category) : null;
+    }
+    if (options.accountNumber !== undefined) {
+      account.accountNumber = options.accountNumber;
     }
     if (options.isActive !== undefined) {
       if (options.isActive) {
@@ -204,6 +236,7 @@ export class AccountsService {
       id: account.id,
       name: account.name,
       type: account.type,
+      accountNumber: account.accountNumber,
       balance: account.balance,
       currency: account.currency,
       debitTransactions: account.debitTransactions,

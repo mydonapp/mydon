@@ -48,7 +48,9 @@ export class LoginComponent {
   }
 
   async onSubmit() {
-    if (!this.email() || !this.password()) return;
+    if (!this.email() || !this.password()) {
+      return;
+    }
     this.loading.set(true);
     try {
       await this.authService.login(this.email(), this.password());

@@ -25,13 +25,13 @@ export class Account {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   declare name: string;
 
   @Column({ nullable: true, type: 'timestamptz', default: null })
   declare deactivatedAt: Date | null;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   declare retirementAccount: boolean;
 
   @Column({ enum: AccountType, type: 'enum' })
@@ -92,6 +92,9 @@ export class Account {
   })
   declare openingBalance: number;
 
+  @Column({ name: 'account_number', nullable: true, type: 'int', default: null })
+  declare accountNumber: number | null;
+
   @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL', eager: false })
   declare category: Category | null;
 
@@ -111,6 +114,6 @@ export class Account {
   }
 
   setUserId(userId: string) {
-    this.user = userId as any;
+    this.user = userId as unknown as User;
   }
 }

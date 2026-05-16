@@ -42,16 +42,14 @@ export class ExportController {
       archive.append(readme, { name: 'README.txt' });
 
       archive.on('error', (error) => {
-        console.error('Error generating export:', error);
         throw error;
       });
 
       await archive.finalize();
-    } catch (error: any) {
-      console.error('Export error:', error);
+    } catch (error) {
       res.status(500).json({
         message: 'Failed to export data',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }

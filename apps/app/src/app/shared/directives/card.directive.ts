@@ -3,7 +3,7 @@ import { Directive, input } from '@angular/core';
 @Directive({
   selector: '[appCard]',
   host: {
-    'class': 'card',
+    class: 'card',
     '[class.card-elevated]': 'elevated()',
   },
 })

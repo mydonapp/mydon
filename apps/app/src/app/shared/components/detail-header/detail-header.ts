@@ -18,5 +18,7 @@ export class DetailHeaderComponent {
   readonly isScrolling = computed(() => this.scrollY() > 5);
 
   @HostListener('window:scroll')
-  onScroll(): void { this.scrollY.set(window.scrollY); }
+  onScroll(): void {
+    this.scrollY.set(window.scrollY);
+  }
 }

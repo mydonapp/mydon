@@ -1,21 +1,5 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Patch,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiBody,
-} from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
@@ -46,6 +30,7 @@ export class AuthController {
       theme: user.theme ?? 'system',
       listStyle: user.listStyle ?? 'normal',
       privacyMode: user.privacyMode ?? false,
+      showAccountNumbers: user.showAccountNumbers ?? false,
     };
   }
 
@@ -54,7 +39,16 @@ export class AuthController {
   @ApiBearerAuth()
   async updateCurrentUser(
     @Req() req: Request,
-    @Body() body: { name?: string; email?: string; language?: string; theme?: string; listStyle?: string; privacyMode?: boolean },
+    @Body()
+    body: {
+      name?: string;
+      email?: string;
+      language?: string;
+      theme?: string;
+      listStyle?: string;
+      privacyMode?: boolean;
+      showAccountNumbers?: boolean;
+    },
   ) {
     const user = req['context']?.user;
     const updated = await this.authService.updateUser(user.id, body);
@@ -66,6 +60,7 @@ export class AuthController {
       theme: updated.theme ?? 'system',
       listStyle: updated.listStyle ?? 'normal',
       privacyMode: updated.privacyMode ?? false,
+      showAccountNumbers: updated.showAccountNumbers ?? false,
     };
   }
 
@@ -103,18 +98,9 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(
-    @Body() loginDto: LoginDto,
-    @Res() res: Response,
-    @Req() req: Request,
-  ) {
+  async login(@Body() loginDto: LoginDto, @Res() res: Response, @Req() req: Request) {
     try {
-      const {
-        refreshToken,
-        accessToken,
-        accessTokenExpiry,
-        refreshTokenExpiry,
-      } = await this.authService.login({
+      const { refreshToken, accessToken, accessTokenExpiry, refreshTokenExpiry } = await this.authService.login({
         ...loginDto,
         userAgent: req.get('user-agent') || '',
         ip: req.get('x-forwarded-for') || '',
@@ -132,7 +118,6 @@ export class AuthController {
         expiry: Math.abs(accessTokenExpiry / 1000),
       });
     } catch (error) {
-      console.error(error);
       return res.status(401).send({ message: 'Unauthorized' });
     }
   }
@@ -149,12 +134,9 @@ export class AuthController {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const { accessToken, expiry } =
-        await this.authService.getNewAccessTokenFromRefreshToken(refreshToken);
+      const { accessToken, expiry } = await this.authService.getNewAccessTokenFromRefreshToken(refreshToken);
 
-      return res
-        .status(200)
-        .json({ accessToken, type: 'Bearer', expiry: Math.abs(expiry / 1000) });
+      return res.status(200).json({ accessToken, type: 'Bearer', expiry: Math.abs(expiry / 1000) });
     } catch {
       // console.error(error);
       return res.status(401).send({ message: 'Unauthorized' });

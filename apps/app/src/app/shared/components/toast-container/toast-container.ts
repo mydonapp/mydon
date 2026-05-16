@@ -12,19 +12,27 @@ export class ToastContainerComponent {
 
   iconFor(type: ToastType): string {
     switch (type) {
-      case 'success': return 'check-circle-2';
-      case 'error':   return 'alert-circle';
-      case 'warning': return 'alert-triangle';
-      default:        return 'info';
+      case 'success':
+        return 'check-circle-2';
+      case 'error':
+        return 'alert-circle';
+      case 'warning':
+        return 'alert-triangle';
+      default:
+        return 'info';
     }
   }
 
   colorFor(type: ToastType): string {
     switch (type) {
-      case 'success': return 'var(--sys-income)';
-      case 'error':   return 'var(--sys-error)';
-      case 'warning': return 'var(--color-warning)';
-      default:        return 'var(--sys-primary)';
+      case 'success':
+        return 'var(--sys-income)';
+      case 'error':
+        return 'var(--sys-error)';
+      case 'warning':
+        return 'var(--color-warning)';
+      default:
+        return 'var(--sys-primary)';
     }
   }
 }

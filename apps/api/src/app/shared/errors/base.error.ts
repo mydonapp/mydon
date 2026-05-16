@@ -16,7 +16,7 @@ export abstract class ExceptionBase extends Error {
   constructor(
     override readonly message: string,
     readonly cause?: Error,
-    readonly metadata?: ExceptionMetadata
+    readonly metadata?: ExceptionMetadata,
   ) {
     super(message);
   }

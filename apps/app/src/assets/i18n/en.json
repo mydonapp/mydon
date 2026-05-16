@@ -275,7 +275,9 @@
           "system": "System",
           "listStyle": "List Style",
           "listStyleNormal": "Normal",
-          "listStyleCompact": "Compact"
+          "listStyleCompact": "Compact",
+          "showAccountNumbers": "Show Account Numbers",
+          "showAccountNumbersDescription": "Display account numbers throughout the app for easier identification and sorting"
         },
         "export": {
           "title": "Data Export",
@@ -382,11 +384,14 @@
       },
       "accounts": {
         "title": "Accounts",
+        "editAccount": "Edit Account",
         "showInactive": "Show inactive",
         "all": "All",
         "inactive": "Inactive",
         "empty": "No accounts found",
         "name": "Name",
+        "accountNumber": "Account Number",
+        "accountNumberPlaceholder": "e.g. 1010",
         "deactivate": "Deactivate",
         "activate": "Activate",
         "updateSuccess": "Account updated.",

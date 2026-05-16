@@ -23,7 +23,7 @@ interface PostFinanceStatementResponse extends PostFinanceStatement {
 
 export class PostFinanceStatementMapper extends StatementMapper<PostFinanceStatement> {
   protected async parseStatement(): Promise<PostFinanceStatement[]> {
-    const parsed: Record<string, any>[] = await parse(this.fileContent, {
+    const parsed: Record<string, unknown>[] = parse(this.fileContent, {
       cast: true,
       columns: true,
       skip_empty_lines: true,
@@ -35,14 +35,13 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
     });
 
     return parsed.map((x) => {
+      const find = (keys: string[]) => Object.entries(x).find(([key]) => keys.includes(key))?.[1];
       return {
-        date: Object.entries(x).find(([key, value]) => headerMappings.date.includes(key))?.[1],
-        creditInCHF: Object.entries(x).find(([key, value]) => headerMappings.creditInCHF.includes(key))?.[1],
-        debitInCHF: Object.entries(x).find(([key, value]) => headerMappings.debitInCHF.includes(key))?.[1],
-        notificationText: Object.entries(x).find(([key, value]) => headerMappings.notificationText.includes(key))?.[1],
-        typeOfTransactipn: Object.entries(x).find(([key, value]) =>
-          headerMappings.typeOfTransactipn.includes(key),
-        )?.[1],
+        date: find(headerMappings.date) as string,
+        creditInCHF: find(headerMappings.creditInCHF) as number | string,
+        debitInCHF: find(headerMappings.debitInCHF) as number | string,
+        notificationText: find(headerMappings.notificationText) as string,
+        typeOfTransactipn: find(headerMappings.typeOfTransactipn) as string,
       };
     });
   }

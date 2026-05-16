@@ -137,12 +137,12 @@ Frontend: http://localhost:4200
 
 ### Tech Stack
 
-| Layer | Technology |
-|---|---|
+| Layer    | Technology                            |
+| -------- | ------------------------------------- |
 | Frontend | Angular 21, Tailwind CSS v4, Tauri v2 |
-| Backend | NestJS 11, TypeORM, PostgreSQL |
-| Monorepo | Nx |
-| Native | Tauri v2 (iOS + desktop) |
+| Backend  | NestJS 11, TypeORM, PostgreSQL        |
+| Monorepo | Nx                                    |
+| Native   | Tauri v2 (iOS + desktop)              |
 
 ## 📜 License
 

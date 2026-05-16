@@ -22,11 +22,7 @@ export class TransactionMatcherService {
    * @param minSimilarity - Minimum similarity threshold (0-1)
    * @returns Array of matched transactions with similarity scores
    */
-  async findSimilarTransactions(
-    userId: string,
-    description: string,
-    minSimilarity = 0.7,
-  ): Promise<TransactionMatch[]> {
+  async findSimilarTransactions(userId: string, description: string, minSimilarity = 0.7): Promise<TransactionMatch[]> {
     if (!description || description.trim().length === 0) {
       return [];
     }
@@ -41,19 +37,14 @@ export class TransactionMatcherService {
       take: 500, // Limit to recent transactions for performance
     });
 
-    const validCandidates = candidates.filter(
-      (t) => t.creditAccount && t.debitAccount && t.description,
-    );
+    const validCandidates = candidates.filter((t) => t.creditAccount && t.debitAccount && t.description);
 
     const matches: TransactionMatch[] = [];
     const normalizedDescription = this.normalizeText(description);
 
     for (const candidate of validCandidates) {
       const normalizedCandidate = this.normalizeText(candidate.description);
-      const similarity = this.calculateSimilarity(
-        normalizedDescription,
-        normalizedCandidate,
-      );
+      const similarity = this.calculateSimilarity(normalizedDescription, normalizedCandidate);
 
       if (similarity >= minSimilarity) {
         matches.push({
@@ -131,16 +122,8 @@ export class TransactionMatcherService {
    * Get the best match for a transaction description
    * Returns the most similar transaction if similarity is above threshold
    */
-  async getBestMatch(
-    userId: string,
-    description: string,
-    minSimilarity = 0.7,
-  ): Promise<Transaction | null> {
-    const matches = await this.findSimilarTransactions(
-      userId,
-      description,
-      minSimilarity,
-    );
+  async getBestMatch(userId: string, description: string, minSimilarity = 0.7): Promise<Transaction | null> {
+    const matches = await this.findSimilarTransactions(userId, description, minSimilarity);
 
     if (matches.length > 0) {
       return matches[0].transaction;

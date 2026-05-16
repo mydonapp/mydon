@@ -33,8 +33,15 @@
     "start:app": "nx serve app",
     "start:api": "nx serve api",
     "lint": "nx run-many --all --target=lint",
+    "lint:fix": "nx run-many --all --target=lint -- --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "nx run-many --all --target=test",
-    "build": "nx run-many --all --target=build"
+    "build": "nx run-many --all --target=build",
+    "migration:generate": "TS_NODE_PROJECT=apps/api/tsconfig.app.json typeorm-ts-node-commonjs migration:generate -d apps/api/src/data-source.ts",
+    "migration:run": "TS_NODE_PROJECT=apps/api/tsconfig.app.json typeorm-ts-node-commonjs migration:run      -d apps/api/src/data-source.ts",
+    "migration:revert": "TS_NODE_PROJECT=apps/api/tsconfig.app.json typeorm-ts-node-commonjs migration:revert   -d apps/api/src/data-source.ts",
+    "migration:show": "TS_NODE_PROJECT=apps/api/tsconfig.app.json typeorm-ts-node-commonjs migration:show     -d apps/api/src/data-source.ts"
   },
   "private": false,
   "dependencies": {

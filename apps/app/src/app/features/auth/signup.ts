@@ -48,7 +48,9 @@ export class SignupComponent {
   }
 
   async onSubmit() {
-    if (!this.name() || !this.email() || !this.password()) return;
+    if (!this.name() || !this.email() || !this.password()) {
+      return;
+    }
     this.loading.set(true);
     try {
       await this.authService.signup(this.name(), this.email(), this.password());

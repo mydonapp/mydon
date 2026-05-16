@@ -1,13 +1,4 @@
-import {
-  Component,
-  input,
-  output,
-  signal,
-  ViewChild,
-  ElementRef,
-  HostListener,
-  inject,
-} from '@angular/core';
+import { Component, input, output, signal, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
 import { IconComponent } from '../icon/icon';
 
 @Component({
@@ -43,8 +34,12 @@ export class FileUploadComponent {
   }
 
   formatSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024) {
+      return `${bytes} B`;
+    }
+    if (bytes < 1024 * 1024) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
@@ -66,6 +61,8 @@ export class FileUploadComponent {
     e.preventDefault();
     this.isDragging.set(false);
     const file = e.dataTransfer?.files?.[0];
-    if (file) this.fileChange.emit(file);
+    if (file) {
+      this.fileChange.emit(file);
+    }
   }
 }

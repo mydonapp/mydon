@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { User } from '../auth/user.entity';
 import { Context } from '../shared/types/context';
 import { Category } from './categories.entity';
 
@@ -21,7 +22,7 @@ export class CategoriesService {
   create(context: Context, name: string): Promise<Category> {
     const category = new Category();
     category.name = name;
-    category.user = { id: context.user.id } as any;
+    category.user = { id: context.user.id } as User;
     return this.categoriesRepository.save(category);
   }
 
@@ -29,7 +30,9 @@ export class CategoriesService {
     const category = await this.categoriesRepository.findOne({
       where: { id, user: { id: context.user.id } },
     });
-    if (!category) throw new NotFoundException();
+    if (!category) {
+      throw new NotFoundException();
+    }
     category.name = name;
     return this.categoriesRepository.save(category);
   }

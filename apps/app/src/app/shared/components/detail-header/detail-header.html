@@ -1,12 +1,24 @@
 <!-- Blurred backdrop: appears on scroll behind button + title (mobile only) -->
-<div class="detail-backdrop" [class.detail-backdrop--visible]="isScrolling()"></div>
+<div
+  class="detail-backdrop"
+  [class.detail-backdrop--visible]="isScrolling()"
+></div>
 
 <!-- Fixed header row: back circle + title that fades in on scroll (mobile only) -->
 <div class="detail-fixed-header">
-  <a [routerLink]="backLink()" class="detail-back-circle">
-    <app-icon name="arrow-left" [size]="18" />
+  <a
+    [routerLink]="backLink()"
+    class="detail-back-circle"
+  >
+    <app-icon
+      name="arrow-left"
+      [size]="18"
+    />
   </a>
-  <div class="detail-scroll-title" [class.detail-scroll-title--visible]="isScrolled()">
+  <div
+    class="detail-scroll-title"
+    [class.detail-scroll-title--visible]="isScrolled()"
+  >
     {{ title() }}
   </div>
   <div class="detail-header-action">
@@ -19,11 +31,17 @@
   [routerLink]="backLink()"
   class="hidden md:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5"
 >
-  <app-icon name="arrow-left" [size]="14" />
+  <app-icon
+    name="arrow-left"
+    [size]="14"
+  />
   {{ backLabel() }}
 </a>
 
 <!-- Title block: fades on mobile scroll, always visible on desktop -->
-<div class="detail-title-block" [class.detail-title-block--hidden]="isScrolled()">
+<div
+  class="detail-title-block"
+  [class.detail-title-block--hidden]="isScrolled()"
+>
   <ng-content />
 </div>

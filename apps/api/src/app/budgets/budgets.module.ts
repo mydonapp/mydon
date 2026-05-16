@@ -9,10 +9,7 @@ import { BudgetsController } from './budgets.controller';
 import { BudgetsService } from './budgets.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Budget, BudgetItem, Account, Category]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Budget, BudgetItem, Account, Category]), AuthModule],
   controllers: [BudgetsController],
   providers: [BudgetsService],
 })

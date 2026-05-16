@@ -20,7 +20,9 @@
   font-family: inherit;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
   min-height: 2.375rem;
 }
 

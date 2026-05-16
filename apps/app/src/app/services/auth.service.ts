@@ -28,7 +28,9 @@ export class AuthService {
   }
 
   isTokenValid(): boolean {
-    if (!this.accessToken || !this.accessTokenExpiry) return false;
+    if (!this.accessToken || !this.accessTokenExpiry) {
+      return false;
+    }
     return new Date() < this.accessTokenExpiry;
   }
 
@@ -54,7 +56,9 @@ export class AuthService {
   }
 
   async init(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
     this.initialized = true;
     await this.fetchAccessToken();
   }

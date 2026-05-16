@@ -10,6 +10,8 @@ export interface AccountSimple {
   currency: string;
   isActive: boolean;
   retirementAccount: boolean;
+  openingBalance: number;
+  accountNumber: number | null;
   categoryId: string | null;
   categoryName: string | null;
 }
@@ -18,6 +20,7 @@ export interface AccountDetail {
   id: string;
   name: string;
   type: string;
+  accountNumber: number | null;
   currency: string;
   isActive: boolean;
   retirementAccount: boolean;
@@ -43,6 +46,7 @@ export interface AccountBalance {
   id: string;
   name: string;
   type: string;
+  accountNumber: number | null;
   creditBalance: number;
   debitBalance: number;
   balance: number;
@@ -159,6 +163,8 @@ export class AccountsService {
       currency: string;
       isActive: boolean;
       categoryId: string;
+      openingBalance: number;
+      accountNumber: number | null;
     }>,
   ): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/accounts/${id}`, data));
@@ -218,6 +224,8 @@ export class AccountsService {
 
   async fetchSpendingAnalysis(params: Record<string, string>): Promise<SpendingAnalysis> {
     const query = new URLSearchParams(params).toString();
-    return firstValueFrom(this.http.get<SpendingAnalysis>(`${this.appConfig.apiUrl}/v1/transactions/analysis?${query}`));
+    return firstValueFrom(
+      this.http.get<SpendingAnalysis>(`${this.appConfig.apiUrl}/v1/transactions/analysis?${query}`),
+    );
   }
 }

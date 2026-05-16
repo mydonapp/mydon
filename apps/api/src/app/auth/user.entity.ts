@@ -9,26 +9,29 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   declare name: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   declare email: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   declare password: string;
 
-  @Column({ default: 'en' })
+  @Column({ type: 'varchar', default: 'en' })
   declare language: string;
 
-  @Column({ default: 'system' })
+  @Column({ type: 'varchar', default: 'system' })
   declare theme: string;
 
-  @Column({ name: 'list_style', default: 'normal' })
+  @Column({ type: 'varchar', name: 'list_style', default: 'normal' })
   declare listStyle: string;
 
-  @Column({ name: 'privacy_mode', default: false })
+  @Column({ type: 'boolean', name: 'privacy_mode', default: false })
   declare privacyMode: boolean;
+
+  @Column({ type: 'boolean', name: 'show_account_numbers', default: false })
+  declare showAccountNumbers: boolean;
 
   @OneToMany(() => AccessToken, (accessToken) => accessToken.user)
   declare accessToken: AccessToken[];

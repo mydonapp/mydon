@@ -49,19 +49,19 @@ export class Transaction {
   })
   declare debitAmount: number;
 
-  @Column({ default: '' })
+  @Column({ type: 'varchar', default: '' })
   declare description: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   declare draft: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   declare creditAccountAISuggested: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   declare debitAccountAISuggested: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   declare matchedTransactionId: string | null;
 
   @ManyToOne(() => Account, (account) => account.creditTransactions, {
@@ -90,7 +90,7 @@ export class Transaction {
   @Column({ type: 'timestamp' })
   declare transactionDate: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   declare raw: string | null;
 
   @ManyToOne(() => User, (user) => user.transactions, {})

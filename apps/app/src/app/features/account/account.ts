@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountDetail, AccountsService, TransactionRecord } from '../../services/accounts.service';
+import { AccountNumbersService } from '../../services/account-numbers.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ListStyleService } from '../../services/list-style.service';
 import { PrivacyService } from '../../services/privacy.service';
@@ -51,6 +52,7 @@ export class AccountComponent implements OnInit {
   currencyService = inject(CurrencyService);
   readonly listStyleService = inject(ListStyleService);
   privacyService = inject(PrivacyService);
+  readonly accountNumbersService = inject(AccountNumbersService);
   private route = inject(ActivatedRoute);
 
   loading = signal(false);
@@ -64,9 +66,7 @@ export class AccountComponent implements OnInit {
 
   accountId = signal<string>('');
 
-  yearOptions = Array.from({ length: 5 }, (_, i) =>
-    String(new Date().getFullYear() - i),
-  );
+  yearOptions = Array.from({ length: 5 }, (_, i) => String(new Date().getFullYear() - i));
 
   paginationStart() {
     return (this.page() - 1) * this.pageSize + 1;
@@ -97,8 +97,14 @@ export class AccountComponent implements OnInit {
       this.account.set({
         ...raw,
         totalTransactions: txs.length,
-        totalCredit: (raw.creditTransactions ?? []).reduce((s: number, t: AccountTransaction) => s + Number(t.creditAmount), 0),
-        totalDebit: (raw.debitTransactions ?? []).reduce((s: number, t: AccountTransaction) => s + Number(t.debitAmount), 0),
+        totalCredit: (raw.creditTransactions ?? []).reduce(
+          (s: number, t: AccountTransaction) => s + Number(t.creditAmount),
+          0,
+        ),
+        totalDebit: (raw.debitTransactions ?? []).reduce(
+          (s: number, t: AccountTransaction) => s + Number(t.debitAmount),
+          0,
+        ),
       });
       this.transactions.set(txs);
       this.applyFilters();

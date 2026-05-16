@@ -1,7 +1,10 @@
 /* ─── Buttons ─────────────────────────────────────────────────────────────── */
 .btn {
   @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium cursor-pointer no-underline;
-  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
   border: 1px solid transparent;
 }
 .btn:focus-visible {
@@ -52,7 +55,7 @@
 
 .btn-success {
   background-color: var(--sys-income);
-  color: light-dark(#FFFFFF, #00200C);
+  color: light-dark(#ffffff, #00200c);
 }
 .btn-success:hover {
   background-color: color-mix(in srgb, #000 10%, var(--sys-income));
@@ -68,7 +71,7 @@
 
 .btn-warning {
   background-color: var(--color-warning);
-  color: light-dark(#FFFFFF, #1C0A00);
+  color: light-dark(#ffffff, #1c0a00);
 }
 .btn-warning:hover {
   background-color: color-mix(in srgb, #000 8%, var(--color-warning));

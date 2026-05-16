@@ -1,15 +1,18 @@
 <div class="auth-page h-screen overflow-y-auto bg-background flex items-center justify-center">
   <div class="surface-elevated rounded-xl w-full max-w-md p-8 sm:p-10 relative">
-
     @if (appConfig.isNativeApp()) {
-      <button type="button"
-        class="absolute top-3 right-3 p-1.5 rounded-lg transition-colors"
-        [class]="showApiSettings() ? 'text-primary bg-primary/10' : 'text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-variant'"
-        (click)="toggleApiSettings()"
-        title="Server settings"
-      >
-        <app-icon name="settings" [size]="14" />
-      </button>
+    <button
+      type="button"
+      class="absolute top-3 right-3 p-1.5 rounded-lg transition-colors"
+      [class]="showApiSettings() ? 'text-primary bg-primary/10' : 'text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-variant'"
+      (click)="toggleApiSettings()"
+      title="Server settings"
+    >
+      <app-icon
+        name="settings"
+        [size]="14"
+      />
+    </button>
     }
 
     <div class="text-center mb-8">
@@ -21,32 +24,53 @@
     </div>
 
     @if (showApiSettings()) {
-      <div class="mb-6 p-3 rounded-xl bg-surface-variant/40">
-        <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Server URL</p>
-        <div class="flex gap-2">
-          <input appInput type="url" name="apiUrl"
-            [ngModel]="editApiUrl()"
-            (ngModelChange)="editApiUrl.set($event)"
-            placeholder="https://api.example.com"
-            class="flex-1"
-          />
-          <button appBtn variant="secondary" size="sm" type="button" (click)="saveApiUrl()">Save</button>
-        </div>
-        @if (appConfig.customApiUrl()) {
-          <button type="button"
-            class="text-xs text-on-surface-variant mt-2 hover:text-on-surface transition-colors"
-            (click)="clearApiUrl()"
-          >
-            Reset to default
-          </button>
-        }
+    <div class="mb-6 p-3 rounded-xl bg-surface-variant/40">
+      <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Server URL</p>
+      <div class="flex gap-2">
+        <input
+          appInput
+          type="url"
+          name="apiUrl"
+          [ngModel]="editApiUrl()"
+          (ngModelChange)="editApiUrl.set($event)"
+          placeholder="https://api.example.com"
+          class="flex-1"
+        />
+        <button
+          appBtn
+          variant="secondary"
+          size="sm"
+          type="button"
+          (click)="saveApiUrl()"
+        >
+          Save
+        </button>
       </div>
+      @if (appConfig.customApiUrl()) {
+      <button
+        type="button"
+        class="text-xs text-on-surface-variant mt-2 hover:text-on-surface transition-colors"
+        (click)="clearApiUrl()"
+      >
+        Reset to default
+      </button>
+      }
+    </div>
     }
 
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+    <form
+      (ngSubmit)="onSubmit()"
+      #loginForm="ngForm"
+    >
       <div class="space-y-4">
-        <app-field [label]="'views.login.loginForm.email.label' | translate" [required]="true">
-          <input appInput type="email" name="email"
+        <app-field
+          [label]="'views.login.loginForm.email.label' | translate"
+          [required]="true"
+        >
+          <input
+            appInput
+            type="email"
+            name="email"
             [ngModel]="email()"
             (ngModelChange)="email.set($event)"
             [placeholder]="'views.login.loginForm.email.placeholder' | translate"
@@ -54,8 +78,13 @@
           />
         </app-field>
         <div>
-          <app-field [label]="'views.login.loginForm.password.label' | translate" [required]="true">
-            <input appInput name="password"
+          <app-field
+            [label]="'views.login.loginForm.password.label' | translate"
+            [required]="true"
+          >
+            <input
+              appInput
+              name="password"
               [type]="showPassword() ? 'text' : 'password'"
               [ngModel]="password()"
               (ngModelChange)="password.set($event)"
@@ -63,12 +92,21 @@
               autocomplete="current-password"
             />
           </app-field>
-          <button type="button" class="text-xs text-on-surface-variant mt-1.5 hover:text-on-surface" (click)="showPassword.update(v => !v)">
+          <button
+            type="button"
+            class="text-xs text-on-surface-variant mt-1.5 hover:text-on-surface"
+            (click)="showPassword.update(v => !v)"
+          >
             {{ showPassword() ? 'Hide' : 'Show' }} password
           </button>
         </div>
 
-        <button appBtn type="submit" [block]="true" [loading]="loading()">
+        <button
+          appBtn
+          type="submit"
+          [block]="true"
+          [loading]="loading()"
+        >
           {{ 'views.login.loginForm.submit.label' | translate }}
         </button>
       </div>
@@ -77,7 +115,10 @@
     <div class="h-px bg-outline-variant/50 my-6"></div>
     <p class="text-center text-sm text-on-surface-variant">
       {{ 'views.login.signupPrompt.text' | translate }}
-      <a routerLink="/auth/signup" class="text-primary hover:underline ml-1">
+      <a
+        routerLink="/auth/signup"
+        class="text-primary hover:underline ml-1"
+      >
         {{ 'views.login.signupPrompt.link' | translate }}
       </a>
     </p>

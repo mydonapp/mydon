@@ -1,25 +1,20 @@
 <div class="page-content">
   <div class="max-w-2xl mx-auto">
-
     <!-- Page header -->
     <div class="mb-8">
-      <h1 class="text-2xl font-semibold text-on-surface">
-        {{ 'views.settings.title' | translate }}
-      </h1>
-      <p class="mt-1 text-sm text-on-surface-variant">
-        {{ 'views.settings.subtitle' | translate }}
-      </p>
+      <h1 class="text-2xl font-semibold text-on-surface">{{ 'views.settings.title' | translate }}</h1>
+      <p class="mt-1 text-sm text-on-surface-variant">{{ 'views.settings.subtitle' | translate }}</p>
     </div>
 
     <div class="flex flex-col gap-6">
-
       <!-- Profile -->
       <div>
         <p class="page-section-label">{{ 'views.settings.sections.profile.title' | translate }}</p>
         <div class="page-group p-4">
           <div class="space-y-4">
             <app-field [label]="'views.settings.sections.profile.name' | translate">
-              <input appInput
+              <input
+                appInput
                 name="profileName"
                 [ngModel]="name()"
                 (ngModelChange)="name.set($event)"
@@ -27,7 +22,8 @@
               />
             </app-field>
             <app-field [label]="'views.settings.sections.profile.email' | translate">
-              <input appInput
+              <input
+                appInput
                 type="email"
                 name="profileEmail"
                 [ngModel]="email()"
@@ -38,7 +34,13 @@
           </div>
         </div>
         <div class="flex justify-end pt-2.5">
-          <button appBtn variant="primary" size="sm" [loading]="savingProfile()" (click)="saveProfile()">
+          <button
+            appBtn
+            variant="primary"
+            size="sm"
+            [loading]="savingProfile()"
+            (click)="saveProfile()"
+          >
             {{ 'views.settings.sections.profile.updateButton' | translate }}
           </button>
         </div>
@@ -52,13 +54,13 @@
             <span class="settings-item-label">{{ 'views.settings.sections.appearance.theme' | translate }}</span>
             <div class="segmented-control">
               @for (opt of themeOptions; track opt.value) {
-                <button
-                  class="segmented-btn"
-                  [class.segmented-btn--active]="themeService.theme() === opt.value"
-                  (click)="onThemeChange(opt.value)"
-                >
-                  {{ opt.label | translate }}
-                </button>
+              <button
+                class="segmented-btn"
+                [class.segmented-btn--active]="themeService.theme() === opt.value"
+                (click)="onThemeChange(opt.value)"
+              >
+                {{ opt.label | translate }}
+              </button>
               }
             </div>
           </div>
@@ -66,15 +68,29 @@
             <span class="settings-item-label">{{ 'views.settings.sections.appearance.listStyle' | translate }}</span>
             <div class="segmented-control">
               @for (opt of listStyleOptions; track opt.value) {
-                <button
-                  class="segmented-btn"
-                  [class.segmented-btn--active]="listStyleService.listStyle() === opt.value"
-                  (click)="onListStyleChange(opt.value)"
-                >
-                  {{ opt.label | translate }}
-                </button>
+              <button
+                class="segmented-btn"
+                [class.segmented-btn--active]="listStyleService.listStyle() === opt.value"
+                (click)="onListStyleChange(opt.value)"
+              >
+                {{ opt.label | translate }}
+              </button>
               }
             </div>
+          </div>
+          <div class="page-item">
+            <div>
+              <p class="settings-item-label">
+                {{ 'views.settings.sections.appearance.showAccountNumbers' | translate }}
+              </p>
+              <p class="settings-item-description">
+                {{ 'views.settings.sections.appearance.showAccountNumbersDescription' | translate }}
+              </p>
+            </div>
+            <app-toggle
+              [value]="accountNumbersService.show()"
+              (valueChange)="onAccountNumbersToggle()"
+            />
           </div>
         </div>
       </div>
@@ -84,13 +100,14 @@
         <p class="page-section-label">{{ 'views.settings.sections.language.title' | translate }}</p>
         <div class="page-group p-4">
           <app-field [label]="'views.settings.sections.language.currentLanguage' | translate">
-            <select appSelect
+            <select
+              appSelect
               [ngModel]="languageService.currentLanguage()"
               (ngModelChange)="onLanguageChange($event)"
               name="language"
             >
               @for (opt of languageOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value">{{ opt.label }}</option>
               }
             </select>
           </app-field>
@@ -104,7 +121,9 @@
           <div class="page-item">
             <div>
               <p class="settings-item-label">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</p>
-              <p class="settings-item-description">{{ 'views.settings.sections.privacy.privacyModeDescription' | translate }}</p>
+              <p class="settings-item-description">
+                {{ 'views.settings.sections.privacy.privacyModeDescription' | translate }}
+              </p>
             </div>
             <app-toggle
               [value]="privacyService.isPrivate()"
@@ -121,8 +140,16 @@
           <p class="text-sm mb-4 text-on-surface-variant">
             {{ 'views.settings.sections.export.exportDescription' | translate }}
           </p>
-          <button appBtn variant="secondary" [loading]="exporting()" (click)="exportData()">
-            <app-icon name="download" [size]="15" />
+          <button
+            appBtn
+            variant="secondary"
+            [loading]="exporting()"
+            (click)="exportData()"
+          >
+            <app-icon
+              name="download"
+              [size]="15"
+            />
             {{ 'views.settings.sections.export.exportButton' | translate }}
           </button>
         </div>
@@ -138,7 +165,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>

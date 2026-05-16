@@ -12,7 +12,7 @@
     "module": "nodenext",
     "lib": ["ES2024", "dom"],
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
+    "skipDefaultLibCheck": true
   },
-  "exclude": ["node_modules", "tmp"],
+  "exclude": ["node_modules", "tmp"]
 }

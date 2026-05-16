@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountsService } from '../../services/accounts.service';
+import { AccountsService, TransactionRecord } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { PrivacyService } from '../../services/privacy.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
@@ -33,7 +33,7 @@ export class DashboardComponent implements OnInit {
 
   loading = signal(false);
   stats = signal<DashboardStats | null>(null);
-  recentTransactions = signal<any[]>([]);
+  recentTransactions = signal<TransactionRecord[]>([]);
 
   ngOnInit() {
     this.loadData();
@@ -72,7 +72,7 @@ export class DashboardComponent implements OnInit {
         incomeChange: lastIncome !== 0 ? ((thisIncome - lastIncome) / Math.abs(lastIncome)) * 100 : null,
       });
 
-      this.recentTransactions.set(txs.filter((tx: any) => !tx.draft).slice(0, 5));
+      this.recentTransactions.set(txs.filter((tx) => !tx.draft).slice(0, 5));
     } catch {
       // silent
     } finally {

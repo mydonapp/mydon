@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Account, AccountType } from '../accounts/accounts.entity';
+import { User } from '../auth/user.entity';
 import { Category } from '../categories/categories.entity';
 import { Context } from '../shared/types/context';
 import { BudgetFrequency, BudgetItem } from './budget-item.entity';
@@ -42,7 +43,9 @@ export class BudgetsService {
       where: { id, user: { id: context.user.id } },
       relations: ['items', 'items.account', 'items.category'],
     });
-    if (!budget) throw new NotFoundException();
+    if (!budget) {
+      throw new NotFoundException();
+    }
 
     return {
       id: budget.id,
@@ -65,7 +68,7 @@ export class BudgetsService {
     const budget = new Budget();
     budget.name = name;
     budget.year = year;
-    budget.user = { id: context.user.id } as any;
+    budget.user = { id: context.user.id } as User;
     const saved = await this.budgetsRepository.save(budget);
     return { id: saved.id, name: saved.name, year: saved.year, itemCount: 0 };
   }
@@ -74,10 +77,16 @@ export class BudgetsService {
     const budget = await this.budgetsRepository.findOne({
       where: { id, user: { id: context.user.id } },
     });
-    if (!budget) throw new NotFoundException();
+    if (!budget) {
+      throw new NotFoundException();
+    }
 
-    if (data.name !== undefined) budget.name = data.name;
-    if (data.year !== undefined) budget.year = data.year;
+    if (data.name !== undefined) {
+      budget.name = data.name;
+    }
+    if (data.year !== undefined) {
+      budget.year = data.year;
+    }
     await this.budgetsRepository.save(budget);
     return { id: budget.id, name: budget.name, year: budget.year };
   }
@@ -86,7 +95,9 @@ export class BudgetsService {
     const budget = await this.budgetsRepository.findOne({
       where: { id, user: { id: context.user.id } },
     });
-    if (!budget) throw new NotFoundException();
+    if (!budget) {
+      throw new NotFoundException();
+    }
     await this.budgetsRepository.remove(budget);
   }
 
@@ -94,18 +105,20 @@ export class BudgetsService {
     const budget = await this.budgetsRepository.findOne({
       where: { id: budgetId, user: { id: context.user.id } },
     });
-    if (!budget) throw new NotFoundException();
+    if (!budget) {
+      throw new NotFoundException();
+    }
 
     await this.budgetItemsRepository.delete({ budget: { id: budgetId } });
 
     const newItems = await Promise.all(
       items.map(async (dto) => {
         const item = new BudgetItem();
-        item.budget = { id: budgetId } as any;
+        item.budget = { id: budgetId } as Budget;
         item.amount = dto.amount;
         item.frequency = dto.frequency;
-        item.account = dto.accountId ? ({ id: dto.accountId } as any) : null;
-        item.category = dto.categoryId ? ({ id: dto.categoryId } as any) : null;
+        item.account = dto.accountId ? ({ id: dto.accountId } as Account) : null;
+        item.category = dto.categoryId ? ({ id: dto.categoryId } as Category) : null;
         return item;
       }),
     );
@@ -119,7 +132,9 @@ export class BudgetsService {
       where: { id: budgetId, user: { id: context.user.id } },
       relations: ['items', 'items.account', 'items.category'],
     });
-    if (!budget) throw new NotFoundException();
+    if (!budget) {
+      throw new NotFoundException();
+    }
 
     const isMonthly = month !== undefined && month !== null;
     const now = new Date();
@@ -133,20 +148,22 @@ export class BudgetsService {
         : new Date(year, 11, 31, 23, 59, 59, 999);
 
     const prevFrom = isMonthly
-      ? month === 1 ? new Date(year - 1, 11, 1) : new Date(year, month - 2, 1)
+      ? month === 1
+        ? new Date(year - 1, 11, 1)
+        : new Date(year, month - 2, 1)
       : new Date(year - 1, 0, 1);
     const prevTo = isMonthly
-      ? month === 1 ? new Date(year - 1, 11, 31, 23, 59, 59) : new Date(year, month - 1, 0, 23, 59, 59)
+      ? month === 1
+        ? new Date(year - 1, 11, 31, 23, 59, 59)
+        : new Date(year, month - 1, 0, 23, 59, 59)
       : new Date(year - 1, 11, 31, 23, 59, 59);
 
     const monthsElapsed = isCurrentYear ? now.getMonth() + 1 : year < now.getFullYear() ? 12 : 0;
 
     const progressItems = await Promise.all(
       budget.items.map(async (item) => {
-        const monthlyBudget =
-          item.frequency === BudgetFrequency.MONTHLY ? item.amount : item.amount / 12;
-        const yearlyBudget =
-          item.frequency === BudgetFrequency.YEARLY ? item.amount : item.amount * 12;
+        const monthlyBudget = item.frequency === BudgetFrequency.MONTHLY ? item.amount : item.amount / 12;
+        const yearlyBudget = item.frequency === BudgetFrequency.YEARLY ? item.amount : item.amount * 12;
         const displayBudget = isMonthly ? monthlyBudget : yearlyBudget;
 
         let actual = 0;
@@ -167,8 +184,7 @@ export class BudgetsService {
           accountType = item.account.type;
         }
 
-        const percentage =
-          displayBudget > 0 ? Math.round((actual / displayBudget) * 1000) / 10 : 0;
+        const percentage = displayBudget > 0 ? Math.round((actual / displayBudget) * 1000) / 10 : 0;
         const monthOverMonthChange =
           prevActual > 0 ? Math.round(((actual - prevActual) / prevActual) * 1000) / 10 : null;
 
@@ -193,6 +209,7 @@ export class BudgetsService {
           categoryName: item.category?.name ?? null,
           accountId: item.account?.id ?? null,
           accountName: item.account?.name ?? null,
+          accountNumber: item.account?.accountNumber ?? null,
           frequency: item.frequency,
           amount: item.amount,
           monthlyBudget: Math.round(monthlyBudget * 100) / 100,
@@ -233,9 +250,7 @@ export class BudgetsService {
     const credit = parseFloat(rows[0]?.creditBalance ?? '0');
     const debit = parseFloat(rows[0]?.debitBalance ?? '0');
     const balance =
-      account.type === AccountType.ASSETS || account.type === AccountType.EXPENSE
-        ? credit - debit
-        : debit - credit;
+      account.type === AccountType.ASSETS || account.type === AccountType.EXPENSE ? credit - debit : debit - credit;
     return Math.max(0, balance);
   }
 
@@ -263,13 +278,13 @@ export class BudgetsService {
       [categoryId, userId, from.toISOString(), to.toISOString()],
     );
 
-    const accounts = rows.map((row: any) => {
+    const accounts = (
+      rows as { id: string; name: string; type: AccountType; creditBalance: string; debitBalance: string }[]
+    ).map((row) => {
       const credit = parseFloat(row.creditBalance);
       const debit = parseFloat(row.debitBalance);
       const balance =
-        row.type === AccountType.ASSETS || row.type === AccountType.EXPENSE
-          ? credit - debit
-          : debit - credit;
+        row.type === AccountType.ASSETS || row.type === AccountType.EXPENSE ? credit - debit : debit - credit;
       return { id: row.id, name: row.name, actual: Math.max(0, balance) };
     });
 

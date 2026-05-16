@@ -8,5 +8,7 @@ import { LanguageService } from './services/language.service';
   templateUrl: './app.html',
 })
 export class AppComponent {
-  constructor() { inject(LanguageService); }
+  constructor() {
+    inject(LanguageService);
+  }
 }

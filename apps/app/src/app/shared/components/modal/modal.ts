@@ -6,9 +6,9 @@ import { Component, DestroyRef, HostListener, effect, inject, input, output } fr
   styleUrl: './modal.css',
 })
 export class ModalComponent {
-  open     = input(false);
+  open = input(false);
   boxClass = input('');
-  closed   = output<void>();
+  closed = output<void>();
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -26,7 +26,9 @@ export class ModalComponent {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.open()) this.closed.emit();
+    if (this.open()) {
+      this.closed.emit();
+    }
   }
 
   private lockScroll(): void {

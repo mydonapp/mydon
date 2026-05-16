@@ -6,8 +6,8 @@
     "types": ["node", "express", "multer"],
     "emitDecoratorMetadata": true,
     "target": "ES2024",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "nodenext"
   },
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.ts"],
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts", "src/data-source.ts", "src/migrations"],
+  "include": ["src/**/*.ts"]
 }

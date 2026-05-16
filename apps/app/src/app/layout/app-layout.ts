@@ -1,14 +1,14 @@
-import { Component, inject, computed, signal, OnInit, HostListener } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../services/auth.service';
-import { UserService } from '../services/user.service';
 import { PrivacyService } from '../services/privacy.service';
 import { SidebarStateService } from '../services/sidebar-state.service';
+import { UserService } from '../services/user.service';
+import { IconComponent } from '../shared/components/icon/icon';
 import { ToastContainerComponent } from '../shared/components/toast-container/toast-container';
 import { ToggleComponent } from '../shared/components/toggle/toggle';
 import { BtnDirective } from '../shared/directives/btn.directive';
-import { IconComponent } from '../shared/components/icon/icon';
 
 interface MenuItem {
   label: string;
@@ -42,10 +42,10 @@ export class AppLayoutComponent implements OnInit {
   userMenuOpen = signal(false);
 
   menu: MenuItem[] = [
-    { label: 'components.sidebar.menu.dashboard',          route: '/app',          icon: 'layout-dashboard', exact: true },
-    { label: 'components.sidebar.menu.accounts',           route: '/app/accounts', icon: 'wallet' },
-    { label: 'components.sidebar.menu.budgets',            route: '/app/budgets',  icon: 'circle-dollar-sign' },
-    { label: 'components.sidebar.menu.importTransactions', route: '/app/import',   icon: 'file-text' },
+    { label: 'components.sidebar.menu.dashboard', route: '/app', icon: 'layout-dashboard', exact: true },
+    { label: 'components.sidebar.menu.accounts', route: '/app/accounts', icon: 'wallet' },
+    { label: 'components.sidebar.menu.budgets', route: '/app/budgets', icon: 'circle-dollar-sign' },
+    { label: 'components.sidebar.menu.importTransactions', route: '/app/import', icon: 'file-text' },
   ];
 
   userInitial = computed(() => {
@@ -64,7 +64,7 @@ export class AppLayoutComponent implements OnInit {
 
   toggleUserMenu(event: Event) {
     event.stopPropagation();
-    this.userMenuOpen.update(v => !v);
+    this.userMenuOpen.update((v) => !v);
   }
 
   goToSettings() {
@@ -82,7 +82,7 @@ export class AppLayoutComponent implements OnInit {
     try {
       await this.userService.updatePreferences({ privacyMode: this.privacyService.isPrivate() });
     } catch (err) {
-      console.error('togglePrivacy failed', err);
+      // stub
     }
   }
 

@@ -4,82 +4,127 @@
       [title]="'views.budgets.title' | translate"
       [subtitle]="'views.budgets.subtitle' | translate"
     />
-    <button appBtn variant="primary" size="sm" (click)="showCreate.set(true)">
-      <app-icon name="plus" [size]="16" class="mr-1" />
+    <button
+      appBtn
+      variant="primary"
+      size="sm"
+      (click)="showCreate.set(true)"
+    >
+      <app-icon
+        name="plus"
+        [size]="16"
+        class="mr-1"
+      />
       {{ 'views.budgets.addBudget' | translate }}
     </button>
   </div>
 
   @if (loading()) {
-    <div class="page-group">
-      @for (i of [1, 2, 3]; track i) {
-        <div class="page-item">
-          <app-skeleton class="h-4 w-40 flex-1" />
-          <app-skeleton class="h-5 w-12 shrink-0" />
-          <app-skeleton class="h-4 w-16 shrink-0" />
-        </div>
-      }
+  <div class="page-group">
+    @for (i of [1, 2, 3]; track i) {
+    <div class="page-item">
+      <app-skeleton class="h-4 w-40 flex-1" />
+      <app-skeleton class="h-5 w-12 shrink-0" />
+      <app-skeleton class="h-4 w-16 shrink-0" />
     </div>
+    }
+  </div>
   } @else if (budgets().length === 0) {
-    <div class="page-group p-8 text-center">
-      <app-icon name="circle-dollar-sign" [size]="48" class="text-on-surface-variant mb-4" />
-      <h3 class="font-semibold text-on-surface mb-2">{{ 'views.budgets.noBudgets' | translate }}</h3>
-      <p class="text-on-surface-variant text-sm mb-4">{{ 'views.budgets.noBudgetsDescription' | translate }}</p>
-      <button appBtn variant="primary" (click)="showCreate.set(true)">
-        {{ 'views.budgets.addFirstBudget' | translate }}
-      </button>
-    </div>
+  <div class="page-group p-8 text-center">
+    <app-icon
+      name="circle-dollar-sign"
+      [size]="48"
+      class="text-on-surface-variant mb-4"
+    />
+    <h3 class="font-semibold text-on-surface mb-2">{{ 'views.budgets.noBudgets' | translate }}</h3>
+    <p class="text-on-surface-variant text-sm mb-4">{{ 'views.budgets.noBudgetsDescription' | translate }}</p>
+    <button
+      appBtn
+      variant="primary"
+      (click)="showCreate.set(true)"
+    >
+      {{ 'views.budgets.addFirstBudget' | translate }}
+    </button>
+  </div>
   } @else {
-    <div class="page-group">
-      @for (budget of budgets(); track budget.id) {
-        <a
-          class="page-item hover:bg-surface-variant/30 transition-colors no-underline"
-          [routerLink]="['/app/budgets', budget.id]"
-        >
-          <span class="font-medium text-on-surface flex-1 truncate">{{ budget.name }}</span>
-          <span class="text-xs bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full shrink-0">
-            {{ budget.year }}
-          </span>
-          <span class="text-sm text-on-surface-variant shrink-0">
-            {{ budget.itemCount }} {{ 'views.budgets.items' | translate }}
-          </span>
-          <button
-            appBtn variant="ghost" size="xs"
-            class="text-error shrink-0"
-            (click)="$event.preventDefault(); $event.stopPropagation(); confirmDelete(budget)"
-          >
-            <app-icon name="trash-2" [size]="16" />
-          </button>
-        </a>
-      }
-    </div>
+  <div class="page-group">
+    @for (budget of budgets(); track budget.id) {
+    <a
+      class="page-item hover:bg-surface-variant/30 transition-colors no-underline"
+      [routerLink]="['/app/budgets', budget.id]"
+    >
+      <span class="font-medium text-on-surface flex-1 truncate">{{ budget.name }}</span>
+      <span class="text-xs bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full shrink-0">
+        {{ budget.year }}
+      </span>
+      <span class="text-sm text-on-surface-variant shrink-0">
+        {{ budget.itemCount }} {{ 'views.budgets.items' | translate }}
+      </span>
+      <button
+        appBtn
+        variant="ghost"
+        size="xs"
+        class="text-error shrink-0"
+        (click)="$event.preventDefault(); $event.stopPropagation(); confirmDelete(budget)"
+      >
+        <app-icon
+          name="trash-2"
+          [size]="16"
+        />
+      </button>
+    </a>
+    }
+  </div>
   }
 </div>
 
 <!-- Create Budget Modal -->
-<app-modal [open]="showCreate()" (closed)="showCreate.set(false)">
+<app-modal
+  [open]="showCreate()"
+  (closed)="showCreate.set(false)"
+>
   <form (ngSubmit)="submitCreate()">
     <div class="modal-header">
       <h3 class="modal-title">{{ 'views.budgets.addBudgetForm.title' | translate }}</h3>
     </div>
     <div class="space-y-4 py-1">
-      <app-field [label]="'views.budgets.addBudgetForm.name.label' | translate" [required]="true">
-        <input appInput name="budgetName"
+      <app-field
+        [label]="'views.budgets.addBudgetForm.name.label' | translate"
+        [required]="true"
+      >
+        <input
+          appInput
+          name="budgetName"
           [(ngModel)]="newBudget.name"
           [placeholder]="'views.budgets.addBudgetForm.name.placeholder' | translate"
         />
       </app-field>
-      <app-field [label]="'views.budgets.addBudgetForm.year.label' | translate" [required]="true">
-        <input appInput type="number" name="budgetYear"
+      <app-field
+        [label]="'views.budgets.addBudgetForm.year.label' | translate"
+        [required]="true"
+      >
+        <input
+          appInput
+          type="number"
+          name="budgetYear"
           [(ngModel)]="newBudget.year"
         />
       </app-field>
     </div>
     <div class="modal-footer mt-6">
-      <button appBtn variant="ghost" type="button" (click)="showCreate.set(false)">
+      <button
+        appBtn
+        variant="ghost"
+        type="button"
+        (click)="showCreate.set(false)"
+      >
         {{ 'common.cancel' | translate }}
       </button>
-      <button appBtn type="submit" [loading]="submitting()">
+      <button
+        appBtn
+        type="submit"
+        [loading]="submitting()"
+      >
         {{ 'views.budgets.addBudgetForm.submit.label' | translate }}
       </button>
     </div>
@@ -87,21 +132,33 @@
 </app-modal>
 
 <!-- Delete Confirm Modal -->
-<app-modal [open]="!!budgetToDelete()" (closed)="budgetToDelete.set(null)">
+<app-modal
+  [open]="!!budgetToDelete()"
+  (closed)="budgetToDelete.set(null)"
+>
   @if (budgetToDelete()) {
-    <div class="modal-header">
-      <h3 class="modal-title text-error">{{ 'common.delete' | translate }}</h3>
-    </div>
-    <p class="text-on-surface text-sm py-1 mb-2">
-      {{ 'views.budgets.confirmDelete' | translate: { name: budgetToDelete()!.name } }}
-    </p>
-    <div class="modal-footer">
-      <button appBtn variant="ghost" (click)="budgetToDelete.set(null)">
-        {{ 'common.cancel' | translate }}
-      </button>
-      <button appBtn variant="danger" [loading]="submitting()" (click)="deleteBudget()">
-        {{ 'common.delete' | translate }}
-      </button>
-    </div>
+  <div class="modal-header">
+    <h3 class="modal-title text-error">{{ 'common.delete' | translate }}</h3>
+  </div>
+  <p class="text-on-surface text-sm py-1 mb-2">
+    {{ 'views.budgets.confirmDelete' | translate: { name: budgetToDelete()!.name } }}
+  </p>
+  <div class="modal-footer">
+    <button
+      appBtn
+      variant="ghost"
+      (click)="budgetToDelete.set(null)"
+    >
+      {{ 'common.cancel' | translate }}
+    </button>
+    <button
+      appBtn
+      variant="danger"
+      [loading]="submitting()"
+      (click)="deleteBudget()"
+    >
+      {{ 'common.delete' | translate }}
+    </button>
+  </div>
   }
 </app-modal>

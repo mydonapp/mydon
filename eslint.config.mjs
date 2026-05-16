@@ -6,10 +6,10 @@ export default [
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
   {
-    ignores: ['**/dist', '**/src-tauri/target/**'],
+    ignores: ['**/dist', '**/src-tauri/target/**', '**/.angular/cache/**', '**/coverage/**'],
   },
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.vue'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
       '@nx/enforce-module-boundaries': [
         'error',
@@ -27,4 +27,11 @@ export default [
     },
   },
   eslintConfigPrettier,
+  {
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    rules: {
+      curly: ['error', 'all'],
+      'no-console': 'error',
+    },
+  },
 ];

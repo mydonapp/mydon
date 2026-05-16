@@ -7,7 +7,7 @@ export class AccessToken {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   declare token: string;
 
   @Column({

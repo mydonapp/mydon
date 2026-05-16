@@ -188,14 +188,40 @@ export class AuthService {
     return user;
   }
 
-  async updateUser(userId: string, data: { name?: string; email?: string; language?: string; theme?: string; listStyle?: string; privacyMode?: boolean }): Promise<User> {
+  async updateUser(
+    userId: string,
+    data: {
+      name?: string;
+      email?: string;
+      language?: string;
+      theme?: string;
+      listStyle?: string;
+      privacyMode?: boolean;
+      showAccountNumbers?: boolean;
+    },
+  ): Promise<User> {
     const user = await this.userRepository.findOneOrFail({ where: { id: userId } });
-    if (data.name) user.name = data.name;
-    if (data.email) user.email = data.email;
-    if (data.language) user.language = data.language;
-    if (data.theme) user.theme = data.theme;
-    if (data.listStyle) user.listStyle = data.listStyle;
-    if (data.privacyMode !== undefined) user.privacyMode = data.privacyMode;
+    if (data.name) {
+      user.name = data.name;
+    }
+    if (data.email) {
+      user.email = data.email;
+    }
+    if (data.language) {
+      user.language = data.language;
+    }
+    if (data.theme) {
+      user.theme = data.theme;
+    }
+    if (data.listStyle) {
+      user.listStyle = data.listStyle;
+    }
+    if (data.privacyMode !== undefined) {
+      user.privacyMode = data.privacyMode;
+    }
+    if (data.showAccountNumbers !== undefined) {
+      user.showAccountNumbers = data.showAccountNumbers;
+    }
     return this.userRepository.save(user);
   }
 

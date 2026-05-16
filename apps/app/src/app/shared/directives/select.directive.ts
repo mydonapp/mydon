@@ -10,11 +10,11 @@ export interface SelectOption {
 @Directive({
   selector: 'select[appSelect]',
   host: {
-    'class': 'select',
+    class: 'select',
     '[class.input-error]': 'field?.hasError() ?? false',
   },
 })
 export class SelectDirective {
-  readonly el    = inject(ElementRef<HTMLSelectElement>);
+  readonly el = inject(ElementRef<HTMLSelectElement>);
   readonly field = inject(FIELD_TOKEN, { optional: true });
 }

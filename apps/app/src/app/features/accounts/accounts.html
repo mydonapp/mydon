@@ -32,26 +32,24 @@
     </div>
   </div>
 
-  @if (loading()) {
-    @for (i of [1, 2]; track i) {
-      <div class="mb-4">
-        <div class="flex items-center justify-between mb-1.5">
-          <app-skeleton class="h-3 w-20" />
-          <app-skeleton class="h-4 w-16" />
+  @if (loading()) { @for (i of [1, 2]; track i) {
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-1.5">
+      <app-skeleton class="h-3 w-20" />
+      <app-skeleton class="h-4 w-16" />
+    </div>
+    <div class="accounts-group">
+      @for (j of [1, 2, 3]; track j) {
+      <div class="page-item">
+        <div class="flex-1 min-w-0">
+          <app-skeleton class="h-4 w-36" />
         </div>
-        <div class="accounts-group">
-          @for (j of [1, 2, 3]; track j) {
-            <div class="page-item">
-              <div class="flex-1 min-w-0">
-                <app-skeleton class="h-4 w-36" />
-              </div>
-              <app-skeleton class="h-4 w-20 flex-shrink-0" />
-            </div>
-          }
-        </div>
+        <app-skeleton class="h-4 w-20 flex-shrink-0" />
       </div>
-    }
-  } @else { @for (group of accountGroups(); track group.type) {
+      }
+    </div>
+  </div>
+  } } @else { @for (group of accountGroups(); track group.type) {
   <div class="mb-4">
     <div class="flex items-center justify-between mb-1.5">
       <p class="page-section-label">{{ group.label | translate }}</p>
@@ -78,17 +76,19 @@
       >
         <div class="min-w-0">
           <p class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors truncate">
-            {{ account.name }}
+            @if (accountNumbersService.show() && account.accountNumber !== null) {
+            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.accountNumber }}</span>
+            } {{ account.name }}
           </p>
           @if (listStyleService.listStyle() !== 'compact') {
           <p class="text-xs text-on-surface-variant mt-0.5">{{ account.currency }}</p>
           }
         </div>
         <span
-          class="font-semibold text-sm ml-4 tabular-nums flex-shrink-0"
-          [class]="balanceClass(group.type, account.balance ?? 0)"
+          class="font-semibold text-sm ml-4 tabular-nums shrink-0"
+          [class]="balanceClass(group.type, account.balance)"
         >
-          {{ privacyService.isPrivate() ? '···' : currencyService.format(account.balance ?? 0, account.currency) }}
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account.balance, account.currency) }}
         </span>
       </a>
       } }

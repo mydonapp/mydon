@@ -46,18 +46,38 @@ Copy `.env.example` to `.env` before first run.
 
 Feature-based NestJS modules under `apps/api/src/app/`:
 
-| Module | Responsibility |
-|---|---|
-| `auth` | Login, signup, JWT access tokens, cookie refresh tokens, password change |
-| `accounts` | Double-entry ledger accounts (assets/liabilities/equity/income/expense), balance calculations |
+| Module         | Responsibility                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `auth`         | Login, signup, JWT access tokens, cookie refresh tokens, password change                                            |
+| `accounts`     | Double-entry ledger accounts (assets/liabilities/equity/income/expense), balance calculations                       |
 | `transactions` | Journal entries (each has a debit + credit account), CSV import, draft/approval flow, AI-suggested account matching |
-| `categories` | User-defined account categories |
-| `budgets` | Budget plans with line items, monthly/yearly progress calculations |
-| `export` | Full data export as a ZIP of CSVs |
-| `status` | Health check endpoint |
-| `shared` | `ColumnDecimalTransformer` (TypeORM decimal precision), `ForexService` (currency conversion) |
+| `categories`   | User-defined account categories                                                                                     |
+| `budgets`      | Budget plans with line items, monthly/yearly progress calculations                                                  |
+| `export`       | Full data export as a ZIP of CSVs                                                                                   |
+| `status`       | Health check endpoint                                                                                               |
+| `shared`       | `ColumnDecimalTransformer` (TypeORM decimal precision), `ForexService` (currency conversion)                        |
 
-**Database**: PostgreSQL via TypeORM. `synchronize: false` — schema changes require migrations. Entities auto-loaded from modules.
+**Database**: PostgreSQL via TypeORM. `synchronize: false` — all schema changes must be written as migration files.
+
+**Migrations**: TypeORM migrations live in `apps/api/src/migrations/`. The standalone DataSource config is at `apps/api/src/data-source.ts`. Run all migration commands from the workspace root with `.env` present:
+
+```bash
+# Generate a migration by diffing entities against the current DB schema
+pnpm migration:generate apps/api/src/migrations/DescriptiveName
+
+# Apply all pending migrations
+pnpm migration:run
+
+# Roll back the last applied migration
+pnpm migration:revert
+
+# Show applied / pending status
+pnpm migration:show
+```
+
+Every entity change (new column, new table, renamed column, etc.) requires a `migration:generate` + commit of the resulting `.ts` file. Never use `synchronize: true`.
+
+**Entity column convention**: Always specify `type` explicitly in every `@Column()` decorator (e.g. `@Column({ type: 'varchar' })`). TypeORM can't infer column types without `emitDecoratorMetadata` in the migration toolchain, which uses tsx/esbuild (no metadata emission).
 
 **Auth flow**: Password login → short-lived JWT access token (in-memory on client) + HttpOnly cookie refresh token. The `AuthGuard` protects all non-public routes.
 
@@ -70,6 +90,7 @@ Swagger docs available at `/api/docs` when `ENABLE_API_DOCS=true`.
 Angular 21 standalone components with lazy-loaded routes. No NgModules.
 
 **Key files:**
+
 - `app.config.ts` — providers: router, HttpClient + auth interceptor, ngx-translate
 - `app.routes.ts` — route tree; `/app/*` is behind `authGuard`
 

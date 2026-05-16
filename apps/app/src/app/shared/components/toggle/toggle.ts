@@ -6,8 +6,8 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './toggle.css',
 })
 export class ToggleComponent {
-  value    = input(false);
-  size     = input<'sm' | 'md' | 'lg'>('md');
+  value = input(false);
+  size = input<'sm' | 'md' | 'lg'>('md');
   disabled = input(false);
 
   valueChange = output<boolean>();

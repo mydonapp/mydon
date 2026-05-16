@@ -11,10 +11,7 @@ import { ExportController } from './export.controller';
 import { ExportService } from './export.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, Account, Transaction, Budget, BudgetItem, Category]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([User, Account, Transaction, Budget, BudgetItem, Category]), AuthModule],
   controllers: [ExportController],
   providers: [ExportService],
 })

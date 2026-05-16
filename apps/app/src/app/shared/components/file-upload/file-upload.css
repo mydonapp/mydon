@@ -15,7 +15,9 @@
   border: 1.5px dashed var(--sys-outline-variant);
   background-color: transparent;
   cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
   text-align: center;
 }
 
@@ -106,7 +108,9 @@
   background-color: var(--sys-surface-variant);
   color: var(--sys-on-surface-variant);
   cursor: pointer;
-  transition: background-color 0.1s, color 0.1s;
+  transition:
+    background-color 0.1s,
+    color 0.1s;
 }
 
 .file-upload-clear:hover {

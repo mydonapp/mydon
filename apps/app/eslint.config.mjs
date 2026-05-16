@@ -26,8 +26,4 @@ export default [
       ],
     },
   },
-  {
-    files: ['**/*.html'],
-    rules: {},
-  },
 ];

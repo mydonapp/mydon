@@ -8,7 +8,7 @@ export type ProgressBarVariant = 'default' | 'success' | 'warning' | 'error';
   styleUrl: './progress-bar.css',
 })
 export class ProgressBarComponent {
-  value   = input(0);
+  value = input(0);
   variant = input<ProgressBarVariant>('default');
 
   readonly clamped = computed(() => Math.min(100, Math.max(0, this.value())));

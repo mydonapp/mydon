@@ -30,13 +30,13 @@ import { IconComponent } from '../../shared/components/icon/icon';
 })
 export class BudgetsComponent implements OnInit {
   private readonly budgetsService = inject(BudgetsService);
-  private readonly toastService   = inject(ToastService);
-  private readonly router         = inject(Router);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
 
-  loading    = signal(false);
+  loading = signal(false);
   submitting = signal(false);
   showCreate = signal(false);
-  budgets    = signal<BudgetSummary[]>([]);
+  budgets = signal<BudgetSummary[]>([]);
   budgetToDelete = signal<BudgetSummary | null>(null);
 
   newBudget = {
@@ -63,7 +63,9 @@ export class BudgetsComponent implements OnInit {
 
   async deleteBudget() {
     const budget = this.budgetToDelete();
-    if (!budget) return;
+    if (!budget) {
+      return;
+    }
     this.submitting.set(true);
     try {
       await this.budgetsService.deleteBudget(budget.id);
@@ -78,7 +80,9 @@ export class BudgetsComponent implements OnInit {
   }
 
   async submitCreate() {
-    if (!this.newBudget.name || !this.newBudget.year) return;
+    if (!this.newBudget.name || !this.newBudget.year) {
+      return;
+    }
     this.submitting.set(true);
     try {
       const created = await this.budgetsService.createBudget({

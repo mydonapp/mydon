@@ -1,14 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  ViewChild,
-  computed,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../icon/icon';
 
@@ -29,32 +19,28 @@ let counter = 0;
 export class ComboboxComponent {
   private el = inject(ElementRef);
 
-  options     = input<ComboboxOption[]>([]);
-  value       = input<string>('');
+  options = input<ComboboxOption[]>([]);
+  value = input<string>('');
   placeholder = input<string>('Select…');
-  disabled    = input<boolean>(false);
+  disabled = input<boolean>(false);
 
   valueChange = output<string>();
 
   readonly listboxId = `combobox-list-${++counter}`;
 
-  isOpen      = signal(false);
-  query       = signal('');
+  isOpen = signal(false);
+  query = signal('');
   activeIndex = signal(-1);
   dropdownPos = signal<{ top: number; left: number; width: number } | null>(null);
 
   @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('trigger')     triggerRef!: ElementRef<HTMLButtonElement>;
+  @ViewChild('trigger') triggerRef!: ElementRef<HTMLButtonElement>;
 
-  selectedLabel = computed(() =>
-    this.options().find(o => o.value === this.value())?.label ?? '',
-  );
+  selectedLabel = computed(() => this.options().find((o) => o.value === this.value())?.label ?? '');
 
   filtered = computed(() => {
     const q = this.query().toLowerCase().trim();
-    return q
-      ? this.options().filter(o => o.label.toLowerCase().includes(q))
-      : this.options();
+    return q ? this.options().filter((o) => o.label.toLowerCase().includes(q)) : this.options();
   });
 
   @HostListener('document:click', ['$event'])
@@ -67,11 +53,15 @@ export class ComboboxComponent {
   @HostListener('window:scroll')
   @HostListener('window:resize')
   onScrollOrResize() {
-    if (this.isOpen()) this.close();
+    if (this.isOpen()) {
+      this.close();
+    }
   }
 
   toggle() {
-    if (this.disabled()) return;
+    if (this.disabled()) {
+      return;
+    }
     if (this.isOpen()) {
       this.close();
     } else {
@@ -104,16 +94,18 @@ export class ComboboxComponent {
         break;
       case 'ArrowDown':
         e.preventDefault();
-        this.activeIndex.update(i => Math.min(i + 1, opts.length - 1));
+        this.activeIndex.update((i) => Math.min(i + 1, opts.length - 1));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        this.activeIndex.update(i => Math.max(i - 1, 0));
+        this.activeIndex.update((i) => Math.max(i - 1, 0));
         break;
       case 'Enter': {
         e.preventDefault();
         const idx = this.activeIndex();
-        if (idx >= 0 && idx < opts.length) this.select(opts[idx]);
+        if (idx >= 0 && idx < opts.length) {
+          this.select(opts[idx]);
+        }
         break;
       }
     }
@@ -122,7 +114,9 @@ export class ComboboxComponent {
   onTriggerKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
       e.preventDefault();
-      if (!this.isOpen()) this.open();
+      if (!this.isOpen()) {
+        this.open();
+      }
     }
   }
 

@@ -6,7 +6,7 @@ export class Category {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   declare name: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })

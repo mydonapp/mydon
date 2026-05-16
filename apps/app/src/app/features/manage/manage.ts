@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { CategoriesService, Category } from '../../services/categories.service';
-import { AccountsService } from '../../services/accounts.service';
+import { AccountSimple, AccountsService } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { BtnDirective } from '../../shared/directives/btn.directive';
@@ -51,16 +51,17 @@ export class ManageComponent implements OnInit {
   // ── Accounts ────────────────────────────────────────────────────────────
   showInactive = false;
   activeTab = signal('all');
-  allAccounts = signal<any[]>([]);
-  filteredAccounts = signal<any[]>([]);
-  editingAccId = signal<string | null>(null);
-  editAccName = '';
+  allAccounts = signal<AccountSimple[]>([]);
+  filteredAccounts = signal<AccountSimple[]>([]);
   updatingAcc = signal(false);
   togglingAcc = signal<string | null>(null);
 
   showAddAccount = signal(false);
   submitting = signal(false);
   newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', categoryId: '' };
+
+  showEditAccount = signal(false);
+  editAcc = { id: '', name: '', categoryId: '', openingBalance: 0, accountNumber: null as number | null };
 
   accountTabs = [
     { value: 'all', label: 'views.manage.accounts.all' },
@@ -99,7 +100,9 @@ export class ManageComponent implements OnInit {
 
   filterAccounts() {
     let accounts = this.allAccounts();
-    if (!this.showInactive) accounts = accounts.filter((a) => a.isActive);
+    if (!this.showInactive) {
+      accounts = accounts.filter((a) => a.isActive);
+    }
     if (this.activeTab() !== 'all') {
       accounts = accounts.filter((a) => a.type === this.activeTab());
     }
@@ -107,7 +110,9 @@ export class ManageComponent implements OnInit {
   }
 
   async createCategory() {
-    if (!this.newCategoryName.trim()) return;
+    if (!this.newCategoryName.trim()) {
+      return;
+    }
     this.creatingCat.set(true);
     try {
       await this.categoriesService.createCategory(this.newCategoryName.trim());
@@ -126,7 +131,9 @@ export class ManageComponent implements OnInit {
   }
 
   async saveCategory(cat: Category) {
-    if (!this.editCatName.trim()) return;
+    if (!this.editCatName.trim()) {
+      return;
+    }
     this.updatingCat.set(true);
     try {
       await this.categoriesService.updateCategory(cat.id, this.editCatName.trim());
@@ -139,18 +146,31 @@ export class ManageComponent implements OnInit {
     }
   }
 
-  startEditAcc(account: any) {
-    this.editingAccId.set(account.id);
-    this.editAccName = account.name;
+  startEditAcc(account: AccountSimple) {
+    this.editAcc = {
+      id: account.id,
+      name: account.name,
+      categoryId: account.categoryId ?? '',
+      openingBalance: account.openingBalance ?? 0,
+      accountNumber: account.accountNumber ?? null,
+    };
+    this.showEditAccount.set(true);
   }
 
-  async saveAccount(account: any) {
-    if (!this.editAccName.trim()) return;
+  async saveAccount() {
+    if (!this.editAcc.name.trim()) {
+      return;
+    }
     this.updatingAcc.set(true);
     try {
-      await this.accountsService.updateAccount(account.id, { name: this.editAccName.trim() });
+      await this.accountsService.updateAccount(this.editAcc.id, {
+        name: this.editAcc.name.trim(),
+        categoryId: this.editAcc.categoryId || undefined,
+        openingBalance: this.editAcc.openingBalance,
+        accountNumber: this.editAcc.accountNumber,
+      });
       this.toastService.success('views.manage.accounts.updateSuccess');
-      this.editingAccId.set(null);
+      this.showEditAccount.set(false);
       await this.loadAccounts();
     } catch {
       this.toastService.error('views.manage.accounts.updateError');
@@ -159,7 +179,7 @@ export class ManageComponent implements OnInit {
     }
   }
 
-  async toggleAccount(account: any) {
+  async toggleAccount(account: AccountSimple) {
     this.togglingAcc.set(account.id);
     try {
       await this.accountsService.updateAccount(account.id, { isActive: !account.isActive });
@@ -176,16 +196,16 @@ export class ManageComponent implements OnInit {
   }
 
   async submitAddAccount() {
-    if (!this.newAccount.name || !this.newAccount.type) return;
+    if (!this.newAccount.name || !this.newAccount.type) {
+      return;
+    }
     this.submitting.set(true);
     try {
       await this.accountsService.createAccount({
         name: this.newAccount.name,
         type: this.newAccount.type,
         currency: this.newAccount.currency || 'CHF',
-        openingBalance: this.newAccount.openingBalance
-          ? Number(this.newAccount.openingBalance)
-          : undefined,
+        openingBalance: this.newAccount.openingBalance ? Number(this.newAccount.openingBalance) : undefined,
         categoryId: this.newAccount.categoryId || undefined,
       });
       this.toastService.success('views.accounts.addAccountForm.success');

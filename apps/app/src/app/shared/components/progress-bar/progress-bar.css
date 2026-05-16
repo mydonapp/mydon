@@ -13,6 +13,12 @@
   transition: width 0.3s ease;
 }
 
-.progress-bar--success .progress-bar__fill { background-color: var(--sys-income); }
-.progress-bar--error   .progress-bar__fill { background-color: var(--sys-error); }
-.progress-bar--warning .progress-bar__fill { background-color: var(--color-warning); }
+.progress-bar--success .progress-bar__fill {
+  background-color: var(--sys-income);
+}
+.progress-bar--error .progress-bar__fill {
+  background-color: var(--sys-error);
+}
+.progress-bar--warning .progress-bar__fill {
+  background-color: var(--color-warning);
+}

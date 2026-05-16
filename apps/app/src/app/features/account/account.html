@@ -4,180 +4,212 @@
     <app-detail-header
       backLink="/app/accounts"
       [backLabel]="'views.accounts.title' | translate"
-      [title]="account()?.name ?? ''"
+      [title]="
+        (accountNumbersService.show() && account()?.accountNumber !== null && account()?.accountNumber !== undefined
+          ? account()!.accountNumber + ' '
+          : '') + (account()?.name ?? '')
+      "
     >
       @if (loading()) {
-        <app-skeleton class="h-7 w-44" />
-        <app-skeleton class="h-4 w-28 mt-2" />
+      <app-skeleton class="h-7 w-44" />
+      <app-skeleton class="h-4 w-28 mt-2" />
       } @else {
-        <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">{{ account()?.name }}</h1>
-        <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>
+      <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">
+        @if (accountNumbersService.show() && account()?.accountNumber !== null) {
+        <span class="text-base font-mono text-on-surface-variant mr-2">{{ account()!.accountNumber }}</span>
+        } {{ account()?.name }}
+      </h1>
+      <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>
       }
     </app-detail-header>
 
     @if (loading()) {
-      <!-- Skeleton stat cards -->
-      <div class="grid grid-cols-2 gap-3 mt-5">
-        @for (i of [1, 2, 3, 4]; track i) {
-          <div class="page-group p-4">
-            <app-skeleton class="h-3 w-16 mb-2" />
-            <app-skeleton class="h-6 w-20" />
-          </div>
-        }
+    <!-- Skeleton stat cards -->
+    <div class="grid grid-cols-2 gap-3 mt-5">
+      @for (i of [1, 2, 3, 4]; track i) {
+      <div class="page-group p-4">
+        <app-skeleton class="h-3 w-16 mb-2" />
+        <app-skeleton class="h-6 w-20" />
       </div>
+      }
+    </div>
     } @else if (account()) {
-      <!-- Stats grid: always 2-col in left panel -->
-      <div class="grid grid-cols-2 gap-3 mt-5">
-        <div class="page-group p-4">
-          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.currentBalance' | translate }}</p>
-          <p class="text-lg font-bold text-primary tabular-nums">
-            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.balance, account()!.currency) }}
-          </p>
-        </div>
-        <div class="page-group p-4">
-          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalTransactions' | translate }}</p>
-          <p class="text-lg font-bold text-on-surface tabular-nums">{{ account()!.totalTransactions }}</p>
-        </div>
-        <div class="page-group p-4">
-          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalCredit' | translate }}</p>
-          <p class="text-lg font-bold text-success tabular-nums">
-            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency) }}
-          </p>
-        </div>
-        <div class="page-group p-4">
-          <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalDebit' | translate }}</p>
-          <p class="text-lg font-bold text-error tabular-nums">
-            {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency) }}
-          </p>
-        </div>
+    <!-- Stats grid: always 2-col in left panel -->
+    <div class="grid grid-cols-2 gap-3 mt-5">
+      <div class="page-group p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.currentBalance' | translate }}</p>
+        <p class="text-lg font-bold text-primary tabular-nums">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.balance, account()!.currency) }}
+        </p>
       </div>
+      <div class="page-group p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalTransactions' | translate }}</p>
+        <p class="text-lg font-bold text-on-surface tabular-nums">{{ account()!.totalTransactions }}</p>
+      </div>
+      <div class="page-group p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalCredit' | translate }}</p>
+        <p class="text-lg font-bold text-success tabular-nums">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalCredit, account()!.currency) }}
+        </p>
+      </div>
+      <div class="page-group p-4">
+        <p class="text-xs text-on-surface-variant mb-1">{{ 'views.account.totalDebit' | translate }}</p>
+        <p class="text-lg font-bold text-error tabular-nums">
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(account()!.totalDebit, account()!.currency) }}
+        </p>
+      </div>
+    </div>
 
-      <!-- Filters -->
-      <div class="flex flex-col gap-2 mt-4">
-        <select
-          appSelect
-          class="w-full"
-          [ngModel]="accountsService.timeFilter()"
-          (ngModelChange)="onYearChange($event)"
-        >
-          @for (year of yearOptions; track year) {
-            <option [value]="year">{{ year }}</option>
-          }
-        </select>
-        <input
-          appInput
-          type="text"
-          [(ngModel)]="searchText"
-          (ngModelChange)="applyFilters()"
-          [placeholder]="'common.search' | translate"
-        />
-      </div>
+    <!-- Filters -->
+    <div class="flex flex-col gap-2 mt-4">
+      <select
+        appSelect
+        class="w-full"
+        [ngModel]="accountsService.timeFilter()"
+        (ngModelChange)="onYearChange($event)"
+      >
+        @for (year of yearOptions; track year) {
+        <option [value]="year">{{ year }}</option>
+        }
+      </select>
+      <input
+        appInput
+        type="text"
+        [(ngModel)]="searchText"
+        (ngModelChange)="applyFilters()"
+        [placeholder]="'common.search' | translate"
+      />
+    </div>
     }
   </div>
 
   <!-- ── Right panel: transaction list ─────────────────────────────────── -->
   <div class="account-right">
     @if (loading()) {
-      <div class="account-tx-list">
-        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
-          <div class="page-item" [class.page-item--compact]="listStyleService.listStyle() === 'compact'">
-            <div class="flex-1 min-w-0 flex flex-col gap-1.5">
-              <app-skeleton class="h-4 w-48" />
-              @if (listStyleService.listStyle() !== 'compact') {
-                <app-skeleton class="h-3 w-28" />
-              }
-            </div>
-            <app-skeleton class="h-4 w-16 flex-shrink-0" />
-          </div>
-        }
+    <div class="account-tx-list">
+      @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+      <div
+        class="page-item"
+        [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+      >
+        <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+          <app-skeleton class="h-4 w-48" />
+          @if (listStyleService.listStyle() !== 'compact') {
+          <app-skeleton class="h-3 w-28" />
+          }
+        </div>
+        <app-skeleton class="h-4 w-16 flex-shrink-0" />
       </div>
+      }
+    </div>
     } @else if (account()) {
-      <div class="flex items-center justify-between mb-1.5">
-        <p class="page-section-label">{{ 'views.account.transactions.title' | translate }}</p>
-        <span class="text-xs text-on-surface-variant">
-          {{ filteredTransactions().length }} {{ 'views.account.transactions.title' | translate | lowercase }}
+    <div class="flex items-center justify-between mb-1.5">
+      <p class="page-section-label">{{ 'views.account.transactions.title' | translate }}</p>
+      <span class="text-xs text-on-surface-variant">
+        {{ filteredTransactions().length }} {{ 'views.account.transactions.title' | translate | lowercase }}
+      </span>
+    </div>
+    <div class="account-tx-list">
+      @if (filteredTransactions().length === 0) {
+      <p class="text-on-surface-variant text-center py-12 text-sm">{{ 'views.account.noTransactions' | translate }}</p>
+      } @else { @for (tx of paginatedTransactions(); track tx.id) {
+      <div
+        class="page-item hover:bg-surface-variant cursor-pointer transition-colors"
+        [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+        role="button"
+        tabindex="0"
+        (click)="selectedTx.set(tx)"
+        (keydown.enter)="selectedTx.set(tx)"
+        (keydown.space)="$event.preventDefault(); selectedTx.set(tx)"
+      >
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
+          @if (listStyleService.listStyle() !== 'compact') {
+          <p class="text-xs text-on-surface-variant mt-0.5 truncate">
+            {{ tx.transactionDate | date: 'mediumDate' }} @if (tx.counterAccount?.name; as other) { · {{ other }} }
+          </p>
+          }
+        </div>
+        <span
+          class="text-sm font-semibold tabular-nums flex-shrink-0"
+          [class]="txColor(tx)"
+        >
+          {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, account()!.currency) }}
         </span>
       </div>
-      <div class="account-tx-list">
-        @if (filteredTransactions().length === 0) {
-          <p class="text-on-surface-variant text-center py-12 text-sm">
-            {{ 'views.account.noTransactions' | translate }}
-          </p>
-        } @else {
-          @for (tx of paginatedTransactions(); track tx.id) {
-            <div
-              class="page-item hover:bg-surface-variant cursor-pointer transition-colors"
-              [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
-              role="button"
-              tabindex="0"
-              (click)="selectedTx.set(tx)"
-              (keydown.enter)="selectedTx.set(tx)"
-              (keydown.space)="$event.preventDefault(); selectedTx.set(tx)"
-            >
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
-                @if (listStyleService.listStyle() !== 'compact') {
-                  <p class="text-xs text-on-surface-variant mt-0.5 truncate">
-                    {{ tx.transactionDate | date: 'mediumDate' }}
-                    @if (tx.counterAccount?.name; as other) {
-                      · {{ other }}
-                    }
-                  </p>
-                }
-              </div>
-              <span
-                class="text-sm font-semibold tabular-nums flex-shrink-0"
-                [class]="txColor(tx)"
-              >
-                {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, account()!.currency) }}
-              </span>
-            </div>
-          }
+      }
 
-          <!-- Pagination -->
-          <div class="page-item">
-            <span class="text-xs text-on-surface-variant">
-              {{ paginationStart() }}–{{ paginationEnd() }} of {{ filteredTransactions().length }}
-            </span>
-            <div class="flex gap-1">
-              <button appBtn size="xs" variant="ghost" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
-                <app-icon name="chevron-left" [size]="16" />
-              </button>
-              <button
-                appBtn size="xs" variant="ghost"
-                [disabled]="paginationEnd() >= filteredTransactions().length"
-                (click)="page.update(p => p + 1)"
-              >
-                <app-icon name="chevron-right" [size]="16" />
-              </button>
-            </div>
-          </div>
-        }
+      <!-- Pagination -->
+      <div class="page-item">
+        <span class="text-xs text-on-surface-variant">
+          {{ paginationStart() }}–{{ paginationEnd() }} of {{ filteredTransactions().length }}
+        </span>
+        <div class="flex gap-1">
+          <button
+            appBtn
+            size="xs"
+            variant="ghost"
+            [disabled]="page() === 1"
+            (click)="page.update(p => p - 1)"
+          >
+            <app-icon
+              name="chevron-left"
+              [size]="16"
+            />
+          </button>
+          <button
+            appBtn
+            size="xs"
+            variant="ghost"
+            [disabled]="paginationEnd() >= filteredTransactions().length"
+            (click)="page.update(p => p + 1)"
+          >
+            <app-icon
+              name="chevron-right"
+              [size]="16"
+            />
+          </button>
+        </div>
       </div>
+      }
+    </div>
     }
   </div>
 </div>
 
 <!-- Transaction Detail Modal -->
-<app-modal [open]="!!selectedTx()" (closed)="selectedTx.set(null)">
+<app-modal
+  [open]="!!selectedTx()"
+  (closed)="selectedTx.set(null)"
+>
   @if (selectedTx()) {
-    <h3 class="font-bold text-lg mb-4">{{ 'views.account.transactionDetails' | translate }}</h3>
-    <div class="space-y-3 mb-4">
-      <div class="flex justify-between">
-        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.date' | translate }}</span>
-        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.transactionDate | date: 'mediumDate' }}</span>
-      </div>
-      <div class="flex justify-between">
-        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.description' | translate }}</span>
-        <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.description }}</span>
-      </div>
-      <div class="flex justify-between">
-        <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.amount' | translate }}</span>
-        <span class="text-on-surface font-bold text-sm tabular-nums">{{ currencyService.format(selectedTx()!.amount, account()!.currency) }}</span>
-      </div>
+  <h3 class="font-bold text-lg mb-4">{{ 'views.account.transactionDetails' | translate }}</h3>
+  <div class="space-y-3 mb-4">
+    <div class="flex justify-between">
+      <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.date' | translate }}</span>
+      <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.transactionDate | date: 'mediumDate' }}</span>
     </div>
-    <div class="modal-footer">
-      <button appBtn variant="ghost" (click)="selectedTx.set(null)">{{ 'common.close' | translate }}</button>
+    <div class="flex justify-between">
+      <span class="text-on-surface-variant text-sm"
+        >{{ 'views.account.transactions.table.description' | translate }}</span
+      >
+      <span class="text-on-surface text-sm font-medium">{{ selectedTx()!.description }}</span>
     </div>
+    <div class="flex justify-between">
+      <span class="text-on-surface-variant text-sm">{{ 'views.account.transactions.table.amount' | translate }}</span>
+      <span class="text-on-surface font-bold text-sm tabular-nums"
+        >{{ currencyService.format(selectedTx()!.amount, account()!.currency) }}</span
+      >
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      appBtn
+      variant="ghost"
+      (click)="selectedTx.set(null)"
+    >
+      {{ 'common.close' | translate }}
+    </button>
+  </div>
   }
 </app-modal>

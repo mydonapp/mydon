@@ -7,13 +7,13 @@ export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   declare token: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   declare userAgent: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   declare ip: string;
 
   @Column({

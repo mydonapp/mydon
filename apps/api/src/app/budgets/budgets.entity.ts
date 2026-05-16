@@ -7,10 +7,10 @@ export class Budget {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   declare name: string;
 
-  @Column()
+  @Column({ type: 'int' })
   declare year: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })

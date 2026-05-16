@@ -22,46 +22,46 @@ All tokens are defined once in `:root` using `light-dark()`. There are **no sepa
 
 ### Surface Stack (three layers)
 
-| Token | Light | Dark | Role |
-|---|---|---|---|
-| `--sys-background` | `#f0f2f5` | `#111316` | Page background — slightly gray |
-| `--sys-surface` | `#ffffff` | `#1a1c1e` | Content groups — white / near-black |
-| `--sys-surface-variant` | `#dfe3eb` | `#43474e` | Hover states, secondary fills |
+| Token                   | Light     | Dark      | Role                                |
+| ----------------------- | --------- | --------- | ----------------------------------- |
+| `--sys-background`      | `#f0f2f5` | `#111316` | Page background — slightly gray     |
+| `--sys-surface`         | `#ffffff` | `#1a1c1e` | Content groups — white / near-black |
+| `--sys-surface-variant` | `#dfe3eb` | `#43474e` | Hover states, secondary fills       |
 
 The contrast between `background` and `surface` is the sole visual separator for content groups. Do not add borders to supplement it.
 
 ### Primary (blue seed `#1667ff`)
 
-| Token | Role |
-|---|---|
-| `--sys-primary` | CTA buttons, active links, focus rings |
-| `--sys-on-primary` | Text/icons on primary bg |
-| `--sys-primary-container` | Active nav items, selected states (soft fill) |
-| `--sys-on-primary-container` | Text on primary-container |
+| Token                        | Role                                          |
+| ---------------------------- | --------------------------------------------- |
+| `--sys-primary`              | CTA buttons, active links, focus rings        |
+| `--sys-on-primary`           | Text/icons on primary bg                      |
+| `--sys-primary-container`    | Active nav items, selected states (soft fill) |
+| `--sys-on-primary-container` | Text on primary-container                     |
 
 ### Text
 
-| Token | Role |
-|---|---|
-| `--sys-on-surface` | Body text, headings |
+| Token                      | Role                                 |
+| -------------------------- | ------------------------------------ |
+| `--sys-on-surface`         | Body text, headings                  |
 | `--sys-on-surface-variant` | Secondary text, labels, placeholders |
-| `--sys-on-background` | Same as on-surface (alias) |
+| `--sys-on-background`      | Same as on-surface (alias)           |
 
 ### Semantic
 
-| Token | Role |
-|---|---|
-| `--sys-error` | Errors, destructive, negative amounts |
-| `--sys-income` | Success, positive amounts (green) |
-| `--sys-expense` | Expenses (red alias, same as error-adjacent) |
-| `--color-warning` | Warnings, caution states |
+| Token             | Role                                         |
+| ----------------- | -------------------------------------------- |
+| `--sys-error`     | Errors, destructive, negative amounts        |
+| `--sys-income`    | Success, positive amounts (green)            |
+| `--sys-expense`   | Expenses (red alias, same as error-adjacent) |
+| `--color-warning` | Warnings, caution states                     |
 
 ### Outline
 
-| Token | Role |
-|---|---|
-| `--sys-outline-variant` | Row dividers, form borders at rest |
-| `--sys-outline` | Stronger borders (focused states, separators) |
+| Token                   | Role                                          |
+| ----------------------- | --------------------------------------------- |
+| `--sys-outline-variant` | Row dividers, form borders at rest            |
+| `--sys-outline`         | Stronger borders (focused states, separators) |
 
 ### Usage rules
 
@@ -75,14 +75,14 @@ The contrast between `background` and `surface` is the sole visual separator for
 
 **Font:** Inter Variable (`@fontsource-variable/inter`). Always the only typeface.
 
-| Context | Size | Weight | Notes |
-|---|---|---|---|
-| Page title (h1) | `text-2xl` / `text-4xl` | `font-bold` | Hero numbers use `tracking-tight` |
-| Section heading | `text-lg` | `font-semibold` | |
-| Body | `text-sm` | `font-normal` | Default for list rows |
-| Secondary text | `text-xs` | `font-normal` | Subtitles, meta |
-| Section label | `0.6875rem` | `font-semibold` | Uppercase, `letter-spacing: 0.06em`, `on-surface-variant` |
-| Micro label | `0.625rem` (10px) | `font-medium` | Bottom nav labels |
+| Context         | Size                    | Weight          | Notes                                                     |
+| --------------- | ----------------------- | --------------- | --------------------------------------------------------- |
+| Page title (h1) | `text-2xl` / `text-4xl` | `font-bold`     | Hero numbers use `tracking-tight`                         |
+| Section heading | `text-lg`               | `font-semibold` |                                                           |
+| Body            | `text-sm`               | `font-normal`   | Default for list rows                                     |
+| Secondary text  | `text-xs`               | `font-normal`   | Subtitles, meta                                           |
+| Section label   | `0.6875rem`             | `font-semibold` | Uppercase, `letter-spacing: 0.06em`, `on-surface-variant` |
+| Micro label     | `0.625rem` (10px)       | `font-medium`   | Bottom nav labels                                         |
 
 **Monetary values always use `tabular-nums`** (`font-variant-numeric: tabular-nums`). This prevents layout shift as digits change and keeps decimal points aligned in lists.
 
@@ -90,12 +90,12 @@ The contrast between `background` and `surface` is the sole visual separator for
 
 ## Spacing & Radius
 
-| Token | Value | Usage |
-|---|---|---|
-| `--radius-sm` | `6px` | Small chips, badges |
-| `--radius-md` | `10px` | Buttons, inputs, nav items |
+| Token         | Value  | Usage                         |
+| ------------- | ------ | ----------------------------- |
+| `--radius-sm` | `6px`  | Small chips, badges           |
+| `--radius-md` | `10px` | Buttons, inputs, nav items    |
 | `--radius-lg` | `14px` | Content groups (`page-group`) |
-| `--radius-xl` | `20px` | Bottom nav, large modals |
+| `--radius-xl` | `20px` | Bottom nav, large modals      |
 
 Page padding scale: `p-4` mobile → `p-6` tablet → `p-8` desktop.
 
@@ -133,6 +133,7 @@ The primary content container pattern. Used everywhere lists or grouped settings
 ```
 
 **Rules:**
+
 - Never add a border to `.page-group` itself.
 - Use `page-item` for all rows inside a group. Row dividers come automatically.
 - Prefix group with `page-section-label` above it (not inside it with a border-b).
@@ -187,7 +188,7 @@ Used exclusively on **floating elements** that sit above scrolling content: bott
 background: light-dark(rgb(255 255 255 / 0.72), rgb(30 32 36 / 0.68));
 backdrop-filter: blur(3px) saturate(120%);
 -webkit-backdrop-filter: blur(3px) saturate(120%);
-border: 1px solid light-dark(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.10));
+border: 1px solid light-dark(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.1));
 box-shadow:
   0 8px 32px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.52)),
   0 2px 8px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.28)),
@@ -202,14 +203,14 @@ box-shadow:
 
 Sizes: `xs` / `sm` / (default) / `lg`. Variants:
 
-| Variant | Background | Use |
-|---|---|---|
-| `primary` | `--sys-primary` | Main CTA |
+| Variant     | Background                       | Use              |
+| ----------- | -------------------------------- | ---------------- |
+| `primary`   | `--sys-primary`                  | Main CTA         |
 | `secondary` | `--sys-surface` + outline border | Secondary action |
-| `ghost` | Transparent | Tertiary, cancel |
-| `success` | `--sys-income` | Confirm, approve |
-| `error` | `--sys-error` | Destructive |
-| `warning` | `--color-warning` | Caution action |
+| `ghost`     | Transparent                      | Tertiary, cancel |
+| `success`   | `--sys-income`                   | Confirm, approve |
+| `error`     | `--sys-error`                    | Destructive      |
+| `warning`   | `--color-warning`                | Caution action   |
 
 Buttons have `border-radius: 0.5rem` (rounded-lg), `0.15s` transitions, and a focus ring (`2px solid primary, offset 2px`). The loading state uses a CSS `::before` spinner — no separate spinner component needed inside button content.
 
@@ -232,7 +233,9 @@ Inside modals, inputs stay on `--sys-surface` background (same token; the modal'
   background-color: var(--sys-surface);
   border: none; /* no border — shadow provides depth */
   border-radius: 1rem;
-  box-shadow: 0 8px 32px rgb(0 0 0 / 0.18), 0 2px 8px rgb(0 0 0 / 0.10);
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / 0.18),
+    0 2px 8px rgb(0 0 0 / 0.1);
   max-width: 32rem;
   padding: 1.5rem;
 }
@@ -260,6 +263,7 @@ Sizes: `sm` (2.25rem × 1.125rem) / default (2.75rem × 1.5rem) / `lg` (3.25rem 
 ## Icons
 
 **Lucide Angular** (`lucide-angular`). Icons must be registered in two places in `app.config.ts`:
+
 1. The ES import at the top.
 2. Inside the `LucideIconProvider` object in `useValue`.
 

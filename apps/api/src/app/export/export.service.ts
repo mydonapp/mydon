@@ -51,7 +51,9 @@ export class ExportService {
       this.categoryRepository.find({ where: { user: { id: userId } } }),
     ]);
 
-    const budgetItems = budgets.flatMap((b) => b.items.map((item) => ({ ...item, budgetId: b.id, budgetName: b.name })));
+    const budgetItems = budgets.flatMap((b) =>
+      b.items.map((item) => ({ ...item, budgetId: b.id, budgetName: b.name })),
+    );
 
     return {
       userCsv: this.generateUserCsv(user),
@@ -86,10 +88,21 @@ export class ExportService {
 
   private generateTransactionsCsv(transactions: Transaction[]): string {
     const headers = [
-      'ID', 'Date', 'Description', 'Credit Amount', 'Debit Amount',
-      'Credit Account ID', 'Credit Account Name', 'Debit Account ID', 'Debit Account Name',
-      'Draft', 'Credit Account AI Suggested', 'Debit Account AI Suggested',
-      'Matched Transaction ID', 'Created At', 'Updated At',
+      'ID',
+      'Date',
+      'Description',
+      'Credit Amount',
+      'Debit Amount',
+      'Credit Account ID',
+      'Credit Account Name',
+      'Debit Account ID',
+      'Debit Account Name',
+      'Draft',
+      'Credit Account AI Suggested',
+      'Debit Account AI Suggested',
+      'Matched Transaction ID',
+      'Created At',
+      'Updated At',
     ];
     const rows = transactions.map((t) => [
       t.id,
@@ -118,7 +131,17 @@ export class ExportService {
   }
 
   private generateBudgetItemsCsv(items: (BudgetItem & { budgetId: string; budgetName: string })[]): string {
-    const headers = ['ID', 'Budget ID', 'Budget Name', 'Account ID', 'Account Name', 'Category ID', 'Category Name', 'Amount', 'Frequency'];
+    const headers = [
+      'ID',
+      'Budget ID',
+      'Budget Name',
+      'Account ID',
+      'Account Name',
+      'Category ID',
+      'Category Name',
+      'Amount',
+      'Frequency',
+    ];
     const rows = items.map((item) => [
       item.id,
       item.budgetId,
@@ -140,7 +163,9 @@ export class ExportService {
   }
 
   private escapeCsvValue(value: string): string {
-    if (!value) return '';
+    if (!value) {
+      return '';
+    }
     if (value.includes(',') || value.includes('"') || value.includes('\n')) {
       return `"${value.replace(/"/g, '""')}"`;
     }

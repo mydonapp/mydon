@@ -9,6 +9,7 @@ declare namespace Express {
         theme: string;
         listStyle: string;
         privacyMode: boolean;
+        showAccountNumbers: boolean;
       };
     };
   }
