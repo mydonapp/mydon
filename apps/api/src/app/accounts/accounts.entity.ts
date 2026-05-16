@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { AccountGroup } from '../account-groups/account-group.entity';
 import { User } from '../auth/user.entity';
-import { Category } from '../categories/categories.entity';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
 import { Transaction } from '../transactions/transactions.entity';
 
@@ -95,8 +95,12 @@ export class Account {
   @Column({ name: 'account_number', nullable: true, type: 'int', default: null })
   declare accountNumber: number | null;
 
-  @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL', eager: false })
-  declare category: Category | null;
+  @Column({ name: 'group_id', type: 'uuid', nullable: true, default: null })
+  declare groupId: string | null;
+
+  @ManyToOne(() => AccountGroup, { nullable: true, onDelete: 'SET NULL', eager: false })
+  @JoinColumn({ name: 'group_id' })
+  declare group: AccountGroup | null;
 
   @ManyToOne(() => User, (user) => user.accounts, {})
   declare user: User;

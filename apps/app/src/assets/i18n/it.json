@@ -115,9 +115,9 @@
           "label": "Valuta",
           "placeholder": "Seleziona valuta"
         },
-        "category": {
-          "label": "Categoria",
-          "placeholder": "Seleziona o crea una categoria"
+        "group": {
+          "label": "Gruppo di conti",
+          "placeholder": "Seleziona o crea un gruppo di conti"
         },
         "submit": {
           "label": "Aggiungi conto"
@@ -342,10 +342,10 @@
         "saveItems": "Salva",
         "saveSuccess": "Voci del budget salvate!",
         "saveError": "Salvataggio delle voci del budget non riuscito.",
-        "selectCategory": "Seleziona una categoria",
+        "selectGroup": "Seleziona un gruppo di conti",
         "selectAccount": "Seleziona un conto",
         "type": {
-          "category": "Categoria",
+          "group": "Gruppo di conti",
           "account": "Conto"
         },
         "amount": {
@@ -372,15 +372,15 @@
     },
     "manage": {
       "title": "Gestisci",
-      "subtitle": "Gestisci i tuoi conti e categorie",
-      "categories": {
-        "title": "Categorie",
-        "namePlaceholder": "Nome della categoria",
-        "empty": "Nessuna categoria ancora",
-        "createSuccess": "Categoria creata.",
-        "createError": "Creazione della categoria non riuscita.",
-        "updateSuccess": "Categoria aggiornata.",
-        "updateError": "Aggiornamento della categoria non riuscito."
+      "subtitle": "Gestisci i tuoi conti e gruppi di conti",
+      "accountGroups": {
+        "title": "Gruppi di conti",
+        "namePlaceholder": "Nome del gruppo di conti",
+        "empty": "Nessun gruppo di conti ancora",
+        "createSuccess": "Gruppo di conti creato.",
+        "createError": "Creazione del gruppo di conti non riuscita.",
+        "updateSuccess": "Gruppo di conti aggiornato.",
+        "updateError": "Aggiornamento del gruppo di conti non riuscito."
       },
       "accounts": {
         "title": "Conti",
@@ -414,9 +414,9 @@
         "logout": "Disconnetti"
       }
     },
-    "categoryCombobox": {
-      "createNew": "Crea nuova categoria",
-      "newCategoryPlaceholder": "Nome della nuova categoria",
+    "accountGroupCombobox": {
+      "createNew": "Crea nuovo gruppo di conti",
+      "newGroupPlaceholder": "Nome del nuovo gruppo di conti",
       "creating": "Creazione..."
     }
   },

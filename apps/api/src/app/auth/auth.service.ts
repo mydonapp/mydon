@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as argon2 from 'argon2';
 import { randomBytes } from 'crypto';
 import { Raw, Repository } from 'typeorm';
+import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account, AccountType } from '../accounts/accounts.entity';
-import { Category } from '../categories/categories.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { AccessToken } from './accessToken.entity';
@@ -27,8 +27,8 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>,
     @InjectRepository(Account)
     private accountRepository: Repository<Account>,
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
+    @InjectRepository(AccountGroup)
+    private accountGroupRepository: Repository<AccountGroup>,
     private organizationsService: OrganizationsService,
     private ledgersService: LedgersService,
   ) {}
@@ -66,24 +66,24 @@ export class AuthService {
     // Provision personal organization + default ledger for the new user.
     // Phase 1/2 model: every user gets one PERSONAL org with an OWNER membership and one "Main" ledger.
     const organization = await this.organizationsService.createPersonalOrganization(user);
-    await this.ledgersService.createDefaultLedger(organization.id);
+    const ledger = await this.ledgersService.createDefaultLedger(organization.id);
 
-    // Create default categories
-    const categoryNames = ['Banking', 'Income', 'Food', 'Housing'];
-    const categories: Record<string, Category> = {};
-    for (const name of categoryNames) {
-      const cat = new Category();
-      cat.name = name;
-      cat.user = user;
-      categories[name] = await this.categoryRepository.save(cat);
+    // Create default account groups (scoped to the new ledger)
+    const groupNames = ['Banking', 'Income', 'Food', 'Housing'];
+    const groups: Record<string, AccountGroup> = {};
+    for (const name of groupNames) {
+      const group = new AccountGroup();
+      group.name = name;
+      group.ledgerId = ledger.id;
+      groups[name] = await this.accountGroupRepository.save(group);
     }
 
     // Create default accounts
     const defaultAccounts = [
-      { name: 'Bank', type: AccountType.ASSETS, category: categories['Banking'] },
-      { name: 'Income', type: AccountType.INCOME, category: categories['Income'] },
-      { name: 'Food', type: AccountType.EXPENSE, category: categories['Food'] },
-      { name: 'Rent', type: AccountType.EXPENSE, category: categories['Housing'] },
+      { name: 'Bank', type: AccountType.ASSETS, group: groups['Banking'] },
+      { name: 'Income', type: AccountType.INCOME, group: groups['Income'] },
+      { name: 'Food', type: AccountType.EXPENSE, group: groups['Food'] },
+      { name: 'Rent', type: AccountType.EXPENSE, group: groups['Housing'] },
     ];
 
     for (const accountData of defaultAccounts) {
@@ -91,7 +91,7 @@ export class AuthService {
       account.name = accountData.name;
       account.type = accountData.type;
       account.openingBalance = 0;
-      account.category = accountData.category;
+      account.group = accountData.group;
       account.user = user;
       await this.accountRepository.save(account);
     }

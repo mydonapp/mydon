@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { CategoriesService, Category } from '../../services/categories.service';
+import { AccountGroup, AccountGroupsService } from '../../services/account-groups.service';
 import { AccountSimple, AccountsService } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
@@ -12,9 +12,9 @@ import { FieldComponent } from '../../shared/components/field/field';
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { ToggleComponent } from '../../shared/components/toggle/toggle';
 import { IconComponent } from '../../shared/components/icon/icon';
-import { CategoryComboboxComponent } from '../../shared/components/category-combobox/category-combobox';
+import { AccountGroupComboboxComponent } from '../../shared/components/account-group-combobox/account-group-combobox';
 
-type Section = 'accounts' | 'categories';
+type Section = 'accounts' | 'accountGroups';
 
 @Component({
   selector: 'app-manage',
@@ -31,22 +31,22 @@ type Section = 'accounts' | 'categories';
     ModalComponent,
     ToggleComponent,
     IconComponent,
-    CategoryComboboxComponent,
+    AccountGroupComboboxComponent,
   ],
 })
 export class ManageComponent implements OnInit {
-  categoriesService = inject(CategoriesService);
+  accountGroupsService = inject(AccountGroupsService);
   private accountsService = inject(AccountsService);
   private toastService = inject(ToastService);
 
   activeSection = signal<Section>('accounts');
 
-  // ── Categories ─────────────────────────────────────────────────────────
-  newCategoryName = '';
-  creatingCat = signal(false);
-  editingCatId = signal<string | null>(null);
-  editCatName = '';
-  updatingCat = signal(false);
+  // ── Account Groups ─────────────────────────────────────────────────────
+  newGroupName = '';
+  creatingGroup = signal(false);
+  editingGroupId = signal<string | null>(null);
+  editGroupName = '';
+  updatingGroup = signal(false);
 
   // ── Accounts ────────────────────────────────────────────────────────────
   showInactive = false;
@@ -58,10 +58,10 @@ export class ManageComponent implements OnInit {
 
   showAddAccount = signal(false);
   submitting = signal(false);
-  newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', categoryId: '' };
+  newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', groupId: '' };
 
   showEditAccount = signal(false);
-  editAcc = { id: '', name: '', categoryId: '', openingBalance: 0, accountNumber: null as number | null };
+  editAcc = { id: '', name: '', groupId: '', openingBalance: 0, accountNumber: null as number | null };
 
   accountTabs = [
     { value: 'all', label: 'views.manage.accounts.all' },
@@ -88,7 +88,7 @@ export class ManageComponent implements OnInit {
   ];
 
   ngOnInit() {
-    this.categoriesService.fetchCategories();
+    this.accountGroupsService.fetchAccountGroups();
     this.loadAccounts();
   }
 
@@ -109,40 +109,40 @@ export class ManageComponent implements OnInit {
     this.filteredAccounts.set(accounts);
   }
 
-  async createCategory() {
-    if (!this.newCategoryName.trim()) {
+  async createAccountGroup() {
+    if (!this.newGroupName.trim()) {
       return;
     }
-    this.creatingCat.set(true);
+    this.creatingGroup.set(true);
     try {
-      await this.categoriesService.createCategory(this.newCategoryName.trim());
-      this.toastService.success('views.manage.categories.createSuccess');
-      this.newCategoryName = '';
+      await this.accountGroupsService.createAccountGroup({ name: this.newGroupName.trim() });
+      this.toastService.success('views.manage.accountGroups.createSuccess');
+      this.newGroupName = '';
     } catch {
-      this.toastService.error('views.manage.categories.createError');
+      this.toastService.error('views.manage.accountGroups.createError');
     } finally {
-      this.creatingCat.set(false);
+      this.creatingGroup.set(false);
     }
   }
 
-  startEditCat(cat: Category) {
-    this.editingCatId.set(cat.id);
-    this.editCatName = cat.name;
+  startEditGroup(group: AccountGroup) {
+    this.editingGroupId.set(group.id);
+    this.editGroupName = group.name;
   }
 
-  async saveCategory(cat: Category) {
-    if (!this.editCatName.trim()) {
+  async saveAccountGroup(group: AccountGroup) {
+    if (!this.editGroupName.trim()) {
       return;
     }
-    this.updatingCat.set(true);
+    this.updatingGroup.set(true);
     try {
-      await this.categoriesService.updateCategory(cat.id, this.editCatName.trim());
-      this.toastService.success('views.manage.categories.updateSuccess');
-      this.editingCatId.set(null);
+      await this.accountGroupsService.updateAccountGroup(group.id, { name: this.editGroupName.trim() });
+      this.toastService.success('views.manage.accountGroups.updateSuccess');
+      this.editingGroupId.set(null);
     } catch {
-      this.toastService.error('views.manage.categories.updateError');
+      this.toastService.error('views.manage.accountGroups.updateError');
     } finally {
-      this.updatingCat.set(false);
+      this.updatingGroup.set(false);
     }
   }
 
@@ -150,7 +150,7 @@ export class ManageComponent implements OnInit {
     this.editAcc = {
       id: account.id,
       name: account.name,
-      categoryId: account.categoryId ?? '',
+      groupId: account.groupId ?? '',
       openingBalance: account.openingBalance ?? 0,
       accountNumber: account.accountNumber ?? null,
     };
@@ -165,7 +165,7 @@ export class ManageComponent implements OnInit {
     try {
       await this.accountsService.updateAccount(this.editAcc.id, {
         name: this.editAcc.name.trim(),
-        categoryId: this.editAcc.categoryId || undefined,
+        groupId: this.editAcc.groupId || undefined,
         openingBalance: this.editAcc.openingBalance,
         accountNumber: this.editAcc.accountNumber,
       });
@@ -206,11 +206,11 @@ export class ManageComponent implements OnInit {
         type: this.newAccount.type,
         currency: this.newAccount.currency || 'CHF',
         openingBalance: this.newAccount.openingBalance ? Number(this.newAccount.openingBalance) : undefined,
-        categoryId: this.newAccount.categoryId || undefined,
+        groupId: this.newAccount.groupId || undefined,
       });
       this.toastService.success('views.accounts.addAccountForm.success');
       this.showAddAccount.set(false);
-      this.newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', categoryId: '' };
+      this.newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', groupId: '' };
       await this.loadAccounts();
     } catch {
       this.toastService.error('views.accounts.addAccountForm.error');

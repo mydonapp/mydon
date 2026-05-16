@@ -5,7 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { AccountNumbersService } from '../../services/account-numbers.service';
 import { BudgetDetail, BudgetItem, BudgetProgressItem, BudgetsService } from '../../services/budgets.service';
-import { CategoriesService } from '../../services/categories.service';
+import { AccountGroupsService } from '../../services/account-groups.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
 import { ComboboxComponent, ComboboxOption } from '../../shared/components/combobox/combobox';
@@ -36,7 +36,7 @@ import { SelectDirective } from '../../shared/directives/select.directive';
 export class BudgetDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly budgetsService = inject(BudgetsService);
-  readonly categoriesService = inject(CategoriesService);
+  readonly accountGroupsService = inject(AccountGroupsService);
   readonly accountsService = inject(AccountsService);
   readonly accountNumbersService = inject(AccountNumbersService);
   readonly currencyService = inject(CurrencyService);
@@ -61,8 +61,8 @@ export class BudgetDetailComponent implements OnInit {
     label: new Date(0, i).toLocaleString('default', { month: 'long' }),
   }));
 
-  categoryOptions = computed<ComboboxOption[]>(() =>
-    this.categoriesService.categories().map((c) => ({ value: c.id, label: c.name })),
+  groupOptions = computed<ComboboxOption[]>(() =>
+    this.accountGroupsService.accountGroups().map((g) => ({ value: g.id, label: g.name })),
   );
 
   accountOptions = computed<ComboboxOption[]>(() =>
@@ -89,7 +89,7 @@ export class BudgetDetailComponent implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.params['id'];
     this.loadBudget(id);
-    this.categoriesService.fetchCategories();
+    this.accountGroupsService.fetchAccountGroups();
     this.accountsService.fetchSimple();
   }
 
@@ -181,7 +181,7 @@ export class BudgetDetailComponent implements OnInit {
   addItem() {
     this.editItems.update((items) => [
       ...items,
-      { type: 'category', categoryId: undefined, accountId: undefined, amount: 0, frequency: 'monthly' },
+      { type: 'group', groupId: undefined, accountId: undefined, amount: 0, frequency: 'monthly' },
     ]);
   }
 

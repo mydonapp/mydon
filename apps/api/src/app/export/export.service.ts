@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account } from '../accounts/accounts.entity';
 import { User } from '../auth/user.entity';
 import { BudgetItem } from '../budgets/budget-item.entity';
 import { Budget } from '../budgets/budgets.entity';
-import { Category } from '../categories/categories.entity';
+import { LedgersService } from '../ledgers/ledgers.service';
 import { Context } from '../shared/types/context';
 import { Transaction } from '../transactions/transactions.entity';
 
@@ -22,8 +23,9 @@ export class ExportService {
     private budgetRepository: Repository<Budget>,
     @InjectRepository(BudgetItem)
     private budgetItemRepository: Repository<BudgetItem>,
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
+    @InjectRepository(AccountGroup)
+    private accountGroupRepository: Repository<AccountGroup>,
+    private ledgersService: LedgersService,
   ) {}
 
   async exportUserData(context: Context): Promise<{
@@ -32,12 +34,13 @@ export class ExportService {
     transactionsCsv: string;
     budgetsCsv: string;
     budgetItemsCsv: string;
-    categoriesCsv: string;
+    accountGroupsCsv: string;
     filename: string;
   }> {
     const userId = context.user.id;
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(userId);
 
-    const [user, accounts, transactions, budgets, categories] = await Promise.all([
+    const [user, accounts, transactions, budgets, accountGroups] = await Promise.all([
       this.userRepository.findOneOrFail({ where: { id: userId } }),
       this.accountRepository.find({ where: { user: { id: userId } }, relations: ['user'] }),
       this.transactionRepository.find({
@@ -46,9 +49,9 @@ export class ExportService {
       }),
       this.budgetRepository.find({
         where: { user: { id: userId } },
-        relations: ['items', 'items.account', 'items.category'],
+        relations: ['items', 'items.account', 'items.group'],
       }),
-      this.categoryRepository.find({ where: { user: { id: userId } } }),
+      this.accountGroupRepository.find({ where: { ledgerId: ledger.id } }),
     ]);
 
     const budgetItems = budgets.flatMap((b) =>
@@ -61,7 +64,7 @@ export class ExportService {
       transactionsCsv: this.generateTransactionsCsv(transactions),
       budgetsCsv: this.generateBudgetsCsv(budgets),
       budgetItemsCsv: this.generateBudgetItemsCsv(budgetItems),
-      categoriesCsv: this.generateCategoriesCsv(categories),
+      accountGroupsCsv: this.generateAccountGroupsCsv(accountGroups),
       filename: `${new Date().toISOString().split('T')[0]}-mydon-export`,
     };
   }
@@ -137,8 +140,8 @@ export class ExportService {
       'Budget Name',
       'Account ID',
       'Account Name',
-      'Category ID',
-      'Category Name',
+      'Account Group ID',
+      'Account Group Name',
       'Amount',
       'Frequency',
     ];
@@ -148,17 +151,17 @@ export class ExportService {
       this.escapeCsvValue(item.budgetName),
       item.account?.id || '',
       this.escapeCsvValue(item.account?.name || ''),
-      item.category?.id || '',
-      this.escapeCsvValue(item.category?.name || ''),
+      item.group?.id || '',
+      this.escapeCsvValue(item.group?.name || ''),
       item.amount,
       item.frequency,
     ]);
     return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
   }
 
-  private generateCategoriesCsv(categories: Category[]): string {
-    const headers = ['ID', 'Name'];
-    const rows = categories.map((c) => [c.id, this.escapeCsvValue(c.name)]);
+  private generateAccountGroupsCsv(groups: AccountGroup[]): string {
+    const headers = ['ID', 'Name', 'Code'];
+    const rows = groups.map((g) => [g.id, this.escapeCsvValue(g.name), g.code]);
     return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
   }
 

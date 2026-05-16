@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ForexService } from '../shared/forex/forex.service';
 import { Context } from '../shared/types/context';
-import { Category } from '../categories/categories.entity';
+import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account, AccountType, Currency } from './accounts.entity';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class AccountsService {
   async findAllSimple(context: Context) {
     const accounts = await this.accountsRepository.find({
       where: { user: { id: context.user.id } },
-      relations: ['category'],
+      relations: ['group'],
     });
 
     accounts.sort((a, b) => {
@@ -42,8 +42,8 @@ export class AccountsService {
       retirementAccount: account.retirementAccount,
       openingBalance: account.openingBalance,
       accountNumber: account.accountNumber,
-      categoryId: account.category?.id ?? null,
-      categoryName: account.category?.name ?? null,
+      groupId: account.group?.id ?? null,
+      groupName: account.group?.name ?? null,
     }));
   }
 
@@ -71,8 +71,8 @@ export class AccountsService {
                 new Date(),
               ),
               retirementAccount: account.retirementAccount,
-              categoryId: account.category?.id ?? null,
-              categoryName: account.category?.name ?? null,
+              groupId: account.group?.id ?? null,
+              groupName: account.group?.name ?? null,
             };
           }),
       )
@@ -96,7 +96,7 @@ export class AccountsService {
   ) {
     const query = this.accountsRepository
       .createQueryBuilder('account')
-      .leftJoinAndSelect('account.category', 'category')
+      .leftJoinAndSelect('account.group', 'group')
       .addSelect(
         `(SELECT COALESCE(SUM("debitTransaction"."debitAmount"), 0)
           FROM transactions "debitTransaction"
@@ -160,7 +160,7 @@ export class AccountsService {
       type: AccountType;
       openingBalance: number;
       currency?: Currency;
-      categoryId?: string;
+      groupId?: string;
     },
   ) {
     const account = new Account();
@@ -170,8 +170,8 @@ export class AccountsService {
     if (options.currency) {
       account.currency = options.currency;
     }
-    if (options.categoryId) {
-      account.category = { id: options.categoryId } as Category;
+    if (options.groupId) {
+      account.group = { id: options.groupId } as AccountGroup;
     }
     account.setUserId(context.user.id);
     return this.accountsRepository.save(account);
@@ -182,7 +182,7 @@ export class AccountsService {
     accountId: string,
     options: {
       name?: string;
-      categoryId?: string | null;
+      groupId?: string | null;
       openingBalance?: number;
       isActive?: boolean;
       accountNumber?: number | null;
@@ -201,8 +201,8 @@ export class AccountsService {
     if (options.openingBalance !== undefined) {
       account.openingBalance = options.openingBalance;
     }
-    if (options.categoryId !== undefined) {
-      account.category = options.categoryId ? ({ id: options.categoryId } as Category) : null;
+    if (options.groupId !== undefined) {
+      account.group = options.groupId ? ({ id: options.groupId } as AccountGroup) : null;
     }
     if (options.accountNumber !== undefined) {
       account.accountNumber = options.accountNumber;

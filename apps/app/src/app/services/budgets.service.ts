@@ -12,9 +12,9 @@ export interface BudgetSummary {
 
 export interface BudgetItem {
   id: string;
-  type: 'category' | 'account';
-  categoryId?: string;
-  categoryName?: string;
+  type: 'group' | 'account';
+  groupId?: string;
+  groupName?: string;
   accountId?: string;
   accountName?: string;
   amount: number;
@@ -31,7 +31,7 @@ export interface BudgetDetail {
 export interface BudgetProgressItem {
   id: string;
   name: string;
-  type: 'category' | 'account';
+  type: 'group' | 'account';
   accountType: string | null;
   accountNumber: number | null;
   amount: number;

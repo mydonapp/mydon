@@ -9,10 +9,10 @@ export class BudgetItemDto {
   @IsUUID()
   accountId?: string;
 
-  @ApiProperty({ description: 'Category ID (if category-level item)', required: false })
+  @ApiProperty({ description: 'Account group ID (if group-level item)', required: false })
   @IsOptional()
   @IsUUID()
-  categoryId?: string;
+  groupId?: string;
 
   @ApiProperty({ description: 'Budget amount', example: 500 })
   @IsNumber()

@@ -115,9 +115,9 @@
           "label": "Currency",
           "placeholder": "Select currency"
         },
-        "category": {
-          "label": "Category",
-          "placeholder": "Select or create a category"
+        "group": {
+          "label": "Account group",
+          "placeholder": "Select or create an account group"
         },
         "submit": {
           "label": "Add Account"
@@ -342,10 +342,10 @@
         "saveItems": "Save",
         "saveSuccess": "Budget items saved!",
         "saveError": "Failed to save budget items.",
-        "selectCategory": "Select a category",
+        "selectGroup": "Select an account group",
         "selectAccount": "Select an account",
         "type": {
-          "category": "Category",
+          "group": "Account group",
           "account": "Account"
         },
         "amount": {
@@ -372,15 +372,15 @@
     },
     "manage": {
       "title": "Manage",
-      "subtitle": "Manage your accounts and categories",
-      "categories": {
-        "title": "Categories",
-        "namePlaceholder": "Category name",
-        "empty": "No categories yet",
-        "createSuccess": "Category created.",
-        "createError": "Failed to create category.",
-        "updateSuccess": "Category updated.",
-        "updateError": "Failed to update category."
+      "subtitle": "Manage your accounts and account groups",
+      "accountGroups": {
+        "title": "Account groups",
+        "namePlaceholder": "Account group name",
+        "empty": "No account groups yet",
+        "createSuccess": "Account group created.",
+        "createError": "Failed to create account group.",
+        "updateSuccess": "Account group updated.",
+        "updateError": "Failed to update account group."
       },
       "accounts": {
         "title": "Accounts",
@@ -414,9 +414,9 @@
         "logout": "Logout"
       }
     },
-    "categoryCombobox": {
-      "createNew": "Create new category",
-      "newCategoryPlaceholder": "New category name",
+    "accountGroupCombobox": {
+      "createNew": "Create new account group",
+      "newGroupPlaceholder": "New account group name",
       "creating": "Creating..."
     }
   },

@@ -115,9 +115,9 @@
           "label": "Devise",
           "placeholder": "Sélectionner une devise"
         },
-        "category": {
-          "label": "Catégorie",
-          "placeholder": "Sélectionner ou créer une catégorie"
+        "group": {
+          "label": "Groupe de comptes",
+          "placeholder": "Sélectionner ou créer un groupe de comptes"
         },
         "submit": {
           "label": "Ajouter un compte"
@@ -342,10 +342,10 @@
         "saveItems": "Enregistrer",
         "saveSuccess": "Éléments du budget enregistrés !",
         "saveError": "Échec de l'enregistrement des éléments du budget.",
-        "selectCategory": "Sélectionner une catégorie",
+        "selectGroup": "Sélectionner un groupe de comptes",
         "selectAccount": "Sélectionner un compte",
         "type": {
-          "category": "Catégorie",
+          "group": "Groupe de comptes",
           "account": "Compte"
         },
         "amount": {
@@ -372,15 +372,15 @@
     },
     "manage": {
       "title": "Gérer",
-      "subtitle": "Gérez vos comptes et catégories",
-      "categories": {
-        "title": "Catégories",
-        "namePlaceholder": "Nom de la catégorie",
-        "empty": "Aucune catégorie pour l'instant",
-        "createSuccess": "Catégorie créée.",
-        "createError": "Échec de la création de la catégorie.",
-        "updateSuccess": "Catégorie mise à jour.",
-        "updateError": "Échec de la mise à jour de la catégorie."
+      "subtitle": "Gérez vos comptes et groupes de comptes",
+      "accountGroups": {
+        "title": "Groupes de comptes",
+        "namePlaceholder": "Nom du groupe de comptes",
+        "empty": "Aucun groupe de comptes pour l'instant",
+        "createSuccess": "Groupe de comptes créé.",
+        "createError": "Échec de la création du groupe de comptes.",
+        "updateSuccess": "Groupe de comptes mis à jour.",
+        "updateError": "Échec de la mise à jour du groupe de comptes."
       },
       "accounts": {
         "title": "Comptes",
@@ -414,9 +414,9 @@
         "logout": "Déconnexion"
       }
     },
-    "categoryCombobox": {
-      "createNew": "Créer une nouvelle catégorie",
-      "newCategoryPlaceholder": "Nom de la nouvelle catégorie",
+    "accountGroupCombobox": {
+      "createNew": "Créer un nouveau groupe de comptes",
+      "newGroupPlaceholder": "Nom du nouveau groupe de comptes",
       "creating": "Création..."
     }
   },

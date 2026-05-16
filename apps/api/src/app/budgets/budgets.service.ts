@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account, AccountType } from '../accounts/accounts.entity';
 import { User } from '../auth/user.entity';
-import { Category } from '../categories/categories.entity';
 import { Context } from '../shared/types/context';
 import { BudgetFrequency, BudgetItem } from './budget-item.entity';
 import { Budget } from './budgets.entity';
@@ -18,8 +18,8 @@ export class BudgetsService {
     private budgetItemsRepository: Repository<BudgetItem>,
     @InjectRepository(Account)
     private accountsRepository: Repository<Account>,
-    @InjectRepository(Category)
-    private categoriesRepository: Repository<Category>,
+    @InjectRepository(AccountGroup)
+    private accountGroupsRepository: Repository<AccountGroup>,
     private dataSource: DataSource,
   ) {}
 
@@ -41,7 +41,7 @@ export class BudgetsService {
   async findOne(id: string, context: Context) {
     const budget = await this.budgetsRepository.findOne({
       where: { id, user: { id: context.user.id } },
-      relations: ['items', 'items.account', 'items.category'],
+      relations: ['items', 'items.account', 'items.group'],
     });
     if (!budget) {
       throw new NotFoundException();
@@ -53,9 +53,9 @@ export class BudgetsService {
       year: budget.year,
       items: budget.items.map((item) => ({
         id: item.id,
-        type: item.category ? 'category' : 'account',
-        categoryId: item.category?.id ?? null,
-        categoryName: item.category?.name ?? null,
+        type: item.group ? 'group' : 'account',
+        groupId: item.group?.id ?? null,
+        groupName: item.group?.name ?? null,
         accountId: item.account?.id ?? null,
         accountName: item.account?.name ?? null,
         amount: item.amount,
@@ -118,7 +118,7 @@ export class BudgetsService {
         item.amount = dto.amount;
         item.frequency = dto.frequency;
         item.account = dto.accountId ? ({ id: dto.accountId } as Account) : null;
-        item.category = dto.categoryId ? ({ id: dto.categoryId } as Category) : null;
+        item.group = dto.groupId ? ({ id: dto.groupId } as AccountGroup) : null;
         return item;
       }),
     );
@@ -130,7 +130,7 @@ export class BudgetsService {
   async getProgress(budgetId: string, context: Context, year: number, month?: number) {
     const budget = await this.budgetsRepository.findOne({
       where: { id: budgetId, user: { id: context.user.id } },
-      relations: ['items', 'items.account', 'items.category'],
+      relations: ['items', 'items.account', 'items.group'],
     });
     if (!budget) {
       throw new NotFoundException();
@@ -171,9 +171,9 @@ export class BudgetsService {
         let accountType: string | null = null;
         let accountBreakdown: { id: string; name: string; actual: number }[] = [];
 
-        if (item.category) {
-          const curr = await this.getCategoryActual(item.category.id, context.user.id, from, to);
-          const prev = await this.getCategoryActual(item.category.id, context.user.id, prevFrom, prevTo);
+        if (item.group) {
+          const curr = await this.getGroupActual(item.group.id, context.user.id, from, to);
+          const prev = await this.getGroupActual(item.group.id, context.user.id, prevFrom, prevTo);
           actual = curr.total;
           prevActual = prev.total;
           accountType = curr.accountType;
@@ -202,11 +202,11 @@ export class BudgetsService {
 
         return {
           id: item.id,
-          name: item.category?.name ?? item.account?.name ?? '',
-          type: item.category ? 'category' : 'account',
+          name: item.group?.name ?? item.account?.name ?? '',
+          type: item.group ? 'group' : 'account',
           accountType,
-          categoryId: item.category?.id ?? null,
-          categoryName: item.category?.name ?? null,
+          groupId: item.group?.id ?? null,
+          groupName: item.group?.name ?? null,
           accountId: item.account?.id ?? null,
           accountName: item.account?.name ?? null,
           accountNumber: item.account?.accountNumber ?? null,
@@ -254,8 +254,8 @@ export class BudgetsService {
     return Math.max(0, balance);
   }
 
-  private async getCategoryActual(
-    categoryId: string,
+  private async getGroupActual(
+    groupId: string,
     userId: string,
     from: Date,
     to: Date,
@@ -272,10 +272,10 @@ export class BudgetsService {
          ON (t."creditAccountId" = a.id OR t."debitAccountId" = a.id)
          AND t."userId" = $2
          AND t."transactionDate" BETWEEN $3::timestamptz AND $4::timestamptz
-       WHERE a."categoryId" = $1
+       WHERE a."group_id" = $1
          AND a."userId" = $2
        GROUP BY a.id, a.name, a.type`,
-      [categoryId, userId, from.toISOString(), to.toISOString()],
+      [groupId, userId, from.toISOString(), to.toISOString()],
     );
 
     const accounts = (

@@ -8,10 +8,10 @@ export class UpdateAccountDto {
   @Length(3, 50)
   name?: string;
 
-  @ApiProperty({ description: 'Category ID', required: false })
+  @ApiProperty({ description: 'Account group ID', required: false })
   @IsOptional()
   @IsUUID()
-  categoryId?: string;
+  groupId?: string;
 
   @ApiProperty({ description: 'Opening balance', required: false })
   @IsOptional()

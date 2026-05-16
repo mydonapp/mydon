@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountGroupsModule } from './account-groups/account-groups.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { AuthModule } from './auth/auth.module';
 import { BudgetsModule } from './budgets/budgets.module';
-import { CategoriesModule } from './categories/categories.module';
 import { ExportModule } from './export/export.module';
 import { LedgersModule } from './ledgers/ledgers.module';
 import { OrganizationsModule } from './organizations/organizations.module';
@@ -17,7 +17,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     AccountsModule,
     TransactionsModule,
     AuthModule,
-    CategoriesModule,
+    AccountGroupsModule,
     BudgetsModule,
     ExportModule,
     OrganizationsModule,

@@ -12,8 +12,8 @@ export interface AccountSimple {
   retirementAccount: boolean;
   openingBalance: number;
   accountNumber: number | null;
-  categoryId: string | null;
-  categoryName: string | null;
+  groupId: string | null;
+  groupName: string | null;
 }
 
 export interface AccountDetail {
@@ -24,7 +24,7 @@ export interface AccountDetail {
   currency: string;
   isActive: boolean;
   retirementAccount: boolean;
-  category: { id: string; name: string } | null;
+  group: { id: string; name: string } | null;
   balance: number;
   totalTransactions: number;
   totalCredit: number;
@@ -53,8 +53,8 @@ export interface AccountBalance {
   currency: string;
   balanceMainCurrency: number;
   retirementAccount: boolean;
-  categoryId: string | null;
-  categoryName: string | null;
+  groupId: string | null;
+  groupName: string | null;
 }
 
 export interface AccountGroup {
@@ -149,7 +149,7 @@ export class AccountsService {
     type: string;
     currency: string;
     openingBalance?: number;
-    categoryId?: string;
+    groupId?: string;
   }): Promise<void> {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/accounts`, account));
     await this.fetchSimple();
@@ -162,7 +162,7 @@ export class AccountsService {
       type: string;
       currency: string;
       isActive: boolean;
-      categoryId: string;
+      groupId: string;
       openingBalance: number;
       accountNumber: number | null;
     }>,

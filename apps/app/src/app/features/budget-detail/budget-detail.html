@@ -263,19 +263,19 @@
           appSelect
           class="w-28 shrink-0"
           [ngModel]="item.type"
-          (ngModelChange)="item.type = $event; item.categoryId = undefined; item.accountId = undefined"
+          (ngModelChange)="item.type = $event; item.groupId = undefined; item.accountId = undefined"
         >
-          <option value="category">{{ 'views.budgets.budgetItems.type.category' | translate }}</option>
+          <option value="group">{{ 'views.budgets.budgetItems.type.group' | translate }}</option>
           <option value="account">{{ 'views.budgets.budgetItems.type.account' | translate }}</option>
         </select>
 
-        @if (item.type === 'category') {
+        @if (item.type === 'group') {
         <app-combobox
           class="flex-1 min-w-0 block"
-          [options]="categoryOptions()"
-          [value]="item.categoryId ?? ''"
-          [placeholder]="item.categoryName || ('views.budgets.budgetItems.selectCategory' | translate)"
-          (valueChange)="item.categoryId = $event; item.categoryName = undefined"
+          [options]="groupOptions()"
+          [value]="item.groupId ?? ''"
+          [placeholder]="item.groupName || ('views.budgets.budgetItems.selectGroup' | translate)"
+          (valueChange)="item.groupId = $event; item.groupName = undefined"
         />
         } @else {
         <app-combobox

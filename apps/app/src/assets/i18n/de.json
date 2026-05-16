@@ -115,9 +115,9 @@
           "label": "Währung",
           "placeholder": "Währung auswählen"
         },
-        "category": {
-          "label": "Kategorie",
-          "placeholder": "Kategorie auswählen oder erstellen"
+        "group": {
+          "label": "Kontogruppe",
+          "placeholder": "Kontogruppe auswählen oder erstellen"
         },
         "submit": {
           "label": "Konto hinzufügen"
@@ -342,10 +342,10 @@
         "saveItems": "Speichern",
         "saveSuccess": "Budgeteinträge gespeichert!",
         "saveError": "Speichern fehlgeschlagen.",
-        "selectCategory": "Kategorie auswählen",
+        "selectGroup": "Kontogruppe auswählen",
         "selectAccount": "Konto auswählen",
         "type": {
-          "category": "Kategorie",
+          "group": "Kontogruppe",
           "account": "Konto"
         },
         "amount": {
@@ -372,15 +372,15 @@
     },
     "manage": {
       "title": "Verwalten",
-      "subtitle": "Konten und Kategorien verwalten",
-      "categories": {
-        "title": "Kategorien",
-        "namePlaceholder": "Kategoriename",
-        "empty": "Noch keine Kategorien",
-        "createSuccess": "Kategorie erstellt.",
-        "createError": "Kategorie konnte nicht erstellt werden.",
-        "updateSuccess": "Kategorie aktualisiert.",
-        "updateError": "Kategorie konnte nicht aktualisiert werden."
+      "subtitle": "Konten und Kontogruppen verwalten",
+      "accountGroups": {
+        "title": "Kontogruppen",
+        "namePlaceholder": "Name der Kontogruppe",
+        "empty": "Noch keine Kontogruppen",
+        "createSuccess": "Kontogruppe erstellt.",
+        "createError": "Kontogruppe konnte nicht erstellt werden.",
+        "updateSuccess": "Kontogruppe aktualisiert.",
+        "updateError": "Kontogruppe konnte nicht aktualisiert werden."
       },
       "accounts": {
         "title": "Konten",
@@ -414,9 +414,9 @@
         "logout": "Abmelden"
       }
     },
-    "categoryCombobox": {
-      "createNew": "Neue Kategorie erstellen",
-      "newCategoryPlaceholder": "Neuer Kategoriename",
+    "accountGroupCombobox": {
+      "createNew": "Neue Kontogruppe erstellen",
+      "newGroupPlaceholder": "Name der neuen Kontogruppe",
       "creating": "Wird erstellt..."
     }
   },

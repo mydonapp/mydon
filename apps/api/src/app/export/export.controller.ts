@@ -19,7 +19,7 @@ export class ExportController {
   })
   async exportUserData(@Req() req: Request, @Res() res: Response) {
     try {
-      const { userCsv, accountsCsv, transactionsCsv, budgetsCsv, budgetItemsCsv, categoriesCsv, filename } =
+      const { userCsv, accountsCsv, transactionsCsv, budgetsCsv, budgetItemsCsv, accountGroupsCsv, filename } =
         await this.exportService.exportUserData(req['context']);
 
       const archive = archiver('zip', {
@@ -36,7 +36,7 @@ export class ExportController {
       archive.append(transactionsCsv, { name: 'transactions.csv' });
       archive.append(budgetsCsv, { name: 'budgets.csv' });
       archive.append(budgetItemsCsv, { name: 'budget-items.csv' });
-      archive.append(categoriesCsv, { name: 'categories.csv' });
+      archive.append(accountGroupsCsv, { name: 'account-groups.csv' });
 
       const readme = this.generateReadme();
       archive.append(readme, { name: 'README.txt' });

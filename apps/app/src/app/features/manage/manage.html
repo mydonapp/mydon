@@ -21,14 +21,14 @@
       </button>
       <button
         class="manage-nav-item"
-        [class.manage-nav-item--active]="activeSection() === 'categories'"
-        (click)="activeSection.set('categories')"
+        [class.manage-nav-item--active]="activeSection() === 'accountGroups'"
+        (click)="activeSection.set('accountGroups')"
       >
         <app-icon
           name="tag"
           [size]="16"
         />
-        {{ 'views.manage.categories.title' | translate }}
+        {{ 'views.manage.accountGroups.title' | translate }}
       </button>
     </nav>
 
@@ -123,28 +123,28 @@
       </div>
       } }
 
-      <!-- Categories section -->
-      @if (activeSection() === 'categories') {
+      <!-- Account Groups section -->
+      @if (activeSection() === 'accountGroups') {
       <div class="flex items-center justify-between mb-3">
-        <p class="page-section-label">{{ 'views.manage.categories.title' | translate }}</p>
+        <p class="page-section-label">{{ 'views.manage.accountGroups.title' | translate }}</p>
       </div>
 
-      <!-- Add Category -->
+      <!-- Add Account Group -->
       <div class="flex gap-2 mb-4">
         <input
           appInput
           type="text"
-          [(ngModel)]="newCategoryName"
-          [placeholder]="'views.manage.categories.namePlaceholder' | translate"
+          [(ngModel)]="newGroupName"
+          [placeholder]="'views.manage.accountGroups.namePlaceholder' | translate"
           class="flex-1"
-          (keyup.enter)="createCategory()"
+          (keyup.enter)="createAccountGroup()"
         />
         <button
           appBtn
           variant="primary"
           size="sm"
-          [loading]="creatingCat()"
-          (click)="createCategory()"
+          [loading]="creatingGroup()"
+          (click)="createAccountGroup()"
         >
           <app-icon
             name="plus"
@@ -153,27 +153,27 @@
         </button>
       </div>
 
-      @if (categoriesService.categories().length === 0) {
-      <p class="text-on-surface-variant text-sm text-center py-8">{{ 'views.manage.categories.empty' | translate }}</p>
+      @if (accountGroupsService.accountGroups().length === 0) {
+      <p class="text-on-surface-variant text-sm text-center py-8">{{ 'views.manage.accountGroups.empty' | translate }}</p>
       } @else {
       <div class="page-group">
-        @for (cat of categoriesService.categories(); track cat.id) {
+        @for (group of accountGroupsService.accountGroups(); track group.id) {
         <div class="page-item">
-          @if (editingCatId() === cat.id) {
+          @if (editingGroupId() === group.id) {
           <input
             appInput
             type="text"
-            [(ngModel)]="editCatName"
+            [(ngModel)]="editGroupName"
             class="flex-1"
-            (keyup.enter)="saveCategory(cat)"
-            (keyup.escape)="editingCatId.set(null)"
+            (keyup.enter)="saveAccountGroup(group)"
+            (keyup.escape)="editingGroupId.set(null)"
           />
           <button
             appBtn
             size="xs"
             variant="success"
-            [loading]="updatingCat()"
-            (click)="saveCategory(cat)"
+            [loading]="updatingGroup()"
+            (click)="saveAccountGroup(group)"
           >
             <app-icon
               name="check"
@@ -184,7 +184,7 @@
             appBtn
             size="xs"
             variant="ghost"
-            (click)="editingCatId.set(null)"
+            (click)="editingGroupId.set(null)"
           >
             <app-icon
               name="x"
@@ -192,12 +192,12 @@
             />
           </button>
           } @else {
-          <span class="flex-1 text-sm text-on-surface">{{ cat.name }}</span>
+          <span class="flex-1 text-sm text-on-surface">{{ group.name }}</span>
           <button
             appBtn
             size="xs"
             variant="ghost"
-            (click)="startEditCat(cat)"
+            (click)="startEditGroup(group)"
           >
             <app-icon
               name="pencil"
@@ -249,11 +249,11 @@
           [(ngModel)]="editAcc.openingBalance"
         />
       </app-field>
-      <app-category-combobox
-        [value]="editAcc.categoryId"
-        (valueChange)="editAcc.categoryId = $event"
-        [label]="'views.accounts.addAccountForm.category.label' | translate"
-        [placeholder]="'views.accounts.addAccountForm.category.placeholder' | translate"
+      <app-account-group-combobox
+        [value]="editAcc.groupId"
+        (valueChange)="editAcc.groupId = $event"
+        [label]="'views.accounts.addAccountForm.group.label' | translate"
+        [placeholder]="'views.accounts.addAccountForm.group.placeholder' | translate"
       />
     </div>
     <div class="modal-footer">
@@ -328,11 +328,11 @@
           [(ngModel)]="newAccount.openingBalance"
         />
       </app-field>
-      <app-category-combobox
-        [value]="newAccount.categoryId"
-        (valueChange)="newAccount.categoryId = $event"
-        [label]="'views.accounts.addAccountForm.category.label' | translate"
-        [placeholder]="'views.accounts.addAccountForm.category.placeholder' | translate"
+      <app-account-group-combobox
+        [value]="newAccount.groupId"
+        (valueChange)="newAccount.groupId = $event"
+        [label]="'views.accounts.addAccountForm.group.label' | translate"
+        [placeholder]="'views.accounts.addAccountForm.group.placeholder' | translate"
       />
     </div>
     <div class="modal-footer">

@@ -1,24 +1,24 @@
 import { Component, input, output, signal, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { CategoriesService, Category } from '../../../services/categories.service';
+import { AccountGroup, AccountGroupsService } from '../../../services/account-groups.service';
 
 let comboboxCounter = 0;
 
 @Component({
-  selector: 'app-category-combobox',
-  templateUrl: './category-combobox.html',
+  selector: 'app-account-group-combobox',
+  templateUrl: './account-group-combobox.html',
   imports: [FormsModule, TranslateModule],
 })
-export class CategoryComboboxComponent implements OnInit {
+export class AccountGroupComboboxComponent implements OnInit {
   value = input<string>('');
   label = input<string>('');
   placeholder = input<string>('');
 
   valueChange = output<string>();
-  categoryCreated = output<Category>();
+  accountGroupCreated = output<AccountGroup>();
 
-  private categoriesService = inject(CategoriesService);
+  private accountGroupsService = inject(AccountGroupsService);
 
   readonly id = ++comboboxCounter;
   readonly inputId = `combobox-input-${this.id}`;
@@ -26,30 +26,32 @@ export class CategoryComboboxComponent implements OnInit {
 
   searchText = '';
   showDropdown = signal(false);
-  filtered = signal<Category[]>([]);
+  filtered = signal<AccountGroup[]>([]);
   creating = signal(false);
   activeIndex = signal(-1);
 
   get canCreate(): boolean {
     return (
       !!this.searchText &&
-      !this.categoriesService.categories().some((c) => c.name.toLowerCase() === this.searchText.toLowerCase())
+      !this.accountGroupsService.accountGroups().some((g) => g.name.toLowerCase() === this.searchText.toLowerCase())
     );
   }
 
   ngOnInit(): void {
     if (this.value()) {
-      const cat = this.categoriesService.categories().find((c) => c.id === this.value());
-      if (cat) {
-        this.searchText = cat.name;
+      const group = this.accountGroupsService.accountGroups().find((g) => g.id === this.value());
+      if (group) {
+        this.searchText = group.name;
       }
     }
-    this.filtered.set(this.categoriesService.categories());
+    this.filtered.set(this.accountGroupsService.accountGroups());
   }
 
   onSearch(text: string): void {
     const lower = text.toLowerCase();
-    this.filtered.set(this.categoriesService.categories().filter((c) => c.name.toLowerCase().includes(lower)));
+    this.filtered.set(
+      this.accountGroupsService.accountGroups().filter((g) => g.name.toLowerCase().includes(lower)),
+    );
     this.activeIndex.set(-1);
     this.showDropdown.set(true);
   }
@@ -66,43 +68,43 @@ export class CategoryComboboxComponent implements OnInit {
     if (!this.showDropdown()) {
       return;
     }
-    const cats = this.filtered();
+    const groups = this.filtered();
 
     if (event.key === 'Escape') {
       this.showDropdown.set(false);
       event.preventDefault();
     } else if (event.key === 'ArrowDown') {
       event.preventDefault();
-      this.activeIndex.update((i) => Math.min(i + 1, cats.length - 1));
+      this.activeIndex.update((i) => Math.min(i + 1, groups.length - 1));
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
       this.activeIndex.update((i) => Math.max(i - 1, 0));
     } else if (event.key === 'Enter') {
       event.preventDefault();
       const idx = this.activeIndex();
-      if (idx >= 0 && idx < cats.length) {
-        this.selectCategory(cats[idx]);
+      if (idx >= 0 && idx < groups.length) {
+        this.selectAccountGroup(groups[idx]);
       } else if (this.canCreate) {
-        this.createCategory();
+        this.createAccountGroup();
       }
     }
   }
 
-  selectCategory(cat: Category): void {
-    this.searchText = cat.name;
+  selectAccountGroup(group: AccountGroup): void {
+    this.searchText = group.name;
     this.showDropdown.set(false);
-    this.valueChange.emit(cat.id);
+    this.valueChange.emit(group.id);
   }
 
-  async createCategory(): Promise<void> {
+  async createAccountGroup(): Promise<void> {
     if (!this.searchText || this.creating()) {
       return;
     }
     this.creating.set(true);
     try {
-      const cat = await this.categoriesService.createCategory(this.searchText);
-      this.categoryCreated.emit(cat);
-      this.selectCategory(cat);
+      const group = await this.accountGroupsService.createAccountGroup({ name: this.searchText });
+      this.accountGroupCreated.emit(group);
+      this.selectAccountGroup(group);
     } finally {
       this.creating.set(false);
     }
