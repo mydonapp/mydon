@@ -56,7 +56,7 @@ export class SignupComponent {
       await this.authService.signup(this.name(), this.email(), this.password());
       this.router.navigate(['/app']);
     } catch {
-      this.toastService.error('Signup failed. Please try again.');
+      this.toastService.error('views.signup.signupForm.error');
     } finally {
       this.loading.set(false);
     }

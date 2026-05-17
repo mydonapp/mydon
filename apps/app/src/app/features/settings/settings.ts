@@ -78,9 +78,9 @@ export class SettingsComponent implements OnInit {
     this.savingProfile.set(true);
     try {
       await this.userService.updateUser(this.name(), this.email());
-      this.toastService.success('Profile updated.');
+      this.toastService.success('views.settings.sections.profile.updateSuccess');
     } catch {
-      this.toastService.error('Failed to update profile.');
+      this.toastService.error('views.settings.sections.profile.updateError');
     } finally {
       this.savingProfile.set(false);
     }
@@ -104,8 +104,8 @@ export class SettingsComponent implements OnInit {
   private async savePreference(key: string, value: string) {
     try {
       await this.userService.updatePreferences({ [key]: value });
-    } catch (err) {
-      this.toastService.error('Failed to save preference.');
+    } catch {
+      this.toastService.error('views.settings.preferenceError');
     }
   }
 
@@ -131,9 +131,9 @@ export class SettingsComponent implements OnInit {
     this.exporting.set(true);
     try {
       await this.exportService.exportData();
-      this.toastService.success('Export downloaded successfully!');
+      this.toastService.success('views.settings.sections.export.downloadSuccess');
     } catch {
-      this.toastService.error('Failed to export data. Please try again.');
+      this.toastService.error('views.settings.sections.export.downloadError');
     } finally {
       this.exporting.set(false);
     }

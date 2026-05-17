@@ -112,11 +112,11 @@ export class ImportComponent implements OnInit {
     this.uploading.set(true);
     try {
       await this.accountsService.importTransactions(this.selectedAccountId(), this.selectedIssuerId(), f);
-      this.toastService.success('Import successful!');
+      this.toastService.success('views.importTransactions.toasts.importSuccess');
       this.file.set(null);
       await this.loadDrafts();
     } catch {
-      this.toastService.error('Import failed.');
+      this.toastService.error('views.importTransactions.toasts.importError');
     } finally {
       this.uploading.set(false);
     }
@@ -162,7 +162,7 @@ export class ImportComponent implements OnInit {
         ),
       );
     } catch {
-      this.toastService.error('Failed to update transaction.');
+      this.toastService.error('views.importTransactions.toasts.updateError');
     }
   }
 
@@ -172,7 +172,7 @@ export class ImportComponent implements OnInit {
       this.draftTransactions.update((d) => d.filter((t) => t.id !== id));
       this.selectedDrafts.update((ids) => ids.filter((i) => i !== id));
     } catch {
-      this.toastService.error('Failed to delete transaction.');
+      this.toastService.error('views.importTransactions.toasts.deleteError');
     }
   }
 
@@ -183,11 +183,11 @@ export class ImportComponent implements OnInit {
     this.approving.set(true);
     try {
       await this.accountsService.approveDraftTransactions(this.selectedDrafts());
-      this.toastService.success('Transactions approved!');
+      this.toastService.success('views.importTransactions.toasts.approveSuccess');
       this.selectedDrafts.set([]);
       await this.loadDrafts();
     } catch {
-      this.toastService.error('Failed to approve transactions.');
+      this.toastService.error('views.importTransactions.toasts.approveError');
     } finally {
       this.approving.set(false);
     }

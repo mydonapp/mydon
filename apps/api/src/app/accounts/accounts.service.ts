@@ -18,10 +18,20 @@ export class AccountsService {
   constructor(
     @InjectRepository(Account)
     private accountsRepository: Repository<Account>,
+    @InjectRepository(AccountGroup)
+    private accountGroupsRepository: Repository<AccountGroup>,
     private forexService: ForexService,
     private ledgersService: LedgersService,
     private dataSource: DataSource,
   ) {}
+
+  /** Reject a group reference that belongs to another ledger (cross-tenant FK). */
+  private async assertGroupInLedger(groupId: string, ledgerId: string): Promise<void> {
+    const exists = await this.accountGroupsRepository.count({ where: { id: groupId, ledgerId } });
+    if (exists === 0) {
+      throw new NotFoundException('Account group not found in this ledger');
+    }
+  }
 
   async findAllSimple(context: Context) {
     const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
@@ -30,20 +40,7 @@ export class AccountsService {
       relations: ['group'],
     });
 
-    accounts.sort((a, b) => {
-      const aHas = a.code !== '';
-      const bHas = b.code !== '';
-      if (aHas && bHas) {
-        return a.code.localeCompare(b.code, undefined, { numeric: true });
-      }
-      if (aHas) {
-        return -1;
-      }
-      if (bHas) {
-        return 1;
-      }
-      return a.name.localeCompare(b.name);
-    });
+    accounts.sort((a, b) => this.byCode(a, b));
 
     return accounts.map((account) => ({
       id: account.id,
@@ -103,6 +100,25 @@ export class AccountsService {
     return map;
   }
 
+  /**
+   * Chart-of-accounts order: coded accounts first, sorted numerically by code
+   * (so "100" < "1000" < "1100"); uncoded accounts last, sorted by name.
+   */
+  private byCode(a: { code: string; name: string }, b: { code: string; name: string }): number {
+    const aHas = a.code !== '';
+    const bHas = b.code !== '';
+    if (aHas && bHas) {
+      return a.code.localeCompare(b.code, undefined, { numeric: true });
+    }
+    if (aHas) {
+      return -1;
+    }
+    if (bHas) {
+      return 1;
+    }
+    return a.name.localeCompare(b.name);
+  }
+
   private computeBalance(type: AccountType, debit: number, credit: number): number {
     // Normal balance: ASSETS/EXPENSE are debit-positive; LIABILITIES/EQUITY/INCOME are credit-positive.
     if (type === AccountType.ASSETS || type === AccountType.EXPENSE) {
@@ -139,7 +155,7 @@ export class AccountsService {
             };
           }),
       )
-    ).sort((a, b) => b.balanceMainCurrency - a.balanceMainCurrency);
+    ).sort((a, b) => this.byCode(a, b));
 
     return {
       accounts: result,
@@ -216,6 +232,7 @@ export class AccountsService {
       account.currency = options.currency;
     }
     if (options.groupId) {
+      await this.assertGroupInLedger(options.groupId, ledger.id);
       account.group = { id: options.groupId } as AccountGroup;
     }
     return this.accountsRepository.save(account);
@@ -244,6 +261,9 @@ export class AccountsService {
       account.name = options.name;
     }
     if (options.groupId !== undefined) {
+      if (options.groupId) {
+        await this.assertGroupInLedger(options.groupId, ledger.id);
+      }
       account.group = options.groupId ? ({ id: options.groupId } as AccountGroup) : null;
     }
     if (options.code !== undefined) {

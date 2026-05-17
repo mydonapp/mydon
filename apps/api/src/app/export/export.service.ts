@@ -58,7 +58,7 @@ export class ExportService {
         .orderBy('t.transaction_date', 'ASC')
         .getMany(),
       this.budgetRepository.find({
-        where: { user: { id: userId } },
+        where: { ledgerId: ledger.id },
         relations: ['items', 'items.account', 'items.group'],
       }),
       this.accountGroupRepository.find({ where: { ledgerId: ledger.id } }),

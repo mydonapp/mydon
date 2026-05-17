@@ -1,4 +1,10 @@
 .auth-page {
+  /* min-height (not h-screen/100vh): on iOS Safari 100vh is the toolbar-hidden
+     height, so a fixed-height page scrolls behind the address bar even when the
+     card fits. dvh tracks the actually-visible viewport; 100vh is the fallback
+     for browsers without dvh support. */
+  min-height: 100vh;
+  min-height: 100dvh;
   padding-top: max(1rem, env(safe-area-inset-top));
   padding-right: max(1rem, env(safe-area-inset-right));
   padding-bottom: max(1rem, env(safe-area-inset-bottom));

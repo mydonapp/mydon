@@ -176,7 +176,7 @@ export class AccountsComponent implements OnInit {
         debit === base ? 1 : await this.forexService.getRate(debit, base, date);
     } catch {
       // Leave whatever rate is there (default 1) editable; the user can still override.
-      this.toastService.error('Could not load the exchange rate — enter it manually.');
+      this.toastService.error('views.accounts.createTransactionForm.rateLoadError');
     } finally {
       this.rateLoading.set(false);
     }
@@ -269,15 +269,15 @@ export class AccountsComponent implements OnInit {
     const creditAmount = Number(this.newTransaction.creditAmount);
     const debitAmount = Number(this.newTransaction.debitAmount);
     if (!creditCurrency || !debitCurrency) {
-      this.toastService.error('Select both accounts.');
+      this.toastService.error('views.accounts.createTransactionForm.selectAccountsError');
       return;
     }
     if (!creditAmount || !debitAmount) {
-      this.toastService.error('Enter an amount on both sides.');
+      this.toastService.error('views.accounts.createTransactionForm.enterAmountsError');
       return;
     }
     if (!this.isBalanced()) {
-      this.toastService.error('The two sides do not balance — adjust the amount or the exchange rate.');
+      this.toastService.error('views.accounts.createTransactionForm.notBalancedError');
       return;
     }
 
@@ -304,7 +304,7 @@ export class AccountsComponent implements OnInit {
           },
         ],
       });
-      this.toastService.success('Transaction created successfully!');
+      this.toastService.success('views.accounts.createTransactionForm.success');
       this.showCreateTransaction.set(false);
       this.newTransaction = {
         date: new Date().toISOString().split('T')[0],
@@ -317,7 +317,7 @@ export class AccountsComponent implements OnInit {
         debitFxRate: 1,
       };
     } catch {
-      this.toastService.error('Failed to create transaction.');
+      this.toastService.error('views.accounts.createTransactionForm.error');
     } finally {
       this.submitting.set(false);
     }

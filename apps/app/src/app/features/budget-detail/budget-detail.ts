@@ -168,11 +168,11 @@ export class BudgetDetailComponent implements OnInit {
         });
       }
       await this.budgetsService.upsertBudgetItems(b.id, this.editItems());
-      this.toastService.success('Budget saved!');
+      this.toastService.success('views.budgets.saveSuccess');
       this.editMode.set(false);
       await this.loadBudget(b.id);
     } catch {
-      this.toastService.error('Failed to save budget.');
+      this.toastService.error('views.budgets.saveError');
     } finally {
       this.submitting.set(false);
     }

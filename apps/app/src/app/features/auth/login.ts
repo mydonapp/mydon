@@ -56,7 +56,7 @@ export class LoginComponent {
       await this.authService.login(this.email(), this.password());
       this.router.navigate(['/app']);
     } catch {
-      this.toastService.error('Login failed. Check your credentials.');
+      this.toastService.error('views.login.loginForm.error');
     } finally {
       this.loading.set(false);
     }

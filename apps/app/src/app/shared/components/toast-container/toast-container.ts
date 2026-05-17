@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { ToastService, ToastType } from '../../../services/toast.service';
 import { IconComponent } from '../icon/icon';
 
 @Component({
   selector: 'app-toast-container',
-  imports: [IconComponent],
+  imports: [IconComponent, TranslateModule],
   templateUrl: './toast-container.html',
 })
 export class ToastContainerComponent {

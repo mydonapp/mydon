@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account, AccountType } from '../accounts/accounts.entity';
-import { User } from '../auth/user.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
 import { Context } from '../shared/types/context';
 import { BudgetFrequency, BudgetItem } from './budget-item.entity';
@@ -17,14 +16,19 @@ export class BudgetsService {
     private budgetsRepository: Repository<Budget>,
     @InjectRepository(BudgetItem)
     private budgetItemsRepository: Repository<BudgetItem>,
+    @InjectRepository(Account)
+    private accountsRepository: Repository<Account>,
+    @InjectRepository(AccountGroup)
+    private accountGroupsRepository: Repository<AccountGroup>,
 
     private dataSource: DataSource,
     private ledgersService: LedgersService,
   ) {}
 
   async findAll(context: Context) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budgets = await this.budgetsRepository.find({
-      where: { user: { id: context.user.id } },
+      where: { ledgerId: ledger.id },
       relations: ['items'],
       order: { year: 'DESC', name: 'ASC' },
     });
@@ -38,8 +42,9 @@ export class BudgetsService {
   }
 
   async findOne(id: string, context: Context) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budget = await this.budgetsRepository.findOne({
-      where: { id, user: { id: context.user.id } },
+      where: { id, ledgerId: ledger.id },
       relations: ['items', 'items.account', 'items.group'],
     });
     if (!budget) {
@@ -64,17 +69,19 @@ export class BudgetsService {
   }
 
   async create(context: Context, name: string, year: number) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budget = new Budget();
     budget.name = name;
     budget.year = year;
-    budget.user = { id: context.user.id } as User;
+    budget.ledgerId = ledger.id;
     const saved = await this.budgetsRepository.save(budget);
     return { id: saved.id, name: saved.name, year: saved.year, itemCount: 0 };
   }
 
   async update(id: string, context: Context, data: { name?: string; year?: number }) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budget = await this.budgetsRepository.findOne({
-      where: { id, user: { id: context.user.id } },
+      where: { id, ledgerId: ledger.id },
     });
     if (!budget) {
       throw new NotFoundException();
@@ -91,8 +98,9 @@ export class BudgetsService {
   }
 
   async remove(id: string, context: Context) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budget = await this.budgetsRepository.findOne({
-      where: { id, user: { id: context.user.id } },
+      where: { id, ledgerId: ledger.id },
     });
     if (!budget) {
       throw new NotFoundException();
@@ -101,12 +109,15 @@ export class BudgetsService {
   }
 
   async upsertItems(budgetId: string, context: Context, items: BudgetItemDto[]) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budget = await this.budgetsRepository.findOne({
-      where: { id: budgetId, user: { id: context.user.id } },
+      where: { id: budgetId, ledgerId: ledger.id },
     });
     if (!budget) {
       throw new NotFoundException();
     }
+
+    await this.assertReferencesInLedger(ledger.id, items);
 
     await this.budgetItemsRepository.delete({ budget: { id: budgetId } });
 
@@ -127,8 +138,9 @@ export class BudgetsService {
   }
 
   async getProgress(budgetId: string, context: Context, year: number, month?: number) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budget = await this.budgetsRepository.findOne({
-      where: { id: budgetId, user: { id: context.user.id } },
+      where: { id: budgetId, ledgerId: ledger.id },
       relations: ['items', 'items.account', 'items.group'],
     });
     if (!budget) {
@@ -159,8 +171,6 @@ export class BudgetsService {
 
     const monthsElapsed = isCurrentYear ? now.getMonth() + 1 : year < now.getFullYear() ? 12 : 0;
 
-    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
-
     const progressItems = await Promise.all(
       budget.items.map(async (item) => {
         const monthlyBudget = item.frequency === BudgetFrequency.MONTHLY ? item.amount : item.amount / 12;
@@ -173,15 +183,15 @@ export class BudgetsService {
         let accountBreakdown: { id: string; name: string; actual: number }[] = [];
 
         if (item.group) {
-          const curr = await this.getGroupActual(item.group.id, context.user.id, ledger.id, from, to);
-          const prev = await this.getGroupActual(item.group.id, context.user.id, ledger.id, prevFrom, prevTo);
+          const curr = await this.getGroupActual(item.group.id, ledger.id, from, to);
+          const prev = await this.getGroupActual(item.group.id, ledger.id, prevFrom, prevTo);
           actual = curr.total;
           prevActual = prev.total;
           accountType = curr.accountType;
           accountBreakdown = curr.accounts;
         } else if (item.account) {
-          actual = await this.getAccountActual(item.account, context.user.id, from, to);
-          prevActual = await this.getAccountActual(item.account, context.user.id, prevFrom, prevTo);
+          actual = await this.getAccountActual(item.account, ledger.id, from, to);
+          prevActual = await this.getAccountActual(item.account, ledger.id, prevFrom, prevTo);
           accountType = item.account.type;
         }
 
@@ -236,7 +246,34 @@ export class BudgetsService {
     };
   }
 
-  private async getAccountActual(account: Account, _userId: string, from: Date, to: Date): Promise<number> {
+  /**
+   * Reject budget items that reference an account or group outside the caller's ledger.
+   * Without this, a crafted `accountId` would let a user read another tenant's balances
+   * through the progress endpoint.
+   */
+  private async assertReferencesInLedger(ledgerId: string, items: BudgetItemDto[]): Promise<void> {
+    const accountIds = [...new Set(items.map((i) => i.accountId).filter((id): id is string => !!id))];
+    if (accountIds.length > 0) {
+      const found = await this.accountsRepository.count({
+        where: { id: In(accountIds), ledgerId },
+      });
+      if (found !== accountIds.length) {
+        throw new BadRequestException('One or more accounts are not in your ledger');
+      }
+    }
+
+    const groupIds = [...new Set(items.map((i) => i.groupId).filter((id): id is string => !!id))];
+    if (groupIds.length > 0) {
+      const found = await this.accountGroupsRepository.count({
+        where: { id: In(groupIds), ledgerId },
+      });
+      if (found !== groupIds.length) {
+        throw new BadRequestException('One or more account groups are not in your ledger');
+      }
+    }
+  }
+
+  private async getAccountActual(account: Account, ledgerId: string, from: Date, to: Date): Promise<number> {
     const rows = await this.dataSource.query(
       `SELECT
         COALESCE(SUM(CASE WHEN e.direction = 'CREDIT' THEN e.amount ELSE 0 END), 0)::numeric AS "creditBalance",
@@ -244,9 +281,10 @@ export class BudgetsService {
        FROM entries e
        JOIN transactions t ON t.id = e.transaction_id
        WHERE e.account_id = $1
+         AND t.ledger_id = $4
          AND t.posted_at IS NOT NULL
          AND t.transaction_date BETWEEN $2::timestamptz AND $3::timestamptz`,
-      [account.id, from.toISOString(), to.toISOString()],
+      [account.id, from.toISOString(), to.toISOString(), ledgerId],
     );
 
     const credit = parseFloat(rows[0]?.creditBalance ?? '0');
@@ -259,7 +297,6 @@ export class BudgetsService {
 
   private async getGroupActual(
     groupId: string,
-    _userId: string,
     ledgerId: string,
     from: Date,
     to: Date,

@@ -53,7 +53,8 @@
         },
         "submit": {
           "label": "Login"
-        }
+        },
+        "error": "Login failed. Check your credentials."
       },
       "signupPrompt": {
         "text": "Not a member?",
@@ -77,7 +78,8 @@
         },
         "submit": {
           "label": "Create Account"
-        }
+        },
+        "error": "Signup failed. Please try again."
       },
       "loginPrompt": {
         "text": "Already a member?",
@@ -158,7 +160,11 @@
           "label": "Create Transaction"
         },
         "success": "Transaction created successfully!",
-        "error": "Failed to create transaction. Please try again."
+        "error": "Failed to create transaction. Please try again.",
+        "rateLoadError": "Could not load the exchange rate — enter it manually.",
+        "selectAccountsError": "Select both accounts.",
+        "enterAmountsError": "Enter an amount on both sides.",
+        "notBalancedError": "The two sides do not balance — adjust the amount or the exchange rate."
       }
     },
     "account": {
@@ -247,6 +253,14 @@
           "title": "3. Upload CSV",
           "description": "Import your bank statement file"
         }
+      },
+      "toasts": {
+        "importSuccess": "Import successful!",
+        "importError": "Import failed.",
+        "updateError": "Failed to update transaction.",
+        "deleteError": "Failed to delete transaction.",
+        "approveSuccess": "Transactions approved!",
+        "approveError": "Failed to approve transactions."
       }
     },
     "settings": {
@@ -259,7 +273,9 @@
           "namePlaceholder": "Enter your full name",
           "email": "Email Address",
           "emailPlaceholder": "Enter your email address",
-          "updateButton": "Update Profile"
+          "updateButton": "Update Profile",
+          "updateSuccess": "Profile updated.",
+          "updateError": "Failed to update profile."
         },
         "language": {
           "title": "Language & Region",
@@ -297,7 +313,8 @@
           "downloadSuccess": "Export downloaded successfully!",
           "downloadError": "Failed to export data. Please try again."
         }
-      }
+      },
+      "preferenceError": "Failed to save preference."
     },
     "budgets": {
       "title": "Budgets",
@@ -377,7 +394,9 @@
           "on_pace_to_exceed": "On pace to exceed yearly budget",
           "over_budget": "Over monthly budget"
         }
-      }
+      },
+      "saveSuccess": "Budget saved!",
+      "saveError": "Failed to save budget."
     },
     "manage": {
       "title": "Manage",
@@ -385,6 +404,13 @@
       "accountGroups": {
         "title": "Account groups",
         "namePlaceholder": "Account group name",
+        "addTitle": "Add Account Group",
+        "editTitle": "Edit Account Group",
+        "name": "Name",
+        "code": "Code",
+        "codePlaceholder": "e.g. 4000 or EXP",
+        "parent": "Parent group",
+        "noParent": "None (top level)",
         "empty": "No account groups yet",
         "createSuccess": "Account group created.",
         "createError": "Failed to create account group.",
@@ -405,12 +431,8 @@
         "activeFromHelp": "Leave empty to mean active since creation",
         "activeUntil": "Active until",
         "activeUntilHelp": "Leave empty for no scheduled deactivation",
-        "deactivate": "Deactivate",
-        "activate": "Activate",
         "updateSuccess": "Account updated.",
-        "updateError": "Failed to update account.",
-        "deactivateSuccess": "Account deactivated.",
-        "activateSuccess": "Account activated."
+        "updateError": "Failed to update account."
       }
     }
   },

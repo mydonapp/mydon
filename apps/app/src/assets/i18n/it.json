@@ -53,7 +53,8 @@
         },
         "submit": {
           "label": "Accedi"
-        }
+        },
+        "error": "Accesso non riuscito. Controlla le tue credenziali."
       },
       "signupPrompt": {
         "text": "Non sei ancora membro?",
@@ -77,7 +78,8 @@
         },
         "submit": {
           "label": "Crea account"
-        }
+        },
+        "error": "Registrazione non riuscita. Riprova."
       },
       "loginPrompt": {
         "text": "Sei già membro?",
@@ -158,7 +160,11 @@
           "label": "Crea transazione"
         },
         "success": "Transazione creata con successo!",
-        "error": "Creazione della transazione non riuscita. Riprova."
+        "error": "Creazione della transazione non riuscita. Riprova.",
+        "rateLoadError": "Impossibile caricare il tasso di cambio: inseriscilo manualmente.",
+        "selectAccountsError": "Seleziona entrambi i conti.",
+        "enterAmountsError": "Inserisci un importo su entrambi i lati.",
+        "notBalancedError": "I due lati non sono bilanciati: modifica l’importo o il tasso di cambio."
       }
     },
     "account": {
@@ -247,6 +253,14 @@
           "title": "3. Carica il CSV",
           "description": "Importa il file del tuo estratto conto"
         }
+      },
+      "toasts": {
+        "importSuccess": "Importazione riuscita!",
+        "importError": "Importazione non riuscita.",
+        "updateError": "Aggiornamento della transazione non riuscito.",
+        "deleteError": "Eliminazione della transazione non riuscita.",
+        "approveSuccess": "Transazioni approvate!",
+        "approveError": "Approvazione delle transazioni non riuscita."
       }
     },
     "settings": {
@@ -259,7 +273,9 @@
           "namePlaceholder": "Inserisci il tuo nome completo",
           "email": "Indirizzo email",
           "emailPlaceholder": "Inserisci il tuo indirizzo email",
-          "updateButton": "Aggiorna profilo"
+          "updateButton": "Aggiorna profilo",
+          "updateSuccess": "Profilo aggiornato.",
+          "updateError": "Aggiornamento del profilo non riuscito."
         },
         "language": {
           "title": "Lingua e regione",
@@ -297,7 +313,8 @@
           "downloadSuccess": "Esportazione scaricata con successo!",
           "downloadError": "Esportazione dati non riuscita. Riprova."
         }
-      }
+      },
+      "preferenceError": "Salvataggio della preferenza non riuscito."
     },
     "budgets": {
       "title": "Budget",
@@ -377,7 +394,9 @@
           "on_pace_to_exceed": "In linea per superare il budget annuale",
           "over_budget": "Oltre il budget mensile"
         }
-      }
+      },
+      "saveSuccess": "Budget salvato!",
+      "saveError": "Salvataggio del budget non riuscito."
     },
     "manage": {
       "title": "Gestisci",
@@ -385,6 +404,13 @@
       "accountGroups": {
         "title": "Gruppi di conti",
         "namePlaceholder": "Nome del gruppo di conti",
+        "addTitle": "Aggiungi gruppo di conti",
+        "editTitle": "Modifica gruppo di conti",
+        "name": "Nome",
+        "code": "Codice",
+        "codePlaceholder": "es. 4000 o EXP",
+        "parent": "Gruppo principale",
+        "noParent": "Nessuno (livello principale)",
         "empty": "Nessun gruppo di conti ancora",
         "createSuccess": "Gruppo di conti creato.",
         "createError": "Creazione del gruppo di conti non riuscita.",
@@ -405,12 +431,8 @@
         "activeFromHelp": "Vuoto = attivo dalla creazione",
         "activeUntil": "Attivo fino al",
         "activeUntilHelp": "Vuoto = nessuna disattivazione pianificata",
-        "deactivate": "Disattiva",
-        "activate": "Attiva",
         "updateSuccess": "Conto aggiornato.",
-        "updateError": "Aggiornamento del conto non riuscito.",
-        "deactivateSuccess": "Conto disattivato.",
-        "activateSuccess": "Conto attivato."
+        "updateError": "Aggiornamento del conto non riuscito."
       }
     }
   },

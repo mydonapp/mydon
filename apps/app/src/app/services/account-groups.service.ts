@@ -36,7 +36,11 @@ export class AccountGroupsService {
   ): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/account-groups/${id}`, data));
     this.accountGroups.update((gs) =>
-      gs.map((g) => (g.id === id ? { ...g, ...data, parentId: data.parentId ?? g.parentId } : g)),
+      gs.map((g) =>
+        g.id === id
+          ? { ...g, ...data, parentId: 'parentId' in data ? (data.parentId ?? null) : g.parentId }
+          : g,
+      ),
     );
   }
 }

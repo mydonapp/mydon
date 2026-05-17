@@ -1,19 +1,20 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountGroup, AccountGroupsService } from '../../services/account-groups.service';
 import { AccountSimple, AccountsService } from '../../services/accounts.service';
+import { ListStyleService } from '../../services/list-style.service';
 import { ToastService } from '../../services/toast.service';
-import { CURRENCIES } from '../../shared/currency';
+import { AccountGroupComboboxComponent } from '../../shared/components/account-group-combobox/account-group-combobox';
+import { FieldComponent } from '../../shared/components/field/field';
+import { IconComponent } from '../../shared/components/icon/icon';
+import { ModalComponent } from '../../shared/components/modal/modal';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
+import { ToggleComponent } from '../../shared/components/toggle/toggle';
+import { CURRENCIES } from '../../shared/currency';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
-import { FieldComponent } from '../../shared/components/field/field';
-import { ModalComponent } from '../../shared/components/modal/modal';
-import { ToggleComponent } from '../../shared/components/toggle/toggle';
-import { IconComponent } from '../../shared/components/icon/icon';
-import { AccountGroupComboboxComponent } from '../../shared/components/account-group-combobox/account-group-combobox';
 
 type Section = 'accounts' | 'accountGroups';
 
@@ -37,17 +38,30 @@ type Section = 'accounts' | 'accountGroups';
 })
 export class ManageComponent implements OnInit {
   accountGroupsService = inject(AccountGroupsService);
+  protected readonly listStyleService = inject(ListStyleService);
   private accountsService = inject(AccountsService);
   private toastService = inject(ToastService);
 
   activeSection = signal<Section>('accounts');
 
   // ── Account Groups ─────────────────────────────────────────────────────
-  newGroupName = '';
   creatingGroup = signal(false);
-  editingGroupId = signal<string | null>(null);
-  editGroupName = '';
   updatingGroup = signal(false);
+
+  showAddGroup = signal(false);
+  newGroup = {
+    name: '',
+    code: '',
+    parentId: '' as string,
+  };
+
+  showEditGroup = signal(false);
+  editGroup = {
+    id: '',
+    name: '',
+    code: '',
+    parentId: '' as string,
+  };
 
   // ── Accounts ────────────────────────────────────────────────────────────
   showInactive = false;
@@ -55,7 +69,6 @@ export class ManageComponent implements OnInit {
   allAccounts = signal<AccountSimple[]>([]);
   filteredAccounts = signal<AccountSimple[]>([]);
   updatingAcc = signal(false);
-  togglingAcc = signal<string | null>(null);
 
   showAddAccount = signal(false);
   submitting = signal(false);
@@ -75,8 +88,9 @@ export class ManageComponent implements OnInit {
     { value: 'all', label: 'views.manage.accounts.all' },
     { value: 'assets', label: 'words.assets' },
     { value: 'liabilities', label: 'words.liabilities' },
+    { value: 'equity', label: 'words.equity' },
     { value: 'income', label: 'words.income' },
-    { value: 'expenses', label: 'words.expenses' },
+    { value: 'expense', label: 'words.expenses' },
   ];
 
   accountTypeOptions: SelectOption[] = [
@@ -84,7 +98,7 @@ export class ManageComponent implements OnInit {
     { value: 'liabilities', label: 'Liabilities' },
     { value: 'equity', label: 'Equity' },
     { value: 'income', label: 'Income' },
-    { value: 'expenses', label: 'Expenses' },
+    { value: 'expense', label: 'Expenses' },
   ];
 
   currencyOptions: SelectOption[] = CURRENCIES.map((c) => ({ value: c, label: c }));
@@ -106,20 +120,25 @@ export class ManageComponent implements OnInit {
       accounts = accounts.filter((a) => a.isActive);
     }
     if (this.activeTab() !== 'all') {
-      accounts = accounts.filter((a) => a.type === this.activeTab());
+      accounts = accounts.filter((a) => a.type === this.activeTab().toUpperCase());
     }
     this.filteredAccounts.set(accounts);
   }
 
-  async createAccountGroup() {
-    if (!this.newGroupName.trim()) {
+  async submitAddGroup() {
+    if (!this.newGroup.name.trim()) {
       return;
     }
     this.creatingGroup.set(true);
     try {
-      await this.accountGroupsService.createAccountGroup({ name: this.newGroupName.trim() });
+      await this.accountGroupsService.createAccountGroup({
+        name: this.newGroup.name.trim(),
+        code: this.newGroup.code.trim(),
+        parentId: this.newGroup.parentId || null,
+      });
       this.toastService.success('views.manage.accountGroups.createSuccess');
-      this.newGroupName = '';
+      this.showAddGroup.set(false);
+      this.newGroup = { name: '', code: '', parentId: '' };
     } catch {
       this.toastService.error('views.manage.accountGroups.createError');
     } finally {
@@ -128,19 +147,34 @@ export class ManageComponent implements OnInit {
   }
 
   startEditGroup(group: AccountGroup) {
-    this.editingGroupId.set(group.id);
-    this.editGroupName = group.name;
+    this.editGroup = {
+      id: group.id,
+      name: group.name,
+      code: group.code ?? '',
+      parentId: group.parentId ?? '',
+    };
+    this.showEditGroup.set(true);
   }
 
-  async saveAccountGroup(group: AccountGroup) {
-    if (!this.editGroupName.trim()) {
+  /** Candidate parents = every group except the one being edited (no self-parent). */
+  parentGroupOptions(): AccountGroup[] {
+    const excludeId = this.showEditGroup() ? this.editGroup.id : '';
+    return this.accountGroupsService.accountGroups().filter((g) => g.id !== excludeId);
+  }
+
+  async saveAccountGroup() {
+    if (!this.editGroup.name.trim()) {
       return;
     }
     this.updatingGroup.set(true);
     try {
-      await this.accountGroupsService.updateAccountGroup(group.id, { name: this.editGroupName.trim() });
+      await this.accountGroupsService.updateAccountGroup(this.editGroup.id, {
+        name: this.editGroup.name.trim(),
+        code: this.editGroup.code.trim(),
+        parentId: this.editGroup.parentId || null,
+      });
       this.toastService.success('views.manage.accountGroups.updateSuccess');
-      this.editingGroupId.set(null);
+      this.showEditGroup.set(false);
     } catch {
       this.toastService.error('views.manage.accountGroups.updateError');
     } finally {
@@ -180,24 +214,6 @@ export class ManageComponent implements OnInit {
       this.toastService.error('views.manage.accounts.updateError');
     } finally {
       this.updatingAcc.set(false);
-    }
-  }
-
-  async toggleAccount(account: AccountSimple) {
-    this.togglingAcc.set(account.id);
-    try {
-      // Flip activity window: active → set activeUntil = now; inactive → clear activeUntil.
-      const nextActiveUntil = account.isActive ? new Date().toISOString() : null;
-      await this.accountsService.updateAccount(account.id, { activeUntil: nextActiveUntil });
-      const msg = account.isActive
-        ? 'views.manage.accounts.deactivateSuccess'
-        : 'views.manage.accounts.activateSuccess';
-      this.toastService.success(msg);
-      await this.loadAccounts();
-    } catch {
-      this.toastService.error('views.manage.accounts.updateError');
-    } finally {
-      this.togglingAcc.set(null);
     }
   }
 

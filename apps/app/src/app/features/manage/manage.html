@@ -84,6 +84,7 @@
         <div
           class="page-item"
           [class.opacity-60]="!account.isActive"
+          [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
         >
           <div class="flex-1 min-w-0">
             @if (account.code) {
@@ -106,18 +107,6 @@
               [size]="16"
             />
           </button>
-          <button
-            appBtn
-            size="xs"
-            [variant]="account.isActive ? 'warning' : 'success'"
-            [loading]="togglingAcc() === account.id"
-            (click)="toggleAccount(account)"
-          >
-            <app-icon
-              [name]="account.isActive ? 'pause' : 'play'"
-              [size]="16"
-            />
-          </button>
         </div>
         }
       </div>
@@ -127,29 +116,17 @@
       @if (activeSection() === 'accountGroups') {
       <div class="flex items-center justify-between mb-3">
         <p class="page-section-label">{{ 'views.manage.accountGroups.title' | translate }}</p>
-      </div>
-
-      <!-- Add Account Group -->
-      <div class="flex gap-2 mb-4">
-        <input
-          appInput
-          type="text"
-          [(ngModel)]="newGroupName"
-          [placeholder]="'views.manage.accountGroups.namePlaceholder' | translate"
-          class="flex-1"
-          (keyup.enter)="createAccountGroup()"
-        />
         <button
           appBtn
-          variant="primary"
           size="sm"
-          [loading]="creatingGroup()"
-          (click)="createAccountGroup()"
+          (click)="showAddGroup.set(true)"
         >
           <app-icon
             name="plus"
-            [size]="16"
+            [size]="14"
+            class="mr-1"
           />
+          {{ 'views.manage.accountGroups.addTitle' | translate }}
         </button>
       </div>
 
@@ -160,41 +137,16 @@
       } @else {
       <div class="page-group">
         @for (group of accountGroupsService.accountGroups(); track group.id) {
-        <div class="page-item">
-          @if (editingGroupId() === group.id) {
-          <input
-            appInput
-            type="text"
-            [(ngModel)]="editGroupName"
-            class="flex-1"
-            (keyup.enter)="saveAccountGroup(group)"
-            (keyup.escape)="editingGroupId.set(null)"
-          />
-          <button
-            appBtn
-            size="xs"
-            variant="success"
-            [loading]="updatingGroup()"
-            (click)="saveAccountGroup(group)"
-          >
-            <app-icon
-              name="check"
-              [size]="16"
-            />
-          </button>
-          <button
-            appBtn
-            size="xs"
-            variant="ghost"
-            (click)="editingGroupId.set(null)"
-          >
-            <app-icon
-              name="x"
-              [size]="16"
-            />
-          </button>
-          } @else {
-          <span class="flex-1 text-sm text-on-surface">{{ group.name }}</span>
+        <div
+          class="page-item"
+          [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+        >
+          <span class="flex-1 min-w-0 text-sm text-on-surface truncate">
+            @if (group.code) {
+            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ group.code }}</span>
+            }
+            {{ group.name }}
+          </span>
           <button
             appBtn
             size="xs"
@@ -206,7 +158,6 @@
               [size]="16"
             />
           </button>
-          }
         </div>
         }
       </div>
@@ -289,6 +240,128 @@
         [loading]="updatingAcc()"
       >
         {{ 'common.save' | translate }}
+      </button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Edit Account Group Modal -->
+<app-modal
+  [open]="showEditGroup()"
+  (closed)="showEditGroup.set(false)"
+>
+  <form (ngSubmit)="saveAccountGroup()">
+    <h3 class="font-bold text-lg mb-4">{{ 'views.manage.accountGroups.editTitle' | translate }}</h3>
+    <div class="space-y-4 mb-4">
+      <app-field
+        [label]="'views.manage.accountGroups.name' | translate"
+        [required]="true"
+      >
+        <input
+          appInput
+          name="editGroupName"
+          [(ngModel)]="editGroup.name"
+          [placeholder]="'views.manage.accountGroups.namePlaceholder' | translate"
+        />
+      </app-field>
+      <app-field [label]="'views.manage.accountGroups.code' | translate">
+        <input
+          appInput
+          type="text"
+          name="editGroupCode"
+          [(ngModel)]="editGroup.code"
+          [placeholder]="'views.manage.accountGroups.codePlaceholder' | translate"
+        />
+      </app-field>
+      <app-field [label]="'views.manage.accountGroups.parent' | translate">
+        <select
+          appSelect
+          name="editGroupParent"
+          [(ngModel)]="editGroup.parentId"
+        >
+          <option value="">{{ 'views.manage.accountGroups.noParent' | translate }}</option>
+          @for (g of parentGroupOptions(); track g.id) {
+          <option [value]="g.id">{{ g.code ? g.code + ' · ' + g.name : g.name }}</option>
+          }
+        </select>
+      </app-field>
+    </div>
+    <div class="modal-footer">
+      <button
+        appBtn
+        variant="ghost"
+        type="button"
+        (click)="showEditGroup.set(false)"
+      >
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button
+        appBtn
+        type="submit"
+        [loading]="updatingGroup()"
+      >
+        {{ 'common.save' | translate }}
+      </button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Add Account Group Modal -->
+<app-modal
+  [open]="showAddGroup()"
+  (closed)="showAddGroup.set(false)"
+>
+  <form (ngSubmit)="submitAddGroup()">
+    <h3 class="font-bold text-lg mb-4">{{ 'views.manage.accountGroups.addTitle' | translate }}</h3>
+    <div class="space-y-4 mb-4">
+      <app-field
+        [label]="'views.manage.accountGroups.name' | translate"
+        [required]="true"
+      >
+        <input
+          appInput
+          name="addGroupName"
+          [(ngModel)]="newGroup.name"
+          [placeholder]="'views.manage.accountGroups.namePlaceholder' | translate"
+        />
+      </app-field>
+      <app-field [label]="'views.manage.accountGroups.code' | translate">
+        <input
+          appInput
+          type="text"
+          name="addGroupCode"
+          [(ngModel)]="newGroup.code"
+          [placeholder]="'views.manage.accountGroups.codePlaceholder' | translate"
+        />
+      </app-field>
+      <app-field [label]="'views.manage.accountGroups.parent' | translate">
+        <select
+          appSelect
+          name="addGroupParent"
+          [(ngModel)]="newGroup.parentId"
+        >
+          <option value="">{{ 'views.manage.accountGroups.noParent' | translate }}</option>
+          @for (g of parentGroupOptions(); track g.id) {
+          <option [value]="g.id">{{ g.code ? g.code + ' · ' + g.name : g.name }}</option>
+          }
+        </select>
+      </app-field>
+    </div>
+    <div class="modal-footer">
+      <button
+        appBtn
+        variant="ghost"
+        type="button"
+        (click)="showAddGroup.set(false)"
+      >
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button
+        appBtn
+        type="submit"
+        [loading]="creatingGroup()"
+      >
+        {{ 'common.add' | translate }}
       </button>
     </div>
   </form>

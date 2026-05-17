@@ -69,11 +69,11 @@ export class BudgetsComponent implements OnInit {
     this.submitting.set(true);
     try {
       await this.budgetsService.deleteBudget(budget.id);
-      this.toastService.success('Budget deleted.');
+      this.toastService.success('views.budgets.deleteSuccess');
       this.budgetToDelete.set(null);
       await this.loadData();
     } catch {
-      this.toastService.error('Failed to delete budget.');
+      this.toastService.error('views.budgets.deleteError');
     } finally {
       this.submitting.set(false);
     }
@@ -89,12 +89,12 @@ export class BudgetsComponent implements OnInit {
         name: this.newBudget.name,
         year: Number(this.newBudget.year),
       });
-      this.toastService.success('Budget created!');
+      this.toastService.success('views.budgets.addBudgetForm.success');
       this.showCreate.set(false);
       this.newBudget = { name: '', year: String(new Date().getFullYear()) };
       this.router.navigate(['/app/budgets', created.id]);
     } catch {
-      this.toastService.error('Failed to create budget.');
+      this.toastService.error('views.budgets.addBudgetForm.error');
     } finally {
       this.submitting.set(false);
     }
