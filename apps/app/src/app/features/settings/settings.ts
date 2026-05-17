@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { APP_VERSION } from '../../../version';
-import { AccountNumbersService } from '../../services/account-numbers.service';
+import { AccountCodesService } from '../../services/account-codes.service';
 import { ExportService } from '../../services/export.service';
 import { AVAILABLE_LANGUAGES, LanguageService } from '../../services/language.service';
 import { ListStyleService } from '../../services/list-style.service';
@@ -37,7 +37,7 @@ export class SettingsComponent implements OnInit {
   private readonly userService = inject(UserService);
   protected readonly languageService = inject(LanguageService);
   protected readonly privacyService = inject(PrivacyService);
-  protected readonly accountNumbersService = inject(AccountNumbersService);
+  protected readonly accountCodesService = inject(AccountCodesService);
   protected readonly themeService = inject(ThemeService);
   protected readonly listStyleService = inject(ListStyleService);
   private readonly exportService = inject(ExportService);
@@ -118,10 +118,10 @@ export class SettingsComponent implements OnInit {
     }
   }
 
-  async onAccountNumbersToggle() {
-    this.accountNumbersService.toggle();
+  async onAccountCodesToggle() {
+    this.accountCodesService.toggle();
     try {
-      await this.userService.updatePreferences({ showAccountNumbers: this.accountNumbersService.show() });
+      await this.userService.updatePreferences({ showAccountCodes: this.accountCodesService.show() });
     } catch {
       // Local change already applied; backend sync failed silently
     }

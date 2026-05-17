@@ -4,6 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account, AccountType } from '../accounts/accounts.entity';
 import { User } from '../auth/user.entity';
+import { LedgersService } from '../ledgers/ledgers.service';
 import { Context } from '../shared/types/context';
 import { BudgetFrequency, BudgetItem } from './budget-item.entity';
 import { Budget } from './budgets.entity';
@@ -16,11 +17,9 @@ export class BudgetsService {
     private budgetsRepository: Repository<Budget>,
     @InjectRepository(BudgetItem)
     private budgetItemsRepository: Repository<BudgetItem>,
-    @InjectRepository(Account)
-    private accountsRepository: Repository<Account>,
-    @InjectRepository(AccountGroup)
-    private accountGroupsRepository: Repository<AccountGroup>,
+
     private dataSource: DataSource,
+    private ledgersService: LedgersService,
   ) {}
 
   async findAll(context: Context) {
@@ -160,6 +159,8 @@ export class BudgetsService {
 
     const monthsElapsed = isCurrentYear ? now.getMonth() + 1 : year < now.getFullYear() ? 12 : 0;
 
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+
     const progressItems = await Promise.all(
       budget.items.map(async (item) => {
         const monthlyBudget = item.frequency === BudgetFrequency.MONTHLY ? item.amount : item.amount / 12;
@@ -172,8 +173,8 @@ export class BudgetsService {
         let accountBreakdown: { id: string; name: string; actual: number }[] = [];
 
         if (item.group) {
-          const curr = await this.getGroupActual(item.group.id, context.user.id, from, to);
-          const prev = await this.getGroupActual(item.group.id, context.user.id, prevFrom, prevTo);
+          const curr = await this.getGroupActual(item.group.id, context.user.id, ledger.id, from, to);
+          const prev = await this.getGroupActual(item.group.id, context.user.id, ledger.id, prevFrom, prevTo);
           actual = curr.total;
           prevActual = prev.total;
           accountType = curr.accountType;
@@ -209,7 +210,7 @@ export class BudgetsService {
           groupName: item.group?.name ?? null,
           accountId: item.account?.id ?? null,
           accountName: item.account?.name ?? null,
-          accountNumber: item.account?.accountNumber ?? null,
+          accountCode: item.account?.code ?? null,
           frequency: item.frequency,
           amount: item.amount,
           monthlyBudget: Math.round(monthlyBudget * 100) / 100,
@@ -257,6 +258,7 @@ export class BudgetsService {
   private async getGroupActual(
     groupId: string,
     userId: string,
+    ledgerId: string,
     from: Date,
     to: Date,
   ): Promise<{ total: number; accountType: string | null; accounts: { id: string; name: string; actual: number }[] }> {
@@ -271,11 +273,11 @@ export class BudgetsService {
        LEFT JOIN transactions t
          ON (t."creditAccountId" = a.id OR t."debitAccountId" = a.id)
          AND t."userId" = $2
-         AND t."transactionDate" BETWEEN $3::timestamptz AND $4::timestamptz
+         AND t."transactionDate" BETWEEN $4::timestamptz AND $5::timestamptz
        WHERE a."group_id" = $1
-         AND a."userId" = $2
+         AND a."ledger_id" = $3
        GROUP BY a.id, a.name, a.type`,
-      [groupId, userId, from.toISOString(), to.toISOString()],
+      [groupId, userId, ledgerId, from.toISOString(), to.toISOString()],
     );
 
     const accounts = (

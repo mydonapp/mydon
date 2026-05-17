@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
-import { User } from '../auth/user.entity';
+import { Ledger } from '../ledgers/ledger.entity';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
 import { Transaction } from '../transactions/transactions.entity';
 
@@ -25,11 +25,24 @@ export class Account {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;
 
+  @Column({ name: 'ledger_id', type: 'uuid' })
+  declare ledgerId: string;
+
+  @ManyToOne(() => Ledger, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'ledger_id' })
+  declare ledger: Ledger;
+
   @Column({ type: 'varchar' })
   declare name: string;
 
-  @Column({ nullable: true, type: 'timestamptz', default: null })
-  declare deactivatedAt: Date | null;
+  @Column({ type: 'varchar', default: '' })
+  declare code: string;
+
+  @Column({ name: 'active_from', type: 'timestamptz', nullable: true, default: null })
+  declare activeFrom: Date | null;
+
+  @Column({ name: 'active_until', type: 'timestamptz', nullable: true, default: null })
+  declare activeUntil: Date | null;
 
   @Column({ type: 'boolean', default: false })
   declare retirementAccount: boolean;
@@ -45,25 +58,6 @@ export class Account {
 
   @OneToMany(() => Transaction, (transaction) => transaction.debitAccount)
   declare debitTransactions: Transaction[];
-
-  // @VirtualColumn({
-  //   query: (alias) =>
-  //     `SELECT COALESCE(SUM("creditAmount"), 0) FROM "transactions" WHERE "creditAccountId" = ${alias}.id`,
-  //   type: 'decimal',
-  //   transformer: new ColumnDecimalTransformer(),
-  // })
-  //_creditBalance: number;
-
-  /*
-  @VirtualColumn({
-    query: (alias) =>
-      `SELECT COALESCE(SUM("debitAmount"), 0) FROM "transactions" WHERE "debitAccountId" = ${alias}.id`,
-    type: 'decimal',
-    transformer: new ColumnDecimalTransformer(),
-  })
-  debitBalance: number;
-  */
-  //_debitBalance: number;
 
   @Column({
     type: 'decimal',
@@ -92,9 +86,6 @@ export class Account {
   })
   declare openingBalance: number;
 
-  @Column({ name: 'account_number', nullable: true, type: 'int', default: null })
-  declare accountNumber: number | null;
-
   @Column({ name: 'group_id', type: 'uuid', nullable: true, default: null })
   declare groupId: string | null;
 
@@ -102,22 +93,11 @@ export class Account {
   @JoinColumn({ name: 'group_id' })
   declare group: AccountGroup | null;
 
-  @ManyToOne(() => User, (user) => user.accounts, {})
-  declare user: User;
-
-  get isActive(): boolean {
-    return this.deactivatedAt === null;
-  }
-
   get balance() {
     if (this.type === AccountType.ASSETS || this.type === AccountType.EXPENSE) {
       return (this.creditBalance || 0) - (this.debitBalance || 0) + this.openingBalance;
     } else {
       return (this.debitBalance || 0) - (this.creditBalance || 0) + this.openingBalance;
     }
-  }
-
-  setUserId(userId: string) {
-    this.user = userId as unknown as User;
   }
 }

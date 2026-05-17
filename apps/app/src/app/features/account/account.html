@@ -5,9 +5,7 @@
       backLink="/app/accounts"
       [backLabel]="'views.accounts.title' | translate"
       [title]="
-        (accountNumbersService.show() && account()?.accountNumber !== null && account()?.accountNumber !== undefined
-          ? account()!.accountNumber + ' '
-          : '') + (account()?.name ?? '')
+        (accountCodesService.show() && account()?.code ? account()!.code + ' ' : '') + (account()?.name ?? '')
       "
     >
       @if (loading()) {
@@ -15,8 +13,8 @@
       <app-skeleton class="h-4 w-28 mt-2" />
       } @else {
       <h1 class="text-2xl font-bold text-on-surface leading-tight truncate">
-        @if (accountNumbersService.show() && account()?.accountNumber !== null) {
-        <span class="text-base font-mono text-on-surface-variant mr-2">{{ account()!.accountNumber }}</span>
+        @if (accountCodesService.show() && account()?.code) {
+        <span class="text-base font-mono text-on-surface-variant mr-2">{{ account()!.code }}</span>
         } {{ account()?.name }}
       </h1>
       <p class="text-sm text-on-surface-variant mt-1">{{ 'views.account.subtitle' | translate }}</p>

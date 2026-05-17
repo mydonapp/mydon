@@ -86,8 +86,8 @@
           [class.opacity-60]="!account.isActive"
         >
           <div class="flex-1 min-w-0">
-            @if (account.accountNumber !== null) {
-            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.accountNumber }}</span>
+            @if (account.code) {
+            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.code }}</span>
             }
             <span class="text-sm text-on-surface">{{ account.name }}</span>
             <span class="text-xs text-on-surface-variant ml-2">{{ account.type }}</span>
@@ -232,13 +232,13 @@
           [placeholder]="'views.accounts.addAccountForm.accountName.placeholder' | translate"
         />
       </app-field>
-      <app-field [label]="'views.manage.accounts.accountNumber' | translate">
+      <app-field [label]="'views.manage.accounts.code' | translate">
         <input
           appInput
-          type="number"
-          name="editAccountNumber"
-          [(ngModel)]="editAcc.accountNumber"
-          [placeholder]="'views.manage.accounts.accountNumberPlaceholder' | translate"
+          type="text"
+          name="editAccountCode"
+          [(ngModel)]="editAcc.code"
+          [placeholder]="'views.manage.accounts.codePlaceholder' | translate"
         />
       </app-field>
       <app-field [label]="'views.accounts.addAccountForm.openingBalance.label' | translate">
@@ -255,6 +255,30 @@
         [label]="'views.accounts.addAccountForm.group.label' | translate"
         [placeholder]="'views.accounts.addAccountForm.group.placeholder' | translate"
       />
+      <div class="grid grid-cols-2 gap-3">
+        <app-field
+          [label]="'views.manage.accounts.activeFrom' | translate"
+          [helpText]="'views.manage.accounts.activeFromHelp' | translate"
+        >
+          <input
+            appInput
+            type="date"
+            name="editActiveFrom"
+            [(ngModel)]="editAcc.activeFrom"
+          />
+        </app-field>
+        <app-field
+          [label]="'views.manage.accounts.activeUntil' | translate"
+          [helpText]="'views.manage.accounts.activeUntilHelp' | translate"
+        >
+          <input
+            appInput
+            type="date"
+            name="editActiveUntil"
+            [(ngModel)]="editAcc.activeUntil"
+          />
+        </app-field>
+      </div>
     </div>
     <div class="modal-footer">
       <button

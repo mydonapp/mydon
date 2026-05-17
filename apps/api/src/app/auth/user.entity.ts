@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Account } from '../accounts/accounts.entity';
 import { Transaction } from '../transactions/transactions.entity';
 import { AccessToken } from './accessToken.entity';
 import { RefreshToken } from './refreshToken.entity';
@@ -30,17 +29,14 @@ export class User {
   @Column({ type: 'boolean', name: 'privacy_mode', default: false })
   declare privacyMode: boolean;
 
-  @Column({ type: 'boolean', name: 'show_account_numbers', default: false })
-  declare showAccountNumbers: boolean;
+  @Column({ type: 'boolean', name: 'show_account_codes', default: false })
+  declare showAccountCodes: boolean;
 
   @OneToMany(() => AccessToken, (accessToken) => accessToken.user)
   declare accessToken: AccessToken[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   declare refreshToken: RefreshToken[];
-
-  @OneToMany(() => Account, (account) => account.user)
-  declare accounts: Account[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)
   declare transactions: Transaction[];

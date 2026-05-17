@@ -276,8 +276,8 @@
           "listStyle": "List Style",
           "listStyleNormal": "Normal",
           "listStyleCompact": "Compact",
-          "showAccountNumbers": "Show Account Numbers",
-          "showAccountNumbersDescription": "Display account numbers throughout the app for easier identification and sorting"
+          "showAccountCodes": "Show Account Codes",
+          "showAccountCodesDescription": "Display account codes throughout the app for easier identification and sorting"
         },
         "export": {
           "title": "Data Export",
@@ -390,8 +390,12 @@
         "inactive": "Inactive",
         "empty": "No accounts found",
         "name": "Name",
-        "accountNumber": "Account Number",
-        "accountNumberPlaceholder": "e.g. 1010",
+        "code": "Code",
+        "codePlaceholder": "e.g. 1010 or EXP-FOOD",
+        "activeFrom": "Active from",
+        "activeFromHelp": "Leave empty to mean active since creation",
+        "activeUntil": "Active until",
+        "activeUntilHelp": "Leave empty for no scheduled deactivation",
         "deactivate": "Deactivate",
         "activate": "Activate",
         "updateSuccess": "Account updated.",

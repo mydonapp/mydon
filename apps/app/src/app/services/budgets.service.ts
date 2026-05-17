@@ -33,7 +33,7 @@ export interface BudgetProgressItem {
   name: string;
   type: 'group' | 'account';
   accountType: string | null;
-  accountNumber: number | null;
+  accountCode: string | null;
   amount: number;
   frequency: 'monthly' | 'yearly';
   monthlyBudget: number;

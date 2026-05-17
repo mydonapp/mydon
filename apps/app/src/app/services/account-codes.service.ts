@@ -1,9 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 
-const STORAGE_KEY = 'mydon:showAccountNumbers';
+const STORAGE_KEY = 'mydon:showAccountCodes';
 
 @Injectable({ providedIn: 'root' })
-export class AccountNumbersService {
+export class AccountCodesService {
   readonly show = signal<boolean>(localStorage.getItem(STORAGE_KEY) === 'true');
 
   setFromBackend(value: boolean): void {

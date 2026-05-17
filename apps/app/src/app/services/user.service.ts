@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AccountNumbersService } from './account-numbers.service';
+import { AccountCodesService } from './account-codes.service';
 import { AppConfigService } from './app-config.service';
 import { LanguageService } from './language.service';
 import { ListStyle, ListStyleService } from './list-style.service';
@@ -16,7 +16,7 @@ export interface User {
   theme: string;
   listStyle: string;
   privacyMode: boolean;
-  showAccountNumbers: boolean;
+  showAccountCodes: boolean;
 }
 
 export interface UserPreferences {
@@ -24,7 +24,7 @@ export interface UserPreferences {
   theme?: string;
   listStyle?: string;
   privacyMode?: boolean;
-  showAccountNumbers?: boolean;
+  showAccountCodes?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -34,7 +34,7 @@ export class UserService {
   private readonly themeService = inject(ThemeService);
   private readonly listStyleService = inject(ListStyleService);
   private readonly privacyService = inject(PrivacyService);
-  private readonly accountNumbersService = inject(AccountNumbersService);
+  private readonly accountCodesService = inject(AccountCodesService);
   private readonly appConfig = inject(AppConfigService);
 
   user = signal<User | null>(null);
@@ -54,7 +54,7 @@ export class UserService {
     this.themeService.setTheme((user.theme ?? 'system') as Theme);
     this.listStyleService.set((user.listStyle ?? 'normal') as ListStyle);
     this.privacyService.setFromBackend(user.privacyMode ?? false);
-    this.accountNumbersService.setFromBackend(user.showAccountNumbers ?? false);
+    this.accountCodesService.setFromBackend(user.showAccountCodes ?? false);
   }
 
   async updateUser(name: string, email: string): Promise<void> {

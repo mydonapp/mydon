@@ -276,8 +276,8 @@
           "listStyle": "Stile lista",
           "listStyleNormal": "Normale",
           "listStyleCompact": "Compatto",
-          "showAccountNumbers": "Mostra numeri di conto",
-          "showAccountNumbersDescription": "Mostra i numeri di conto in tutta l'app per una più facile identificazione e ordinamento"
+          "showAccountCodes": "Mostra codici dei conti",
+          "showAccountCodesDescription": "Mostra i codici dei conti in tutta l'app per una più facile identificazione e ordinamento"
         },
         "export": {
           "title": "Esportazione dati",
@@ -390,8 +390,12 @@
         "inactive": "Inattivo",
         "empty": "Nessun conto trovato",
         "name": "Nome",
-        "accountNumber": "Numero di conto",
-        "accountNumberPlaceholder": "es. 1010",
+        "code": "Codice",
+        "codePlaceholder": "es. 1010 o EXP-FOOD",
+        "activeFrom": "Attivo dal",
+        "activeFromHelp": "Vuoto = attivo dalla creazione",
+        "activeUntil": "Attivo fino al",
+        "activeUntilHelp": "Vuoto = nessuna disattivazione pianificata",
         "deactivate": "Disattiva",
         "activate": "Attiva",
         "updateSuccess": "Conto aggiornato.",

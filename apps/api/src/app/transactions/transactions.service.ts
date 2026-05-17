@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { isAccountActive } from '../accounts/account-active';
 import { Account } from '../accounts/accounts.entity';
 import { Context } from '../shared/types/context';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
@@ -48,8 +49,9 @@ export class TransactionsService {
       this.accountRepository.findOne({ where: { id: options.creditAccountId } }),
       this.accountRepository.findOne({ where: { id: options.debitAccountId } }),
     ]);
-    if (credit?.deactivatedAt || debit?.deactivatedAt) {
-      throw new BadRequestException('Cannot add transactions to a deactivated account');
+    const txDate = options.transactionDate ?? new Date();
+    if ((credit && !isAccountActive(credit, txDate)) || (debit && !isAccountActive(debit, txDate))) {
+      throw new BadRequestException('Account is not active on the transaction date');
     }
     const transaction = Transaction.create({
       ...options,
@@ -107,8 +109,8 @@ export class TransactionsService {
 
   async importStatement(context: Context, fileContent: string, statementIssuer: string, accountId: string) {
     const importAccount = await this.accountRepository.findOne({ where: { id: accountId } });
-    if (importAccount?.deactivatedAt) {
-      throw new BadRequestException('Cannot import into a deactivated account');
+    if (importAccount && !isAccountActive(importAccount)) {
+      throw new BadRequestException('Cannot import into an inactive account');
     }
     const mapper = StatementMapperFactory.create(
       context,

@@ -61,7 +61,15 @@ export class ManageComponent implements OnInit {
   newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', groupId: '' };
 
   showEditAccount = signal(false);
-  editAcc = { id: '', name: '', groupId: '', openingBalance: 0, accountNumber: null as number | null };
+  editAcc = {
+    id: '',
+    name: '',
+    groupId: '',
+    openingBalance: 0,
+    code: '',
+    activeFrom: '' as string,
+    activeUntil: '' as string,
+  };
 
   accountTabs = [
     { value: 'all', label: 'views.manage.accounts.all' },
@@ -152,7 +160,9 @@ export class ManageComponent implements OnInit {
       name: account.name,
       groupId: account.groupId ?? '',
       openingBalance: account.openingBalance ?? 0,
-      accountNumber: account.accountNumber ?? null,
+      code: account.code ?? '',
+      activeFrom: account.activeFrom ? account.activeFrom.substring(0, 10) : '',
+      activeUntil: account.activeUntil ? account.activeUntil.substring(0, 10) : '',
     };
     this.showEditAccount.set(true);
   }
@@ -167,7 +177,9 @@ export class ManageComponent implements OnInit {
         name: this.editAcc.name.trim(),
         groupId: this.editAcc.groupId || undefined,
         openingBalance: this.editAcc.openingBalance,
-        accountNumber: this.editAcc.accountNumber,
+        code: this.editAcc.code,
+        activeFrom: this.editAcc.activeFrom ? new Date(this.editAcc.activeFrom).toISOString() : null,
+        activeUntil: this.editAcc.activeUntil ? new Date(this.editAcc.activeUntil).toISOString() : null,
       });
       this.toastService.success('views.manage.accounts.updateSuccess');
       this.showEditAccount.set(false);
@@ -182,7 +194,9 @@ export class ManageComponent implements OnInit {
   async toggleAccount(account: AccountSimple) {
     this.togglingAcc.set(account.id);
     try {
-      await this.accountsService.updateAccount(account.id, { isActive: !account.isActive });
+      // Flip activity window: active → set activeUntil = now; inactive → clear activeUntil.
+      const nextActiveUntil = account.isActive ? new Date().toISOString() : null;
+      await this.accountsService.updateAccount(account.id, { activeUntil: nextActiveUntil });
       const msg = account.isActive
         ? 'views.manage.accounts.deactivateSuccess'
         : 'views.manage.accounts.activateSuccess';

@@ -81,15 +81,15 @@
           <div class="page-item">
             <div>
               <p class="settings-item-label">
-                {{ 'views.settings.sections.appearance.showAccountNumbers' | translate }}
+                {{ 'views.settings.sections.appearance.showAccountCodes' | translate }}
               </p>
               <p class="settings-item-description">
-                {{ 'views.settings.sections.appearance.showAccountNumbersDescription' | translate }}
+                {{ 'views.settings.sections.appearance.showAccountCodesDescription' | translate }}
               </p>
             </div>
             <app-toggle
-              [value]="accountNumbersService.show()"
-              (valueChange)="onAccountNumbersToggle()"
+              [value]="accountCodesService.show()"
+              (valueChange)="onAccountCodesToggle()"
             />
           </div>
         </div>

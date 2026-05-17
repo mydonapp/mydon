@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountNumbersService } from '../../services/account-numbers.service';
+import { AccountCodesService } from '../../services/account-codes.service';
 import { AccountBalance, AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ListStyleService } from '../../services/list-style.service';
@@ -50,7 +50,7 @@ export class AccountsComponent implements OnInit {
   protected readonly currencyService = inject(CurrencyService);
   protected readonly privacyService = inject(PrivacyService);
   protected readonly listStyleService = inject(ListStyleService);
-  protected readonly accountNumbersService = inject(AccountNumbersService);
+  protected readonly accountCodesService = inject(AccountCodesService);
   private readonly userService = inject(UserService);
   private readonly toastService = inject(ToastService);
 

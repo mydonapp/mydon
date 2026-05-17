@@ -76,8 +76,8 @@
       >
         <div class="min-w-0">
           <p class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors truncate">
-            @if (accountNumbersService.show() && account.accountNumber !== null) {
-            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.accountNumber }}</span>
+            @if (accountCodesService.show() && account.code) {
+            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.code }}</span>
             } {{ account.name }}
           </p>
           @if (listStyleService.listStyle() !== 'compact') {

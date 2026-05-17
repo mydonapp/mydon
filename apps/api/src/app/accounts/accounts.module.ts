@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
+import { LedgersModule } from '../ledgers/ledgers.module';
 import { ForexModule } from '../shared/forex/forex.module';
 import { AccountsController } from './accounts.controller';
 import { Account } from './accounts.entity';
 import { AccountsService } from './accounts.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Account]), ForexModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([Account]), ForexModule, AuthModule, LedgersModule],
   controllers: [AccountsController],
   providers: [AccountsService],
 })

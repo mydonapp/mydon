@@ -42,7 +42,7 @@ export class ExportService {
 
     const [user, accounts, transactions, budgets, accountGroups] = await Promise.all([
       this.userRepository.findOneOrFail({ where: { id: userId } }),
-      this.accountRepository.find({ where: { user: { id: userId } }, relations: ['user'] }),
+      this.accountRepository.find({ where: { ledgerId: ledger.id } }),
       this.transactionRepository.find({
         where: { user: { id: userId } },
         relations: ['creditAccount', 'debitAccount', 'user'],

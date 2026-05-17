@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 
 export class UpdateAccountDto {
   @ApiProperty({ required: false })
@@ -18,13 +18,19 @@ export class UpdateAccountDto {
   @IsNumber()
   openingBalance?: number;
 
-  @ApiProperty({ description: 'Whether the account is active', required: false })
+  @ApiProperty({ description: 'Account code (e.g. SKR03 1200)', required: false })
   @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
+  @IsString()
+  @Length(0, 20)
+  code?: string;
 
-  @ApiProperty({ description: 'Account number for sorting and identification', required: false })
+  @ApiProperty({ description: 'Activity window start (null = since creation)', required: false, nullable: true })
   @IsOptional()
-  @IsNumber()
-  accountNumber?: number | null;
+  @IsDateString()
+  activeFrom?: string | null;
+
+  @ApiProperty({ description: 'Activity window end (null = no scheduled end)', required: false, nullable: true })
+  @IsOptional()
+  @IsDateString()
+  activeUntil?: string | null;
 }

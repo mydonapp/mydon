@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { AccountGroup } from '../account-groups/account-group.entity';
+import { LedgersService } from '../ledgers/ledgers.service';
 import { ForexService } from '../shared/forex/forex.service';
 import { Context } from '../shared/types/context';
-import { AccountGroup } from '../account-groups/account-group.entity';
+import { isAccountActive } from './account-active';
 import { Account, AccountType, Currency } from './accounts.entity';
 
 @Injectable()
@@ -12,22 +14,26 @@ export class AccountsService {
     @InjectRepository(Account)
     private accountsRepository: Repository<Account>,
     private forexService: ForexService,
+    private ledgersService: LedgersService,
   ) {}
 
   async findAllSimple(context: Context) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const accounts = await this.accountsRepository.find({
-      where: { user: { id: context.user.id } },
+      where: { ledgerId: ledger.id },
       relations: ['group'],
     });
 
     accounts.sort((a, b) => {
-      if (a.accountNumber !== null && b.accountNumber !== null) {
-        return a.accountNumber - b.accountNumber;
+      const aHas = a.code !== '';
+      const bHas = b.code !== '';
+      if (aHas && bHas) {
+        return a.code.localeCompare(b.code, undefined, { numeric: true });
       }
-      if (a.accountNumber !== null) {
+      if (aHas) {
         return -1;
       }
-      if (b.accountNumber !== null) {
+      if (bHas) {
         return 1;
       }
       return a.name.localeCompare(b.name);
@@ -38,10 +44,12 @@ export class AccountsService {
       name: account.name,
       type: account.type,
       currency: account.currency,
-      isActive: account.deactivatedAt === null,
+      isActive: isAccountActive(account),
+      activeFrom: account.activeFrom,
+      activeUntil: account.activeUntil,
       retirementAccount: account.retirementAccount,
       openingBalance: account.openingBalance,
-      accountNumber: account.accountNumber,
+      code: account.code,
       groupId: account.group?.id ?? null,
       groupName: account.group?.name ?? null,
     }));
@@ -59,7 +67,7 @@ export class AccountsService {
               id: account.id,
               name: account.name,
               type: account.type,
-              accountNumber: account.accountNumber,
+              code: account.code,
               creditBalance: creditBalance,
               debitBalance: account.debitBalance,
               balance: account.balance,
@@ -94,6 +102,7 @@ export class AccountsService {
       filter: { from?: Date; to?: Date };
     },
   ) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const query = this.accountsRepository
       .createQueryBuilder('account')
       .leftJoinAndSelect('account.group', 'group')
@@ -123,10 +132,10 @@ export class AccountsService {
         )`,
         'account_creditBalance',
       )
-      .where('account."userId" = :userId')
+      .where('account."ledger_id" = :ledgerId')
       .andWhere(
         `(
-        account."deactivatedAt" IS NULL
+        (account."active_until" IS NULL OR account."active_until" > NOW())
         OR EXISTS (
           SELECT 1 FROM transactions t
           WHERE t."creditAccountId" = account.id OR t."debitAccountId" = account.id
@@ -138,6 +147,7 @@ export class AccountsService {
         to: options?.filter?.to ? new Date(options?.filter?.to?.setUTCHours(23, 59, 59, 999)) : new Date('2100-12-31'),
         filteredTypes: ['EXPENSE', 'INCOME'],
         userId: context.user.id,
+        ledgerId: ledger.id,
       });
 
     const result = await query.getMany();
@@ -153,7 +163,7 @@ export class AccountsService {
     return grouped;
   }
 
-  createAccount(
+  async createAccount(
     context: Context,
     options: {
       name: string;
@@ -161,19 +171,22 @@ export class AccountsService {
       openingBalance: number;
       currency?: Currency;
       groupId?: string;
+      code?: string;
     },
   ) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const account = new Account();
+    account.ledgerId = ledger.id;
     account.name = options.name;
     account.type = options.type;
     account.openingBalance = options.openingBalance;
+    account.code = options.code ?? '';
     if (options.currency) {
       account.currency = options.currency;
     }
     if (options.groupId) {
       account.group = { id: options.groupId } as AccountGroup;
     }
-    account.setUserId(context.user.id);
     return this.accountsRepository.save(account);
   }
 
@@ -184,12 +197,14 @@ export class AccountsService {
       name?: string;
       groupId?: string | null;
       openingBalance?: number;
-      isActive?: boolean;
-      accountNumber?: number | null;
+      code?: string;
+      activeFrom?: Date | string | null;
+      activeUntil?: Date | string | null;
     },
   ) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const account = await this.accountsRepository.findOne({
-      where: { id: accountId, user: { id: context.user.id } },
+      where: { id: accountId, ledgerId: ledger.id },
     });
     if (!account) {
       throw new NotFoundException();
@@ -204,23 +219,24 @@ export class AccountsService {
     if (options.groupId !== undefined) {
       account.group = options.groupId ? ({ id: options.groupId } as AccountGroup) : null;
     }
-    if (options.accountNumber !== undefined) {
-      account.accountNumber = options.accountNumber;
+    if (options.code !== undefined) {
+      account.code = options.code;
     }
-    if (options.isActive !== undefined) {
-      if (options.isActive) {
-        account.deactivatedAt = null;
-      } else if (account.deactivatedAt === null) {
-        account.deactivatedAt = new Date();
-      }
+    if (options.activeFrom !== undefined) {
+      account.activeFrom = options.activeFrom ? new Date(options.activeFrom) : null;
+    }
+    if (options.activeUntil !== undefined) {
+      account.activeUntil = options.activeUntil ? new Date(options.activeUntil) : null;
     }
     return this.accountsRepository.save(account);
   }
 
   async getAccount(context: Context, accountId: string) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const account = await this.accountsRepository.findOne({
-      where: { id: accountId, user: { id: context.user.id } },
+      where: { id: accountId, ledgerId: ledger.id },
       relations: [
+        'group',
         'debitTransactions',
         'creditTransactions',
         'creditTransactions.debitAccount',
@@ -232,15 +248,25 @@ export class AccountsService {
       throw new NotFoundException();
     }
 
+    const totalCredit = account.creditTransactions.reduce((sum, t) => sum + Number(t.creditAmount), 0);
+    const totalDebit = account.debitTransactions.reduce((sum, t) => sum + Number(t.debitAmount), 0);
+    const totalTransactions = account.creditTransactions.length + account.debitTransactions.length;
+
     return {
       id: account.id,
       name: account.name,
       type: account.type,
-      accountNumber: account.accountNumber,
+      code: account.code,
+      activeFrom: account.activeFrom,
+      activeUntil: account.activeUntil,
+      isActive: isAccountActive(account),
       balance: account.balance,
       currency: account.currency,
-      debitTransactions: account.debitTransactions,
-      creditTransactions: account.creditTransactions,
+      retirementAccount: account.retirementAccount,
+      group: account.group ? { id: account.group.id, name: account.group.name } : null,
+      totalTransactions,
+      totalCredit,
+      totalDebit,
       transactions: [
         ...(account.debitTransactions.map((x) => ({
           id: x.id,

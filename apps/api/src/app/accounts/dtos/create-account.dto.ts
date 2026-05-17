@@ -43,4 +43,10 @@ export class CreateAccountDto {
   @IsOptional()
   @IsUUID()
   groupId?: string;
+
+  @ApiProperty({ description: 'Account code (e.g. SKR03 1200)', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 20)
+  code?: string;
 }

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
-import { AccountNumbersService } from '../../services/account-numbers.service';
+import { AccountCodesService } from '../../services/account-codes.service';
 import { BudgetDetail, BudgetItem, BudgetProgressItem, BudgetsService } from '../../services/budgets.service';
 import { AccountGroupsService } from '../../services/account-groups.service';
 import { CurrencyService } from '../../services/currency.service';
@@ -38,7 +38,7 @@ export class BudgetDetailComponent implements OnInit {
   private readonly budgetsService = inject(BudgetsService);
   readonly accountGroupsService = inject(AccountGroupsService);
   readonly accountsService = inject(AccountsService);
-  readonly accountNumbersService = inject(AccountNumbersService);
+  readonly accountCodesService = inject(AccountCodesService);
   readonly currencyService = inject(CurrencyService);
   private readonly toastService = inject(ToastService);
 
@@ -68,7 +68,7 @@ export class BudgetDetailComponent implements OnInit {
   accountOptions = computed<ComboboxOption[]>(() =>
     this.accountsService.accounts().map((a) => ({
       value: a.id,
-      label: this.accountNumbersService.show() && a.accountNumber !== null ? `${a.accountNumber} ${a.name}` : a.name,
+      label: this.accountCodesService.show() && a.code ? `${a.code} ${a.name}` : a.name,
     })),
   );
 

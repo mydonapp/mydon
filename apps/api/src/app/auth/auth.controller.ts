@@ -30,7 +30,7 @@ export class AuthController {
       theme: user.theme ?? 'system',
       listStyle: user.listStyle ?? 'normal',
       privacyMode: user.privacyMode ?? false,
-      showAccountNumbers: user.showAccountNumbers ?? false,
+      showAccountCodes: user.showAccountCodes ?? false,
     };
   }
 
@@ -47,7 +47,7 @@ export class AuthController {
       theme?: string;
       listStyle?: string;
       privacyMode?: boolean;
-      showAccountNumbers?: boolean;
+      showAccountCodes?: boolean;
     },
   ) {
     const user = req['context']?.user;
@@ -60,7 +60,7 @@ export class AuthController {
       theme: updated.theme ?? 'system',
       listStyle: updated.listStyle ?? 'normal',
       privacyMode: updated.privacyMode ?? false,
-      showAccountNumbers: updated.showAccountNumbers ?? false,
+      showAccountCodes: updated.showAccountCodes ?? false,
     };
   }
 

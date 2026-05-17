@@ -7,6 +7,6 @@ export interface Context {
     theme: string;
     listStyle: string;
     privacyMode: boolean;
-    showAccountNumbers: boolean;
+    showAccountCodes: boolean;
   };
 }

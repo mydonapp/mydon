@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountDetail, AccountsService, TransactionRecord } from '../../services/accounts.service';
-import { AccountNumbersService } from '../../services/account-numbers.service';
+import { AccountCodesService } from '../../services/account-codes.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ListStyleService } from '../../services/list-style.service';
 import { PrivacyService } from '../../services/privacy.service';
@@ -52,7 +52,7 @@ export class AccountComponent implements OnInit {
   currencyService = inject(CurrencyService);
   readonly listStyleService = inject(ListStyleService);
   privacyService = inject(PrivacyService);
-  readonly accountNumbersService = inject(AccountNumbersService);
+  readonly accountCodesService = inject(AccountCodesService);
   private route = inject(ActivatedRoute);
 
   loading = signal(false);

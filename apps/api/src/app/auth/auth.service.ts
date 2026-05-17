@@ -92,7 +92,7 @@ export class AuthService {
       account.type = accountData.type;
       account.openingBalance = 0;
       account.group = accountData.group;
-      account.user = user;
+      account.ledgerId = ledger.id;
       await this.accountRepository.save(account);
     }
   }
@@ -206,7 +206,7 @@ export class AuthService {
       theme?: string;
       listStyle?: string;
       privacyMode?: boolean;
-      showAccountNumbers?: boolean;
+      showAccountCodes?: boolean;
     },
   ): Promise<User> {
     const user = await this.userRepository.findOneOrFail({ where: { id: userId } });
@@ -228,8 +228,8 @@ export class AuthService {
     if (data.privacyMode !== undefined) {
       user.privacyMode = data.privacyMode;
     }
-    if (data.showAccountNumbers !== undefined) {
-      user.showAccountNumbers = data.showAccountNumbers;
+    if (data.showAccountCodes !== undefined) {
+      user.showAccountCodes = data.showAccountCodes;
     }
     return this.userRepository.save(user);
   }

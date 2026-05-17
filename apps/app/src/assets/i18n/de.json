@@ -276,8 +276,8 @@
           "listStyle": "Listenstil",
           "listStyleNormal": "Normal",
           "listStyleCompact": "Kompakt",
-          "showAccountNumbers": "Kontonummern anzeigen",
-          "showAccountNumbersDescription": "Kontonummern in der gesamten App anzeigen für einfachere Identifikation und Sortierung"
+          "showAccountCodes": "Kontocodes anzeigen",
+          "showAccountCodesDescription": "Kontocodes in der gesamten App anzeigen für einfachere Identifikation und Sortierung"
         },
         "export": {
           "title": "Datenexport",
@@ -390,8 +390,12 @@
         "inactive": "Inaktiv",
         "empty": "Keine Konten gefunden",
         "name": "Name",
-        "accountNumber": "Kontonummer",
-        "accountNumberPlaceholder": "z.B. 1010",
+        "code": "Code",
+        "codePlaceholder": "z.B. 1010 oder EXP-FOOD",
+        "activeFrom": "Aktiv ab",
+        "activeFromHelp": "Leer = aktiv seit Erstellung",
+        "activeUntil": "Aktiv bis",
+        "activeUntilHelp": "Leer = keine geplante Deaktivierung",
         "deactivate": "Deaktivieren",
         "activate": "Aktivieren",
         "updateSuccess": "Konto aktualisiert.",

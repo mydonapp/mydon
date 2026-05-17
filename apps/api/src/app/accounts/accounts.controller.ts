@@ -53,6 +53,7 @@ export class AccountsController {
       openingBalance: createAccountDto.openingBalance,
       currency: createAccountDto.currency,
       groupId: createAccountDto.groupId,
+      code: createAccountDto.code,
     });
   }
 
@@ -67,8 +68,9 @@ export class AccountsController {
     return this.accountsService.updateAccount(req['context'], accountId, {
       name: dto.name,
       groupId: dto.groupId,
-      isActive: dto.isActive,
-      accountNumber: dto.accountNumber,
+      code: dto.code,
+      activeFrom: dto.activeFrom,
+      activeUntil: dto.activeUntil,
       openingBalance: dto.openingBalance,
     });
   }
