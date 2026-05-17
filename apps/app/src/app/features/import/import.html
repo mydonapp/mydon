@@ -195,7 +195,7 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1.5">
               <span class="text-xs text-on-surface-variant">{{ draft.transactionDate | date:'shortDate' }}</span>
-              @if (draft.creditAccountAISuggested || draft.debitAccountAISuggested) {
+              @if (entryFor(draft, 'CREDIT')?.aiSuggested || entryFor(draft, 'DEBIT')?.aiSuggested) {
               <span class="badge badge--info badge--xs">AI</span>
               }
               <p class="text-sm text-on-surface font-medium truncate">{{ draft.description }}</p>
@@ -204,8 +204,8 @@
               <select
                 appSelect
                 class="flex-1 text-xs"
-                [ngModel]="draft.creditAccountId"
-                (ngModelChange)="updateDraft(draft.id, 'creditAccountId', $event)"
+                [ngModel]="accountIdFor(draft, 'CREDIT')"
+                (ngModelChange)="setDraftAccount(draft.id, 'CREDIT', $event)"
               >
                 <option value="">
                   {{ 'views.importTransactions.draftTransactions.table.selectAccount' | translate }}
@@ -222,8 +222,8 @@
               <select
                 appSelect
                 class="flex-1 text-xs"
-                [ngModel]="draft.debitAccountId"
-                (ngModelChange)="updateDraft(draft.id, 'debitAccountId', $event)"
+                [ngModel]="accountIdFor(draft, 'DEBIT')"
+                (ngModelChange)="setDraftAccount(draft.id, 'DEBIT', $event)"
               >
                 <option value="">
                   {{ 'views.importTransactions.draftTransactions.table.selectAccount' | translate }}

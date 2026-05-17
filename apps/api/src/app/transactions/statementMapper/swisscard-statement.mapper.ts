@@ -59,14 +59,14 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
   protected getCreditAccountIdFromStatement(
     transaction: MappedTransaction<SwisscardStatementResponse>,
   ): string | undefined {
-    if (transaction.raw['Debit/Credit'] === 'Credit') {
+    if (transaction.raw['Debit/Credit'] === 'Debit') {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
     transaction: MappedTransaction<SwisscardStatementResponse>,
   ): string | undefined {
-    if (transaction.raw['Debit/Credit'] === 'Debit') {
+    if (transaction.raw['Debit/Credit'] === 'Credit') {
       return this.accountId;
     }
   }

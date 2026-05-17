@@ -49,9 +49,7 @@ export class AccountGroupComboboxComponent implements OnInit {
 
   onSearch(text: string): void {
     const lower = text.toLowerCase();
-    this.filtered.set(
-      this.accountGroupsService.accountGroups().filter((g) => g.name.toLowerCase().includes(lower)),
-    );
+    this.filtered.set(this.accountGroupsService.accountGroups().filter((g) => g.name.toLowerCase().includes(lower)));
     this.activeIndex.set(-1);
     this.showDropdown.set(true);
   }

@@ -4,7 +4,7 @@ import { DatePipe, LowerCasePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountDetail, AccountsService, TransactionRecord } from '../../services/accounts.service';
+import { AccountDetail, AccountsService } from '../../services/accounts.service';
 import { AccountCodesService } from '../../services/account-codes.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ListStyleService } from '../../services/list-style.service';
@@ -17,16 +17,16 @@ import { IconComponent } from '../../shared/components/icon/icon';
 import { DetailHeaderComponent } from '../../shared/components/detail-header/detail-header';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 
-type AccountTransaction = TransactionRecord & {
-  creditAccountName?: string;
-  debitAccountName?: string;
-  counterAccount?: { name: string } | null;
+type AccountTransaction = {
+  id: string;
+  transactionDate: string;
+  description: string;
+  amount: number;
+  counterAccount?: { id: string; name: string } | null;
 };
 
 type RawAccountResponse = AccountDetail & {
   transactions?: AccountTransaction[];
-  creditTransactions?: AccountTransaction[];
-  debitTransactions?: AccountTransaction[];
 };
 
 @Component({
@@ -94,18 +94,7 @@ export class AccountComponent implements OnInit {
     try {
       const raw = (await this.accountsService.fetchAccount(this.accountId())) as RawAccountResponse;
       const txs: AccountTransaction[] = raw.transactions ?? [];
-      this.account.set({
-        ...raw,
-        totalTransactions: txs.length,
-        totalCredit: (raw.creditTransactions ?? []).reduce(
-          (s: number, t: AccountTransaction) => s + Number(t.creditAmount),
-          0,
-        ),
-        totalDebit: (raw.debitTransactions ?? []).reduce(
-          (s: number, t: AccountTransaction) => s + Number(t.debitAmount),
-          0,
-        ),
-      });
+      this.account.set(raw);
       this.transactions.set(txs);
       this.applyFilters();
     } finally {
@@ -124,8 +113,7 @@ export class AccountComponent implements OnInit {
         (tx) =>
           !search ||
           tx.description?.toLowerCase().includes(search) ||
-          tx.creditAccountName?.toLowerCase().includes(search) ||
-          tx.debitAccountName?.toLowerCase().includes(search),
+          tx.counterAccount?.name?.toLowerCase().includes(search),
       ),
     );
     this.page.set(1);

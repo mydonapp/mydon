@@ -50,7 +50,6 @@ export class AccountsController {
     return this.accountsService.createAccount(req['context'], {
       name: createAccountDto.name,
       type: createAccountDto.type,
-      openingBalance: createAccountDto.openingBalance,
       currency: createAccountDto.currency,
       groupId: createAccountDto.groupId,
       code: createAccountDto.code,
@@ -71,7 +70,6 @@ export class AccountsController {
       code: dto.code,
       activeFrom: dto.activeFrom,
       activeUntil: dto.activeUntil,
-      openingBalance: dto.openingBalance,
     });
   }
 

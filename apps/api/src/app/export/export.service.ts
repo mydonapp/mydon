@@ -8,6 +8,7 @@ import { BudgetItem } from '../budgets/budget-item.entity';
 import { Budget } from '../budgets/budgets.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
 import { Context } from '../shared/types/context';
+import { Entry } from '../transactions/entry.entity';
 import { Transaction } from '../transactions/transactions.entity';
 
 @Injectable()
@@ -19,6 +20,8 @@ export class ExportService {
     private accountRepository: Repository<Account>,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    @InjectRepository(Entry)
+    private entryRepository: Repository<Entry>,
     @InjectRepository(Budget)
     private budgetRepository: Repository<Budget>,
     @InjectRepository(BudgetItem)
@@ -32,6 +35,7 @@ export class ExportService {
     userCsv: string;
     accountsCsv: string;
     transactionsCsv: string;
+    entriesCsv: string;
     budgetsCsv: string;
     budgetItemsCsv: string;
     accountGroupsCsv: string;
@@ -40,13 +44,19 @@ export class ExportService {
     const userId = context.user.id;
     const ledger = await this.ledgersService.getDefaultLedgerForUser(userId);
 
-    const [user, accounts, transactions, budgets, accountGroups] = await Promise.all([
+    const [user, accounts, transactions, entries, budgets, accountGroups] = await Promise.all([
       this.userRepository.findOneOrFail({ where: { id: userId } }),
       this.accountRepository.find({ where: { ledgerId: ledger.id } }),
       this.transactionRepository.find({
-        where: { user: { id: userId } },
-        relations: ['creditAccount', 'debitAccount', 'user'],
+        where: { ledgerId: ledger.id },
+        order: { transactionDate: 'ASC' },
       }),
+      this.entryRepository
+        .createQueryBuilder('e')
+        .innerJoin('transactions', 't', 't.id = e.transaction_id')
+        .where('t.ledger_id = :lid', { lid: ledger.id })
+        .orderBy('t.transaction_date', 'ASC')
+        .getMany(),
       this.budgetRepository.find({
         where: { user: { id: userId } },
         relations: ['items', 'items.account', 'items.group'],
@@ -62,6 +72,7 @@ export class ExportService {
       userCsv: this.generateUserCsv(user),
       accountsCsv: this.generateAccountsCsv(accounts),
       transactionsCsv: this.generateTransactionsCsv(transactions),
+      entriesCsv: this.generateEntriesCsv(entries),
       budgetsCsv: this.generateBudgetsCsv(budgets),
       budgetItemsCsv: this.generateBudgetItemsCsv(budgetItems),
       accountGroupsCsv: this.generateAccountGroupsCsv(accountGroups),
@@ -76,15 +87,16 @@ export class ExportService {
   }
 
   private generateAccountsCsv(accounts: Account[]): string {
-    const headers = ['ID', 'Name', 'Type', 'Currency', 'Balance', 'Opening Balance', 'Retirement Account'];
+    const headers = ['ID', 'Code', 'Name', 'Type', 'Currency', 'Retirement Account', 'Active From', 'Active Until'];
     const rows = accounts.map((account) => [
       account.id,
+      this.escapeCsvValue(account.code),
       this.escapeCsvValue(account.name),
       account.type,
       account.currency,
-      account.balance,
-      account.openingBalance,
       account.retirementAccount,
+      account.activeFrom?.toISOString() ?? '',
+      account.activeUntil?.toISOString() ?? '',
     ]);
     return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
   }
@@ -94,16 +106,9 @@ export class ExportService {
       'ID',
       'Date',
       'Description',
-      'Credit Amount',
-      'Debit Amount',
-      'Credit Account ID',
-      'Credit Account Name',
-      'Debit Account ID',
-      'Debit Account Name',
-      'Draft',
-      'Credit Account AI Suggested',
-      'Debit Account AI Suggested',
-      'Matched Transaction ID',
+      'Reference',
+      'Posted At',
+      'Reverses Transaction ID',
       'Created At',
       'Updated At',
     ];
@@ -111,18 +116,37 @@ export class ExportService {
       t.id,
       t.transactionDate?.toISOString() || '',
       this.escapeCsvValue(t.description),
-      t.creditAmount,
-      t.debitAmount,
-      t.creditAccount?.id || '',
-      this.escapeCsvValue(t.creditAccount?.name || ''),
-      t.debitAccount?.id || '',
-      this.escapeCsvValue(t.debitAccount?.name || ''),
-      t.draft,
-      t.creditAccountAISuggested,
-      t.debitAccountAISuggested,
-      t.matchedTransactionId || '',
+      this.escapeCsvValue(t.reference ?? ''),
+      t.postedAt?.toISOString() || '',
+      t.reversesTransactionId ?? '',
       t.createdAt?.toISOString() || '',
       t.updatedAt?.toISOString() || '',
+    ]);
+    return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+  }
+
+  private generateEntriesCsv(entries: Entry[]): string {
+    const headers = [
+      'ID',
+      'Transaction ID',
+      'Account ID',
+      'Direction',
+      'Amount',
+      'Currency',
+      'FX Rate',
+      'Base Amount',
+      'AI Suggested',
+    ];
+    const rows = entries.map((e) => [
+      e.id,
+      e.transactionId,
+      e.accountId,
+      e.direction,
+      e.amount,
+      e.currency,
+      e.fxRate,
+      e.baseAmount,
+      e.aiSuggested,
     ]);
     return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
   }

@@ -58,14 +58,13 @@ export class ManageComponent implements OnInit {
 
   showAddAccount = signal(false);
   submitting = signal(false);
-  newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', groupId: '' };
+  newAccount = { name: '', type: 'assets', currency: 'CHF', groupId: '' };
 
   showEditAccount = signal(false);
   editAcc = {
     id: '',
     name: '',
     groupId: '',
-    openingBalance: 0,
     code: '',
     activeFrom: '' as string,
     activeUntil: '' as string,
@@ -159,7 +158,6 @@ export class ManageComponent implements OnInit {
       id: account.id,
       name: account.name,
       groupId: account.groupId ?? '',
-      openingBalance: account.openingBalance ?? 0,
       code: account.code ?? '',
       activeFrom: account.activeFrom ? account.activeFrom.substring(0, 10) : '',
       activeUntil: account.activeUntil ? account.activeUntil.substring(0, 10) : '',
@@ -176,7 +174,6 @@ export class ManageComponent implements OnInit {
       await this.accountsService.updateAccount(this.editAcc.id, {
         name: this.editAcc.name.trim(),
         groupId: this.editAcc.groupId || undefined,
-        openingBalance: this.editAcc.openingBalance,
         code: this.editAcc.code,
         activeFrom: this.editAcc.activeFrom ? new Date(this.editAcc.activeFrom).toISOString() : null,
         activeUntil: this.editAcc.activeUntil ? new Date(this.editAcc.activeUntil).toISOString() : null,
@@ -219,12 +216,11 @@ export class ManageComponent implements OnInit {
         name: this.newAccount.name,
         type: this.newAccount.type,
         currency: this.newAccount.currency || 'CHF',
-        openingBalance: this.newAccount.openingBalance ? Number(this.newAccount.openingBalance) : undefined,
         groupId: this.newAccount.groupId || undefined,
       });
       this.toastService.success('views.accounts.addAccountForm.success');
       this.showAddAccount.set(false);
-      this.newAccount = { name: '', type: 'assets', currency: 'CHF', openingBalance: '', groupId: '' };
+      this.newAccount = { name: '', type: 'assets', currency: 'CHF', groupId: '' };
       await this.loadAccounts();
     } catch {
       this.toastService.error('views.accounts.addAccountForm.error');

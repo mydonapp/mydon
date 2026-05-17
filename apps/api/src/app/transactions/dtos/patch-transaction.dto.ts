@@ -1,29 +1,28 @@
-import { IsBoolean, IsNumber, IsOptional, IsPositive, IsString, IsUUID } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsArray, IsDateString, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { EntryDto } from './entry.dto';
 
 export class PatchTransactionDto {
-  @IsNumber()
-  @IsPositive()
+  @ApiProperty({ required: false })
   @IsOptional()
-  declare debitAmount?: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsOptional()
-  declare creditAmount?: number;
-
   @IsString()
-  @IsOptional()
-  declare description?: string;
+  description?: string;
 
-  @IsUUID()
+  @ApiProperty({ required: false })
   @IsOptional()
-  declare creditAccountId?: string;
+  @IsString()
+  reference?: string;
 
-  @IsUUID()
+  @ApiProperty({ required: false })
   @IsOptional()
-  declare debitAccountId?: string;
+  @IsDateString()
+  transactionDate?: string;
 
-  @IsBoolean()
+  @ApiProperty({ type: [EntryDto], required: false, description: 'Full replacement entries set' })
   @IsOptional()
-  declare draft?: boolean;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EntryDto)
+  entries?: EntryDto[];
 }

@@ -1,69 +1,81 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { DataSource, In, IsNull, Not, Repository } from 'typeorm';
 import { isAccountActive } from '../accounts/account-active';
 import { Account } from '../accounts/accounts.entity';
+import { LedgersService } from '../ledgers/ledgers.service';
 import { Context } from '../shared/types/context';
+import { Entry, EntryDirection } from './entry.entity';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
 import { TransactionMatcherService } from './transaction-matcher.service';
 import { Transaction } from './transactions.entity';
+
+export interface EntryInput {
+  accountId: string;
+  direction: EntryDirection;
+  amount: number;
+  currency?: string;
+  fxRate?: number;
+  aiSuggested?: boolean;
+}
 
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    @InjectRepository(Entry)
+    private entryRepository: Repository<Entry>,
     @InjectRepository(Account)
     private accountRepository: Repository<Account>,
     private transactionMatcher: TransactionMatcherService,
+    private ledgersService: LedgersService,
+    private dataSource: DataSource,
   ) {}
 
-  findAll(context: Context, filter?: string) {
-    const where: FindOptionsWhere<Transaction> = {
-      user: { id: context.user.id },
-    };
-
-    if (filter === 'draft') {
-      where['draft'] = true;
-    }
-
-    return this.transactionRepository.find({
-      where,
-      relations: ['creditAccount', 'debitAccount'],
+  async findAll(context: Context, filter?: string) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const txs = await this.transactionRepository.find({
+      where: {
+        ledgerId: ledger.id,
+        ...(filter === 'draft' ? { postedAt: IsNull() } : {}),
+        ...(filter === 'posted' ? { postedAt: Not(IsNull()) } : {}),
+      },
+      relations: ['entries', 'entries.account'],
       order: { transactionDate: 'DESC' },
     });
+    return txs.map((tx) => this.serialize(tx));
   }
 
   async createTransaction(
     context: Context,
     options: {
-      creditAmount: number;
-      debitAmount: number;
       description: string;
-      creditAccountId: string;
-      debitAccountId: string;
+      reference?: string;
       transactionDate: Date;
+      entries: EntryInput[];
+      post?: boolean;
     },
   ) {
-    const [credit, debit] = await Promise.all([
-      this.accountRepository.findOne({ where: { id: options.creditAccountId } }),
-      this.accountRepository.findOne({ where: { id: options.debitAccountId } }),
-    ]);
-    const txDate = options.transactionDate ?? new Date();
-    if ((credit && !isAccountActive(credit, txDate)) || (debit && !isAccountActive(debit, txDate))) {
-      throw new BadRequestException('Account is not active on the transaction date');
-    }
-    const transaction = Transaction.create({
-      ...options,
-      userId: context.user.id,
-    });
-    return this.transactionRepository.save(transaction);
-  }
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    await this.validateEntries(options.entries, options.transactionDate, ledger.id);
 
-  deleteTransaction(context: Context, id: string) {
-    return this.transactionRepository.delete({
-      id,
-      user: { id: context.user.id },
+    return this.dataSource.transaction(async (manager) => {
+      const tx = manager.create(Transaction, {
+        ledgerId: ledger.id,
+        description: options.description,
+        reference: options.reference ?? null,
+        transactionDate: options.transactionDate,
+        postedAt: options.post === false ? null : new Date(),
+      });
+      const savedTx = await manager.save(Transaction, tx);
+      const entries = options.entries.map((e) => this.buildEntry(savedTx.id, e));
+      await manager.save(Entry, entries);
+      const reloaded = await manager.findOneOrFail(Transaction, {
+        where: { id: savedTx.id },
+        relations: ['entries', 'entries.account'],
+      });
+      return this.serialize(reloaded);
     });
   }
 
@@ -71,47 +83,143 @@ export class TransactionsService {
     context: Context,
     id: string,
     options: {
-      creditAmount?: number;
-      debitAmount?: number;
       description?: string;
-      creditAccountId?: string;
-      debitAccountId?: string;
-      draft?: boolean;
+      reference?: string;
+      transactionDate?: Date;
+      entries?: EntryInput[];
     },
   ) {
-    const transaction = await this.transactionRepository.findOneOrFail({
-      where: { id, user: { id: context.user.id } },
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const tx = await this.transactionRepository.findOne({
+      where: { id, ledgerId: ledger.id },
+      relations: ['entries'],
     });
-
-    if (options.creditAmount) {
-      transaction.creditAmount = options.creditAmount;
+    if (!tx) {
+      throw new NotFoundException();
     }
-    if (options.debitAmount) {
-      transaction.debitAmount = options.debitAmount;
-    }
-    if (options.description) {
-      transaction.description = options.description;
-    }
-    if (options.creditAccountId) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      transaction.creditAccount = options.creditAccountId as any;
-    }
-    if (options.debitAccountId) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      transaction.debitAccount = options.debitAccountId as any;
-    }
-    if (options.draft !== undefined) {
-      transaction.draft = options.draft;
+    if (tx.postedAt !== null) {
+      throw new ConflictException('Posted transactions are immutable. Use reverseTransaction to correct.');
     }
 
-    return this.transactionRepository.save(transaction);
+    if (options.description !== undefined) {
+      tx.description = options.description;
+    }
+    if (options.reference !== undefined) {
+      tx.reference = options.reference;
+    }
+    if (options.transactionDate !== undefined) {
+      tx.transactionDate = options.transactionDate;
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      await manager.save(Transaction, tx);
+      if (options.entries) {
+        await this.validateEntries(options.entries, tx.transactionDate, tx.ledgerId);
+        await manager.delete(Entry, { transactionId: tx.id });
+        const newEntries = options.entries.map((e) => this.buildEntry(tx.id, e));
+        await manager.save(Entry, newEntries);
+      }
+      const reloaded = await manager.findOneOrFail(Transaction, {
+        where: { id: tx.id },
+        relations: ['entries', 'entries.account'],
+      });
+      return this.serialize(reloaded);
+    });
+  }
+
+  async postTransaction(context: Context, id: string) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const tx = await this.transactionRepository.findOne({
+      where: { id, ledgerId: ledger.id },
+      relations: ['entries', 'entries.account'],
+    });
+    if (!tx) {
+      throw new NotFoundException();
+    }
+    if (tx.postedAt !== null) {
+      throw new ConflictException('Already posted');
+    }
+    await this.validateEntries(
+      tx.entries.map((e) => ({
+        accountId: e.accountId,
+        direction: e.direction,
+        amount: Number(e.amount),
+        currency: e.currency,
+        fxRate: Number(e.fxRate),
+      })),
+      tx.transactionDate,
+      tx.ledgerId,
+    );
+    tx.postedAt = new Date();
+    await this.transactionRepository.save(tx);
+    return this.serialize(tx);
+  }
+
+  async reverseTransaction(context: Context, id: string) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const original = await this.transactionRepository.findOne({
+      where: { id, ledgerId: ledger.id },
+      relations: ['entries'],
+    });
+    if (!original) {
+      throw new NotFoundException();
+    }
+    if (original.postedAt === null) {
+      throw new BadRequestException('Cannot reverse a draft. Delete it instead.');
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      const reversal = manager.create(Transaction, {
+        ledgerId: original.ledgerId,
+        description: `Reversal of: ${original.description}`,
+        reference: original.reference,
+        transactionDate: new Date(),
+        postedAt: new Date(),
+        reversesTransactionId: original.id,
+      });
+      const savedTx = await manager.save(Transaction, reversal);
+      const flipped = original.entries.map((e) =>
+        manager.create(Entry, {
+          transactionId: savedTx.id,
+          accountId: e.accountId,
+          direction: e.direction === EntryDirection.DEBIT ? EntryDirection.CREDIT : EntryDirection.DEBIT,
+          amount: e.amount,
+          currency: e.currency,
+          fxRate: e.fxRate,
+          baseAmount: e.baseAmount,
+        }),
+      );
+      await manager.save(Entry, flipped);
+      const reloaded = await manager.findOneOrFail(Transaction, {
+        where: { id: savedTx.id },
+        relations: ['entries', 'entries.account'],
+      });
+      return this.serialize(reloaded);
+    });
+  }
+
+  async deleteTransaction(context: Context, id: string) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const tx = await this.transactionRepository.findOne({ where: { id, ledgerId: ledger.id } });
+    if (!tx) {
+      throw new NotFoundException();
+    }
+    if (tx.postedAt !== null) {
+      throw new ConflictException('Posted transactions are immutable. Use reverseTransaction to correct.');
+    }
+    return this.transactionRepository.delete({ id, ledgerId: ledger.id });
   }
 
   async importStatement(context: Context, fileContent: string, statementIssuer: string, accountId: string) {
-    const importAccount = await this.accountRepository.findOne({ where: { id: accountId } });
-    if (importAccount && !isAccountActive(importAccount)) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const importAccount = await this.accountRepository.findOne({ where: { id: accountId, ledgerId: ledger.id } });
+    if (!importAccount) {
+      throw new NotFoundException('Account not found');
+    }
+    if (!isAccountActive(importAccount)) {
       throw new BadRequestException('Cannot import into an inactive account');
     }
+
     const mapper = StatementMapperFactory.create(
       context,
       fileContent,
@@ -119,8 +227,147 @@ export class TransactionsService {
       accountId,
       this.transactionMatcher,
     );
+    const drafts = await mapper.convertStatement();
 
-    const transactions = await mapper.convertStatement();
-    return this.transactionRepository.save(transactions);
+    return this.dataSource.transaction(async (manager) => {
+      const saved: Transaction[] = [];
+      for (const d of drafts) {
+        const tx = manager.create(Transaction, {
+          ledgerId: ledger.id,
+          description: d.description ?? '',
+          transactionDate: d.transactionDate,
+          postedAt: null,
+          raw: d.raw ?? null,
+        });
+        const savedTx = await manager.save(Transaction, tx);
+        const creditAccount = d.creditAccountId
+          ? await manager.findOne(Account, { where: { id: d.creditAccountId } })
+          : null;
+        const debitAccount = d.debitAccountId
+          ? await manager.findOne(Account, { where: { id: d.debitAccountId } })
+          : null;
+        const entries: Entry[] = [];
+        if (creditAccount) {
+          entries.push(
+            manager.create(Entry, {
+              transactionId: savedTx.id,
+              accountId: creditAccount.id,
+              direction: EntryDirection.CREDIT,
+              amount: d.creditAmount ?? 0,
+              currency: creditAccount.currency,
+              fxRate: 1,
+              baseAmount: d.creditAmount ?? 0,
+              aiSuggested: d.creditAccountAISuggested ?? false,
+            }),
+          );
+        }
+        if (debitAccount) {
+          entries.push(
+            manager.create(Entry, {
+              transactionId: savedTx.id,
+              accountId: debitAccount.id,
+              direction: EntryDirection.DEBIT,
+              amount: d.debitAmount ?? 0,
+              currency: debitAccount.currency,
+              fxRate: 1,
+              baseAmount: d.debitAmount ?? 0,
+              aiSuggested: d.debitAccountAISuggested ?? false,
+            }),
+          );
+        }
+        if (entries.length > 0) {
+          await manager.save(Entry, entries);
+        }
+        saved.push(savedTx);
+      }
+      return saved.map((t) => ({ id: t.id }));
+    });
+  }
+
+  private async validateEntries(entries: EntryInput[], txDate: Date, ledgerId: string): Promise<void> {
+    if (entries.length < 2) {
+      throw new BadRequestException('A transaction must have at least two entries (one debit, one credit)');
+    }
+    const accountIds = [...new Set(entries.map((e) => e.accountId))];
+    const accounts = await this.accountRepository.find({ where: { id: In(accountIds), ledgerId } });
+    if (accounts.length !== accountIds.length) {
+      throw new BadRequestException('One or more accounts are not in the current ledger');
+    }
+    for (const account of accounts) {
+      if (!isAccountActive(account, txDate)) {
+        throw new BadRequestException(`Account ${account.name} is not active on the transaction date`);
+      }
+    }
+    // Balance: sum of debit baseAmounts must equal sum of credit baseAmounts.
+    let debitTotal = 0;
+    let creditTotal = 0;
+    for (const e of entries) {
+      const fxRate = e.fxRate ?? 1;
+      const base = e.amount * fxRate;
+      if (e.amount < 0) {
+        throw new BadRequestException('Entry amount must be non-negative; use direction to indicate sign');
+      }
+      if (e.direction === EntryDirection.DEBIT) {
+        debitTotal += base;
+      } else {
+        creditTotal += base;
+      }
+    }
+    const diff = Math.abs(debitTotal - creditTotal);
+    if (diff > 0.005) {
+      throw new BadRequestException(
+        `Entries are not balanced: debit total ${debitTotal} vs credit total ${creditTotal}`,
+      );
+    }
+  }
+
+  private buildEntry(transactionId: string, input: EntryInput): Entry {
+    const e = new Entry();
+    e.transactionId = transactionId;
+    e.accountId = input.accountId;
+    e.direction = input.direction;
+    e.amount = input.amount;
+    e.currency = input.currency ?? 'CHF';
+    e.fxRate = input.fxRate ?? 1;
+    e.baseAmount = input.amount * (input.fxRate ?? 1);
+    e.aiSuggested = input.aiSuggested ?? false;
+    return e;
+  }
+
+  /**
+   * Build the response shape for a single transaction.
+   * `amount` is the absolute value of the transaction (= sum of debit base amounts =
+   * sum of credit base amounts when balanced) — useful for list-views.
+   */
+  private serialize(tx: Transaction) {
+    const entries = tx.entries.map((e) => ({
+      id: e.id,
+      accountId: e.accountId,
+      accountName: e.account?.name,
+      accountType: e.account?.type,
+      direction: e.direction,
+      amount: Number(e.amount),
+      currency: e.currency,
+      fxRate: Number(e.fxRate),
+      baseAmount: Number(e.baseAmount),
+      aiSuggested: e.aiSuggested,
+    }));
+    const amount = entries
+      .filter((e) => e.direction === EntryDirection.DEBIT)
+      .reduce((sum, e) => sum + e.baseAmount, 0);
+    return {
+      id: tx.id,
+      ledgerId: tx.ledgerId,
+      description: tx.description,
+      reference: tx.reference,
+      transactionDate: tx.transactionDate,
+      postedAt: tx.postedAt,
+      reversesTransactionId: tx.reversesTransactionId,
+      createdAt: tx.createdAt,
+      updatedAt: tx.updatedAt,
+      entries,
+      amount,
+      draft: tx.postedAt === null,
+    };
   }
 }

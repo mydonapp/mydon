@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 import { AccountType, Currency } from '../accounts.entity';
 
 export class CreateAccountDto {
@@ -20,14 +20,6 @@ export class CreateAccountDto {
   })
   @IsEnum(AccountType)
   declare type: AccountType;
-
-  @ApiProperty({
-    description: 'Opening balance for the account',
-    example: 1000.5,
-    type: 'number',
-  })
-  @IsNumber()
-  declare openingBalance: number;
 
   @ApiProperty({
     description: 'Currency for the account',

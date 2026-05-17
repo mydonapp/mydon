@@ -17,7 +17,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { AccountType } from '../accounts/accounts.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { ForexService } from '../shared/forex/forex.service';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
@@ -48,55 +47,42 @@ export class TransactionsController {
   @UseGuards(AuthGuard)
   @Get('v1/transactions')
   async findAll(@Req() req: Request, @Query('filter') filter: string) {
-    const result = await this.transactionsService.findAll(req['context'], filter);
-
-    return result.map((transaction) => {
-      return {
-        id: transaction.id,
-        creditAmount: transaction.creditAmount,
-        debitAmount: transaction.debitAmount,
-        description: transaction.description,
-        creditAccountId: transaction.creditAccount?.id,
-        debitAccountId: transaction.debitAccount?.id,
-        transactionDate: transaction.transactionDate,
-        draft: transaction.draft,
-        creditAccountAISuggested: transaction.creditAccountAISuggested,
-        debitAccountAISuggested: transaction.debitAccountAISuggested,
-        matchedTransactionId: transaction.matchedTransactionId,
-        // Amount based on user perception
-        amount:
-          transaction.creditAccount?.type === AccountType.INCOME ||
-          transaction.creditAccount?.type === AccountType.ASSETS
-            ? transaction.creditAmount
-            : transaction.creditAmount * -1,
-      };
-    });
+    return this.transactionsService.findAll(req['context'], filter);
   }
 
   @UseGuards(AuthGuard)
   @Post('v1/transactions')
-  createTransaction(@Req() req: Request, @Body() createTransactionDto: CreateTransactionDto) {
+  createTransaction(@Req() req: Request, @Body() dto: CreateTransactionDto) {
     return this.transactionsService.createTransaction(req['context'], {
-      creditAmount: createTransactionDto.creditAmount,
-      debitAmount: createTransactionDto.debitAmount,
-      creditAccountId: createTransactionDto.creditAccountId,
-      debitAccountId: createTransactionDto.debitAccountId,
-      transactionDate: createTransactionDto.transactionDate,
-      description: createTransactionDto.description,
+      description: dto.description,
+      reference: dto.reference,
+      transactionDate: new Date(dto.transactionDate),
+      entries: dto.entries,
+      post: dto.post,
     });
   }
 
   @UseGuards(AuthGuard)
   @Patch('v1/transactions/:id')
-  patchTransaction(@Req() req: Request, @Param('id') id: string, @Body() patchTransactionDto: PatchTransactionDto) {
+  patchTransaction(@Req() req: Request, @Param('id') id: string, @Body() dto: PatchTransactionDto) {
     return this.transactionsService.patchTransaction(req['context'], id, {
-      creditAmount: patchTransactionDto.creditAmount,
-      debitAmount: patchTransactionDto.debitAmount,
-      creditAccountId: patchTransactionDto.creditAccountId,
-      debitAccountId: patchTransactionDto.debitAccountId,
-      draft: patchTransactionDto.draft,
-      description: patchTransactionDto.description,
+      description: dto.description,
+      reference: dto.reference,
+      transactionDate: dto.transactionDate ? new Date(dto.transactionDate) : undefined,
+      entries: dto.entries,
     });
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('v1/transactions/:id/post')
+  postTransaction(@Req() req: Request, @Param('id') id: string) {
+    return this.transactionsService.postTransaction(req['context'], id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('v1/transactions/:id/reverse')
+  reverseTransaction(@Req() req: Request, @Param('id') id: string) {
+    return this.transactionsService.reverseTransaction(req['context'], id);
   }
 
   @UseGuards(AuthGuard)
@@ -116,9 +102,6 @@ export class TransactionsController {
           fileType: 'csv',
           skipMagicNumbersValidation: true,
         })
-        // .addMaxSizeValidator({
-        //   maxSize: 1000,
-        // })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
         }),

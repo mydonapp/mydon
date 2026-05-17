@@ -92,6 +92,7 @@
       "moreAccounts": "autres comptes",
       "noLiabilities": "Aucun passif trouvé",
       "noAssets": "Aucun actif trouvé",
+      "noEquity": "Aucun compte de capitaux propres trouvé",
       "noIncome": "Aucun compte de revenus trouvé",
       "noExpenses": "Aucun compte de dépenses trouvé",
       "addFirstAccount": "Ajouter votre premier compte",
@@ -104,9 +105,6 @@
         "accountName": {
           "label": "Nom du compte",
           "placeholder": "Saisir le nom du compte"
-        },
-        "openingBalance": {
-          "label": "Solde d'ouverture"
         },
         "accountType": {
           "label": "Type de compte"

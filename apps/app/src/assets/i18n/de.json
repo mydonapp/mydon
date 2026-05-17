@@ -92,6 +92,7 @@
       "moreAccounts": "weitere Konten",
       "noLiabilities": "Keine Verbindlichkeiten gefunden",
       "noAssets": "Keine Vermögenswerte gefunden",
+      "noEquity": "Keine Eigenkapitalkonten gefunden",
       "noIncome": "Keine Einkommenskonten gefunden",
       "noExpenses": "Keine Ausgabenkonten gefunden",
       "addFirstAccount": "Erstes Konto hinzufügen",
@@ -104,9 +105,6 @@
         "accountName": {
           "label": "Kontoname",
           "placeholder": "Kontoname eingeben"
-        },
-        "openingBalance": {
-          "label": "Anfangsbestand"
         },
         "accountType": {
           "label": "Kontotyp"

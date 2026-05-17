@@ -7,13 +7,14 @@ import { User } from '../auth/user.entity';
 import { BudgetItem } from '../budgets/budget-item.entity';
 import { Budget } from '../budgets/budgets.entity';
 import { LedgersModule } from '../ledgers/ledgers.module';
+import { Entry } from '../transactions/entry.entity';
 import { Transaction } from '../transactions/transactions.entity';
 import { ExportController } from './export.controller';
 import { ExportService } from './export.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Account, Transaction, Budget, BudgetItem, AccountGroup]),
+    TypeOrmModule.forFeature([User, Account, Transaction, Entry, Budget, BudgetItem, AccountGroup]),
     AuthModule,
     LedgersModule,
   ],

@@ -109,6 +109,13 @@ export class AccountsComponent implements OnInit {
           total: data.liabilities?.total ?? 0,
         },
         {
+          type: 'equity',
+          label: 'words.equity',
+          emptyLabel: 'views.accounts.noEquity',
+          accounts: data.equity?.accounts ?? [],
+          total: data.equity?.total ?? 0,
+        },
+        {
           type: 'income',
           label: 'words.income',
           emptyLabel: 'views.accounts.noIncome',
@@ -136,13 +143,14 @@ export class AccountsComponent implements OnInit {
   async submitCreateTransaction() {
     this.submitting.set(true);
     try {
+      const amount = Number(this.newTransaction.amount);
       await this.accountsService.createTransaction({
         transactionDate: this.newTransaction.date,
         description: this.newTransaction.description,
-        creditAccountId: this.newTransaction.creditAccountId,
-        debitAccountId: this.newTransaction.debitAccountId,
-        debitAmount: Number(this.newTransaction.amount),
-        creditAmount: Number(this.newTransaction.amount),
+        entries: [
+          { accountId: this.newTransaction.creditAccountId, direction: 'CREDIT' as const, amount },
+          { accountId: this.newTransaction.debitAccountId, direction: 'DEBIT' as const, amount },
+        ],
       });
       this.toastService.success('Transaction created successfully!');
       this.showCreateTransaction.set(false);

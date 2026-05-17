@@ -18,9 +18,7 @@ export class AccountGroupsService {
   accountGroups = signal<AccountGroup[]>([]);
 
   async fetchAccountGroups(): Promise<void> {
-    const groups = await firstValueFrom(
-      this.http.get<AccountGroup[]>(`${this.appConfig.apiUrl}/v1/account-groups`),
-    );
+    const groups = await firstValueFrom(this.http.get<AccountGroup[]>(`${this.appConfig.apiUrl}/v1/account-groups`));
     this.accountGroups.set(groups);
   }
 

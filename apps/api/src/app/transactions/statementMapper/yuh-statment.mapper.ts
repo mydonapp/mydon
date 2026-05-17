@@ -48,13 +48,15 @@ export class YuhStatementMapper extends StatementMapper<YuhStatement> {
     return Promise.resolve(mappedStatement);
   }
 
+  // CSV CREDIT column populated → money IN to the imported account → it is DEBITED.
+  // CSV DEBIT column populated  → money OUT of the imported account → it is CREDITED.
   protected getCreditAccountIdFromStatement(transaction: MappedTransaction<YuhStatementResponse>): string | undefined {
-    if (transaction.raw.CREDIT) {
+    if (transaction.raw.DEBIT) {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(transaction: MappedTransaction<YuhStatementResponse>): string | undefined {
-    if (transaction.raw.DEBIT) {
+    if (transaction.raw.CREDIT) {
       return this.accountId;
     }
   }

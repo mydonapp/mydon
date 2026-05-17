@@ -1,6 +1,6 @@
 import { Context } from '../../shared/types/context';
+import { EntryDirection } from '../entry.entity';
 import { TransactionMatcherService } from '../transaction-matcher.service';
-import { Transaction } from '../transactions.entity';
 
 export interface MappedTransaction<T> {
   creditAmount: number;
@@ -8,6 +8,23 @@ export interface MappedTransaction<T> {
   description: string;
   transactionDate: Date;
   raw: T;
+}
+
+/**
+ * Output of the mapper — one "draft" per row of the source statement.
+ * The TransactionsService consumes these and turns them into Transaction + 2 Entries.
+ */
+export interface DraftStatementTransaction {
+  creditAmount: number;
+  debitAmount: number;
+  description: string;
+  transactionDate: Date;
+  raw: string;
+  creditAccountId?: string;
+  debitAccountId?: string;
+  creditAccountAISuggested?: boolean;
+  debitAccountAISuggested?: boolean;
+  matchedTransactionId?: string;
 }
 
 export abstract class StatementMapper<T> {
@@ -24,13 +41,13 @@ export abstract class StatementMapper<T> {
 
   protected abstract parseStatement(fileContent: string): Promise<T[]>;
 
-  public async convertStatement(): Promise<Transaction[]> {
+  public async convertStatement(): Promise<DraftStatementTransaction[]> {
     if (!this.statement) {
       this.statement = await this.parseStatement(this.fileContent);
     }
 
     const mappedStatement = await this.mapStatement();
-    const transactions: Transaction[] = [];
+    const drafts: DraftStatementTransaction[] = [];
 
     for (const transaction of mappedStatement) {
       let creditAccountId = this.getCreditAccountId(transaction);
@@ -39,65 +56,55 @@ export abstract class StatementMapper<T> {
       let debitAccountAISuggested = false;
       let matchedTransactionId: string | undefined;
 
-      // If accounts are not provided from statement, try to find similar transactions
       if (this.transactionMatcher && (!creditAccountId || !debitAccountId) && transaction.description) {
         const bestMatch = await this.transactionMatcher.getBestMatch(
           this.context.user.id,
           transaction.description,
-          0.7, // 70% similarity threshold
+          0.7,
         );
 
         if (bestMatch) {
           matchedTransactionId = bestMatch.id;
+          const matchedCredit = bestMatch.entries.find((e) => e.direction === EntryDirection.CREDIT)?.accountId;
+          const matchedDebit = bestMatch.entries.find((e) => e.direction === EntryDirection.DEBIT)?.accountId;
 
-          // Use matched transaction's accounts if not already set
-          if (!creditAccountId && bestMatch.creditAccount) {
-            creditAccountId = bestMatch.creditAccount.id;
+          if (!creditAccountId && matchedCredit) {
+            creditAccountId = matchedCredit;
             creditAccountAISuggested = true;
           }
-          if (!debitAccountId && bestMatch.debitAccount) {
-            debitAccountId = bestMatch.debitAccount.id;
+          if (!debitAccountId && matchedDebit) {
+            debitAccountId = matchedDebit;
             debitAccountAISuggested = true;
           }
         }
       }
 
-      const newTransaction = Transaction.create({
+      drafts.push({
         creditAmount: transaction.creditAmount,
         debitAmount: transaction.debitAmount,
         description: transaction.description,
-        creditAccountId: creditAccountId,
-        debitAccountId: debitAccountId,
+        creditAccountId,
+        debitAccountId,
         transactionDate: transaction.transactionDate,
-        draft: true,
         raw: JSON.stringify(transaction.raw),
-        userId: this.context.user.id,
         creditAccountAISuggested,
         debitAccountAISuggested,
         matchedTransactionId,
       });
-
-      transactions.push(newTransaction);
     }
 
-    return transactions;
+    return drafts;
   }
 
   protected abstract getCreditAccountIdFromStatement(transaction: MappedTransaction<T>): string | undefined;
 
   private getCreditAccountId(transaction: MappedTransaction<T>): string | undefined {
-    const creditAccountIdFromStatement = this.getCreditAccountIdFromStatement(transaction);
-    if (creditAccountIdFromStatement) {
-      return creditAccountIdFromStatement;
-    }
+    return this.getCreditAccountIdFromStatement(transaction);
   }
 
   protected abstract getDebitAccountIdFromStatement(transaction: MappedTransaction<T>): string | undefined;
 
   private getDebitAccountId(transaction: MappedTransaction<T>): string | undefined {
-    const debitAccountIdFromStatement = this.getDebitAccountIdFromStatement(transaction);
-    if (debitAccountIdFromStatement) {
-      return debitAccountIdFromStatement;
-    }
+    return this.getDebitAccountIdFromStatement(transaction);
   }
 }

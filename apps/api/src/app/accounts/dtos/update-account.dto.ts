@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNumber, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 
 export class UpdateAccountDto {
   @ApiProperty({ required: false })
@@ -12,11 +12,6 @@ export class UpdateAccountDto {
   @IsOptional()
   @IsUUID()
   groupId?: string;
-
-  @ApiProperty({ description: 'Opening balance', required: false })
-  @IsOptional()
-  @IsNumber()
-  openingBalance?: number;
 
   @ApiProperty({ description: 'Account code (e.g. SKR03 1200)', required: false })
   @IsOptional()

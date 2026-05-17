@@ -82,14 +82,14 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
   protected getCreditAccountIdFromStatement(
     transaction: MappedTransaction<PostFinanceStatementResponse>,
   ): string | undefined {
-    if (transaction.raw.creditInCHF !== '') {
+    if (transaction.raw.debitInCHF !== '') {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(
     transaction: MappedTransaction<PostFinanceStatementResponse>,
   ): string | undefined {
-    if (transaction.raw.debitInCHF !== '') {
+    if (transaction.raw.creditInCHF !== '') {
       return this.accountId;
     }
   }

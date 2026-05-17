@@ -53,13 +53,15 @@ export class WiseStatementMapper extends StatementMapper<WiseStatement> {
     return Promise.resolve(mappedStatement);
   }
 
+  // Amount > 0 → money IN (asset increase) → imported account is DEBITED.
+  // Amount < 0 → money OUT (asset decrease) → imported account is CREDITED.
   protected getCreditAccountIdFromStatement(transaction: MappedTransaction<WiseStatementResponse>): string | undefined {
-    if (transaction.raw.Amount >= 0) {
+    if (transaction.raw.Amount < 0) {
       return this.accountId;
     }
   }
   protected getDebitAccountIdFromStatement(transaction: MappedTransaction<WiseStatementResponse>): string | undefined {
-    if (transaction.raw.Amount < 0) {
+    if (transaction.raw.Amount >= 0) {
       return this.accountId;
     }
   }

@@ -13,12 +13,15 @@ I created MyDon because I couldn't find a tool that made it easy to import bank 
 
 ## 📦 Features
 
-- 📥 **Bank CSV Import** — upload bank statements with automatic parsing
-- 💼 **Double-entry bookkeeping** — proper assets, liabilities, income & expense accounts
-- 🤖 **AI-assisted categorization** — automatic account suggestions during import
-- 🏷 **Budgeting** — set monthly or yearly budgets per category with progress tracking
-- 📊 **Spending analytics** — balance history, credit/debit totals per account
-- 📁 **Data export** — full export as CSV/ZIP
+- 📥 **Bank CSV import** — PostFinance, Swisscard, Wise and Yuh statements, parsed into balanced journal entries you can review before posting
+- 💼 **Proper double-entry bookkeeping** — every transaction is a header + ≥2 entries that balance on `baseAmount`; assets/liabilities/equity/income/expense account types with the correct debit/credit semantics
+- ⏪ **Immutable posted transactions** — corrections happen via reversing transactions, preserving a full audit trail
+- 🗓 **Activity windows on accounts** — `activeFrom` / `activeUntil` for scheduled activation/deactivation (year-end chart-of-accounts changes, SKR migrations) without manual intervention
+- 🏷 **Account groups** — optional SKR-style hierarchy with codes and parent groups, used for grouping and budget rollups
+- 🤖 **AI-assisted import** — similarity-matched account suggestions on draft imports
+- 📊 **Budgeting** — monthly or yearly budgets per account or account-group, with progress and projections
+- 💱 **Multi-currency entries** — each entry tracks its own currency + FX rate; balances roll up in the ledger's base currency
+- 📁 **Data export** — full ZIP export with separate CSVs for accounts, transactions, entries, budgets, budget items, and account groups
 - 🌍 **Multi-language** — English, German, French, Italian
 - 🎨 **Theming** — light, dark and system theme with persisted user preferences
 - 📱 **Native app** — iOS and desktop via Tauri, with configurable self-hosted API URL

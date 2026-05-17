@@ -90,7 +90,6 @@ export class AuthService {
       const account = new Account();
       account.name = accountData.name;
       account.type = accountData.type;
-      account.openingBalance = 0;
       account.group = accountData.group;
       account.ledgerId = ledger.id;
       await this.accountRepository.save(account);

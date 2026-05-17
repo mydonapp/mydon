@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountsService, Issuer, TransactionRecord } from '../../services/accounts.service';
+import { AccountsService, EntryInput, Issuer, TransactionRecord } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ComboboxComponent, ComboboxOption } from '../../shared/components/combobox/combobox';
@@ -54,7 +54,20 @@ export class ImportComponent implements OnInit {
   }
 
   hasAiSuggestions() {
-    return this.draftTransactions().some((d) => d.creditAccountAISuggested || d.debitAccountAISuggested);
+    return this.draftTransactions().some((d) => d.entries.some((e) => e.aiSuggested));
+  }
+
+  /** Look up the (single) entry of a given direction on a draft, if any. */
+  entryFor(draft: TransactionRecord, direction: 'CREDIT' | 'DEBIT') {
+    return draft.entries.find((e) => e.direction === direction);
+  }
+
+  accountIdFor(draft: TransactionRecord, direction: 'CREDIT' | 'DEBIT'): string {
+    return this.entryFor(draft, direction)?.accountId ?? '';
+  }
+
+  amountFor(draft: TransactionRecord, direction: 'CREDIT' | 'DEBIT'): number {
+    return this.entryFor(draft, direction)?.amount ?? draft.amount;
   }
 
   accountOptions() {
@@ -119,10 +132,35 @@ export class ImportComponent implements OnInit {
     this.selectedDrafts.update((ids) => (checked ? [...ids, id] : ids.filter((i) => i !== id)));
   }
 
-  async updateDraft(id: string, field: string, value: string) {
+  /**
+   * Replace one side's account on a draft. We send the full entries[] back to the server
+   * (PATCH replaces the entire set) and reflect the change locally on the next reload.
+   */
+  async setDraftAccount(draftId: string, direction: 'CREDIT' | 'DEBIT', accountId: string) {
+    const draft = this.draftTransactions().find((d) => d.id === draftId);
+    if (!draft) {
+      return;
+    }
+    const other: 'CREDIT' | 'DEBIT' = direction === 'CREDIT' ? 'DEBIT' : 'CREDIT';
+    const otherEntry = this.entryFor(draft, other);
+    const thisAmount = this.amountFor(draft, direction);
+    const otherAmount = otherEntry?.amount ?? thisAmount;
+    const entries: EntryInput[] = [
+      { accountId, direction, amount: thisAmount },
+      ...(otherEntry?.accountId ? [{ accountId: otherEntry.accountId, direction: other, amount: otherAmount }] : []),
+    ];
     try {
-      await this.accountsService.updateDraftTransaction(id, { [field]: value });
-      this.draftTransactions.update((drafts) => drafts.map((d) => (d.id === id ? { ...d, [field]: value } : d)));
+      await this.accountsService.updateDraftTransaction(draftId, { entries });
+      this.draftTransactions.update((drafts) =>
+        drafts.map((d) =>
+          d.id === draftId
+            ? {
+                ...d,
+                entries: d.entries.map((e) => (e.direction === direction ? { ...e, accountId } : e)),
+              }
+            : d,
+        ),
+      );
     } catch {
       this.toastService.error('Failed to update transaction.');
     }

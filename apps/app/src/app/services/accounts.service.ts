@@ -12,7 +12,6 @@ export interface AccountSimple {
   activeFrom: string | null;
   activeUntil: string | null;
   retirementAccount: boolean;
-  openingBalance: number;
   code: string;
   groupId: string | null;
   groupName: string | null;
@@ -33,17 +32,6 @@ export interface AccountDetail {
   totalTransactions: number;
   totalCredit: number;
   totalDebit: number;
-}
-
-export interface Transaction {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  creditAccountId: string;
-  creditAccountName: string;
-  debitAccountId: string;
-  debitAccountName: string;
 }
 
 export interface AccountBalance {
@@ -75,19 +63,43 @@ export interface AccountsResponse {
   expense: AccountGroup;
 }
 
+export type EntryDirection = 'DEBIT' | 'CREDIT';
+
+export interface TransactionEntry {
+  id: string;
+  accountId: string;
+  accountName?: string;
+  accountType?: string;
+  direction: EntryDirection;
+  amount: number;
+  currency: string;
+  fxRate: number;
+  baseAmount: number;
+  aiSuggested?: boolean;
+}
+
+export interface EntryInput {
+  accountId: string;
+  direction: EntryDirection;
+  amount: number;
+  currency?: string;
+  fxRate?: number;
+  aiSuggested?: boolean;
+}
+
 export interface TransactionRecord {
   id: string;
-  creditAmount: number;
-  debitAmount: number;
-  amount: number;
+  ledgerId: string;
   description: string;
-  creditAccountId: string;
-  debitAccountId: string;
+  reference: string | null;
   transactionDate: string;
+  postedAt: string | null;
+  reversesTransactionId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  entries: TransactionEntry[];
+  amount: number;
   draft: boolean;
-  creditAccountAISuggested?: boolean;
-  debitAccountAISuggested?: boolean;
-  matchedTransactionId?: string | null;
 }
 
 export interface Issuer {
@@ -95,14 +107,20 @@ export interface Issuer {
   name: string;
 }
 
-export type PatchTransactionData = Partial<{
-  debitAmount: number;
-  creditAmount: number;
+export interface CreateTransactionPayload {
   description: string;
-  creditAccountId: string;
-  debitAccountId: string;
-  draft: boolean;
-}>;
+  reference?: string;
+  transactionDate: string;
+  entries: EntryInput[];
+  post?: boolean;
+}
+
+export interface PatchTransactionPayload {
+  description?: string;
+  reference?: string;
+  transactionDate?: string;
+  entries?: EntryInput[];
+}
 
 export type SpendingAnalysis = Record<string, unknown>;
 
@@ -152,7 +170,6 @@ export class AccountsService {
     name: string;
     type: string;
     currency: string;
-    openingBalance?: number;
     groupId?: string;
     code?: string;
   }): Promise<void> {
@@ -167,7 +184,6 @@ export class AccountsService {
       type: string;
       currency: string;
       groupId: string;
-      openingBalance: number;
       code: string;
       activeFrom: string | null;
       activeUntil: string | null;
@@ -177,14 +193,7 @@ export class AccountsService {
     await this.fetchSimple();
   }
 
-  async createTransaction(data: {
-    transactionDate: string;
-    description: string;
-    creditAccountId: string;
-    debitAccountId: string;
-    creditAmount: number;
-    debitAmount: number;
-  }): Promise<void> {
+  async createTransaction(data: CreateTransactionPayload): Promise<void> {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions`, data));
   }
 
@@ -198,17 +207,11 @@ export class AccountsService {
 
   async approveDraftTransactions(ids: string[]): Promise<void> {
     await Promise.all(
-      ids.map((id) =>
-        firstValueFrom(
-          this.http.patch(`${this.appConfig.apiUrl}/v1/transactions/${id}`, {
-            draft: false,
-          }),
-        ),
-      ),
+      ids.map((id) => firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions/${id}/post`, {}))),
     );
   }
 
-  async updateDraftTransaction(id: string, data: PatchTransactionData): Promise<void> {
+  async updateDraftTransaction(id: string, data: PatchTransactionPayload): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/transactions/${id}`, data));
   }
 

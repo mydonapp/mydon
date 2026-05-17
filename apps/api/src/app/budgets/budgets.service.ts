@@ -236,48 +236,61 @@ export class BudgetsService {
     };
   }
 
-  private async getAccountActual(account: Account, userId: string, from: Date, to: Date): Promise<number> {
+  private async getAccountActual(account: Account, _userId: string, from: Date, to: Date): Promise<number> {
     const rows = await this.dataSource.query(
       `SELECT
-        COALESCE(SUM(CASE WHEN "creditAccountId" = $1 THEN "creditAmount" ELSE 0 END), 0)::numeric AS "creditBalance",
-        COALESCE(SUM(CASE WHEN "debitAccountId" = $1 THEN "debitAmount" ELSE 0 END), 0)::numeric AS "debitBalance"
-       FROM transactions
-       WHERE "userId" = $2
-         AND "transactionDate" BETWEEN $3::timestamptz AND $4::timestamptz
-         AND ("creditAccountId" = $1 OR "debitAccountId" = $1)`,
-      [account.id, userId, from.toISOString(), to.toISOString()],
+        COALESCE(SUM(CASE WHEN e.direction = 'CREDIT' THEN e.amount ELSE 0 END), 0)::numeric AS "creditBalance",
+        COALESCE(SUM(CASE WHEN e.direction = 'DEBIT'  THEN e.amount ELSE 0 END), 0)::numeric AS "debitBalance"
+       FROM entries e
+       JOIN transactions t ON t.id = e.transaction_id
+       WHERE e.account_id = $1
+         AND t.posted_at IS NOT NULL
+         AND t.transaction_date BETWEEN $2::timestamptz AND $3::timestamptz`,
+      [account.id, from.toISOString(), to.toISOString()],
     );
 
     const credit = parseFloat(rows[0]?.creditBalance ?? '0');
     const debit = parseFloat(rows[0]?.debitBalance ?? '0');
+    // Normal-balance direction by type: ASSETS/EXPENSE are debit-positive, others credit-positive.
     const balance =
-      account.type === AccountType.ASSETS || account.type === AccountType.EXPENSE ? credit - debit : debit - credit;
+      account.type === AccountType.ASSETS || account.type === AccountType.EXPENSE ? debit - credit : credit - debit;
     return Math.max(0, balance);
   }
 
   private async getGroupActual(
     groupId: string,
-    userId: string,
+    _userId: string,
     ledgerId: string,
     from: Date,
     to: Date,
   ): Promise<{ total: number; accountType: string | null; accounts: { id: string; name: string; actual: number }[] }> {
+    // Note: keep accounts even when they have no in-range entries (LEFT JOIN preserves the row),
+    // but filter entries by the transaction's posted state + date range inside the CASE — the
+    // ON-clause filter alone wouldn't exclude rows in a LEFT JOIN, only null out `t`.
     const rows = await this.dataSource.query(
       `SELECT
         a.id,
         a.name,
         a.type,
-        COALESCE(SUM(CASE WHEN t."creditAccountId" = a.id THEN t."creditAmount" ELSE 0 END), 0)::numeric AS "creditBalance",
-        COALESCE(SUM(CASE WHEN t."debitAccountId" = a.id THEN t."debitAmount" ELSE 0 END), 0)::numeric AS "debitBalance"
+        COALESCE(SUM(
+          CASE WHEN e.direction = 'CREDIT'
+                AND t.posted_at IS NOT NULL
+                AND t.transaction_date BETWEEN $3::timestamptz AND $4::timestamptz
+               THEN e.amount ELSE 0 END
+        ), 0)::numeric AS "creditBalance",
+        COALESCE(SUM(
+          CASE WHEN e.direction = 'DEBIT'
+                AND t.posted_at IS NOT NULL
+                AND t.transaction_date BETWEEN $3::timestamptz AND $4::timestamptz
+               THEN e.amount ELSE 0 END
+        ), 0)::numeric AS "debitBalance"
        FROM accounts a
-       LEFT JOIN transactions t
-         ON (t."creditAccountId" = a.id OR t."debitAccountId" = a.id)
-         AND t."userId" = $2
-         AND t."transactionDate" BETWEEN $4::timestamptz AND $5::timestamptz
+       LEFT JOIN entries e ON e.account_id = a.id
+       LEFT JOIN transactions t ON t.id = e.transaction_id
        WHERE a."group_id" = $1
-         AND a."ledger_id" = $3
+         AND a."ledger_id" = $2
        GROUP BY a.id, a.name, a.type`,
-      [groupId, userId, ledgerId, from.toISOString(), to.toISOString()],
+      [groupId, ledgerId, from.toISOString(), to.toISOString()],
     );
 
     const accounts = (
@@ -286,7 +299,7 @@ export class BudgetsService {
       const credit = parseFloat(row.creditBalance);
       const debit = parseFloat(row.debitBalance);
       const balance =
-        row.type === AccountType.ASSETS || row.type === AccountType.EXPENSE ? credit - debit : debit - credit;
+        row.type === AccountType.ASSETS || row.type === AccountType.EXPENSE ? debit - credit : credit - debit;
       return { id: row.id, name: row.name, actual: Math.max(0, balance) };
     });
 
