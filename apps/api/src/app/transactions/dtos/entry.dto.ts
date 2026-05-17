@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNumber, IsOptional, IsPositive, IsString, IsUUID, Length } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsPositive, IsUUID } from 'class-validator';
+import { Currency } from '../../shared/currency';
 import { EntryDirection } from '../entry.entity';
 
 export class EntryDto {
@@ -16,11 +17,10 @@ export class EntryDto {
   @IsPositive()
   declare amount: number;
 
-  @ApiProperty({ description: 'ISO 4217 currency (defaults to account currency)', required: false })
+  @ApiProperty({ enum: Currency, description: 'Currency (defaults to account currency)', required: false })
   @IsOptional()
-  @IsString()
-  @Length(3, 3)
-  currency?: string;
+  @IsEnum(Currency)
+  currency?: Currency;
 
   @ApiProperty({ description: 'FX rate from entry currency to ledger base currency (default 1)', required: false })
   @IsOptional()

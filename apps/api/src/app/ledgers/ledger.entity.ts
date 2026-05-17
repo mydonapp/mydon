@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Organization } from '../organizations/organization.entity';
+import { Currency } from '../shared/currency';
 
 @Entity('ledgers')
 export class Ledger {
@@ -16,8 +17,8 @@ export class Ledger {
   @Column({ type: 'varchar' })
   declare name: string;
 
-  @Column({ name: 'base_currency', type: 'varchar', length: 3, default: 'CHF' })
-  declare baseCurrency: string;
+  @Column({ name: 'base_currency', type: 'enum', enum: Currency, enumName: 'currency_enum', default: Currency.CHF })
+  declare baseCurrency: Currency;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   declare createdAt: Date;

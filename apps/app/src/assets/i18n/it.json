@@ -143,6 +143,17 @@
         "amount": {
           "label": "Importo"
         },
+        "creditAmount": {
+          "label": "Importo avere"
+        },
+        "debitAmount": {
+          "label": "Importo dare"
+        },
+        "exchangeRate": {
+          "label": "Tasso di cambio"
+        },
+        "balanced": "Bilanciato",
+        "notBalanced": "Non bilanciato",
         "submit": {
           "label": "Crea transazione"
         },

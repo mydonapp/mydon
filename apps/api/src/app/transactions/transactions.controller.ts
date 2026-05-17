@@ -18,6 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
+import { Currency } from '../shared/currency';
 import { ForexService } from '../shared/forex/forex.service';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { ImportStatementDto } from './dtos/import-statenment.dto';
@@ -119,7 +120,7 @@ export class TransactionsController {
 
   @UseGuards(AuthGuard)
   @Get('v1/currency/convert')
-  convertAmount(@Req() req: Request, @Query() query: { amount: number; from: string; to: string; date: string }) {
+  convertAmount(@Req() req: Request, @Query() query: { amount: number; from: Currency; to: Currency; date: string }) {
     return this.forexService.convertCurrency(query.amount, query.from, query.to, new Date(query.date));
   }
 }

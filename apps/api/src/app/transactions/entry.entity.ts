@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Account } from '../accounts/accounts.entity';
+import { Currency } from '../shared/currency';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
 import { Transaction } from './transactions.entity';
 
@@ -33,8 +34,8 @@ export class Entry {
   @Column({ type: 'decimal', precision: 14, scale: 2, transformer: new ColumnDecimalTransformer() })
   declare amount: number;
 
-  @Column({ type: 'varchar', length: 3 })
-  declare currency: string;
+  @Column({ type: 'enum', enum: Currency, enumName: 'currency_enum' })
+  declare currency: Currency;
 
   @Column({
     name: 'fx_rate',

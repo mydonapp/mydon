@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account } from '../accounts/accounts.entity';
@@ -15,7 +15,7 @@ import { User } from './user.entity';
   imports: [
     TypeOrmModule.forFeature([AccessToken, RefreshToken, User, Account, AccountGroup]),
     OrganizationsModule,
-    LedgersModule,
+    forwardRef(() => LedgersModule),
   ],
   controllers: [AuthController],
   providers: [AuthService, AuthGuard],

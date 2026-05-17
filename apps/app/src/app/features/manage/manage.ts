@@ -4,6 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AccountGroup, AccountGroupsService } from '../../services/account-groups.service';
 import { AccountSimple, AccountsService } from '../../services/accounts.service';
 import { ToastService } from '../../services/toast.service';
+import { CURRENCIES } from '../../shared/currency';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
@@ -86,13 +87,7 @@ export class ManageComponent implements OnInit {
     { value: 'expenses', label: 'Expenses' },
   ];
 
-  currencyOptions: SelectOption[] = [
-    { value: 'CHF', label: 'CHF' },
-    { value: 'EUR', label: 'EUR' },
-    { value: 'USD', label: 'USD' },
-    { value: 'GBP', label: 'GBP' },
-    { value: 'KRW', label: 'KRW' },
-  ];
+  currencyOptions: SelectOption[] = CURRENCIES.map((c) => ({ value: c, label: c }));
 
   ngOnInit() {
     this.accountGroupsService.fetchAccountGroups();

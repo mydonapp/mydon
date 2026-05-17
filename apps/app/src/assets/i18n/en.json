@@ -143,6 +143,17 @@
         "amount": {
           "label": "Amount"
         },
+        "creditAmount": {
+          "label": "Credit Amount"
+        },
+        "debitAmount": {
+          "label": "Debit Amount"
+        },
+        "exchangeRate": {
+          "label": "Exchange Rate"
+        },
+        "balanced": "Balanced",
+        "notBalanced": "Not balanced",
         "submit": {
           "label": "Create Transaction"
         },

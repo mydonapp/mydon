@@ -111,7 +111,7 @@ export class AccountsService {
     return credit - debit;
   }
 
-  async mapAccountsToGrouped(accounts: AccountWithBalance[], accountType: AccountType) {
+  async mapAccountsToGrouped(accounts: AccountWithBalance[], accountType: AccountType, baseCurrency: Currency) {
     const result = (
       await Promise.all(
         accounts
@@ -130,7 +130,7 @@ export class AccountsService {
               balanceMainCurrency: await this.forexService.convertCurrency(
                 balance,
                 account.currency,
-                'CHF',
+                baseCurrency,
                 new Date(),
               ),
               retirementAccount: account.retirementAccount,
@@ -188,11 +188,11 @@ export class AccountsService {
     }));
 
     return {
-      assets: await this.mapAccountsToGrouped(withBalances, AccountType.ASSETS),
-      liabilities: await this.mapAccountsToGrouped(withBalances, AccountType.LIABILITIES),
-      equity: await this.mapAccountsToGrouped(withBalances, AccountType.EQUITY),
-      income: await this.mapAccountsToGrouped(withBalances, AccountType.INCOME),
-      expense: await this.mapAccountsToGrouped(withBalances, AccountType.EXPENSE),
+      assets: await this.mapAccountsToGrouped(withBalances, AccountType.ASSETS, ledger.baseCurrency),
+      liabilities: await this.mapAccountsToGrouped(withBalances, AccountType.LIABILITIES, ledger.baseCurrency),
+      equity: await this.mapAccountsToGrouped(withBalances, AccountType.EQUITY, ledger.baseCurrency),
+      income: await this.mapAccountsToGrouped(withBalances, AccountType.INCOME, ledger.baseCurrency),
+      expense: await this.mapAccountsToGrouped(withBalances, AccountType.EXPENSE, ledger.baseCurrency),
     };
   }
 

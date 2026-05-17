@@ -5,6 +5,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AccountCodesService } from '../../services/account-codes.service';
 import { AccountBalance, AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
+import { ForexService } from '../../services/forex.service';
+import { LedgerService } from '../../services/ledger.service';
 import { ListStyleService } from '../../services/list-style.service';
 import { PrivacyService } from '../../services/privacy.service';
 import { ToastService } from '../../services/toast.service';
@@ -51,11 +53,14 @@ export class AccountsComponent implements OnInit {
   protected readonly privacyService = inject(PrivacyService);
   protected readonly listStyleService = inject(ListStyleService);
   protected readonly accountCodesService = inject(AccountCodesService);
+  protected readonly ledgerService = inject(LedgerService);
+  private readonly forexService = inject(ForexService);
   private readonly userService = inject(UserService);
   private readonly toastService = inject(ToastService);
 
   loading = signal(false);
   submitting = signal(false);
+  rateLoading = signal(false);
   showCreateTransaction = signal(false);
   accountGroups = signal<AccountGroupRow[]>([]);
 
@@ -64,7 +69,10 @@ export class AccountsComponent implements OnInit {
     description: '',
     creditAccountId: '',
     debitAccountId: '',
-    amount: '',
+    creditAmount: '',
+    debitAmount: '',
+    creditFxRate: 1,
+    debitFxRate: 1,
   };
 
   accountOptions() {
@@ -72,6 +80,121 @@ export class AccountsComponent implements OnInit {
       value: a.id,
       label: `${a.name} (${a.currency})`,
     }));
+  }
+
+  private accountCurrency(id: string): string | null {
+    return this.accountsService.accounts().find((a) => a.id === id)?.currency ?? null;
+  }
+
+  baseCurrency(): string {
+    return this.ledgerService.baseCurrency();
+  }
+
+  creditCurrency(): string | null {
+    return this.newTransaction.creditAccountId ? this.accountCurrency(this.newTransaction.creditAccountId) : null;
+  }
+
+  debitCurrency(): string | null {
+    return this.newTransaction.debitAccountId ? this.accountCurrency(this.newTransaction.debitAccountId) : null;
+  }
+
+  /** Both accounts chosen and their currencies differ → need a per-leg amount. */
+  currenciesDiffer(): boolean {
+    const c = this.creditCurrency();
+    const d = this.debitCurrency();
+    return !!c && !!d && c !== d;
+  }
+
+  creditNeedsRate(): boolean {
+    const c = this.creditCurrency();
+    return !!c && c !== this.baseCurrency();
+  }
+
+  debitNeedsRate(): boolean {
+    const d = this.debitCurrency();
+    return !!d && d !== this.baseCurrency();
+  }
+
+  /** A single shared amount field is enough when currencies match (the common case). */
+  get singleAmount(): string {
+    return this.newTransaction.creditAmount;
+  }
+  set singleAmount(value: string) {
+    this.newTransaction.creditAmount = value;
+    this.newTransaction.debitAmount = value;
+  }
+
+  /** When both legs share a non-base currency, one rate drives both sides. */
+  get sharedFxRate(): number {
+    return this.newTransaction.creditFxRate;
+  }
+  set sharedFxRate(value: number) {
+    this.newTransaction.creditFxRate = value;
+    this.newTransaction.debitFxRate = value;
+  }
+
+  creditBase(): number {
+    return (Number(this.newTransaction.creditAmount) || 0) * this.newTransaction.creditFxRate;
+  }
+
+  debitBase(): number {
+    return (Number(this.newTransaction.debitAmount) || 0) * this.newTransaction.debitFxRate;
+  }
+
+  balanceDelta(): number {
+    return this.creditBase() - this.debitBase();
+  }
+
+  isBalanced(): boolean {
+    return Math.abs(this.balanceDelta()) <= 0.01;
+  }
+
+  onCreditAccountChange(id: string): void {
+    this.newTransaction.creditAccountId = id;
+    this.onTransactionInputChanged();
+  }
+
+  onDebitAccountChange(id: string): void {
+    this.newTransaction.debitAccountId = id;
+    this.onTransactionInputChanged();
+  }
+
+  /** Re-fetch the per-leg rates to base whenever the accounts or the date change. */
+  async onTransactionInputChanged(): Promise<void> {
+    const credit = this.creditCurrency();
+    const debit = this.debitCurrency();
+    if (!credit || !debit) {
+      return;
+    }
+    const base = this.baseCurrency();
+    const date = this.newTransaction.date;
+    this.rateLoading.set(true);
+    try {
+      this.newTransaction.creditFxRate =
+        credit === base ? 1 : await this.forexService.getRate(credit, base, date);
+      this.newTransaction.debitFxRate =
+        debit === base ? 1 : await this.forexService.getRate(debit, base, date);
+    } catch {
+      // Leave whatever rate is there (default 1) editable; the user can still override.
+      this.toastService.error('Could not load the exchange rate — enter it manually.');
+    } finally {
+      this.rateLoading.set(false);
+    }
+    this.recomputeDebitAmount();
+  }
+
+  /** Keep the debit amount in sync so the two legs balance on the base currency. */
+  recomputeDebitAmount(): void {
+    if (!this.currenciesDiffer()) {
+      this.newTransaction.debitAmount = this.newTransaction.creditAmount;
+      return;
+    }
+    const creditAmount = Number(this.newTransaction.creditAmount);
+    if (!creditAmount || !this.newTransaction.debitFxRate) {
+      return;
+    }
+    const debit = (creditAmount * this.newTransaction.creditFxRate) / this.newTransaction.debitFxRate;
+    this.newTransaction.debitAmount = (Math.round(debit * 100) / 100).toString();
   }
 
   async toggleListStyle() {
@@ -141,15 +264,44 @@ export class AccountsComponent implements OnInit {
   }
 
   async submitCreateTransaction() {
+    const creditCurrency = this.creditCurrency();
+    const debitCurrency = this.debitCurrency();
+    const creditAmount = Number(this.newTransaction.creditAmount);
+    const debitAmount = Number(this.newTransaction.debitAmount);
+    if (!creditCurrency || !debitCurrency) {
+      this.toastService.error('Select both accounts.');
+      return;
+    }
+    if (!creditAmount || !debitAmount) {
+      this.toastService.error('Enter an amount on both sides.');
+      return;
+    }
+    if (!this.isBalanced()) {
+      this.toastService.error('The two sides do not balance — adjust the amount or the exchange rate.');
+      return;
+    }
+
+    const base = this.baseCurrency();
     this.submitting.set(true);
     try {
-      const amount = Number(this.newTransaction.amount);
       await this.accountsService.createTransaction({
         transactionDate: this.newTransaction.date,
         description: this.newTransaction.description,
         entries: [
-          { accountId: this.newTransaction.creditAccountId, direction: 'CREDIT' as const, amount },
-          { accountId: this.newTransaction.debitAccountId, direction: 'DEBIT' as const, amount },
+          {
+            accountId: this.newTransaction.creditAccountId,
+            direction: 'CREDIT' as const,
+            amount: creditAmount,
+            currency: creditCurrency,
+            fxRate: creditCurrency === base ? 1 : this.newTransaction.creditFxRate,
+          },
+          {
+            accountId: this.newTransaction.debitAccountId,
+            direction: 'DEBIT' as const,
+            amount: debitAmount,
+            currency: debitCurrency,
+            fxRate: debitCurrency === base ? 1 : this.newTransaction.debitFxRate,
+          },
         ],
       });
       this.toastService.success('Transaction created successfully!');
@@ -159,7 +311,10 @@ export class AccountsComponent implements OnInit {
         description: '',
         creditAccountId: '',
         debitAccountId: '',
-        amount: '',
+        creditAmount: '',
+        debitAmount: '',
+        creditFxRate: 1,
+        debitFxRate: 1,
       };
     } catch {
       this.toastService.error('Failed to create transaction.');

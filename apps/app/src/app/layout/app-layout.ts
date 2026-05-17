@@ -2,6 +2,7 @@ import { Component, computed, HostListener, inject, OnInit, signal } from '@angu
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../services/auth.service';
+import { LedgerService } from '../services/ledger.service';
 import { PrivacyService } from '../services/privacy.service';
 import { SidebarStateService } from '../services/sidebar-state.service';
 import { UserService } from '../services/user.service';
@@ -37,6 +38,7 @@ export class AppLayoutComponent implements OnInit {
   protected readonly userService = inject(UserService);
   protected readonly privacyService = inject(PrivacyService);
   protected readonly sidebarState = inject(SidebarStateService);
+  private readonly ledgerService = inject(LedgerService);
   private readonly router = inject(Router);
 
   userMenuOpen = signal(false);
@@ -60,6 +62,7 @@ export class AppLayoutComponent implements OnInit {
 
   ngOnInit() {
     this.userService.fetchUser();
+    this.ledgerService.fetch();
   }
 
   toggleUserMenu(event: Event) {

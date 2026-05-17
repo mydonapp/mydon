@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrganizationMembership } from '../organizations/organization-membership.entity';
 import { OrganizationKind } from '../organizations/organization.entity';
+import { Currency } from '../shared/currency';
 import { Ledger } from './ledger.entity';
 
 @Injectable()
@@ -14,7 +15,7 @@ export class LedgersService {
     private membershipsRepository: Repository<OrganizationMembership>,
   ) {}
 
-  async createDefaultLedger(organizationId: string, baseCurrency = 'CHF'): Promise<Ledger> {
+  async createDefaultLedger(organizationId: string, baseCurrency: Currency = Currency.CHF): Promise<Ledger> {
     const ledger = this.ledgersRepository.create({
       organizationId,
       name: 'Main',

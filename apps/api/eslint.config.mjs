@@ -8,6 +8,7 @@ export default [
       parserOptions: {
         projectService: {
           allowDefaultProject: ['src/data-source.ts', 'src/migrations/*.ts'],
+          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 50,
         },
         tsconfigRootDir: import.meta.dirname,
       },

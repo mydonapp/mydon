@@ -5,6 +5,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>webcredentials:mydon.app</string>
+		<string>applinks:mydon.app</string>
 	</array>
 </dict>
 </plist>

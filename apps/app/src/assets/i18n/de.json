@@ -143,6 +143,17 @@
         "amount": {
           "label": "Betrag"
         },
+        "creditAmount": {
+          "label": "Haben-Betrag"
+        },
+        "debitAmount": {
+          "label": "Soll-Betrag"
+        },
+        "exchangeRate": {
+          "label": "Wechselkurs"
+        },
+        "balanced": "Ausgeglichen",
+        "notBalanced": "Nicht ausgeglichen",
         "submit": {
           "label": "Transaktion erstellen"
         },

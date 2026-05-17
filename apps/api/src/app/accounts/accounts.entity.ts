@@ -1,6 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
 import { Ledger } from '../ledgers/ledger.entity';
+import { Currency } from '../shared/currency';
+
+export { Currency };
 
 export enum AccountType {
   ASSETS = 'ASSETS',
@@ -8,14 +11,6 @@ export enum AccountType {
   EQUITY = 'EQUITY',
   INCOME = 'INCOME',
   EXPENSE = 'EXPENSE',
-}
-
-export enum Currency {
-  CHF = 'CHF',
-  EUR = 'EUR',
-  USD = 'USD',
-  KRW = 'KRW',
-  GBP = 'GBP',
 }
 
 @Entity('accounts')
@@ -48,7 +43,7 @@ export class Account {
   @Column({ enum: AccountType, type: 'enum' })
   declare type: AccountType;
 
-  @Column({ enum: Currency, type: 'enum', default: Currency.CHF })
+  @Column({ enum: Currency, type: 'enum', enumName: 'currency_enum', default: Currency.CHF })
   declare currency: Currency;
 
   @Column({ name: 'group_id', type: 'uuid', nullable: true, default: null })

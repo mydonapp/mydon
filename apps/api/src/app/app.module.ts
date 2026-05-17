@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountGroupsModule } from './account-groups/account-groups.module';
 import { AccountsModule } from './accounts/accounts.module';
@@ -14,6 +15,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, cache: true }),
+    ScheduleModule.forRoot(),
     AccountsModule,
     TransactionsModule,
     AuthModule,

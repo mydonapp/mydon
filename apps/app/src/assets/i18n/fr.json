@@ -143,6 +143,17 @@
         "amount": {
           "label": "Montant"
         },
+        "creditAmount": {
+          "label": "Montant au crédit"
+        },
+        "debitAmount": {
+          "label": "Montant au débit"
+        },
+        "exchangeRate": {
+          "label": "Taux de change"
+        },
+        "balanced": "Équilibré",
+        "notBalanced": "Non équilibré",
         "submit": {
           "label": "Créer une transaction"
         },
