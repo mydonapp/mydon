@@ -31,6 +31,12 @@ export class CreateAccountDto {
   @IsEnum(Currency)
   currency?: Currency;
 
+  @ApiProperty({ description: 'Optional free-text description', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 255)
+  description?: string;
+
   @ApiProperty({ description: 'Account group ID', required: false })
   @IsOptional()
   @IsUUID()

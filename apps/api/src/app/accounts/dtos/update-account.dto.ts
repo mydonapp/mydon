@@ -8,6 +8,12 @@ export class UpdateAccountDto {
   @Length(3, 50)
   name?: string;
 
+  @ApiProperty({ description: 'Optional free-text description', required: false })
+  @IsOptional()
+  @IsString()
+  @Length(0, 255)
+  description?: string;
+
   @ApiProperty({ description: 'Account group ID', required: false })
   @IsOptional()
   @IsUUID()

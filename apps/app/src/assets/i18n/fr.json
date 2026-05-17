@@ -108,6 +108,10 @@
           "label": "Nom du compte",
           "placeholder": "Saisir le nom du compte"
         },
+        "description": {
+          "label": "Description",
+          "placeholder": "Notes facultatives sur ce compte"
+        },
         "accountType": {
           "label": "Type de compte"
         },

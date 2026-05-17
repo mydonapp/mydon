@@ -29,6 +29,9 @@ export class Account {
   declare name: string;
 
   @Column({ type: 'varchar', default: '' })
+  declare description: string;
+
+  @Column({ type: 'varchar', default: '' })
   declare code: string;
 
   @Column({ name: 'active_from', type: 'timestamptz', nullable: true, default: null })

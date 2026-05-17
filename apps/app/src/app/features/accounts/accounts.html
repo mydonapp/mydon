@@ -79,6 +79,9 @@
             @if (accountCodesService.show() && account.code) {
             <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.code }}</span>
             } {{ account.name }}
+            @if (account.description) {
+            <span class="text-xs font-normal text-on-surface-variant/70 ml-2">{{ account.description }}</span>
+            }
           </p>
           @if (listStyleService.listStyle() !== 'compact') {
           <p class="text-xs text-on-surface-variant mt-0.5">{{ account.currency }}</p>

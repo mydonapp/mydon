@@ -91,6 +91,9 @@
             <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.code }}</span>
             }
             <span class="text-sm text-on-surface">{{ account.name }}</span>
+            @if (account.description) {
+            <span class="text-xs text-on-surface-variant/70 ml-2">{{ account.description }}</span>
+            }
             <span class="text-xs text-on-surface-variant ml-2">{{ account.type }}</span>
             @if (!account.isActive) {
             <span class="badge badge--sm ml-1">{{ 'views.manage.accounts.inactive' | translate }}</span>
@@ -184,6 +187,16 @@
           [(ngModel)]="editAcc.name"
           [placeholder]="'views.accounts.addAccountForm.accountName.placeholder' | translate"
         />
+      </app-field>
+      <app-field [label]="'views.accounts.addAccountForm.description.label' | translate">
+        <textarea
+          appInput
+          name="editAccountDescription"
+          [(ngModel)]="editAcc.description"
+          [placeholder]="'views.accounts.addAccountForm.description.placeholder' | translate"
+          rows="1"
+          style="resize: vertical"
+        ></textarea>
       </app-field>
       <app-field [label]="'views.manage.accounts.code' | translate">
         <input
@@ -385,6 +398,16 @@
           [(ngModel)]="newAccount.name"
           [placeholder]="'views.accounts.addAccountForm.accountName.placeholder' | translate"
         />
+      </app-field>
+      <app-field [label]="'views.accounts.addAccountForm.description.label' | translate">
+        <textarea
+          appInput
+          name="accountDescription"
+          [(ngModel)]="newAccount.description"
+          [placeholder]="'views.accounts.addAccountForm.description.placeholder' | translate"
+          rows="1"
+          style="resize: vertical"
+        ></textarea>
       </app-field>
       <app-field
         [label]="'views.accounts.addAccountForm.accountType.label' | translate"

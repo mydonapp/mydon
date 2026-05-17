@@ -6,6 +6,7 @@ import { AppConfigService } from './app-config.service';
 export interface AccountSimple {
   id: string;
   name: string;
+  description: string;
   type: string;
   currency: string;
   isActive: boolean;
@@ -20,6 +21,7 @@ export interface AccountSimple {
 export interface AccountDetail {
   id: string;
   name: string;
+  description: string;
   type: string;
   code: string;
   activeFrom: string | null;
@@ -37,6 +39,7 @@ export interface AccountDetail {
 export interface AccountBalance {
   id: string;
   name: string;
+  description: string;
   type: string;
   code: string;
   creditBalance: number;
@@ -172,6 +175,7 @@ export class AccountsService {
     currency: string;
     groupId?: string;
     code?: string;
+    description?: string;
   }): Promise<void> {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/accounts`, account));
     await this.fetchSimple();
@@ -181,6 +185,7 @@ export class AccountsService {
     id: string,
     data: Partial<{
       name: string;
+      description: string;
       type: string;
       currency: string;
       groupId: string;

@@ -72,12 +72,13 @@ export class ManageComponent implements OnInit {
 
   showAddAccount = signal(false);
   submitting = signal(false);
-  newAccount = { name: '', type: 'assets', currency: 'CHF', groupId: '' };
+  newAccount = { name: '', description: '', type: 'assets', currency: 'CHF', groupId: '' };
 
   showEditAccount = signal(false);
   editAcc = {
     id: '',
     name: '',
+    description: '',
     groupId: '',
     code: '',
     activeFrom: '' as string,
@@ -186,6 +187,7 @@ export class ManageComponent implements OnInit {
     this.editAcc = {
       id: account.id,
       name: account.name,
+      description: account.description ?? '',
       groupId: account.groupId ?? '',
       code: account.code ?? '',
       activeFrom: account.activeFrom ? account.activeFrom.substring(0, 10) : '',
@@ -202,6 +204,7 @@ export class ManageComponent implements OnInit {
     try {
       await this.accountsService.updateAccount(this.editAcc.id, {
         name: this.editAcc.name.trim(),
+        description: this.editAcc.description.trim(),
         groupId: this.editAcc.groupId || undefined,
         code: this.editAcc.code,
         activeFrom: this.editAcc.activeFrom ? new Date(this.editAcc.activeFrom).toISOString() : null,
@@ -225,13 +228,14 @@ export class ManageComponent implements OnInit {
     try {
       await this.accountsService.createAccount({
         name: this.newAccount.name,
+        description: this.newAccount.description.trim(),
         type: this.newAccount.type,
         currency: this.newAccount.currency || 'CHF',
         groupId: this.newAccount.groupId || undefined,
       });
       this.toastService.success('views.accounts.addAccountForm.success');
       this.showAddAccount.set(false);
-      this.newAccount = { name: '', type: 'assets', currency: 'CHF', groupId: '' };
+      this.newAccount = { name: '', description: '', type: 'assets', currency: 'CHF', groupId: '' };
       await this.loadAccounts();
     } catch {
       this.toastService.error('views.accounts.addAccountForm.error');

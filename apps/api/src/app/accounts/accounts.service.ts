@@ -45,6 +45,7 @@ export class AccountsService {
     return accounts.map((account) => ({
       id: account.id,
       name: account.name,
+      description: account.description,
       type: account.type,
       currency: account.currency,
       isActive: isAccountActive(account),
@@ -137,6 +138,7 @@ export class AccountsService {
             return {
               id: account.id,
               name: account.name,
+              description: account.description,
               type: account.type,
               code: account.code,
               creditBalance: account.creditTotal,
@@ -179,22 +181,37 @@ export class AccountsService {
       relations: ['group'],
     });
 
-    // Filter to active accounts OR accounts that have at least one entry (mirrors prior behavior).
-    const visibleAccounts: Account[] = [];
-    for (const a of accounts) {
-      if (isAccountActive(a)) {
-        visibleAccounts.push(a);
-        continue;
-      }
-      const hasEntry = await this.dataSource.query(`SELECT 1 FROM entries WHERE account_id = $1 LIMIT 1`, [a.id]);
-      if (hasEntry.length > 0) {
-        visibleAccounts.push(a);
-      }
-    }
-
     const balances = await this.fetchBalancesByLedger(ledger.id, {
       filter: options?.filter,
       restrictDateForTypes: [AccountType.EXPENSE, AccountType.INCOME],
+    });
+
+    // Accounts with at least one posted transaction inside the selected period.
+    const from = options?.filter?.from ?? new Date('1970-01-01');
+    const to = options?.filter?.to
+      ? new Date(new Date(options.filter.to).setUTCHours(23, 59, 59, 999))
+      : new Date('2100-12-31');
+    const periodRows = await this.dataSource.query(
+      `SELECT DISTINCT e.account_id AS id
+         FROM entries e
+         JOIN transactions t ON t.id = e.transaction_id
+        WHERE t.ledger_id = $1
+          AND t.posted_at IS NOT NULL
+          AND t.transaction_date BETWEEN $2::timestamptz AND $3::timestamptz`,
+      [ledger.id, from.toISOString(), to.toISOString()],
+    );
+    const hasPeriodActivity = new Set<string>((periodRows as { id: string }[]).map((r) => r.id));
+
+    // Show an account when it is active today, had activity in the period, or still
+    // carries a non-zero balance (so closed-but-funded accounts keep the totals
+    // reconciled). Hide only inactive accounts that are both empty in the period and
+    // zeroed out.
+    const visibleAccounts = accounts.filter((a) => {
+      if (isAccountActive(a) || hasPeriodActivity.has(a.id)) {
+        return true;
+      }
+      const bal = balances.get(a.id);
+      return Math.abs(this.computeBalance(a.type, bal?.debit ?? 0, bal?.credit ?? 0)) > 0.005;
     });
 
     const withBalances: AccountWithBalance[] = visibleAccounts.map((a) => ({
@@ -220,6 +237,7 @@ export class AccountsService {
       currency?: Currency;
       groupId?: string;
       code?: string;
+      description?: string;
     },
   ) {
     const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
@@ -228,6 +246,7 @@ export class AccountsService {
     account.name = options.name;
     account.type = options.type;
     account.code = options.code ?? '';
+    account.description = options.description ?? '';
     if (options.currency) {
       account.currency = options.currency;
     }
@@ -243,6 +262,7 @@ export class AccountsService {
     accountId: string,
     options: {
       name?: string;
+      description?: string;
       groupId?: string | null;
       code?: string;
       activeFrom?: Date | string | null;
@@ -259,6 +279,9 @@ export class AccountsService {
 
     if (options.name !== undefined) {
       account.name = options.name;
+    }
+    if (options.description !== undefined) {
+      account.description = options.description;
     }
     if (options.groupId !== undefined) {
       if (options.groupId) {
@@ -353,6 +376,7 @@ export class AccountsService {
     return {
       id: account.id,
       name: account.name,
+      description: account.description,
       type: account.type,
       code: account.code,
       activeFrom: account.activeFrom,

@@ -108,6 +108,10 @@
           "label": "Kontoname",
           "placeholder": "Kontoname eingeben"
         },
+        "description": {
+          "label": "Beschreibung",
+          "placeholder": "Optionale Notizen zu diesem Konto"
+        },
         "accountType": {
           "label": "Kontotyp"
         },

@@ -53,6 +53,7 @@ export class AccountsController {
       currency: createAccountDto.currency,
       groupId: createAccountDto.groupId,
       code: createAccountDto.code,
+      description: createAccountDto.description,
     });
   }
 
@@ -66,6 +67,7 @@ export class AccountsController {
   updateAccount(@Req() req: Request, @Param('accountId') accountId: string, @Body() dto: UpdateAccountDto) {
     return this.accountsService.updateAccount(req['context'], accountId, {
       name: dto.name,
+      description: dto.description,
       groupId: dto.groupId,
       code: dto.code,
       activeFrom: dto.activeFrom,
