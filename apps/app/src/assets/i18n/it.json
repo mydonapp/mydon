@@ -438,6 +438,32 @@
         "updateSuccess": "Conto aggiornato.",
         "updateError": "Aggiornamento del conto non riuscito."
       }
+    },
+    "reports": {
+      "title": "Report",
+      "subtitle": "Bilancio di verifica e stato patrimoniale",
+      "total": "Totale",
+      "trialBalance": {
+        "tab": "Bilancio di verifica",
+        "account": "Conto",
+        "debit": "Dare",
+        "credit": "Avere",
+        "balanced": "La contabilità è in pareggio",
+        "notBalanced": "La contabilità non è in pareggio",
+        "difference": "Differenza"
+      },
+      "balanceSheet": {
+        "tab": "Stato patrimoniale",
+        "assets": "Attività",
+        "liabilities": "Passività",
+        "equity": "Patrimonio netto",
+        "netResult": "Risultato del periodo",
+        "liabilitiesPlusEquity": "Passività + Patrimonio netto",
+        "balanced": "Lo stato patrimoniale è in pareggio",
+        "notBalanced": "Lo stato patrimoniale non è in pareggio"
+      },
+      "download": "Scarica PDF",
+      "downloadError": "Download del report non riuscito."
     }
   },
   "components": {
@@ -450,7 +476,8 @@
         "spendingAnalysis": "Analisi delle spese",
         "importTransactions": "Importa",
         "settings": "Impostazioni",
-        "logout": "Disconnetti"
+        "logout": "Disconnetti",
+        "reports": "Report"
       }
     },
     "accountGroupCombobox": {

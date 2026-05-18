@@ -438,6 +438,32 @@
         "updateSuccess": "Compte mis à jour.",
         "updateError": "Échec de la mise à jour du compte."
       }
+    },
+    "reports": {
+      "title": "Rapports",
+      "subtitle": "Balance et bilan",
+      "total": "Total",
+      "trialBalance": {
+        "tab": "Balance",
+        "account": "Compte",
+        "debit": "Débit",
+        "credit": "Crédit",
+        "balanced": "Le grand livre est équilibré",
+        "notBalanced": "Le grand livre n'est pas équilibré",
+        "difference": "Différence"
+      },
+      "balanceSheet": {
+        "tab": "Bilan",
+        "assets": "Actif",
+        "liabilities": "Passif",
+        "equity": "Capitaux propres",
+        "netResult": "Résultat de la période",
+        "liabilitiesPlusEquity": "Passif + Capitaux propres",
+        "balanced": "Le bilan est équilibré",
+        "notBalanced": "Le bilan n'est pas équilibré"
+      },
+      "download": "Télécharger le PDF",
+      "downloadError": "Échec du téléchargement du rapport."
     }
   },
   "components": {
@@ -450,7 +476,8 @@
         "spendingAnalysis": "Analyse des dépenses",
         "importTransactions": "Importer",
         "settings": "Paramètres",
-        "logout": "Déconnexion"
+        "logout": "Déconnexion",
+        "reports": "Rapports"
       }
     },
     "accountGroupCombobox": {

@@ -438,6 +438,32 @@
         "updateSuccess": "Account updated.",
         "updateError": "Failed to update account."
       }
+    },
+    "reports": {
+      "title": "Reports",
+      "subtitle": "Trial balance and balance sheet",
+      "total": "Total",
+      "trialBalance": {
+        "tab": "Trial Balance",
+        "account": "Account",
+        "debit": "Debit",
+        "credit": "Credit",
+        "balanced": "The ledger is balanced",
+        "notBalanced": "The ledger is not balanced",
+        "difference": "Difference"
+      },
+      "balanceSheet": {
+        "tab": "Balance Sheet",
+        "assets": "Assets",
+        "liabilities": "Liabilities",
+        "equity": "Equity",
+        "netResult": "Net result (period)",
+        "liabilitiesPlusEquity": "Liabilities + Equity",
+        "balanced": "Balance sheet is balanced",
+        "notBalanced": "Balance sheet is not balanced"
+      },
+      "download": "Download PDF",
+      "downloadError": "Failed to download the report."
     }
   },
   "components": {
@@ -450,7 +476,8 @@
         "spendingAnalysis": "Spending Analysis",
         "importTransactions": "Import",
         "settings": "Settings",
-        "logout": "Logout"
+        "logout": "Logout",
+        "reports": "Reports"
       }
     },
     "accountGroupCombobox": {

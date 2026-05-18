@@ -438,6 +438,32 @@
         "updateSuccess": "Konto aktualisiert.",
         "updateError": "Konto konnte nicht aktualisiert werden."
       }
+    },
+    "reports": {
+      "title": "Berichte",
+      "subtitle": "Rohbilanz und Bilanz",
+      "total": "Summe",
+      "trialBalance": {
+        "tab": "Rohbilanz",
+        "account": "Konto",
+        "debit": "Soll",
+        "credit": "Haben",
+        "balanced": "Das Hauptbuch ist ausgeglichen",
+        "notBalanced": "Das Hauptbuch ist nicht ausgeglichen",
+        "difference": "Differenz"
+      },
+      "balanceSheet": {
+        "tab": "Bilanz",
+        "assets": "Aktiven",
+        "liabilities": "Passiven",
+        "equity": "Eigenkapital",
+        "netResult": "Periodenergebnis",
+        "liabilitiesPlusEquity": "Passiven + Eigenkapital",
+        "balanced": "Die Bilanz ist ausgeglichen",
+        "notBalanced": "Die Bilanz ist nicht ausgeglichen"
+      },
+      "download": "PDF herunterladen",
+      "downloadError": "Bericht konnte nicht heruntergeladen werden."
     }
   },
   "components": {
@@ -450,7 +476,8 @@
         "spendingAnalysis": "Ausgabenanalyse",
         "importTransactions": "Importieren",
         "settings": "Einstellungen",
-        "logout": "Abmelden"
+        "logout": "Abmelden",
+        "reports": "Berichte"
       }
     },
     "accountGroupCombobox": {

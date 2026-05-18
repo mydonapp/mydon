@@ -12,5 +12,6 @@ import { AccountsService } from './accounts.service';
   imports: [TypeOrmModule.forFeature([Account, AccountGroup]), ForexModule, AuthModule, LedgersModule],
   controllers: [AccountsController],
   providers: [AccountsService],
+  exports: [AccountsService],
 })
 export class AccountsModule {}

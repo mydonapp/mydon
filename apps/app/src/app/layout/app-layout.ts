@@ -46,6 +46,7 @@ export class AppLayoutComponent implements OnInit {
   menu: MenuItem[] = [
     { label: 'components.sidebar.menu.dashboard', route: '/app', icon: 'layout-dashboard', exact: true },
     { label: 'components.sidebar.menu.accounts', route: '/app/accounts', icon: 'wallet' },
+    { label: 'components.sidebar.menu.reports', route: '/app/reports', icon: 'scale' },
     { label: 'components.sidebar.menu.budgets', route: '/app/budgets', icon: 'circle-dollar-sign' },
     { label: 'components.sidebar.menu.importTransactions', route: '/app/import', icon: 'file-text' },
   ];

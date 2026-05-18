@@ -9,6 +9,7 @@ import { BudgetsModule } from './budgets/budgets.module';
 import { ExportModule } from './export/export.module';
 import { LedgersModule } from './ledgers/ledgers.module';
 import { OrganizationsModule } from './organizations/organizations.module';
+import { ReportsModule } from './reports/reports.module';
 import { StatusModule } from './status/status.module';
 import { TransactionsModule } from './transactions/transactions.module';
 
@@ -23,6 +24,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     BudgetsModule,
     ExportModule,
     OrganizationsModule,
+    ReportsModule,
     LedgersModule,
     StatusModule,
     TypeOrmModule.forRootAsync({
