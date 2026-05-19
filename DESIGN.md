@@ -184,18 +184,46 @@ Always add `min-width: 0` to grid children to prevent content from expanding pas
 
 Used exclusively on **floating elements** that sit above scrolling content: bottom nav, floating back button, scroll-triggered title overlays. Never on static content sections.
 
+**iOS is the target, so the baseline is honest glassmorphism, not refraction.** Real per-pixel refraction (`backdrop-filter: url(#svgFilter)`) is Chromium-only — iOS Safari does not support it — so don't rely on it. The dependable recipe is a *moderate* readable blur over a translucent tint plate with a strong white rim-light. Too much blur hides the background; too little kills foreground legibility — `blur(7px)` + a ~0.32 tint is the balance point.
+
 ```css
-background: light-dark(rgb(255 255 255 / 0.72), rgb(30 32 36 / 0.68));
-backdrop-filter: blur(3px) saturate(120%);
--webkit-backdrop-filter: blur(3px) saturate(120%);
-border: 1px solid light-dark(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.1));
+background: light-dark(rgb(255 255 255 / 0.32), rgb(28 30 34 / 0.42));
+backdrop-filter: blur(7px) saturate(160%);
+-webkit-backdrop-filter: blur(7px) saturate(160%);
 box-shadow:
-  0 8px 32px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.52)),
-  0 2px 8px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.28)),
-  inset 0 1px 0 light-dark(rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.08));
+  0 10px 30px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5)),
+  inset 0 0 0 1px light-dark(rgb(255 255 255 / 0.5), rgb(255 255 255 / 0.12)),  /* rim */
+  inset 0 1px 0 light-dark(rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.16));   /* top sheen */
 ```
 
-**Do not use** `light-dark()` with gradient values — it only accepts color values. For gradient backgrounds that differ between modes, use a base rule + `@media (prefers-color-scheme: dark)` override.
+The rim + top-sheen are inset box-shadows (no opaque `border`, no `::before` needed). Smaller chips (back button) can drop the outer shadow but keep blur + rim.
+
+**Real iOS material:** layer Apple's private property *after* the CSS recipe so it wins where available (WKWebView with system appearance) and is silently ignored everywhere else:
+
+```css
+@supports (-apple-visual-effect: -apple-system-glass-material) {
+  .floating-glass {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    -apple-visual-effect: -apple-system-glass-material;
+  }
+}
+```
+
+**Shape:** floating glass is a **full capsule** — `border-radius: 999px`. Any pill that slides inside it (e.g. the bottom-nav active indicator) is also `999px`, which keeps the radii concentric automatically.
+
+**Selection:** keep the active pill *faint* (tint ≈ primary 4% over white 0.16) — the colour shift of the active icon/label is the real cue, not a strong blob.
+
+**Motion (interactive glass, e.g. bottom nav):** the active indicator is one absolutely-positioned pill. Its position/size come from the tabs' **measured** `getBoundingClientRect()` (cached per resize/route, lerped for a fractional finger position) written as px `--ind-x` / `--ind-w`, with a `calc()` percentage only as a first-paint fallback — measuring avoids the sub-pixel drift that `calc()` accumulates the further right you go. The base transition is a gentle spring on travel (`translate 0.46s cubic-bezier(0.32, 1.3, 0.42, 1)`) but a fast, **non-bouncy** size snap-back (`scale 0.2s cubic-bezier(0.2, 0, 0, 1)`); `--nav-stretch` applies the horizontal liquid stretch during a gesture.
+
+The pill carries a lens: an `::after` with `backdrop-filter` (`brightness(1.06) saturate(1.15)` at rest) masked by an elliptical `--lens-bezel` radial-gradient so refraction is concentrated at the rounded perimeter and the centre stays clear — the blur boundary curves with the capsule instead of ending on a hard seam. In motion the lens becomes true frosted glass (`blur(3px) brightness(1.12) saturate(1.4)`).
+
+Three escalating states share the indicator and **must stay ordered** `--pressing` → `--moving` → `--dragging` (equal specificity, last wins; dragging is last so it wins if `moving` is also set): `--pressing` is a gentle pop (`scale ≈ ×1.05`) + soft halo; `--moving` (tap / route slide) bulges the pill a touch **taller than the bar** (`scale-y 1.22`) and lifts it to `z-index: 2` so the lens refracts the icons it slides over, keeping the base spring slide; `--dragging` (finger) uses its own quick transition with **no `translate` tween** so the pill tracks the finger 1:1, swells more (`scale-y 1.24`) with a tight primary halo, and also sits at `z-index: 2`. Press feedback *magnifies* an inner content wrapper (`.bottom-nav-item-inner`: `1.04` active, `1.12` pressed), never the hit area. Tabs centre with `display: grid; place-items: center` + `min-width: 0` (equal slots regardless of label length/locale). Gate the spring, bulge and loupe behind `@media (prefers-reduced-motion: reduce)` — it pins `scale: 1` and near-instant transitions.
+
+**Sheets (mobile "More"):** overflow/identity belongs in a bottom sheet, not crammed into a tab. The 5th tab is a normal icon+label tab (`ellipsis` / "More") so the bar keeps one rhythm; tapping it opens a glass sheet (scrim + rounded floating panel, grabber, avatar/name/email header, grouped inset rows). Mount it with `@if`, flip an `.is-shown` class on the next frame so the `translate` slide-in runs, and delay unmount by the transition duration on close. Dismiss via scrim tap, `Escape`, row selection, or a 1:1 swipe-down on the grabber zone (`.is-dragging` drops the tween; release past a threshold closes). Keep it a separate signal from any desktop user-menu so the two never interfere.
+
+**Do not use** `light-dark()` with gradient values — it only accepts color values. For gradient backgrounds that differ between modes, use a base rule + `@media (prefers-color-scheme: dark)` override (as the top-safe-blur and indicator-stretch rules do).
 
 ---
 

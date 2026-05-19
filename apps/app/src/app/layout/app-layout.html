@@ -169,79 +169,171 @@
 
   <!-- Bottom navigation (mobile only, hidden via Tailwind flex md:hidden) -->
   <nav
+    #bottomNav
     class="bottom-nav flex md:hidden"
+    [class.bottom-nav--dragging]="dragging()"
+    [class.bottom-nav--moving]="moving()"
+    [class.bottom-nav--pressing]="pressed()"
+    [style.--nav-count]="navCount()"
+    [style.--nav-pos]="navPos()"
+    [style.--nav-stretch]="stretch()"
+    [style.--ind-x]="indX()"
+    [style.--ind-w]="indW()"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="onPointerUp()"
+    (pointercancel)="onPointerCancel()"
     aria-label="Main navigation"
   >
-    @for (item of menu; track item.route) {
-    <a
-      [routerLink]="item.route"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: !!item.exact }"
+    <span
+      class="bottom-nav-indicator"
+      aria-hidden="true"
+    ></span>
+
+    @for (item of bottomNavItems; track item.route; let i = $index) {
+    <button
+      #navSlot
+      type="button"
       class="bottom-nav-item"
+      [class.active]="activeIndex() === i"
+      [class.is-hot]="hotIndex() === i"
+      [attr.aria-current]="activeIndex() === i ? 'page' : null"
+      (click)="selectTab(i)"
     >
-      <app-icon
-        [name]="item.icon"
-        [size]="22"
-      />
-      <span class="bottom-nav-label">{{ item.label | translate }}</span>
-    </a>
+      <span class="bottom-nav-item-inner">
+        <app-icon
+          [name]="item.icon"
+          [size]="22"
+        />
+        <span class="bottom-nav-label">{{ (item.mobileLabel ?? item.label) | translate }}</span>
+      </span>
+    </button>
     }
 
-    <!-- Profile / user menu -->
-    <div class="bottom-nav-profile">
-      @if (userMenuOpen()) {
-      <div
-        class="user-menu"
-        role="menu"
-        tabindex="-1"
-        (click)="$event.stopPropagation()"
-        (keydown)="$event.stopPropagation()"
-      >
-        <button
-          class="user-menu-item"
-          (click)="goToSettings()"
-        >
-          <app-icon
-            name="settings"
-            [size]="15"
-          />
-          <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
-        </button>
-        <button
-          class="user-menu-item"
-          (click)="goToManage()"
-        >
-          <app-icon
-            name="settings-2"
-            [size]="15"
-          />
-          <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
-        </button>
-        <div class="user-menu-separator"></div>
-        <button
-          class="user-menu-item user-menu-item--danger"
-          (click)="logout()"
-        >
-          <app-icon
-            name="log-out"
-            [size]="15"
-          />
-          <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
-        </button>
+    <!-- More tab — same shape/rhythm as the route tabs; opens the glass sheet -->
+    <button
+      #navSlot
+      type="button"
+      class="bottom-nav-item"
+      (click)="toggleMore($event)"
+      [class.active]="moreOpen()"
+      [class.is-hot]="hotIndex() === bottomNavItems.length"
+      [attr.aria-expanded]="moreOpen()"
+      aria-haspopup="dialog"
+    >
+      <span class="bottom-nav-item-inner">
+        <app-icon
+          name="ellipsis"
+          [size]="22"
+        />
+        <span class="bottom-nav-label">{{ 'components.sidebar.menu.more' | translate }}</span>
+      </span>
+    </button>
+  </nav>
+
+  <!-- Apple-style "More" sheet (mobile only) -->
+  @if (moreOpen()) {
+  <div
+    class="more-scrim md:hidden"
+    [class.is-shown]="moreShown()"
+    (click)="closeMore()"
+    aria-hidden="true"
+  ></div>
+  <div
+    class="more-sheet md:hidden"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'components.sidebar.menu.more' | translate"
+    [class.is-shown]="moreShown()"
+    [class.is-dragging]="sheetDragging()"
+    [style.--sheet-drag]="sheetTranslate()"
+  >
+    <div
+      class="more-grab"
+      (pointerdown)="onSheetPointerDown($event)"
+      (pointermove)="onSheetPointerMove($event)"
+      (pointerup)="onSheetPointerUp()"
+      (pointercancel)="onSheetPointerUp()"
+    >
+      <span
+        class="more-grabber"
+        aria-hidden="true"
+      ></span>
+      <div class="more-profile">
+        <div class="more-avatar">{{ userInitial() }}</div>
+        <div class="more-identity">
+          <p class="more-name">{{ userService.user()?.name || ('app.user' | translate) }}</p>
+          <p class="more-email">{{ userService.user()?.email || ('app.userEmail' | translate) }}</p>
+        </div>
       </div>
+    </div>
+
+    <div class="more-list">
+      @for (item of moreItems; track item.route) {
+      <button
+        type="button"
+        class="more-row"
+        (click)="goTo(item.route)"
+      >
+        <app-icon
+          [name]="item.icon"
+          [size]="18"
+        />
+        <span class="more-row-label">{{ item.label | translate }}</span>
+        <app-icon
+          name="chevron-right"
+          [size]="16"
+          class="more-row-chev"
+        />
+      </button>
       }
       <button
-        class="bottom-nav-item bottom-nav-profile-btn"
-        (click)="toggleUserMenu($event)"
-        [class.active]="userMenuOpen()"
-        [attr.aria-expanded]="userMenuOpen()"
-        aria-haspopup="menu"
+        type="button"
+        class="more-row"
+        (click)="goToSettings()"
       >
-        <div class="bottom-nav-avatar">{{ userInitial() }}</div>
-        <span class="bottom-nav-label">{{ userFirstName() || ('app.user' | translate) }}</span>
+        <app-icon
+          name="settings"
+          [size]="18"
+        />
+        <span class="more-row-label">{{ 'components.sidebar.menu.settings' | translate }}</span>
+        <app-icon
+          name="chevron-right"
+          [size]="16"
+          class="more-row-chev"
+        />
+      </button>
+      <button
+        type="button"
+        class="more-row"
+        (click)="goToManage()"
+      >
+        <app-icon
+          name="settings-2"
+          [size]="18"
+        />
+        <span class="more-row-label">{{ 'components.sidebar.menu.manage' | translate }}</span>
+        <app-icon
+          name="chevron-right"
+          [size]="16"
+          class="more-row-chev"
+        />
       </button>
     </div>
-  </nav>
+
+    <button
+      type="button"
+      class="more-row more-row--danger more-logout"
+      (click)="logout()"
+    >
+      <app-icon
+        name="log-out"
+        [size]="18"
+      />
+      <span class="more-row-label">{{ 'components.sidebar.menu.logout' | translate }}</span>
+    </button>
+  </div>
+  }
 
   <!-- Top safe area blur (mobile only) -->
   <div class="top-safe-blur md:hidden"></div>

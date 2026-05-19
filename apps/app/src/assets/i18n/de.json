@@ -470,6 +470,8 @@
     "sidebar": {
       "menu": {
         "dashboard": "Dashboard",
+        "home": "Start",
+        "more": "Mehr",
         "accounts": "Konten",
         "budgets": "Budgets",
         "manage": "Verwalten",

@@ -470,6 +470,8 @@
     "sidebar": {
       "menu": {
         "dashboard": "Dashboard",
+        "home": "Home",
+        "more": "Altro",
         "accounts": "Conti",
         "budgets": "Budget",
         "manage": "Gestisci",

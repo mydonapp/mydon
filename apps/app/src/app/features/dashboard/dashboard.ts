@@ -1,14 +1,15 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService, TransactionRecord } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { PrivacyService } from '../../services/privacy.service';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { BtnDirective } from '../../shared/directives/btn.directive';
-import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
+import { UserService } from '../../services/user.service';
 import { IconComponent } from '../../shared/components/icon/icon';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
+import { BtnDirective } from '../../shared/directives/btn.directive';
 
 interface DashboardStats {
   netWorth: number;
@@ -27,9 +28,10 @@ interface DashboardStats {
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent implements OnInit {
-  accountsService = inject(AccountsService);
-  currencyService = inject(CurrencyService);
-  privacyService = inject(PrivacyService);
+  private readonly accountsService = inject(AccountsService);
+  protected readonly currencyService = inject(CurrencyService);
+  protected readonly privacyService = inject(PrivacyService);
+  private readonly userService = inject(UserService);
 
   loading = signal(false);
   stats = signal<DashboardStats | null>(null);
@@ -96,5 +98,14 @@ export class DashboardComponent implements OnInit {
   // Income: up = good (green), down = bad (red)
   incomeChangeClass(change: number): string {
     return change > 0 ? 'text-success' : 'text-error';
+  }
+
+  protected async onPrivacyToggle() {
+    this.privacyService.toggle();
+    try {
+      await this.userService.updatePreferences({ privacyMode: this.privacyService.isPrivate() });
+    } catch {
+      // Local change already applied; backend sync failed silently
+    }
   }
 }
