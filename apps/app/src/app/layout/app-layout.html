@@ -163,7 +163,9 @@
     [class.layout-main--collapsed]="sidebarState.collapsed()"
   >
     <div class="flex-1">
-      <router-outlet />
+      <app-page-stage>
+        <router-outlet />
+      </app-page-stage>
     </div>
   </div>
 

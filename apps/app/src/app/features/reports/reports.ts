@@ -2,9 +2,11 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { CurrencyService } from '../../services/currency.service';
+import { ListStyleService } from '../../services/list-style.service';
 import { PrivacyService } from '../../services/privacy.service';
 import { BalanceSheet, ReportsService, TrialBalance } from '../../services/reports.service';
 import { ToastService } from '../../services/toast.service';
+import { UserService } from '../../services/user.service';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
@@ -28,9 +30,11 @@ type Tab = 'trialBalance' | 'balanceSheet';
 })
 export class ReportsComponent implements OnInit {
   protected readonly currencyService = inject(CurrencyService);
+  protected readonly listStyleService = inject(ListStyleService);
   protected readonly privacyService = inject(PrivacyService);
   private readonly reportsService = inject(ReportsService);
   private readonly toastService = inject(ToastService);
+  private readonly userService = inject(UserService);
 
   activeTab = signal<Tab>('trialBalance');
   year = signal(new Date().getFullYear().toString());
@@ -59,6 +63,16 @@ export class ReportsComponent implements OnInit {
     this.trialBalance.set(null);
     this.balanceSheet.set(null);
     this.load();
+  }
+
+  async toggleListStyle() {
+    const next = this.listStyleService.listStyle() === 'compact' ? 'normal' : 'compact';
+    this.listStyleService.set(next);
+    try {
+      await this.userService.updatePreferences({ listStyle: next });
+    } catch {
+      // stub
+    }
   }
 
   format(amount: number, currency: string): string {

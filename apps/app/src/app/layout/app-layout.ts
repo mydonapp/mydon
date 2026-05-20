@@ -20,6 +20,7 @@ import { PrivacyService } from '../services/privacy.service';
 import { SidebarStateService } from '../services/sidebar-state.service';
 import { UserService } from '../services/user.service';
 import { IconComponent } from '../shared/components/icon/icon';
+import { PageStageComponent } from '../shared/components/page-stage/page-stage';
 import { ToastContainerComponent } from '../shared/components/toast-container/toast-container';
 import { ToggleComponent } from '../shared/components/toggle/toggle';
 import { BtnDirective } from '../shared/directives/btn.directive';
@@ -45,6 +46,7 @@ const DRAG_THRESHOLD = 8;
     RouterLink,
     RouterLinkActive,
     TranslateModule,
+    PageStageComponent,
     ToastContainerComponent,
     ToggleComponent,
     BtnDirective,

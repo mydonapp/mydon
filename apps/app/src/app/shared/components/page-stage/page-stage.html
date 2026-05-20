@@ -1,0 +1,34 @@
+<div
+  #stage
+  class="page-stage"
+  [class.is-swiping]="swiping()"
+  [class.is-finishing]="finishing()"
+  [style.--swipe-x.px]="swipeX()"
+  [style.--swipe-p]="swipeP()"
+>
+  <div
+    #prev
+    class="page-prev"
+    aria-hidden="true"
+    inert
+  ></div>
+  <div
+    #current
+    class="page-current"
+  >
+    <ng-content />
+  </div>
+
+  <!-- Left-edge grab strip: captures the back-swipe pointer (no host-wide
+       listeners, so it can't interfere with the page's own scrolling). -->
+  <div
+    #edge
+    class="page-edge"
+    [class.is-armed]="armed()"
+    aria-hidden="true"
+    (pointerdown)="onEdgeDown($event)"
+    (pointermove)="onEdgeMove($event)"
+    (pointerup)="onEdgeUp($event)"
+    (pointercancel)="onEdgeCancel()"
+  ></div>
+</div>

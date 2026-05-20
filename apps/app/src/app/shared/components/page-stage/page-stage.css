@@ -1,0 +1,120 @@
+/* Idle: pass-through wrapper. The layers only activate while .is-swiping /
+   .is-finishing is set, so normal scrolling/layout is untouched the rest of
+   the time. */
+:host {
+  display: block;
+}
+
+.page-stage {
+  position: relative;
+}
+
+/* Previous-page snapshot — only painted during a swipe */
+.page-stage > .page-prev {
+  display: none;
+}
+
+.page-stage.is-swiping > .page-prev,
+.page-stage.is-finishing > .page-prev {
+  display: block;
+  position: fixed;
+  /* Match the live content box: it sits below the safe-area inset (the
+     .layout-main padding), so the snapshot must start there too — otherwise
+     the previous page reads ~a status-bar height too high and looks like a
+     jump on arrival. */
+  top: env(safe-area-inset-top, 0px);
+  left: env(safe-area-inset-left, 0px);
+  right: env(safe-area-inset-right, 0px);
+  bottom: 0;
+  z-index: 0;
+  overflow: hidden;
+  /* Parallax: sits 25% to the left, slides to 0 as the gesture completes */
+  transform: translateX(calc((var(--swipe-p, 0) - 1) * 25%));
+}
+
+/* Dim wash over the previous page, fading out as it comes forward */
+.page-stage.is-swiping > .page-prev::after,
+.page-stage.is-finishing > .page-prev::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: calc((1 - var(--swipe-p, 0)) * 0.22);
+  pointer-events: none;
+}
+
+.page-prev-scroll {
+  position: absolute;
+  inset: 0;
+}
+
+/* The cloned subtree retains its `_ngcontent` attributes, but mirror the
+   common list-edge override here too as a safety net — if the component-scoped
+   padding-inline:0 ever fails to apply to a clone, the items would otherwise
+   pick up the global `.page-item { padding: 0.625rem 1rem }` and look ~16px
+   more inset than the live page on mobile, flickering on commit. Mobile = 0,
+   otherwise (≥768) = 1rem. */
+.page-stage > .page-prev .accounts-group .page-item {
+  padding-inline: 0;
+}
+
+@media (width >= 768px) {
+  .page-stage > .page-prev .accounts-group .page-item {
+    padding-inline: 1rem;
+  }
+}
+
+/* Live page — driven right by the finger, with a soft lifting edge shadow */
+.page-stage.is-swiping > .page-current,
+.page-stage.is-finishing > .page-current {
+  position: relative;
+  z-index: 1;
+  background: var(--sys-background, #fff);
+  transform: translateX(var(--swipe-x, 0px));
+  box-shadow: -10px 0 28px rgb(0 0 0 / calc(0.05 + var(--swipe-p, 0) * 0.16));
+  will-change: transform;
+}
+
+/* The settle (commit / cancel) eases; during the drag it tracks 1:1 */
+.page-stage.is-finishing > .page-prev,
+.page-stage.is-finishing > .page-current {
+  transition:
+    transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.42s ease;
+}
+
+.page-stage.is-finishing > .page-prev::after {
+  transition: opacity 0.42s ease;
+}
+
+/* Left-edge grab strip. Captures the back-swipe pointer; vertical scroll still
+   passes through (touch-action: pan-y). Inert unless a back-swipe is possible
+   so it never swallows left-edge taps. Mobile only. */
+.page-edge {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  z-index: 25; /* above page content, below the bottom nav (z-30) */
+  touch-action: pan-y;
+  pointer-events: none;
+}
+
+.page-edge.is-armed {
+  pointer-events: auto;
+}
+
+@media (min-width: 768px) {
+  .page-edge {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-stage.is-finishing > .page-prev,
+  .page-stage.is-finishing > .page-current,
+  .page-stage.is-finishing > .page-prev::after {
+    transition-duration: 0.001s;
+  }
+}

@@ -5,6 +5,17 @@
       [subtitle]="'views.reports.subtitle' | translate"
     />
     <div class="flex items-center gap-2 flex-shrink-0">
+      <button
+        type="button"
+        class="flex items-center justify-center w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors"
+        (click)="toggleListStyle()"
+        [title]="listStyleService.listStyle() === 'compact' ? 'Switch to normal view' : 'Switch to compact view'"
+      >
+        <app-icon
+          [name]="listStyleService.listStyle() === 'compact' ? 'layout-list' : 'align-justify'"
+          [size]="16"
+        />
+      </button>
       <select
         appSelect
         name="reportYear"
@@ -56,7 +67,10 @@
   @if (loading()) {
   <div class="page-group">
     @for (i of [1, 2, 3, 4, 5]; track i) {
-    <div class="page-item">
+    <div
+      class="page-item"
+      [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+    >
       <app-skeleton class="h-4 w-48" />
       <app-skeleton class="h-4 w-24" />
     </div>
@@ -64,13 +78,19 @@
   </div>
   } @else { @if (activeTab() === 'trialBalance' && trialBalance(); as tb) {
   <div class="page-group">
-    <div class="page-item text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+    <div
+      class="page-item text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+      [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+    >
       <span class="flex-1">{{ 'views.reports.trialBalance.account' | translate }}</span>
       <span class="w-32 text-right">{{ 'views.reports.trialBalance.debit' | translate }}</span>
       <span class="w-32 text-right">{{ 'views.reports.trialBalance.credit' | translate }}</span>
     </div>
     @for (row of tb.rows; track row.id) {
-    <div class="page-item">
+    <div
+      class="page-item"
+      [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+    >
       <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
         @if (row.code) {
         <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ row.code }}</span>
@@ -84,7 +104,10 @@
       </span>
     </div>
     }
-    <div class="page-item font-semibold">
+    <div
+            class="page-item font-semibold"
+            [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+          >
       <span class="flex-1 text-sm text-on-surface">{{ 'views.reports.total' | translate }}</span>
       <span class="w-32 text-right text-sm tabular-nums text-on-surface"
         >{{ format(tb.debitTotal, tb.baseCurrency) }}</span
@@ -119,7 +142,10 @@
         <p class="page-section-label mb-1.5">{{ 'views.reports.balanceSheet.assets' | translate }}</p>
         <div class="page-group">
           @for (line of bs.assets.accounts; track line.id) {
-          <div class="page-item">
+          <div
+      class="page-item"
+      [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+    >
             <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
               @if (line.code) {
               <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ line.code }}</span>
@@ -128,7 +154,10 @@
             <span class="text-sm tabular-nums text-on-surface">{{ format(line.amount, bs.baseCurrency) }}</span>
           </div>
           }
-          <div class="page-item font-semibold">
+          <div
+            class="page-item font-semibold"
+            [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+          >
             <span class="flex-1 text-sm text-on-surface">{{ 'views.reports.total' | translate }}</span>
             <span class="text-sm tabular-nums text-on-surface">{{ format(bs.assets.total, bs.baseCurrency) }}</span>
           </div>
@@ -141,7 +170,10 @@
           <p class="page-section-label mb-1.5">{{ 'views.reports.balanceSheet.liabilities' | translate }}</p>
           <div class="page-group">
             @for (line of bs.liabilities.accounts; track line.id) {
-            <div class="page-item">
+            <div
+      class="page-item"
+      [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+    >
               <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
                 @if (line.code) {
                 <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ line.code }}</span>
@@ -150,7 +182,10 @@
               <span class="text-sm tabular-nums text-on-surface">{{ format(line.amount, bs.baseCurrency) }}</span>
             </div>
             }
-            <div class="page-item font-semibold">
+            <div
+            class="page-item font-semibold"
+            [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+          >
               <span class="flex-1 text-sm text-on-surface">{{ 'views.reports.total' | translate }}</span>
               <span class="text-sm tabular-nums text-on-surface"
                 >{{ format(bs.liabilities.total, bs.baseCurrency) }}</span
@@ -162,7 +197,10 @@
           <p class="page-section-label mb-1.5">{{ 'views.reports.balanceSheet.equity' | translate }}</p>
           <div class="page-group">
             @for (line of bs.equity.accounts; track line.id) {
-            <div class="page-item">
+            <div
+      class="page-item"
+      [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+    >
               <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
                 @if (line.code) {
                 <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ line.code }}</span>
@@ -171,13 +209,19 @@
               <span class="text-sm tabular-nums text-on-surface">{{ format(line.amount, bs.baseCurrency) }}</span>
             </div>
             }
-            <div class="page-item">
+            <div
+      class="page-item"
+      [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+    >
               <span class="flex-1 text-sm text-on-surface"
                 >{{ 'views.reports.balanceSheet.netResult' | translate }}</span
               >
               <span class="text-sm tabular-nums text-on-surface">{{ format(bs.netResult, bs.baseCurrency) }}</span>
             </div>
-            <div class="page-item font-semibold">
+            <div
+            class="page-item font-semibold"
+            [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+          >
               <span class="flex-1 text-sm text-on-surface">{{ 'views.reports.total' | translate }}</span>
               <span class="text-sm tabular-nums text-on-surface">{{ format(bs.totalEquity, bs.baseCurrency) }}</span>
             </div>

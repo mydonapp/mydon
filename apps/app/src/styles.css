@@ -561,8 +561,13 @@ button[appBtn][aria-busy='true']::before {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--sys-on-surface-variant);
-  padding: 0 0.25rem;
   margin-bottom: 0.375rem;
+}
+
+@media (width <= 768px) {
+  .page-item--compact {
+    padding-inline: 0.25rem 0rem;
+  }
 }
 
 /* ─── Detail header: frosted-glass circle button (back + action) ─────────── */

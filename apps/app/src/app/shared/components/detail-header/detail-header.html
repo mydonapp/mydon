@@ -7,8 +7,10 @@
 <!-- Fixed header row: back circle + title that fades in on scroll (mobile only) -->
 <div class="detail-fixed-header">
   <a
-    [routerLink]="backLink()"
+    (click)="onBack($event)"
     class="detail-back-circle"
+    role="button"
+    tabindex="0"
   >
     <app-icon
       name="arrow-left"
@@ -28,8 +30,10 @@
 
 <!-- Desktop back link -->
 <a
-  [routerLink]="backLink()"
-  class="hidden md:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5"
+  (click)="onBack($event)"
+  class="hidden md:inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface transition-colors mb-5 no-underline -ml-0.5 cursor-pointer"
+  role="button"
+  tabindex="0"
 >
   <app-icon
     name="arrow-left"
