@@ -17,9 +17,7 @@ export class ForexService {
 
   async getRate(from: string, to: string, date: string): Promise<number> {
     const params = new URLSearchParams({ from, to, date }).toString();
-    const res = await firstValueFrom(
-      this.http.get<ForexRate>(`${this.appConfig.apiUrl}/v1/forex/rate?${params}`),
-    );
+    const res = await firstValueFrom(this.http.get<ForexRate>(`${this.appConfig.apiUrl}/v1/forex/rate?${params}`));
     return res.rate;
   }
 }

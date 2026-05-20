@@ -170,10 +170,8 @@ export class AccountsComponent implements OnInit {
     const date = this.newTransaction.date;
     this.rateLoading.set(true);
     try {
-      this.newTransaction.creditFxRate =
-        credit === base ? 1 : await this.forexService.getRate(credit, base, date);
-      this.newTransaction.debitFxRate =
-        debit === base ? 1 : await this.forexService.getRate(debit, base, date);
+      this.newTransaction.creditFxRate = credit === base ? 1 : await this.forexService.getRate(credit, base, date);
+      this.newTransaction.debitFxRate = debit === base ? 1 : await this.forexService.getRate(debit, base, date);
     } catch {
       // Leave whatever rate is there (default 1) editable; the user can still override.
       this.toastService.error('views.accounts.createTransactionForm.rateLoadError');

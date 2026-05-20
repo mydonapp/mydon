@@ -59,28 +59,48 @@ export class BudgetsService {
   private http = inject(HttpClient);
   private appConfig = inject(AppConfigService);
 
+  private budgetsCache: BudgetSummary[] | null = null;
+  private budgetByKey = new Map<string, BudgetDetail>();
+  private progressByKey = new Map<string, BudgetProgress>();
+
   async fetchBudgets(): Promise<BudgetSummary[]> {
-    return firstValueFrom(this.http.get<BudgetSummary[]>(`${this.appConfig.apiUrl}/v1/budgets`));
+    if (this.budgetsCache) {
+      return this.budgetsCache;
+    }
+    const data = await firstValueFrom(this.http.get<BudgetSummary[]>(`${this.appConfig.apiUrl}/v1/budgets`));
+    this.budgetsCache = data;
+    return data;
   }
 
   async fetchBudget(id: string): Promise<BudgetDetail> {
-    return firstValueFrom(this.http.get<BudgetDetail>(`${this.appConfig.apiUrl}/v1/budgets/${id}`));
+    const cached = this.budgetByKey.get(id);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(this.http.get<BudgetDetail>(`${this.appConfig.apiUrl}/v1/budgets/${id}`));
+    this.budgetByKey.set(id, data);
+    return data;
   }
 
   async createBudget(data: { name: string; year: number }): Promise<BudgetSummary> {
-    return firstValueFrom(this.http.post<BudgetSummary>(`${this.appConfig.apiUrl}/v1/budgets`, data));
+    const created = await firstValueFrom(this.http.post<BudgetSummary>(`${this.appConfig.apiUrl}/v1/budgets`, data));
+    this.invalidate();
+    return created;
   }
 
   async updateBudget(id: string, data: { name?: string; year?: number }): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/budgets/${id}`, data));
+    this.invalidate();
   }
 
   async deleteBudget(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.appConfig.apiUrl}/v1/budgets/${id}`));
+    this.invalidate();
   }
 
   async upsertBudgetItems(budgetId: string, items: Omit<BudgetItem, 'id'>[]): Promise<void> {
     await firstValueFrom(this.http.put(`${this.appConfig.apiUrl}/v1/budgets/${budgetId}/items`, { items }));
+    this.invalidate();
   }
 
   async fetchProgress(
@@ -92,8 +112,25 @@ export class BudgetsService {
         .filter(([, v]) => v !== undefined)
         .map(([k, v]) => [k, String(v)]),
     ).toString();
-    return firstValueFrom(
+    const key = `${budgetId}|${query}`;
+    const cached = this.progressByKey.get(key);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(
       this.http.get<BudgetProgress>(`${this.appConfig.apiUrl}/v1/budgets/${budgetId}/progress?${query}`),
     );
+    this.progressByKey.set(key, data);
+    return data;
+  }
+
+  invalidate(): void {
+    this.budgetsCache = null;
+    this.budgetByKey.clear();
+    this.progressByKey.clear();
+  }
+
+  clearCache(): void {
+    this.invalidate();
   }
 }

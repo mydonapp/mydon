@@ -79,11 +79,17 @@ export class UnifyCurrencyEnum1779022385203 implements MigrationInterface {
     const oldList = OLD_ACCOUNTS_ENUM.map((c) => `'${c}'`).join(', ');
 
     // exchange_rates: enum → varchar(3)
-    await queryRunner.query(`ALTER TABLE "exchange_rates" ALTER COLUMN "to_currency" TYPE character varying(3) USING "to_currency"::text`);
-    await queryRunner.query(`ALTER TABLE "exchange_rates" ALTER COLUMN "from_currency" TYPE character varying(3) USING "from_currency"::text`);
+    await queryRunner.query(
+      `ALTER TABLE "exchange_rates" ALTER COLUMN "to_currency" TYPE character varying(3) USING "to_currency"::text`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "exchange_rates" ALTER COLUMN "from_currency" TYPE character varying(3) USING "from_currency"::text`,
+    );
 
     // entries: enum → varchar(3)
-    await queryRunner.query(`ALTER TABLE "entries" ALTER COLUMN "currency" TYPE character varying(3) USING "currency"::text`);
+    await queryRunner.query(
+      `ALTER TABLE "entries" ALTER COLUMN "currency" TYPE character varying(3) USING "currency"::text`,
+    );
 
     // accounts: shared enum → restored accounts_currency_enum
     await queryRunner.query(`CREATE TYPE "public"."accounts_currency_enum" AS ENUM(${oldList})`);
@@ -95,7 +101,9 @@ export class UnifyCurrencyEnum1779022385203 implements MigrationInterface {
 
     // ledgers: enum → varchar(3)
     await queryRunner.query(`ALTER TABLE "ledgers" ALTER COLUMN "base_currency" DROP DEFAULT`);
-    await queryRunner.query(`ALTER TABLE "ledgers" ALTER COLUMN "base_currency" TYPE character varying(3) USING "base_currency"::text`);
+    await queryRunner.query(
+      `ALTER TABLE "ledgers" ALTER COLUMN "base_currency" TYPE character varying(3) USING "base_currency"::text`,
+    );
     await queryRunner.query(`ALTER TABLE "ledgers" ALTER COLUMN "base_currency" SET DEFAULT 'CHF'`);
 
     await queryRunner.query(`DROP TYPE "public"."currency_enum"`);

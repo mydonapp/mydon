@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AppConfigService } from './app-config.service';
+import { BudgetsService } from './budgets.service';
+import { ReportsService } from './reports.service';
 
 export interface AccountSimple {
   id: string;
@@ -131,15 +133,29 @@ export type SpendingAnalysis = Record<string, unknown>;
 export class AccountsService {
   private http = inject(HttpClient);
   private appConfig = inject(AppConfigService);
+  private reportsService = inject(ReportsService);
+  private budgetsService = inject(BudgetsService);
 
   accounts = signal<AccountSimple[]>([]);
   timeFilter = signal(new Date().getFullYear().toString());
 
-  async fetchSimple(): Promise<void> {
+  private simpleLoaded = false;
+  private accountsByKey = new Map<string, AccountsResponse>();
+  private accountDetailByKey = new Map<string, AccountDetail>();
+  private transactionsByKey = new Map<string, TransactionRecord[]>();
+  private recentTransactionsCache: TransactionRecord[] | null = null;
+  private draftTransactionsCache: TransactionRecord[] | null = null;
+  private issuersCache: Issuer[] | null = null;
+
+  async fetchSimple(force = false): Promise<void> {
+    if (this.simpleLoaded && !force) {
+      return;
+    }
     const accounts = await firstValueFrom(
       this.http.get<AccountSimple[]>(`${this.appConfig.apiUrl}/v1/accounts?list=true`),
     );
     this.accounts.set(accounts);
+    this.simpleLoaded = true;
   }
 
   async fetchAccounts(params?: Record<string, string>): Promise<AccountsResponse> {
@@ -147,16 +163,29 @@ export class AccountsService {
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
     const query = new URLSearchParams({ from, to, ...params }).toString();
-    return firstValueFrom(this.http.get<AccountsResponse>(`${this.appConfig.apiUrl}/v1/accounts?${query}`));
+    const cached = this.accountsByKey.get(query);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(this.http.get<AccountsResponse>(`${this.appConfig.apiUrl}/v1/accounts?${query}`));
+    this.accountsByKey.set(query, data);
+    return data;
   }
 
   async fetchAccount(id: string): Promise<AccountDetail> {
     const year = this.timeFilter();
+    const key = `${id}|${year}`;
+    const cached = this.accountDetailByKey.get(key);
+    if (cached) {
+      return cached;
+    }
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
-    return firstValueFrom(
+    const data = await firstValueFrom(
       this.http.get<AccountDetail>(`${this.appConfig.apiUrl}/v1/accounts/${id}?from=${from}&to=${to}`),
     );
+    this.accountDetailByKey.set(key, data);
+    return data;
   }
 
   async fetchTransactions(accountId: string, params?: Record<string, string>): Promise<TransactionRecord[]> {
@@ -164,9 +193,16 @@ export class AccountsService {
     const from = `${year}-01-01`;
     const to = `${year}-12-31`;
     const query = new URLSearchParams({ from, to, ...params }).toString();
-    return firstValueFrom(
+    const key = `${accountId}|${query}`;
+    const cached = this.transactionsByKey.get(key);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(
       this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/accounts/${accountId}/transactions?${query}`),
     );
+    this.transactionsByKey.set(key, data);
+    return data;
   }
 
   async createAccount(account: {
@@ -178,7 +214,8 @@ export class AccountsService {
     description?: string;
   }): Promise<void> {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/accounts`, account));
-    await this.fetchSimple();
+    this.invalidateAccounts();
+    await this.fetchSimple(true);
   }
 
   async updateAccount(
@@ -195,33 +232,51 @@ export class AccountsService {
     }>,
   ): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/accounts/${id}`, data));
-    await this.fetchSimple();
+    this.invalidateAccounts();
+    this.invalidateTransactions();
+    await this.fetchSimple(true);
   }
 
   async createTransaction(data: CreateTransactionPayload): Promise<void> {
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions`, data));
+    this.invalidateTransactions();
   }
 
   async fetchRecentTransactions(): Promise<TransactionRecord[]> {
-    return firstValueFrom(this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/transactions`));
+    if (this.recentTransactionsCache) {
+      return this.recentTransactionsCache;
+    }
+    const data = await firstValueFrom(this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/transactions`));
+    this.recentTransactionsCache = data;
+    return data;
   }
 
   async fetchDraftTransactions(): Promise<TransactionRecord[]> {
-    return firstValueFrom(this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/transactions?filter=draft`));
+    if (this.draftTransactionsCache) {
+      return this.draftTransactionsCache;
+    }
+    const data = await firstValueFrom(
+      this.http.get<TransactionRecord[]>(`${this.appConfig.apiUrl}/v1/transactions?filter=draft`),
+    );
+    this.draftTransactionsCache = data;
+    return data;
   }
 
   async approveDraftTransactions(ids: string[]): Promise<void> {
     await Promise.all(
       ids.map((id) => firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions/${id}/post`, {}))),
     );
+    this.invalidateTransactions();
   }
 
   async updateDraftTransaction(id: string, data: PatchTransactionPayload): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/transactions/${id}`, data));
+    this.invalidateTransactions();
   }
 
   async deleteDraftTransaction(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.appConfig.apiUrl}/v1/transactions/${id}`));
+    this.invalidateTransactions();
   }
 
   async importTransactions(accountId: string, issuerId: string, file: File): Promise<void> {
@@ -230,10 +285,16 @@ export class AccountsService {
     formData.append('issuerId', issuerId);
     formData.append('file', file);
     await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions/import`, formData));
+    this.invalidateTransactions();
   }
 
   async fetchIssuers(): Promise<Issuer[]> {
-    return firstValueFrom(this.http.get<Issuer[]>(`${this.appConfig.apiUrl}/v1/transactions/issuers`));
+    if (this.issuersCache) {
+      return this.issuersCache;
+    }
+    const data = await firstValueFrom(this.http.get<Issuer[]>(`${this.appConfig.apiUrl}/v1/transactions/issuers`));
+    this.issuersCache = data;
+    return data;
   }
 
   async fetchSpendingAnalysis(params: Record<string, string>): Promise<SpendingAnalysis> {
@@ -241,5 +302,34 @@ export class AccountsService {
     return firstValueFrom(
       this.http.get<SpendingAnalysis>(`${this.appConfig.apiUrl}/v1/transactions/analysis?${query}`),
     );
+  }
+
+  invalidate(): void {
+    this.invalidateAccounts();
+    this.invalidateTransactions();
+  }
+
+  clearCache(): void {
+    this.invalidate();
+    this.accounts.set([]);
+    this.issuersCache = null;
+  }
+
+  private invalidateAccounts(): void {
+    this.simpleLoaded = false;
+    this.accountsByKey.clear();
+    this.accountDetailByKey.clear();
+    this.reportsService.invalidate();
+    this.budgetsService.invalidate();
+  }
+
+  private invalidateTransactions(): void {
+    this.transactionsByKey.clear();
+    this.recentTransactionsCache = null;
+    this.draftTransactionsCache = null;
+    this.accountsByKey.clear();
+    this.accountDetailByKey.clear();
+    this.reportsService.invalidate();
+    this.budgetsService.invalidate();
   }
 }

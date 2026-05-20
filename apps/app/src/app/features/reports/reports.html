@@ -74,8 +74,7 @@
       <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
         @if (row.code) {
         <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ row.code }}</span>
-        }
-        {{ row.name }}
+        } {{ row.name }}
       </span>
       <span class="w-32 text-right text-sm tabular-nums text-on-surface">
         {{ row.debit ? format(row.debit, tb.baseCurrency) : '' }}
@@ -87,12 +86,12 @@
     }
     <div class="page-item font-semibold">
       <span class="flex-1 text-sm text-on-surface">{{ 'views.reports.total' | translate }}</span>
-      <span class="w-32 text-right text-sm tabular-nums text-on-surface">{{
-        format(tb.debitTotal, tb.baseCurrency)
-      }}</span>
-      <span class="w-32 text-right text-sm tabular-nums text-on-surface">{{
-        format(tb.creditTotal, tb.baseCurrency)
-      }}</span>
+      <span class="w-32 text-right text-sm tabular-nums text-on-surface"
+        >{{ format(tb.debitTotal, tb.baseCurrency) }}</span
+      >
+      <span class="w-32 text-right text-sm tabular-nums text-on-surface"
+        >{{ format(tb.creditTotal, tb.baseCurrency) }}</span
+      >
     </div>
   </div>
   <div
@@ -104,14 +103,12 @@
         [name]="tb.balanced ? 'check' : 'alert-triangle'"
         [size]="14"
       />
-      {{
-        (tb.balanced ? 'views.reports.trialBalance.balanced' : 'views.reports.trialBalance.notBalanced') | translate
-      }}
+      {{ (tb.balanced ? 'views.reports.trialBalance.balanced' : 'views.reports.trialBalance.notBalanced') | translate }}
     </span>
     @if (!tb.balanced) {
-    <span class="tabular-nums">{{ 'views.reports.trialBalance.difference' | translate }}: {{
-      format(tb.difference, tb.baseCurrency)
-    }}</span>
+    <span class="tabular-nums"
+      >{{ 'views.reports.trialBalance.difference' | translate }}: {{ format(tb.difference, tb.baseCurrency) }}</span
+    >
     }
   </div>
   } @if (activeTab() === 'balanceSheet' && balanceSheet(); as bs) {
@@ -126,8 +123,7 @@
             <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
               @if (line.code) {
               <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ line.code }}</span>
-              }
-              {{ line.name }}
+              } {{ line.name }}
             </span>
             <span class="text-sm tabular-nums text-on-surface">{{ format(line.amount, bs.baseCurrency) }}</span>
           </div>
@@ -149,17 +145,16 @@
               <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
                 @if (line.code) {
                 <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ line.code }}</span>
-                }
-                {{ line.name }}
+                } {{ line.name }}
               </span>
               <span class="text-sm tabular-nums text-on-surface">{{ format(line.amount, bs.baseCurrency) }}</span>
             </div>
             }
             <div class="page-item font-semibold">
               <span class="flex-1 text-sm text-on-surface">{{ 'views.reports.total' | translate }}</span>
-              <span class="text-sm tabular-nums text-on-surface">{{
-                format(bs.liabilities.total, bs.baseCurrency)
-              }}</span>
+              <span class="text-sm tabular-nums text-on-surface"
+                >{{ format(bs.liabilities.total, bs.baseCurrency) }}</span
+              >
             </div>
           </div>
         </div>
@@ -171,16 +166,15 @@
               <span class="flex-1 min-w-0 truncate text-sm text-on-surface">
                 @if (line.code) {
                 <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ line.code }}</span>
-                }
-                {{ line.name }}
+                } {{ line.name }}
               </span>
               <span class="text-sm tabular-nums text-on-surface">{{ format(line.amount, bs.baseCurrency) }}</span>
             </div>
             }
             <div class="page-item">
-              <span class="flex-1 text-sm text-on-surface">{{
-                'views.reports.balanceSheet.netResult' | translate
-              }}</span>
+              <span class="flex-1 text-sm text-on-surface"
+                >{{ 'views.reports.balanceSheet.netResult' | translate }}</span
+              >
               <span class="text-sm tabular-nums text-on-surface">{{ format(bs.netResult, bs.baseCurrency) }}</span>
             </div>
             <div class="page-item font-semibold">
@@ -200,14 +194,13 @@
           [name]="bs.balanced ? 'check' : 'alert-triangle'"
           [size]="14"
         />
-        {{
-          (bs.balanced ? 'views.reports.balanceSheet.balanced' : 'views.reports.balanceSheet.notBalanced') | translate
+        {{ (bs.balanced ? 'views.reports.balanceSheet.balanced' : 'views.reports.balanceSheet.notBalanced') | translate
         }}
       </span>
       <span class="tabular-nums">
-        {{ 'views.reports.balanceSheet.assets' | translate }}: {{ format(bs.assets.total, bs.baseCurrency) }} ·
-        {{ 'views.reports.balanceSheet.liabilitiesPlusEquity' | translate }}:
-        {{ format(bs.totalLiabilitiesAndEquity, bs.baseCurrency) }}
+        {{ 'views.reports.balanceSheet.assets' | translate }}: {{ format(bs.assets.total, bs.baseCurrency) }} · {{
+        'views.reports.balanceSheet.liabilitiesPlusEquity' | translate }}: {{ format(bs.totalLiabilitiesAndEquity,
+        bs.baseCurrency) }}
       </span>
     </div>
   </div>

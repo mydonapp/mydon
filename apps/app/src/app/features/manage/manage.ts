@@ -95,11 +95,11 @@ export class ManageComponent implements OnInit {
   ];
 
   accountTypeOptions: SelectOption[] = [
-    { value: 'assets', label: 'Assets' },
-    { value: 'liabilities', label: 'Liabilities' },
-    { value: 'equity', label: 'Equity' },
-    { value: 'income', label: 'Income' },
-    { value: 'expense', label: 'Expenses' },
+    { value: 'ASSETS', label: 'Assets' },
+    { value: 'LIABILITIES', label: 'Liabilities' },
+    { value: 'EQUITY', label: 'Equity' },
+    { value: 'INCOME', label: 'Income' },
+    { value: 'EXPENSE', label: 'Expenses' },
   ];
 
   currencyOptions: SelectOption[] = CURRENCIES.map((c) => ({ value: c, label: c }));

@@ -15,14 +15,25 @@ export class LedgerService {
   private appConfig = inject(AppConfigService);
 
   readonly ledger = signal<Ledger | null>(null);
+  private loaded = false;
 
-  async fetch(): Promise<Ledger> {
+  async fetch(force = false): Promise<Ledger> {
+    const current = this.ledger();
+    if (this.loaded && current && !force) {
+      return current;
+    }
     const ledger = await firstValueFrom(this.http.get<Ledger>(`${this.appConfig.apiUrl}/v1/ledger`));
     this.ledger.set(ledger);
+    this.loaded = true;
     return ledger;
   }
 
   baseCurrency(): string {
     return this.ledger()?.baseCurrency ?? 'CHF';
+  }
+
+  clearCache(): void {
+    this.loaded = false;
+    this.ledger.set(null);
   }
 }

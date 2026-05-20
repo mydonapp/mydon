@@ -41,7 +41,7 @@
         <app-skeleton class="h-4 w-48" />
         <app-skeleton class="h-3 w-28" />
       </div>
-      <app-skeleton class="h-4 w-16 flex-shrink-0" />
+      <app-skeleton class="h-4 w-16 shrink-0" />
     </div>
     }
   </div>
@@ -55,7 +55,7 @@
       <button
         type="button"
         class="md:hidden flex items-center justify-center w-7 h-7 rounded-md text-on-surface-variant hover:bg-surface-variant transition-colors"
-        (click)="privacyService.toggle()"
+        (click)="onPrivacyToggle()"
       >
         <app-icon
           [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'"
@@ -180,7 +180,7 @@
         <p class="text-sm font-medium text-on-surface truncate">{{ tx.description }}</p>
         <p class="text-xs text-on-surface-variant mt-0.5">{{ tx.transactionDate | date: 'mediumDate' }}</p>
       </div>
-      <span class="text-sm font-medium text-on-surface tabular-nums ml-4 flex-shrink-0">
+      <span class="text-sm font-medium text-on-surface tabular-nums ml-4 shrink-0">
         {{ privacyService.isPrivate() ? '···' : currencyService.format(tx.amount, 'CHF') }}
       </span>
     </div>

@@ -312,13 +312,7 @@
   /* Elliptical falloff: clear in the centre, refraction ramps up toward the
      rounded perimeter so the blur boundary curves with the capsule instead of
      ending on a hard vertical seam. */
-  --lens-bezel: radial-gradient(
-    ellipse 62% 76% at 50% 50%,
-    transparent 0%,
-    transparent 52%,
-    #000 86%,
-    #000 100%
-  );
+  --lens-bezel: radial-gradient(ellipse 62% 76% at 50% 50%, transparent 0%, transparent 52%, #000 86%, #000 100%);
   -webkit-mask-image: var(--lens-bezel);
   mask-image: var(--lens-bezel);
   transition:

@@ -50,20 +50,35 @@ export class ReportsService {
   private http = inject(HttpClient);
   private appConfig = inject(AppConfigService);
 
+  private trialBalanceByYear = new Map<string, TrialBalance>();
+  private balanceSheetByYear = new Map<string, BalanceSheet>();
+
   private range(year: string): string {
     return new URLSearchParams({ from: `${year}-01-01`, to: `${year}-12-31` }).toString();
   }
 
   async fetchTrialBalance(year: string): Promise<TrialBalance> {
-    return firstValueFrom(
+    const cached = this.trialBalanceByYear.get(year);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(
       this.http.get<TrialBalance>(`${this.appConfig.apiUrl}/v1/reports/trial-balance?${this.range(year)}`),
     );
+    this.trialBalanceByYear.set(year, data);
+    return data;
   }
 
   async fetchBalanceSheet(year: string): Promise<BalanceSheet> {
-    return firstValueFrom(
+    const cached = this.balanceSheetByYear.get(year);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(
       this.http.get<BalanceSheet>(`${this.appConfig.apiUrl}/v1/reports/balance-sheet?${this.range(year)}`),
     );
+    this.balanceSheetByYear.set(year, data);
+    return data;
   }
 
   async downloadPdf(report: 'trial-balance' | 'balance-sheet', year: string): Promise<void> {
@@ -80,5 +95,14 @@ export class ReportsService {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  invalidate(): void {
+    this.trialBalanceByYear.clear();
+    this.balanceSheetByYear.clear();
+  }
+
+  clearCache(): void {
+    this.invalidate();
   }
 }

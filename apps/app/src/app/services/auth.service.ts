@@ -2,7 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { AccountGroupsService } from './account-groups.service';
+import { AccountsService } from './accounts.service';
 import { AppConfigService } from './app-config.service';
+import { BudgetsService } from './budgets.service';
+import { LedgerService } from './ledger.service';
+import { ReportsService } from './reports.service';
+import { UserService } from './user.service';
 
 interface TokenResponse {
   accessToken: string;
@@ -14,6 +20,12 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly appConfig = inject(AppConfigService);
+  private readonly accountsService = inject(AccountsService);
+  private readonly accountGroupsService = inject(AccountGroupsService);
+  private readonly budgetsService = inject(BudgetsService);
+  private readonly reportsService = inject(ReportsService);
+  private readonly ledgerService = inject(LedgerService);
+  private readonly userService = inject(UserService);
 
   private accessToken: string | null = null;
   private accessTokenExpiry: Date | null = null;
@@ -91,6 +103,12 @@ export class AuthService {
     } finally {
       this.accessToken = null;
       this.accessTokenExpiry = null;
+      this.accountsService.clearCache();
+      this.accountGroupsService.clearCache();
+      this.budgetsService.clearCache();
+      this.reportsService.clearCache();
+      this.ledgerService.clearCache();
+      this.userService.clearCache();
       this.router.navigate(['/auth/login']);
     }
   }

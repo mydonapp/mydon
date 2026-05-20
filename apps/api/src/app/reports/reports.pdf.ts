@@ -75,12 +75,10 @@ function footer(doc: PDFKit.PDFDocument): void {
       .font('Helvetica')
       .fontSize(8)
       .fillColor('#999999')
-      .text(
-        `myDon — page ${i + 1} of ${range.count}`,
-        MARGIN,
-        doc.page.height - MARGIN + 10,
-        { width: doc.page.width - MARGIN * 2, align: 'center' },
-      );
+      .text(`myDon — page ${i + 1} of ${range.count}`, MARGIN, doc.page.height - MARGIN + 10, {
+        width: doc.page.width - MARGIN * 2,
+        align: 'center',
+      });
   }
 }
 
@@ -189,7 +187,12 @@ export function buildBalanceSheetPdf(meta: Meta, data: BalanceSheetData): Promis
   const sectionTitle = (x: number, y: number, title: string): number => {
     doc.font('Helvetica-Bold').fontSize(11).fillColor('#333333').text(title, x, y, { width: colW });
     const ny = y + 16;
-    doc.strokeColor('#dddddd').lineWidth(0.5).moveTo(x, ny).lineTo(x + colW, ny).stroke();
+    doc
+      .strokeColor('#dddddd')
+      .lineWidth(0.5)
+      .moveTo(x, ny)
+      .lineTo(x + colW, ny)
+      .stroke();
     return ny + 6;
   };
 

@@ -78,8 +78,7 @@
           <p class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors truncate">
             @if (accountCodesService.show() && account.code) {
             <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ account.code }}</span>
-            } {{ account.name }}
-            @if (account.description) {
+            } {{ account.name }} @if (account.description) {
             <span class="text-xs font-normal text-on-surface-variant/70 ml-2">{{ account.description }}</span>
             }
           </p>
@@ -200,9 +199,7 @@
         />
       </app-field>
       @if (creditNeedsRate()) {
-      <app-field
-        [label]="'views.accounts.createTransactionForm.exchangeRate.label' | translate"
-      >
+      <app-field [label]="'views.accounts.createTransactionForm.exchangeRate.label' | translate">
         <input
           appInput
           type="number"
@@ -212,8 +209,8 @@
           [disabled]="rateLoading()"
         />
         <p class="text-xs text-on-surface-variant mt-1">
-          1 {{ creditCurrency() }} = {{ sharedFxRate }} {{ baseCurrency() }} ·
-          {{ currencyService.format(creditBase(), baseCurrency()) }}
+          1 {{ creditCurrency() }} = {{ sharedFxRate }} {{ baseCurrency() }} · {{ currencyService.format(creditBase(),
+          baseCurrency()) }}
         </p>
       </app-field>
       } } @else {
@@ -245,8 +242,8 @@
             [disabled]="rateLoading()"
           />
           <p class="text-xs text-on-surface-variant mt-1">
-            1 {{ creditCurrency() }} = {{ newTransaction.creditFxRate }} {{ baseCurrency() }} ·
-            {{ currencyService.format(creditBase(), baseCurrency()) }}
+            1 {{ creditCurrency() }} = {{ newTransaction.creditFxRate }} {{ baseCurrency() }} · {{
+            currencyService.format(creditBase(), baseCurrency()) }}
           </p>
         </app-field>
         }
@@ -276,8 +273,8 @@
             [disabled]="rateLoading()"
           />
           <p class="text-xs text-on-surface-variant mt-1">
-            1 {{ debitCurrency() }} = {{ newTransaction.debitFxRate }} {{ baseCurrency() }} ·
-            {{ currencyService.format(debitBase(), baseCurrency()) }}
+            1 {{ debitCurrency() }} = {{ newTransaction.debitFxRate }} {{ baseCurrency() }} · {{
+            currencyService.format(debitBase(), baseCurrency()) }}
           </p>
         </app-field>
         }
@@ -290,16 +287,12 @@
               [name]="isBalanced() ? 'check' : 'alert-triangle'"
               [size]="14"
             />
-            {{
-              (isBalanced()
-                ? 'views.accounts.createTransactionForm.balanced'
-                : 'views.accounts.createTransactionForm.notBalanced'
-              ) | translate
-            }}
+            {{ (isBalanced() ? 'views.accounts.createTransactionForm.balanced' :
+            'views.accounts.createTransactionForm.notBalanced' ) | translate }}
           </span>
           <span class="tabular-nums">
-            {{ currencyService.format(creditBase(), baseCurrency()) }} /
-            {{ currencyService.format(debitBase(), baseCurrency()) }}
+            {{ currencyService.format(creditBase(), baseCurrency()) }} / {{ currencyService.format(debitBase(),
+            baseCurrency()) }}
           </span>
         </div>
       </div>

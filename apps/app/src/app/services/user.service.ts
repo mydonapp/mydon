@@ -38,14 +38,20 @@ export class UserService {
   private readonly appConfig = inject(AppConfigService);
 
   user = signal<User | null>(null);
+  private loaded = false;
 
-  async fetchUser(): Promise<void> {
+  async fetchUser(force = false): Promise<void> {
+    if (this.loaded && this.user() && !force) {
+      return;
+    }
     try {
       const user = await firstValueFrom(this.http.get<User>(`${this.appConfig.apiUrl}/v1/auth/me`));
       this.user.set(user);
+      this.loaded = true;
       this.applyPreferences(user);
     } catch {
       this.user.set(null);
+      this.loaded = false;
     }
   }
 
@@ -66,5 +72,10 @@ export class UserService {
     const updated = await firstValueFrom(this.http.patch<User>(`${this.appConfig.apiUrl}/v1/auth/me`, prefs));
     this.user.set(updated);
     this.applyPreferences(updated);
+  }
+
+  clearCache(): void {
+    this.loaded = false;
+    this.user.set(null);
   }
 }
