@@ -6,9 +6,11 @@ import { Account, AccountType } from '../accounts/accounts.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
 import { toDateString } from '../shared/date';
 import { Context } from '../shared/types/context';
-import { BudgetFrequency, BudgetItem } from './budget-item.entity';
+import { BudgetFrequency } from './budget-frequency.enum';
+import { BudgetItem } from './budget-item.entity';
+import { BudgetSubItem } from './budget-sub-item.entity';
 import { Budget } from './budgets.entity';
-import { BudgetItemDto } from './dtos/upsert-budget-items.dto';
+import { BudgetItemDto, BudgetSubItemDto } from './dtos/upsert-budget-items.dto';
 
 @Injectable()
 export class BudgetsService {
@@ -46,7 +48,7 @@ export class BudgetsService {
     const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const budget = await this.budgetsRepository.findOne({
       where: { id, ledgerId: ledger.id },
-      relations: ['items', 'items.account', 'items.group'],
+      relations: ['items', 'items.account', 'items.group', 'items.subItems'],
     });
     if (!budget) {
       throw new NotFoundException();
@@ -65,6 +67,9 @@ export class BudgetsService {
         accountName: item.account?.name ?? null,
         amount: item.amount,
         frequency: item.frequency,
+        subItems: [...(item.subItems ?? [])]
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((sub) => ({ id: sub.id, name: sub.name, amount: sub.amount, frequency: sub.frequency })),
       })),
     };
   }
@@ -122,17 +127,31 @@ export class BudgetsService {
 
     await this.budgetItemsRepository.delete({ budget: { id: budgetId } });
 
-    const newItems = await Promise.all(
-      items.map(async (dto) => {
-        const item = new BudgetItem();
-        item.budget = { id: budgetId } as Budget;
+    const newItems = items.map((dto) => {
+      const item = new BudgetItem();
+      item.budget = { id: budgetId } as Budget;
+      item.frequency = dto.frequency;
+      item.account = dto.accountId ? ({ id: dto.accountId } as Account) : null;
+      item.group = dto.groupId ? ({ id: dto.groupId } as AccountGroup) : null;
+
+      const subItems = dto.subItems ?? [];
+      if (subItems.length > 0) {
+        // Sub-items drive the amount: store the normalized sum so getProgress stays untouched.
+        item.amount = this.computeAmountFromSubItems(dto.frequency, subItems);
+        item.subItems = subItems.map((sub, index) => {
+          const subItem = new BudgetSubItem();
+          subItem.name = sub.name;
+          subItem.amount = sub.amount;
+          subItem.frequency = sub.frequency;
+          subItem.sortOrder = index;
+          return subItem;
+        });
+      } else {
         item.amount = dto.amount;
-        item.frequency = dto.frequency;
-        item.account = dto.accountId ? ({ id: dto.accountId } as Account) : null;
-        item.group = dto.groupId ? ({ id: dto.groupId } as AccountGroup) : null;
-        return item;
-      }),
-    );
+        item.subItems = [];
+      }
+      return item;
+    });
 
     await this.budgetItemsRepository.save(newItems);
     return this.findOne(budgetId, context);
@@ -245,6 +264,15 @@ export class BudgetsService {
       monthsElapsed,
       items: progressItems,
     };
+  }
+
+  private computeAmountFromSubItems(lineFrequency: BudgetFrequency, subItems: BudgetSubItemDto[]): number {
+    const sum = subItems.reduce((acc, sub) => {
+      const monthly = sub.frequency === BudgetFrequency.MONTHLY ? sub.amount : sub.amount / 12;
+      const contribution = lineFrequency === BudgetFrequency.MONTHLY ? monthly : monthly * 12;
+      return acc + contribution;
+    }, 0);
+    return Math.round(sum * 100) / 100;
   }
 
   /**

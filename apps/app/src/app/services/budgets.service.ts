@@ -10,6 +10,13 @@ export interface BudgetSummary {
   itemCount: number;
 }
 
+export interface BudgetSubItem {
+  id?: string;
+  name: string;
+  amount: number;
+  frequency: 'monthly' | 'yearly';
+}
+
 export interface BudgetItem {
   id: string;
   type: 'group' | 'account';
@@ -19,6 +26,7 @@ export interface BudgetItem {
   accountName?: string;
   amount: number;
   frequency: 'monthly' | 'yearly';
+  subItems?: BudgetSubItem[];
 }
 
 export interface BudgetDetail {

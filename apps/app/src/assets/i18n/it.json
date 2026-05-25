@@ -400,6 +400,11 @@
           "label": "Frequenza",
           "monthly": "Mensile",
           "yearly": "Annuale"
+        },
+        "subItems": {
+          "addSubItem": "Aggiungi sotto-voce",
+          "namePlaceholder": "es. Netflix",
+          "computedHint": "Calcolato dal dettaglio sottostante"
         }
       },
       "progress": {

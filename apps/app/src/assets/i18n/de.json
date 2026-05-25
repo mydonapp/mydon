@@ -400,6 +400,11 @@
           "label": "Häufigkeit",
           "monthly": "Monatlich",
           "yearly": "Jährlich"
+        },
+        "subItems": {
+          "addSubItem": "Unterposten hinzufügen",
+          "namePlaceholder": "z. B. Netflix",
+          "computedHint": "Aus der Aufschlüsselung unten berechnet"
         }
       },
       "progress": {

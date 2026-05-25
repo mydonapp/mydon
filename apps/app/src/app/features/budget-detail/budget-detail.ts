@@ -2,10 +2,10 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountsService } from '../../services/accounts.service';
 import { AccountCodesService } from '../../services/account-codes.service';
-import { BudgetDetail, BudgetItem, BudgetProgressItem, BudgetsService } from '../../services/budgets.service';
 import { AccountGroupsService } from '../../services/account-groups.service';
+import { AccountsService } from '../../services/accounts.service';
+import { BudgetDetail, BudgetItem, BudgetProgressItem, BudgetsService } from '../../services/budgets.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ToastService } from '../../services/toast.service';
 import { ComboboxComponent, ComboboxOption } from '../../shared/components/combobox/combobox';
@@ -98,7 +98,7 @@ export class BudgetDetailComponent implements OnInit {
     try {
       const b = await this.budgetsService.fetchBudget(id);
       this.budget.set(b);
-      this.editItems.set(b.items.map((i) => ({ ...i })));
+      this.editItems.set(this.cloneItemsForEdit(b));
       this.editName.set(b.name);
       this.editYear.set(b.year);
       await this.loadProgress();
@@ -137,7 +137,7 @@ export class BudgetDetailComponent implements OnInit {
     }
     this.editName.set(b.name);
     this.editYear.set(b.year);
-    this.editItems.set(b.items.map((i) => ({ ...i })));
+    this.editItems.set(this.cloneItemsForEdit(b));
     this.editMode.set(true);
   }
 
@@ -148,7 +148,7 @@ export class BudgetDetailComponent implements OnInit {
     }
     this.editName.set(b.name);
     this.editYear.set(b.year);
-    this.editItems.set(b.items.map((i) => ({ ...i })));
+    this.editItems.set(this.cloneItemsForEdit(b));
     this.editMode.set(false);
   }
 
@@ -167,7 +167,12 @@ export class BudgetDetailComponent implements OnInit {
           ...(yearChanged ? { year: this.editYear() } : {}),
         });
       }
-      await this.budgetsService.upsertBudgetItems(b.id, this.editItems());
+
+      const payload = this.editItems().map((item) => {
+        const subItems = (item.subItems ?? []).filter((s) => s.name.trim().length > 0);
+        return { ...item, subItems: subItems.length > 0 ? subItems : undefined };
+      });
+      await this.budgetsService.upsertBudgetItems(b.id, payload);
       this.toastService.success('views.budgets.saveSuccess');
       this.editMode.set(false);
       await this.loadBudget(b.id);
@@ -187,5 +192,56 @@ export class BudgetDetailComponent implements OnInit {
 
   removeItem(index: number) {
     this.editItems.update((items) => items.filter((_, i) => i !== index));
+  }
+
+  isComputed(item: Omit<BudgetItem, 'id'>): boolean {
+    return (item.subItems?.length ?? 0) > 0;
+  }
+
+  computeLineAmount(item: Omit<BudgetItem, 'id'>): number {
+    const sum = (item.subItems ?? []).reduce((acc, sub) => {
+      const monthly = sub.frequency === 'monthly' ? sub.amount : sub.amount / 12;
+      return acc + (item.frequency === 'monthly' ? monthly : monthly * 12);
+    }, 0);
+    return Math.round(sum * 100) / 100;
+  }
+
+  addSubItem(index: number) {
+    this.editItems.update((items) => {
+      const item = items[index];
+      item.subItems = [...(item.subItems ?? []), { name: '', amount: 0, frequency: item.frequency }];
+      item.amount = this.computeLineAmount(item);
+      return [...items];
+    });
+  }
+
+  removeSubItem(index: number, subIndex: number) {
+    this.editItems.update((items) => {
+      const item = items[index];
+      item.subItems = (item.subItems ?? []).filter((_, i) => i !== subIndex);
+      item.amount = this.computeLineAmount(item);
+      return [...items];
+    });
+  }
+
+  onSubItemChange(index: number) {
+    this.editItems.update((items) => {
+      items[index].amount = this.computeLineAmount(items[index]);
+      return [...items];
+    });
+  }
+
+  onLineFrequencyChange(index: number) {
+    this.editItems.update((items) => {
+      const item = items[index];
+      if (this.isComputed(item)) {
+        item.amount = this.computeLineAmount(item);
+      }
+      return [...items];
+    });
+  }
+
+  private cloneItemsForEdit(b: BudgetDetail): Omit<BudgetItem, 'id'>[] {
+    return b.items.map((i) => ({ ...i, subItems: i.subItems?.map((s) => ({ ...s })) }));
   }
 }

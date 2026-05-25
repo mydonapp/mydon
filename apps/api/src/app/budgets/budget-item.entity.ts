@@ -1,13 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account } from '../accounts/accounts.entity';
 import { ColumnDecimalTransformer } from '../shared/decimal.transformer';
+import { BudgetFrequency } from './budget-frequency.enum';
+import { BudgetSubItem } from './budget-sub-item.entity';
 import { Budget } from './budgets.entity';
-
-export enum BudgetFrequency {
-  MONTHLY = 'monthly',
-  YEARLY = 'yearly',
-}
 
 @Entity('budget_items')
 export class BudgetItem {
@@ -37,4 +34,7 @@ export class BudgetItem {
 
   @Column({ enum: BudgetFrequency, type: 'enum', default: BudgetFrequency.MONTHLY })
   declare frequency: BudgetFrequency;
+
+  @OneToMany(() => BudgetSubItem, (sub) => sub.budgetItem, { cascade: true })
+  declare subItems: BudgetSubItem[];
 }
