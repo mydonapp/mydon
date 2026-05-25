@@ -16,6 +16,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { filter } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { LedgerService } from '../services/ledger.service';
+import { OrganizationsService } from '../services/organizations.service';
 import { PrivacyService } from '../services/privacy.service';
 import { SidebarStateService } from '../services/sidebar-state.service';
 import { UserService } from '../services/user.service';
@@ -61,7 +62,33 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
   protected readonly privacyService = inject(PrivacyService);
   protected readonly sidebarState = inject(SidebarStateService);
   private readonly ledgerService = inject(LedgerService);
+  protected readonly organizationsService = inject(OrganizationsService);
   private readonly router = inject(Router);
+
+  orgMenuOpen = signal(false);
+  readonly organizations = this.organizationsService.organizations;
+  readonly activeLedgerId = computed(() => this.userService.user()?.activeLedgerId ?? null);
+  readonly activeOrg = computed(
+    () =>
+      this.organizations().find((o) => o.ledgers.some((l) => l.id === this.activeLedgerId())) ??
+      this.organizations().at(0) ??
+      null,
+  );
+  readonly activeLedger = computed(() => {
+    const id = this.activeLedgerId();
+    for (const org of this.organizations()) {
+      const found = org.ledgers.find((l) => l.id === id);
+      if (found) {
+        return found;
+      }
+    }
+    return this.activeOrg()?.ledgers.at(0) ?? null;
+  });
+  /** The switcher only appears when there's more than one ledger to switch between
+   *  (which also covers the multiple-orgs case, since every org has at least one ledger). */
+  readonly canSwitchWorkspace = computed(
+    () => this.organizations().reduce((n, o) => n + o.ledgers.length, 0) > 1,
+  );
 
   private readonly bottomNav = viewChild<ElementRef<HTMLElement>>('bottomNav');
   private readonly navSlots = viewChildren<ElementRef<HTMLElement>>('navSlot');
@@ -167,7 +194,21 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.userService.fetchUser();
     this.ledgerService.fetch();
+    this.organizationsService.fetch();
     this.syncActiveFromUrl();
+  }
+
+  toggleOrgMenu(event: Event) {
+    event.stopPropagation();
+    this.orgMenuOpen.update((v) => !v);
+  }
+
+  async switchLedger(ledgerId: string | undefined) {
+    this.orgMenuOpen.set(false);
+    if (!ledgerId || ledgerId === this.activeLedgerId()) {
+      return;
+    }
+    await this.organizationsService.switchToLedger(ledgerId);
   }
 
   ngAfterViewInit() {
@@ -478,7 +519,7 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
     this.privacyService.toggle();
     try {
       await this.userService.updatePreferences({ privacyMode: this.privacyService.isPrivate() });
-    } catch (err) {
+    } catch {
       // stub
     }
   }
@@ -492,11 +533,13 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
   @HostListener('document:click')
   onDocumentClick() {
     this.userMenuOpen.set(false);
+    this.orgMenuOpen.set(false);
   }
 
   @HostListener('document:keydown.escape')
   onEscape() {
     this.userMenuOpen.set(false);
+    this.orgMenuOpen.set(false);
     this.closeMore();
   }
 }

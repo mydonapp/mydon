@@ -12,7 +12,7 @@ import { User } from './user.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([AccessToken, RefreshToken, User]),
-    OrganizationsModule,
+    forwardRef(() => OrganizationsModule),
     forwardRef(() => LedgersModule),
   ],
   controllers: [AuthController],

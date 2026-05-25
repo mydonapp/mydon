@@ -20,7 +20,9 @@
         <span class="text-2xl font-bold">D</span>
       </div>
       <h1 class="text-2xl font-bold text-primary">myDon</h1>
-      <p class="text-on-surface-variant text-sm mt-1">{{ 'views.signup.title' | translate }}</p>
+      <p class="text-on-surface-variant text-sm mt-1">
+        {{ (business() ? 'views.signup.businessTitle' : 'views.signup.title') | translate }}
+      </p>
     </div>
 
     @if (showApiSettings()) {
@@ -102,6 +104,22 @@
             autocomplete="new-password"
           />
         </app-field>
+        @if (business()) {
+        <app-field
+          [label]="'views.signup.signupForm.organizationName.label' | translate"
+          [required]="true"
+        >
+          <input
+            appInput
+            type="text"
+            name="organizationName"
+            [ngModel]="organizationName()"
+            (ngModelChange)="organizationName.set($event)"
+            [placeholder]="'views.signup.signupForm.organizationName.placeholder' | translate"
+            autocomplete="organization"
+          />
+        </app-field>
+        }
 
         <button
           appBtn
@@ -123,6 +141,25 @@
       >
         {{ 'views.signup.loginPrompt.link' | translate }}
       </a>
+    </p>
+    <p class="text-center text-sm text-on-surface-variant mt-2">
+      @if (business()) {
+      {{ 'views.signup.personalPrompt.text' | translate }}
+      <a
+        routerLink="/auth/signup"
+        class="text-primary hover:underline ml-1"
+      >
+        {{ 'views.signup.personalPrompt.link' | translate }}
+      </a>
+      } @else {
+      {{ 'views.signup.businessPrompt.text' | translate }}
+      <a
+        routerLink="/auth/signup/business"
+        class="text-primary hover:underline ml-1"
+      >
+        {{ 'views.signup.businessPrompt.link' | translate }}
+      </a>
+      }
     </p>
   </div>
 </div>

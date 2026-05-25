@@ -19,6 +19,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/signup').then((m) => m.SignupComponent),
   },
   {
+    path: 'auth/signup/business',
+    canActivate: [noAuthGuard],
+    data: { business: true },
+    loadComponent: () => import('./features/auth/signup').then((m) => m.SignupComponent),
+  },
+  {
     path: 'app',
     loadComponent: () => import('./layout/app-layout').then((m) => m.AppLayoutComponent),
     canActivate: [authGuard],

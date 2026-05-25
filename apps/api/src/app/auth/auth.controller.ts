@@ -31,6 +31,7 @@ export class AuthController {
       listStyle: user.listStyle ?? 'normal',
       privacyMode: user.privacyMode ?? false,
       showAccountCodes: user.showAccountCodes ?? false,
+      activeLedgerId: user.activeLedgerId ?? null,
     };
   }
 
@@ -48,6 +49,7 @@ export class AuthController {
       listStyle?: string;
       privacyMode?: boolean;
       showAccountCodes?: boolean;
+      activeLedgerId?: string;
     },
   ) {
     const user = req['context']?.user;
@@ -61,6 +63,7 @@ export class AuthController {
       listStyle: updated.listStyle ?? 'normal',
       privacyMode: updated.privacyMode ?? false,
       showAccountCodes: updated.showAccountCodes ?? false,
+      activeLedgerId: updated.activeLedgerId ?? null,
     };
   }
 

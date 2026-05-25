@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, Length } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, Length, ValidateIf } from 'class-validator';
+import { OrganizationKind } from '../../organizations/organization.entity';
 
 export class SignupDto {
   @ApiProperty({
@@ -32,4 +33,15 @@ export class SignupDto {
   @IsEmail()
   @Length(6, 50)
   declare email: string;
+
+  @ApiProperty({ description: 'Organization kind to provision', required: false, enum: OrganizationKind })
+  @IsOptional()
+  @IsEnum(OrganizationKind)
+  declare kind?: OrganizationKind;
+
+  @ApiProperty({ description: 'Organization name (required for BUSINESS signups)', required: false })
+  @ValidateIf((o) => o.kind === OrganizationKind.BUSINESS)
+  @IsString()
+  @Length(2, 100)
+  declare organizationName?: string;
 }

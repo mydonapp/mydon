@@ -10,6 +10,7 @@ declare namespace Express {
         listStyle: string;
         privacyMode: boolean;
         showAccountCodes: boolean;
+        activeLedgerId: string | null;
       };
     };
   }

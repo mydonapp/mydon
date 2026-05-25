@@ -31,6 +31,10 @@ export class User {
   @Column({ type: 'boolean', name: 'show_account_codes', default: false })
   declare showAccountCodes: boolean;
 
+  /** The ledger the user is currently working in (their "active books"). FK added in migration. */
+  @Column({ type: 'uuid', name: 'active_ledger_id', nullable: true, default: null })
+  declare activeLedgerId: string | null;
+
   @OneToMany(() => AccessToken, (accessToken) => accessToken.user)
   declare accessToken: AccessToken[];
 

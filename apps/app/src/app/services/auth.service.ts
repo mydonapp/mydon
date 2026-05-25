@@ -86,11 +86,16 @@ export class AuthService {
     this.setToken(res.accessToken, res.expiry);
   }
 
-  async signup(name: string, email: string, password: string): Promise<void> {
+  async signup(
+    name: string,
+    email: string,
+    password: string,
+    opts?: { kind?: 'BUSINESS'; organizationName?: string },
+  ): Promise<void> {
     const res = await firstValueFrom(
       this.http.post<TokenResponse>(
         `${this.apiUrl}/v1/auth/signup`,
-        { name, email, password },
+        { name, email, password, kind: opts?.kind, organizationName: opts?.organizationName },
         { withCredentials: true },
       ),
     );

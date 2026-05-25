@@ -17,6 +17,7 @@ export interface User {
   listStyle: string;
   privacyMode: boolean;
   showAccountCodes: boolean;
+  activeLedgerId: string | null;
 }
 
 export interface UserPreferences {

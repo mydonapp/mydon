@@ -63,6 +63,7 @@
     },
     "signup": {
       "title": "Create an account",
+      "businessTitle": "Create a business account",
       "signupForm": {
         "name": {
           "label": "Name",
@@ -76,6 +77,10 @@
           "label": "Password",
           "placeholder": "Password"
         },
+        "organizationName": {
+          "label": "Organization name",
+          "placeholder": "e.g. Acme GmbH"
+        },
         "submit": {
           "label": "Create Account"
         },
@@ -84,6 +89,14 @@
       "loginPrompt": {
         "text": "Already a member?",
         "link": "Login now"
+      },
+      "businessPrompt": {
+        "text": "Signing up a business?",
+        "link": "Create a business account"
+      },
+      "personalPrompt": {
+        "text": "Personal account?",
+        "link": "Create a personal account"
       }
     },
     "accounts": {

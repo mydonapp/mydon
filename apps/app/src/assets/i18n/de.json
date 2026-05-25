@@ -63,6 +63,7 @@
     },
     "signup": {
       "title": "Konto erstellen",
+      "businessTitle": "Geschäftskonto erstellen",
       "signupForm": {
         "name": {
           "label": "Name",
@@ -76,6 +77,10 @@
           "label": "Passwort",
           "placeholder": "Passwort"
         },
+        "organizationName": {
+          "label": "Firmenname",
+          "placeholder": "z. B. Acme GmbH"
+        },
         "submit": {
           "label": "Konto erstellen"
         },
@@ -84,6 +89,14 @@
       "loginPrompt": {
         "text": "Bereits Mitglied?",
         "link": "Jetzt anmelden"
+      },
+      "businessPrompt": {
+        "text": "Ein Unternehmen registrieren?",
+        "link": "Geschäftskonto erstellen"
+      },
+      "personalPrompt": {
+        "text": "Privatkonto?",
+        "link": "Privatkonto erstellen"
       }
     },
     "accounts": {

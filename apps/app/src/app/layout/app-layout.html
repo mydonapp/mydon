@@ -20,6 +20,83 @@
       >
     </div>
 
+    <!-- Workspace (organization / ledger) switcher -->
+    @if (canSwitchWorkspace()) {
+    <div class="org-switcher">
+      <button
+        class="org-switcher-btn"
+        (click)="toggleOrgMenu($event)"
+        [attr.aria-expanded]="orgMenuOpen()"
+        aria-haspopup="menu"
+      >
+        <app-icon
+          name="building"
+          [size]="16"
+          class="flex-shrink-0"
+        />
+        <div class="sidebar-label org-switcher-info">
+          <p class="org-switcher-name">{{ activeOrg()?.name }}</p>
+          @if (activeOrg() && activeOrg()!.ledgers.length > 1) {
+          <p class="org-switcher-ledger">{{ activeLedger()?.name }}</p>
+          }
+        </div>
+        <app-icon
+          name="chevron-down"
+          [size]="14"
+          class="sidebar-label flex-shrink-0"
+        />
+      </button>
+      @if (orgMenuOpen()) {
+      <div
+        class="org-menu"
+        role="menu"
+        tabindex="-1"
+        (click)="$event.stopPropagation()"
+        (keydown)="$event.stopPropagation()"
+      >
+        @for (org of organizations(); track org.id) {
+        @if (org.ledgers.length <= 1) {
+        <button
+          class="user-menu-item"
+          role="menuitem"
+          (click)="switchLedger(org.ledgers[0].id)"
+        >
+          <app-icon
+            name="building"
+            [size]="15"
+          />
+          <span class="flex-1 truncate">{{ org.name }}</span>
+          @if (org.ledgers[0].id === activeLedgerId()) {
+          <app-icon
+            name="check"
+            [size]="14"
+          />
+          }
+        </button>
+        } @else {
+        <p class="org-menu-label">{{ org.name }}</p>
+        @for (l of org.ledgers; track l.id) {
+        <button
+          class="user-menu-item org-menu-ledger"
+          role="menuitem"
+          (click)="switchLedger(l.id)"
+        >
+          <span class="flex-1 truncate">{{ l.name }}</span>
+          @if (l.id === activeLedgerId()) {
+          <app-icon
+            name="check"
+            [size]="14"
+          />
+          }
+        </button>
+        }
+        }
+        }
+      </div>
+      }
+    </div>
+    }
+
     <!-- Navigation (scrolls independently) -->
     <nav
       class="sidebar-nav"
@@ -269,6 +346,48 @@
         </div>
       </div>
     </div>
+
+    @if (canSwitchWorkspace()) {
+    <div class="more-list">
+      @for (org of organizations(); track org.id) { @if (org.ledgers.length <= 1) {
+      <button
+        type="button"
+        class="more-row"
+        (click)="switchLedger(org.ledgers[0].id)"
+      >
+        <app-icon
+          name="building"
+          [size]="18"
+        />
+        <span class="more-row-label">{{ org.name }}</span>
+        @if (org.ledgers[0].id === activeLedgerId()) {
+        <app-icon
+          name="check"
+          [size]="18"
+          class="more-row-chev"
+        />
+        }
+      </button>
+      } @else {
+      <p class="more-section-label">{{ org.name }}</p>
+      @for (l of org.ledgers; track l.id) {
+      <button
+        type="button"
+        class="more-row more-row--nested"
+        (click)="switchLedger(l.id)"
+      >
+        <span class="more-row-label">{{ l.name }}</span>
+        @if (l.id === activeLedgerId()) {
+        <app-icon
+          name="check"
+          [size]="18"
+          class="more-row-chev"
+        />
+        }
+      </button>
+      } } }
+    </div>
+    }
 
     <div class="more-list">
       @for (item of moreItems; track item.route) {

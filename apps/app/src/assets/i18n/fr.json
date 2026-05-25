@@ -63,6 +63,7 @@
     },
     "signup": {
       "title": "Créer un compte",
+      "businessTitle": "Créer un compte professionnel",
       "signupForm": {
         "name": {
           "label": "Nom",
@@ -76,6 +77,10 @@
           "label": "Mot de passe",
           "placeholder": "Mot de passe"
         },
+        "organizationName": {
+          "label": "Nom de l'organisation",
+          "placeholder": "p. ex. Acme SARL"
+        },
         "submit": {
           "label": "Créer un compte"
         },
@@ -84,6 +89,14 @@
       "loginPrompt": {
         "text": "Déjà membre ?",
         "link": "Se connecter"
+      },
+      "businessPrompt": {
+        "text": "Inscrire une entreprise ?",
+        "link": "Créer un compte professionnel"
+      },
+      "personalPrompt": {
+        "text": "Compte personnel ?",
+        "link": "Créer un compte personnel"
       }
     },
     "accounts": {

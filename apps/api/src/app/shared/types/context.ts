@@ -8,5 +8,6 @@ export interface Context {
     listStyle: string;
     privacyMode: boolean;
     showAccountCodes: boolean;
+    activeLedgerId: string | null;
   };
 }

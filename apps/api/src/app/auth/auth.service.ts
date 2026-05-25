@@ -50,7 +50,14 @@ export class AuthService {
     });
   }
 
-  async createUser(data: { email: string; password: string; name: string; language?: string }): Promise<void> {
+  async createUser(data: {
+    email: string;
+    password: string;
+    name: string;
+    language?: string;
+    kind?: OrganizationKind;
+    organizationName?: string;
+  }): Promise<void> {
     data.password = await argon2.hash(data.password);
 
     const language = data.language ?? 'en';
@@ -62,11 +69,15 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
-    // Every signup provisions a PERSONAL org + OWNER membership + "Main" ledger
-    // seeded with the personal chart of accounts (in the user's language). Business orgs added later.
-    const organization = await this.organizationsService.createPersonalOrganization(user);
-    const ledger = await this.ledgersService.createDefaultLedger(organization.id, { kind: OrganizationKind.PERSONAL });
-    await this.chartSeederService.seedChart(ledger, OrganizationKind.PERSONAL, language);
+    // One org per signup: PERSONAL signups get a personal org named after the user; BUSINESS signups get
+    // a single business org with the given name (no personal org). Each gets a "Main" ledger seeded with
+    // the matching chart in the user's language, and becomes the user's active ledger.
+    const kind = data.kind === OrganizationKind.BUSINESS ? OrganizationKind.BUSINESS : OrganizationKind.PERSONAL;
+    const orgName = kind === OrganizationKind.BUSINESS ? (data.organizationName ?? data.name) : data.name;
+    const organization = await this.organizationsService.createOrganization(user, kind, orgName);
+    const ledger = await this.ledgersService.createDefaultLedger(organization.id, { kind });
+    await this.chartSeederService.seedChart(ledger, kind, language);
+    await this.userRepository.update({ id: user.id }, { activeLedgerId: ledger.id });
   }
 
   async logout(refreshToken: string): Promise<void> {
@@ -179,9 +190,17 @@ export class AuthService {
       listStyle?: string;
       privacyMode?: boolean;
       showAccountCodes?: boolean;
+      activeLedgerId?: string;
     },
   ): Promise<User> {
     const user = await this.userRepository.findOneOrFail({ where: { id: userId } });
+    if (data.activeLedgerId !== undefined) {
+      // Switch active books — only to a ledger in an org the user belongs to.
+      if (!(await this.ledgersService.userCanUseLedger(userId, data.activeLedgerId))) {
+        throw new BadRequestException('Ledger not found in your organizations');
+      }
+      user.activeLedgerId = data.activeLedgerId;
+    }
     if (data.name) {
       user.name = data.name;
     }

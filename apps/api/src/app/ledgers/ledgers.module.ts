@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account } from '../accounts/accounts.entity';
 import { AuthModule } from '../auth/auth.module';
+import { User } from '../auth/user.entity';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { ChartSeederService } from './chart-seeder.service';
 import { LedgersController } from './ledgers.controller';
@@ -11,7 +12,7 @@ import { LedgersService } from './ledgers.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Ledger, Account, AccountGroup]),
+    TypeOrmModule.forFeature([Ledger, Account, AccountGroup, User]),
     OrganizationsModule,
     forwardRef(() => AuthModule),
   ],

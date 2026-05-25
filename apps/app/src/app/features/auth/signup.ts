@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AppConfigService } from '../../services/app-config.service';
 import { AuthService } from '../../services/auth.service';
@@ -21,10 +21,14 @@ export class SignupComponent {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   protected readonly appConfig = inject(AppConfigService);
+  private readonly route = inject(ActivatedRoute);
 
+  // Business vs personal signup is driven by the route (`data.business`).
+  readonly business = signal(this.route.snapshot.data['business'] === true);
   name = signal('');
   email = signal('');
   password = signal('');
+  organizationName = signal('');
   loading = signal(false);
   showApiSettings = signal(false);
   editApiUrl = signal('');
@@ -51,9 +55,17 @@ export class SignupComponent {
     if (!this.name() || !this.email() || !this.password()) {
       return;
     }
+    if (this.business() && !this.organizationName()) {
+      return;
+    }
     this.loading.set(true);
     try {
-      await this.authService.signup(this.name(), this.email(), this.password());
+      await this.authService.signup(
+        this.name(),
+        this.email(),
+        this.password(),
+        this.business() ? { kind: 'BUSINESS', organizationName: this.organizationName() } : undefined,
+      );
       this.router.navigate(['/app']);
     } catch {
       this.toastService.error('views.signup.signupForm.error');

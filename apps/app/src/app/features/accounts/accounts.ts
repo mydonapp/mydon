@@ -200,7 +200,7 @@ export class AccountsComponent implements OnInit {
     this.listStyleService.set(next);
     try {
       await this.userService.updatePreferences({ listStyle: next });
-    } catch (err) {
+    } catch {
       // stub
     }
   }
