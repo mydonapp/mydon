@@ -40,9 +40,34 @@ export interface BalanceSheet {
   liabilities: BalanceSheetSection;
   equity: BalanceSheetSection;
   netResult: number;
+  /** Un-closed prior-period income/expense rolled virtually into retained earnings. */
+  priorPeriodResult: number;
   totalEquity: number;
   totalLiabilitiesAndEquity: number;
   balanced: boolean;
+}
+
+export interface IncomeStatementRow {
+  id: string;
+  code: string;
+  name: string;
+  current: number;
+  previous: number;
+}
+
+export interface IncomeStatementSection {
+  rows: IncomeStatementRow[];
+  currentTotal: number;
+  previousTotal: number;
+}
+
+export interface IncomeStatement {
+  baseCurrency: string;
+  currentLabel: string;
+  previousLabel: string | null;
+  income: IncomeStatementSection;
+  expense: IncomeStatementSection;
+  netResult: { current: number; previous: number };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -52,6 +77,7 @@ export class ReportsService {
 
   private trialBalanceByYear = new Map<string, TrialBalance>();
   private balanceSheetByYear = new Map<string, BalanceSheet>();
+  private incomeStatementByYear = new Map<string, IncomeStatement>();
 
   private range(year: string): string {
     return new URLSearchParams({ from: `${year}-01-01`, to: `${year}-12-31` }).toString();
@@ -81,7 +107,19 @@ export class ReportsService {
     return data;
   }
 
-  async downloadPdf(report: 'trial-balance' | 'balance-sheet', year: string): Promise<void> {
+  async fetchIncomeStatement(year: string): Promise<IncomeStatement> {
+    const cached = this.incomeStatementByYear.get(year);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(
+      this.http.get<IncomeStatement>(`${this.appConfig.apiUrl}/v1/reports/income-statement?${this.range(year)}`),
+    );
+    this.incomeStatementByYear.set(year, data);
+    return data;
+  }
+
+  async downloadPdf(report: 'trial-balance' | 'balance-sheet' | 'income-statement', year: string): Promise<void> {
     const blob = await firstValueFrom(
       this.http.get(`${this.appConfig.apiUrl}/v1/reports/${report}/pdf?${this.range(year)}`, {
         responseType: 'blob',
@@ -100,6 +138,7 @@ export class ReportsService {
   invalidate(): void {
     this.trialBalanceByYear.clear();
     this.balanceSheetByYear.clear();
+    this.incomeStatementByYear.clear();
   }
 
   clearCache(): void {

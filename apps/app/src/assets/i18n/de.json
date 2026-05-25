@@ -183,8 +183,10 @@
       "noTransactions": "Keine Transaktionen gefunden",
       "noTransactionsDescription": "Dieses Konto hat noch keine Transaktionen.",
       "transactionDetails": "Transaktionsdetails",
+      "export": "Exportieren",
       "transactions": {
         "title": "Transaktionen",
+        "split": "Sammelbuchung",
         "table": {
           "date": "Transaktionsdatum",
           "description": "Beschreibung",
@@ -405,6 +407,47 @@
     "manage": {
       "title": "Verwalten",
       "subtitle": "Konten und Kontogruppen verwalten",
+      "ledger": {
+        "title": "Hauptbuch",
+        "closingMode": "Abschlussmodus",
+        "closingModeDescription": "Einfach: Jahresabschluss mit einem Klick. Erweitert: Workflow mit Periodensperre (empfohlen für Unternehmen).",
+        "modeSimple": "Einfach",
+        "modeAdvanced": "Erweitert",
+        "fiscalYearStartMonth": "Geschäftsjahr beginnt im",
+        "retainedEarningsAccount": "Gewinnvortrag-Konto",
+        "retainedEarningsAccountHelp": "Ertrags- und Aufwandskonten werden beim Abschluss in dieses Eigenkapital-Konto übertragen. Es kann nicht deaktiviert werden, solange es hier gesetzt ist.",
+        "saveSuccess": "Hauptbuch-Einstellungen aktualisiert.",
+        "saveError": "Hauptbuch-Einstellungen konnten nicht aktualisiert werden."
+      },
+      "closing": {
+        "title": "Jahresabschluss",
+        "subtitle": "Abgeschlossene Geschäftsjahre schließen — überträgt Ertrag und Aufwand auf den Gewinnvortrag.",
+        "empty": "Noch keine abgeschlossenen Geschäftsjahre zum Abschließen.",
+        "statusClosed": "Abgeschlossen",
+        "statusClosing": "In Bearbeitung",
+        "closeButton": "Abschließen",
+        "initiateButton": "Abschluss starten",
+        "sealButton": "Versiegeln",
+        "cancelButton": "Abbrechen",
+        "modalTitle": "Geschäftsjahr {{year}} abschließen",
+        "description": "Es wird eine einzige Buchung erstellt, die Ertrags- und Aufwandssalden des Geschäftsjahres auf das Gewinnvortrag-Konto überträgt.",
+        "netResult": "Periodenergebnis",
+        "entries": "Abschlussbuchungen",
+        "skippedWarning": "{{count}} Konto/Konten in Fremdwährung können nicht automatisch abgeschlossen werden:",
+        "alreadyClosedWarning": "Dieses Geschäftsjahr wurde bereits abgeschlossen.",
+        "noActivityWarning": "Keine Erträge oder Aufwände in diesem Geschäftsjahr — nichts abzuschließen.",
+        "confirm": "Abschlussbuchung erstellen",
+        "initiateConfirm": "Entwurf zur Prüfung erstellen",
+        "success": "Geschäftsjahr abgeschlossen.",
+        "error": "Abschluss fehlgeschlagen.",
+        "previewError": "Vorschau konnte nicht geladen werden.",
+        "loadError": "Geschäftsjahre konnten nicht geladen werden.",
+        "draftCreated": "Abschlussentwurf erstellt. Prüfen Sie die Buchung und versiegeln Sie sie anschließend.",
+        "sealSuccess": "Geschäftsjahr versiegelt — die Periode ist nun gesperrt.",
+        "sealError": "Versiegelung fehlgeschlagen.",
+        "cancelSuccess": "Abschluss abgebrochen. Das Geschäftsjahr ist wieder offen.",
+        "cancelError": "Abbruch fehlgeschlagen."
+      },
       "accountGroups": {
         "title": "Kontogruppen",
         "namePlaceholder": "Name der Kontogruppe",
@@ -458,9 +501,19 @@
         "liabilities": "Passiven",
         "equity": "Eigenkapital",
         "netResult": "Periodenergebnis",
+        "priorPeriodResult": "Gewinnvortrag (Vorperioden)",
         "liabilitiesPlusEquity": "Passiven + Eigenkapital",
         "balanced": "Die Bilanz ist ausgeglichen",
         "notBalanced": "Die Bilanz ist nicht ausgeglichen"
+      },
+      "incomeStatement": {
+        "tab": "Erfolgsrechnung",
+        "account": "Konto",
+        "income": "Ertrag",
+        "expenses": "Aufwand",
+        "totalIncome": "Total Ertrag",
+        "totalExpenses": "Total Aufwand",
+        "netResult": "Periodenergebnis"
       },
       "download": "PDF herunterladen",
       "downloadError": "Bericht konnte nicht heruntergeladen werden."

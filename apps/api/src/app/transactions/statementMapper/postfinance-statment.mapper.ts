@@ -1,4 +1,5 @@
 import { parse } from 'csv-parse/sync';
+import { ymdToDateString } from '../../shared/date';
 import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 
 export interface PostFinanceStatement {
@@ -68,7 +69,7 @@ export class PostFinanceStatementMapper extends StatementMapper<PostFinanceState
             : parseFloat(transaction.creditInCHF.toString()),
         ),
         description: transaction.notificationText,
-        transactionDate: new Date(parseInt(dmy[2]), parseInt(dmy[1]) - 1, parseInt(dmy[0])),
+        transactionDate: ymdToDateString(parseInt(dmy[2]), parseInt(dmy[1]), parseInt(dmy[0])),
         raw: {
           ...transaction,
           issuer: 'POSTFINANCE',

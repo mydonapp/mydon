@@ -1,12 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountGroup, AccountGroupsService } from '../../services/account-groups.service';
 import { AccountSimple, AccountsService } from '../../services/accounts.service';
+import { ClosingMode, LedgerService } from '../../services/ledger.service';
 import { ListStyleService } from '../../services/list-style.service';
 import { ToastService } from '../../services/toast.service';
 import { AccountGroupComboboxComponent } from '../../shared/components/account-group-combobox/account-group-combobox';
 import { FieldComponent } from '../../shared/components/field/field';
+import { FiscalYearClosingComponent } from './fiscal-year-closing';
 import { IconComponent } from '../../shared/components/icon/icon';
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
@@ -16,7 +18,7 @@ import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
 
-type Section = 'accounts' | 'accountGroups';
+type Section = 'accounts' | 'accountGroups' | 'ledger' | 'closing';
 
 @Component({
   selector: 'app-manage',
@@ -34,15 +36,38 @@ type Section = 'accounts' | 'accountGroups';
     ToggleComponent,
     IconComponent,
     AccountGroupComboboxComponent,
+    FiscalYearClosingComponent,
   ],
 })
 export class ManageComponent implements OnInit {
   accountGroupsService = inject(AccountGroupsService);
   protected readonly listStyleService = inject(ListStyleService);
+  protected readonly ledgerService = inject(LedgerService);
   private accountsService = inject(AccountsService);
   private toastService = inject(ToastService);
 
   activeSection = signal<Section>('accounts');
+
+  // ── Ledger ────────────────────────────────────────────────────────────
+  savingLedger = signal(false);
+
+  closingModeOptions = [
+    { value: 'SIMPLE' as const, label: 'views.manage.ledger.modeSimple' },
+    { value: 'ADVANCED' as const, label: 'views.manage.ledger.modeAdvanced' },
+  ];
+
+  monthOptions: SelectOption[] = Array.from({ length: 12 }, (_, i) => ({
+    value: String(i + 1),
+    label: new Date(Date.UTC(2000, i, 1)).toLocaleString(undefined, { month: 'long', timeZone: 'UTC' }),
+  }));
+
+  // Retained-earnings choices: every EQUITY account in the ledger.
+  equityAccountOptions = computed<SelectOption[]>(() =>
+    this.accountsService
+      .accounts()
+      .filter((a) => a.type === 'EQUITY')
+      .map((a) => ({ value: a.id, label: a.code ? `${a.code} — ${a.name}` : a.name })),
+  );
 
   // ── Account Groups ─────────────────────────────────────────────────────
   creatingGroup = signal(false);
@@ -106,7 +131,32 @@ export class ManageComponent implements OnInit {
 
   ngOnInit() {
     this.accountGroupsService.fetchAccountGroups();
+    this.ledgerService.fetch();
     this.loadAccounts();
+  }
+
+  async onFiscalYearStartMonthChange(value: string) {
+    await this.saveLedger({ fiscalYearStartMonth: Number(value) });
+  }
+
+  async onClosingModeChange(mode: ClosingMode) {
+    await this.saveLedger({ closingMode: mode });
+  }
+
+  async onRetainedEarningsAccountChange(accountId: string) {
+    await this.saveLedger({ retainedEarningsAccountId: accountId });
+  }
+
+  private async saveLedger(payload: Parameters<LedgerService['update']>[0]) {
+    this.savingLedger.set(true);
+    try {
+      await this.ledgerService.update(payload);
+      this.toastService.success('views.manage.ledger.saveSuccess');
+    } catch {
+      this.toastService.error('views.manage.ledger.saveError');
+    } finally {
+      this.savingLedger.set(false);
+    }
   }
 
   async loadAccounts() {

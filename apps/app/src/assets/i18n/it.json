@@ -183,8 +183,10 @@
       "noTransactions": "Nessuna transazione trovata",
       "noTransactionsDescription": "Questo conto non ha ancora transazioni.",
       "transactionDetails": "Dettagli transazione",
+      "export": "Esporta",
       "transactions": {
         "title": "Transazioni",
+        "split": "Ripartito",
         "table": {
           "date": "Data transazione",
           "description": "Descrizione",
@@ -405,6 +407,47 @@
     "manage": {
       "title": "Gestisci",
       "subtitle": "Gestisci i tuoi conti e gruppi di conti",
+      "ledger": {
+        "title": "Libro mastro",
+        "closingMode": "Modalità di chiusura",
+        "closingModeDescription": "Semplice: chiusura annuale con un clic. Avanzata: workflow con blocco del periodo (consigliata per le aziende).",
+        "modeSimple": "Semplice",
+        "modeAdvanced": "Avanzata",
+        "fiscalYearStartMonth": "L'esercizio inizia in",
+        "retainedEarningsAccount": "Conto utili portati a nuovo",
+        "retainedEarningsAccountHelp": "I saldi di ricavi e costi vengono trasferiti su questo conto del patrimonio netto in chiusura. Non può essere disattivato finché è impostato qui.",
+        "saveSuccess": "Impostazioni del libro mastro aggiornate.",
+        "saveError": "Aggiornamento delle impostazioni del libro mastro non riuscito."
+      },
+      "closing": {
+        "title": "Chiusura annuale",
+        "subtitle": "Chiudi gli esercizi completati — trasferisce ricavi e costi sugli utili portati a nuovo.",
+        "empty": "Nessun esercizio completato da chiudere per ora.",
+        "statusClosed": "Chiuso",
+        "statusClosing": "In corso",
+        "closeButton": "Chiudi",
+        "initiateButton": "Avvia chiusura",
+        "sealButton": "Sigilla",
+        "cancelButton": "Annulla",
+        "modalTitle": "Chiudi esercizio {{year}}",
+        "description": "Viene creata una singola registrazione che trasferisce i saldi di ricavi e costi dell'esercizio sul conto utili portati a nuovo.",
+        "netResult": "Risultato del periodo",
+        "entries": "Registrazioni di chiusura",
+        "skippedWarning": "{{count}} conto/conti in valuta non base non possono essere chiusi automaticamente:",
+        "alreadyClosedWarning": "Questo esercizio è già stato chiuso.",
+        "noActivityWarning": "Nessuna attività di ricavi o costi in questo esercizio — niente da chiudere.",
+        "confirm": "Crea registrazione di chiusura",
+        "initiateConfirm": "Crea bozza da revisionare",
+        "success": "Esercizio chiuso.",
+        "error": "Chiusura non riuscita.",
+        "previewError": "Impossibile caricare l'anteprima.",
+        "loadError": "Impossibile caricare gli esercizi.",
+        "draftCreated": "Bozza di chiusura creata. Rivedi la registrazione e poi sigilla per finalizzare.",
+        "sealSuccess": "Esercizio sigillato — il periodo è ora bloccato.",
+        "sealError": "Sigillatura non riuscita.",
+        "cancelSuccess": "Chiusura annullata. L'esercizio è di nuovo aperto.",
+        "cancelError": "Annullamento non riuscito."
+      },
       "accountGroups": {
         "title": "Gruppi di conti",
         "namePlaceholder": "Nome del gruppo di conti",
@@ -458,9 +501,19 @@
         "liabilities": "Passività",
         "equity": "Patrimonio netto",
         "netResult": "Risultato del periodo",
+        "priorPeriodResult": "Utili portati a nuovo (periodi precedenti)",
         "liabilitiesPlusEquity": "Passività + Patrimonio netto",
         "balanced": "Lo stato patrimoniale è in pareggio",
         "notBalanced": "Lo stato patrimoniale non è in pareggio"
+      },
+      "incomeStatement": {
+        "tab": "Conto economico",
+        "account": "Conto",
+        "income": "Ricavi",
+        "expenses": "Costi",
+        "totalIncome": "Totale ricavi",
+        "totalExpenses": "Totale costi",
+        "netResult": "Risultato del periodo"
       },
       "download": "Scarica PDF",
       "downloadError": "Download del report non riuscito."

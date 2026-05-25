@@ -69,11 +69,18 @@ export class AuthController {
   @ApiBody({ type: SignupDto })
   @ApiResponse({ status: 201, description: 'User account created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
-  async signup(@Body() signupDto: SignupDto): Promise<void> {
+  async signup(@Req() req: Request, @Body() signupDto: SignupDto): Promise<void> {
     if (!signupDto.password) {
       throw new BadRequestException('invalid password');
     }
-    await this.authService.createUser(signupDto);
+    await this.authService.createUser({ ...signupDto, language: this.languageFromRequest(req) });
+  }
+
+  /** Read the UI language from the X-Language header, falling back to English. */
+  private languageFromRequest(req: Request): string {
+    const raw = req.headers['x-language'];
+    const value = Array.isArray(raw) ? raw[0] : raw;
+    return value && ['en', 'de', 'fr', 'it'].includes(value) ? value : 'en';
   }
 
   @Post('logout')

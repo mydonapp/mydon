@@ -95,8 +95,8 @@ export class ExportService {
       account.type,
       account.currency,
       account.retirementAccount,
-      account.activeFrom?.toISOString() ?? '',
-      account.activeUntil?.toISOString() ?? '',
+      account.activeFrom ?? '',
+      account.activeUntil ?? '',
     ]);
     return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
   }
@@ -114,7 +114,7 @@ export class ExportService {
     ];
     const rows = transactions.map((t) => [
       t.id,
-      t.transactionDate?.toISOString() || '',
+      t.transactionDate || '',
       this.escapeCsvValue(t.description),
       this.escapeCsvValue(t.reference ?? ''),
       t.postedAt?.toISOString() || '',

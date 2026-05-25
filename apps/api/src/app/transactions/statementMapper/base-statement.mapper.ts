@@ -6,7 +6,7 @@ export interface MappedTransaction<T> {
   creditAmount: number;
   debitAmount: number;
   description: string;
-  transactionDate: Date;
+  transactionDate: string;
   raw: T;
 }
 
@@ -18,7 +18,7 @@ export interface DraftStatementTransaction {
   creditAmount: number;
   debitAmount: number;
   description: string;
-  transactionDate: Date;
+  transactionDate: string;
   raw: string;
   creditAccountId?: string;
   debitAccountId?: string;

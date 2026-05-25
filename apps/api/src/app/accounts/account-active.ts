@@ -1,3 +1,5 @@
+import { toDateString, todayDateString } from '../shared/date';
+
 /**
  * Determines whether an account is active on a given date.
  *
@@ -11,10 +13,12 @@
  * find accounts that were active in December.
  */
 export function isAccountActive(
-  a: { activeFrom: Date | null; activeUntil: Date | null },
-  asOf: Date = new Date(),
+  a: { activeFrom: string | null; activeUntil: string | null },
+  asOf: string | Date = todayDateString(),
 ): boolean {
-  const from = a.activeFrom ? new Date(a.activeFrom) : null;
-  const until = a.activeUntil ? new Date(a.activeUntil) : null;
-  return (from == null || from <= asOf) && (until == null || until > asOf);
+  // Calendar-date comparison: 'YYYY-MM-DD' strings sort chronologically, so plain string compare works.
+  const on = toDateString(asOf);
+  const from = a.activeFrom ? toDateString(a.activeFrom) : null;
+  const until = a.activeUntil ? toDateString(a.activeUntil) : null;
+  return (from == null || from <= on) && (until == null || until > on);
 }

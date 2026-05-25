@@ -172,8 +172,7 @@ export class AccountsService {
     return data;
   }
 
-  async fetchAccount(id: string): Promise<AccountDetail> {
-    const year = this.timeFilter();
+  async fetchAccount(id: string, year: string): Promise<AccountDetail> {
     const key = `${id}|${year}`;
     const cached = this.accountDetailByKey.get(key);
     if (cached) {

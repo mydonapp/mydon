@@ -183,8 +183,10 @@
       "noTransactions": "Aucune transaction trouvée",
       "noTransactionsDescription": "Ce compte n'a pas encore de transactions.",
       "transactionDetails": "Détails de la transaction",
+      "export": "Exporter",
       "transactions": {
         "title": "Transactions",
+        "split": "Ventilé",
         "table": {
           "date": "Date de transaction",
           "description": "Description",
@@ -405,6 +407,47 @@
     "manage": {
       "title": "Gérer",
       "subtitle": "Gérez vos comptes et groupes de comptes",
+      "ledger": {
+        "title": "Grand livre",
+        "closingMode": "Mode de clôture",
+        "closingModeDescription": "Simple : clôture annuelle en un clic. Avancé : workflow avec verrouillage de période (recommandé pour les entreprises).",
+        "modeSimple": "Simple",
+        "modeAdvanced": "Avancé",
+        "fiscalYearStartMonth": "L'exercice commence en",
+        "retainedEarningsAccount": "Compte de report à nouveau",
+        "retainedEarningsAccountHelp": "Les soldes des produits et charges sont transférés sur ce compte de capitaux propres lors de la clôture. Il ne peut être désactivé tant qu'il est défini ici.",
+        "saveSuccess": "Paramètres du grand livre mis à jour.",
+        "saveError": "Échec de la mise à jour des paramètres du grand livre."
+      },
+      "closing": {
+        "title": "Clôture annuelle",
+        "subtitle": "Clôturez les exercices terminés — transfère produits et charges sur le report à nouveau.",
+        "empty": "Aucun exercice terminé à clôturer pour l'instant.",
+        "statusClosed": "Clôturé",
+        "statusClosing": "En cours",
+        "closeButton": "Clôturer",
+        "initiateButton": "Lancer la clôture",
+        "sealButton": "Sceller",
+        "cancelButton": "Annuler",
+        "modalTitle": "Clôturer l'exercice {{year}}",
+        "description": "Une seule écriture est créée pour transférer les soldes des produits et charges de l'exercice sur le compte de report à nouveau.",
+        "netResult": "Résultat de la période",
+        "entries": "Écritures de clôture",
+        "skippedWarning": "{{count}} compte(s) en devise non-base ne peuvent pas être clôturés automatiquement :",
+        "alreadyClosedWarning": "Cet exercice a déjà été clôturé.",
+        "noActivityWarning": "Aucune activité de produits ou charges dans cet exercice — rien à clôturer.",
+        "confirm": "Créer l'écriture de clôture",
+        "initiateConfirm": "Créer le brouillon à examiner",
+        "success": "Exercice clôturé.",
+        "error": "Échec de la clôture.",
+        "previewError": "Échec du chargement de l'aperçu.",
+        "loadError": "Échec du chargement des exercices.",
+        "draftCreated": "Brouillon de clôture créé. Examinez l'écriture puis scellez pour finaliser.",
+        "sealSuccess": "Exercice scellé — la période est maintenant verrouillée.",
+        "sealError": "Échec du scellement.",
+        "cancelSuccess": "Clôture annulée. L'exercice est à nouveau ouvert.",
+        "cancelError": "Échec de l'annulation."
+      },
       "accountGroups": {
         "title": "Groupes de comptes",
         "namePlaceholder": "Nom du groupe de comptes",
@@ -458,9 +501,19 @@
         "liabilities": "Passif",
         "equity": "Capitaux propres",
         "netResult": "Résultat de la période",
+        "priorPeriodResult": "Report à nouveau (périodes précédentes)",
         "liabilitiesPlusEquity": "Passif + Capitaux propres",
         "balanced": "Le bilan est équilibré",
         "notBalanced": "Le bilan n'est pas équilibré"
+      },
+      "incomeStatement": {
+        "tab": "Compte de résultat",
+        "account": "Compte",
+        "income": "Produits",
+        "expenses": "Charges",
+        "totalIncome": "Total des produits",
+        "totalExpenses": "Total des charges",
+        "netResult": "Résultat de la période"
       },
       "download": "Télécharger le PDF",
       "downloadError": "Échec du téléchargement du rapport."

@@ -1,4 +1,5 @@
 import { parse } from 'csv-parse/sync';
+import { ymdToDateString } from '../../shared/date';
 import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 
 export interface SwisscardStatement {
@@ -45,7 +46,7 @@ export class SwisscardStatementMapper extends StatementMapper<SwisscardStatement
         creditAmount: Math.abs(transaction.Amount),
         debitAmount: Math.abs(transaction.Amount),
         description: transaction.Description,
-        transactionDate: new Date(parseInt(dmy[2]), parseInt(dmy[1]) - 1, parseInt(dmy[0])),
+        transactionDate: ymdToDateString(parseInt(dmy[2]), parseInt(dmy[1]), parseInt(dmy[0])),
         raw: {
           ...transaction,
           issuer: 'SWISSCARD',

@@ -34,11 +34,11 @@ export class Account {
   @Column({ type: 'varchar', default: '' })
   declare code: string;
 
-  @Column({ name: 'active_from', type: 'timestamptz', nullable: true, default: null })
-  declare activeFrom: Date | null;
+  @Column({ name: 'active_from', type: 'date', nullable: true, default: null })
+  declare activeFrom: string | null;
 
-  @Column({ name: 'active_until', type: 'timestamptz', nullable: true, default: null })
-  declare activeUntil: Date | null;
+  @Column({ name: 'active_until', type: 'date', nullable: true, default: null })
+  declare activeUntil: string | null;
 
   @Column({ type: 'boolean', default: false })
   declare retirementAccount: boolean;

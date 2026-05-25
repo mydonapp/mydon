@@ -1,21 +1,21 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { balanceColor } from '../../shared/utils/balance-color';
 import { DatePipe, LowerCasePipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { AccountDetail, AccountsService } from '../../services/accounts.service';
 import { AccountCodesService } from '../../services/account-codes.service';
+import { AccountDetail, AccountsService } from '../../services/accounts.service';
 import { CurrencyService } from '../../services/currency.service';
 import { ListStyleService } from '../../services/list-style.service';
 import { PrivacyService } from '../../services/privacy.service';
+import { DetailHeaderComponent } from '../../shared/components/detail-header/detail-header';
+import { IconComponent } from '../../shared/components/icon/icon';
+import { ModalComponent } from '../../shared/components/modal/modal';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 import { BtnDirective } from '../../shared/directives/btn.directive';
 import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective } from '../../shared/directives/select.directive';
-import { ModalComponent } from '../../shared/components/modal/modal';
-import { IconComponent } from '../../shared/components/icon/icon';
-import { DetailHeaderComponent } from '../../shared/components/detail-header/detail-header';
-import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
+import { balanceColor } from '../../shared/utils/balance-color';
 
 type AccountTransaction = {
   id: string;
@@ -23,6 +23,7 @@ type AccountTransaction = {
   description: string;
   amount: number;
   counterAccount?: { id: string; name: string } | null;
+  split?: boolean;
 };
 
 type RawAccountResponse = AccountDetail & {
@@ -66,6 +67,8 @@ export class AccountComponent implements OnInit {
 
   accountId = signal<string>('');
 
+  year = signal(new Date().getFullYear().toString());
+
   yearOptions = Array.from({ length: 5 }, (_, i) => String(new Date().getFullYear() - i));
 
   paginationStart() {
@@ -85,14 +88,14 @@ export class AccountComponent implements OnInit {
   }
 
   onYearChange(year: string) {
-    this.accountsService.timeFilter.set(year);
+    this.year.set(year);
     this.loadData();
   }
 
   async loadData() {
     this.loading.set(true);
     try {
-      const raw = (await this.accountsService.fetchAccount(this.accountId())) as RawAccountResponse;
+      const raw = (await this.accountsService.fetchAccount(this.accountId(), this.year())) as RawAccountResponse;
       const txs: AccountTransaction[] = raw.transactions ?? [];
       this.account.set(raw);
       this.transactions.set(txs);
@@ -117,5 +120,36 @@ export class AccountComponent implements OnInit {
       ),
     );
     this.page.set(1);
+  }
+
+  /** Download the currently shown (year- and search-filtered) transactions as CSV. */
+  exportCsv() {
+    const account = this.account();
+    const rows = this.filteredTransactions();
+    if (!account || rows.length === 0) {
+      return;
+    }
+    const escape = (v: string) => `"${(v ?? '').replace(/"/g, '""')}"`;
+    const lines = [
+      ['Date', 'Description', 'Counter account', 'Amount', 'Currency'].join(','),
+      ...rows.map((tx) =>
+        [
+          tx.transactionDate,
+          escape(tx.description),
+          escape(tx.counterAccount?.name ?? (tx.split ? 'Split' : '')),
+          tx.amount,
+          account.currency,
+        ].join(','),
+      ),
+    ];
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${account.name}-${this.year()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 }

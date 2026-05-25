@@ -183,8 +183,10 @@
       "noTransactions": "No transactions found",
       "noTransactionsDescription": "This account has no transactions yet.",
       "transactionDetails": "Transaction Details",
+      "export": "Export",
       "transactions": {
         "title": "Transactions",
+        "split": "Split",
         "table": {
           "date": "Transaction Date",
           "description": "Description",
@@ -405,6 +407,47 @@
     "manage": {
       "title": "Manage",
       "subtitle": "Manage your accounts and account groups",
+      "ledger": {
+        "title": "Ledger",
+        "closingMode": "Closing mode",
+        "closingModeDescription": "Simple: one-click year-end close. Advanced: review workflow with period lock (recommended for businesses).",
+        "modeSimple": "Simple",
+        "modeAdvanced": "Advanced",
+        "fiscalYearStartMonth": "Fiscal year starts in",
+        "retainedEarningsAccount": "Retained Earnings account",
+        "retainedEarningsAccountHelp": "Income and expense balances are swept into this equity account on close. It can't be deactivated while it's set here.",
+        "saveSuccess": "Ledger settings updated.",
+        "saveError": "Failed to update ledger settings."
+      },
+      "closing": {
+        "title": "Year-end closing",
+        "subtitle": "Close completed fiscal years — sweeps income and expense into Retained Earnings.",
+        "empty": "No completed fiscal years to close yet.",
+        "statusClosed": "Closed",
+        "statusClosing": "In progress",
+        "closeButton": "Close",
+        "initiateButton": "Initiate close",
+        "sealButton": "Seal",
+        "cancelButton": "Cancel",
+        "modalTitle": "Close fiscal year {{year}}",
+        "description": "This posts a single transaction that sweeps income and expense balances for the fiscal year into the Retained Earnings account.",
+        "netResult": "Net result",
+        "entries": "Closing entries",
+        "skippedWarning": "{{count}} non-base-currency account(s) cannot be closed automatically and will be skipped:",
+        "alreadyClosedWarning": "This fiscal year has already been closed.",
+        "noActivityWarning": "No income or expense activity in this fiscal year — nothing to close.",
+        "confirm": "Post closing transaction",
+        "initiateConfirm": "Generate draft for review",
+        "success": "Fiscal year closed.",
+        "error": "Failed to close the fiscal year.",
+        "previewError": "Failed to load closing preview.",
+        "loadError": "Failed to load fiscal years.",
+        "draftCreated": "Closing draft created. Review the draft transaction, then seal to finalize.",
+        "sealSuccess": "Fiscal year sealed — the period is now locked.",
+        "sealError": "Failed to seal the fiscal year.",
+        "cancelSuccess": "Closing cancelled. The fiscal year is open again.",
+        "cancelError": "Failed to cancel the close."
+      },
       "accountGroups": {
         "title": "Account groups",
         "namePlaceholder": "Account group name",
@@ -458,9 +501,19 @@
         "liabilities": "Liabilities",
         "equity": "Equity",
         "netResult": "Net result (period)",
+        "priorPeriodResult": "Retained earnings (prior periods)",
         "liabilitiesPlusEquity": "Liabilities + Equity",
         "balanced": "Balance sheet is balanced",
         "notBalanced": "Balance sheet is not balanced"
+      },
+      "incomeStatement": {
+        "tab": "Income Statement",
+        "account": "Account",
+        "income": "Income",
+        "expenses": "Expenses",
+        "totalIncome": "Total income",
+        "totalExpenses": "Total expenses",
+        "netResult": "Net result"
       },
       "download": "Download PDF",
       "downloadError": "Failed to download the report."

@@ -3,9 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, IsNull, Not, Repository } from 'typeorm';
 import { isAccountActive } from '../accounts/account-active';
 import { Account } from '../accounts/accounts.entity';
+import { PeriodLockService } from '../closings/period-lock.service';
 import { Ledger } from '../ledgers/ledger.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
 import { Currency } from '../shared/currency';
+import { todayDateString } from '../shared/date';
 import { Context } from '../shared/types/context';
 import { Entry, EntryDirection } from './entry.entity';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
@@ -32,6 +34,7 @@ export class TransactionsService {
     private accountRepository: Repository<Account>,
     private transactionMatcher: TransactionMatcherService,
     private ledgersService: LedgersService,
+    private periodLockService: PeriodLockService,
     private dataSource: DataSource,
   ) {}
 
@@ -54,12 +57,14 @@ export class TransactionsService {
     options: {
       description: string;
       reference?: string;
-      transactionDate: Date;
+      transactionDate: string;
       entries: EntryInput[];
       post?: boolean;
+      closing?: boolean;
     },
   ) {
     const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    await this.periodLockService.assertDateNotInClosedPeriod(ledger.id, options.transactionDate);
     const resolved = await this.validateEntries(options.entries, options.transactionDate, ledger);
 
     return this.dataSource.transaction(async (manager) => {
@@ -69,6 +74,7 @@ export class TransactionsService {
         reference: options.reference ?? null,
         transactionDate: options.transactionDate,
         postedAt: options.post === false ? null : new Date(),
+        closing: options.closing ?? false,
       });
       const savedTx = await manager.save(Transaction, tx);
       const entries = resolved.map((e) => this.buildEntry(savedTx.id, e));
@@ -87,7 +93,7 @@ export class TransactionsService {
     options: {
       description?: string;
       reference?: string;
-      transactionDate?: Date;
+      transactionDate?: string;
       entries?: EntryInput[];
     },
   ) {
@@ -112,6 +118,9 @@ export class TransactionsService {
     if (options.transactionDate !== undefined) {
       tx.transactionDate = options.transactionDate;
     }
+    await this.periodLockService.assertDateNotInClosedPeriod(ledger.id, tx.transactionDate, {
+      allowClosingTransaction: { transactionId: tx.id },
+    });
 
     return this.dataSource.transaction(async (manager) => {
       await manager.save(Transaction, tx);
@@ -141,6 +150,9 @@ export class TransactionsService {
     if (tx.postedAt !== null) {
       throw new ConflictException('Already posted');
     }
+    await this.periodLockService.assertDateNotInClosedPeriod(ledger.id, tx.transactionDate, {
+      allowClosingTransaction: { transactionId: tx.id },
+    });
     await this.validateEntries(
       tx.entries.map((e) => ({
         accountId: e.accountId,
@@ -175,7 +187,7 @@ export class TransactionsService {
         ledgerId: original.ledgerId,
         description: `Reversal of: ${original.description}`,
         reference: original.reference,
-        transactionDate: new Date(),
+        transactionDate: todayDateString(),
         postedAt: new Date(),
         reversesTransactionId: original.id,
       });
@@ -298,7 +310,7 @@ export class TransactionsService {
    */
   private async validateEntries(
     entries: EntryInput[],
-    txDate: Date,
+    txDate: string,
     ledger: Ledger,
   ): Promise<(EntryInput & { currency: Currency; fxRate: number })[]> {
     if (entries.length < 2) {
@@ -334,7 +346,7 @@ export class TransactionsService {
       } else if (e.fxRate == null) {
         throw new BadRequestException(
           `Entry in ${currency} requires an explicit fxRate to ${ledger.baseCurrency}; ` +
-            `look one up via GET /v1/forex/rate?from=${currency}&to=${ledger.baseCurrency}&date=${txDate.toISOString().split('T')[0]}`,
+            `look one up via GET /v1/forex/rate?from=${currency}&to=${ledger.baseCurrency}&date=${txDate}`,
         );
       } else {
         fxRate = e.fxRate;

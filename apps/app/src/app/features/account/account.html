@@ -65,7 +65,7 @@
       <select
         appSelect
         class="w-full"
-        [ngModel]="accountsService.timeFilter()"
+        [ngModel]="year()"
         (ngModelChange)="onYearChange($event)"
       >
         @for (year of yearOptions; track year) {
@@ -105,9 +105,25 @@
     } @else if (account()) {
     <div class="flex items-center justify-between mb-1.5">
       <p class="page-section-label">{{ 'views.account.transactions.title' | translate }}</p>
-      <span class="text-xs text-on-surface-variant">
-        {{ filteredTransactions().length }} {{ 'views.account.transactions.title' | translate | lowercase }}
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-on-surface-variant">
+          {{ filteredTransactions().length }} {{ 'views.account.transactions.title' | translate | lowercase }}
+        </span>
+        <button
+          appBtn
+          variant="ghost"
+          size="xs"
+          [disabled]="filteredTransactions().length === 0"
+          (click)="exportCsv()"
+        >
+          <app-icon
+            name="download"
+            [size]="14"
+            class="mr-1"
+          />
+          {{ 'views.account.export' | translate }}
+        </button>
+      </div>
     </div>
     <div class="account-tx-list">
       @if (filteredTransactions().length === 0) {
@@ -127,6 +143,7 @@
           @if (listStyleService.listStyle() !== 'compact') {
           <p class="text-xs text-on-surface-variant mt-0.5 truncate">
             {{ tx.transactionDate | date: 'mediumDate' }} @if (tx.counterAccount?.name; as other) { · {{ other }} }
+            @else if (tx.split) { · {{ 'views.account.transactions.split' | translate }} }
           </p>
           }
         </div>

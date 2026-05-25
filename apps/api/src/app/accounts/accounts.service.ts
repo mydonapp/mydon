@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
+import { Ledger } from '../ledgers/ledger.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
+import { toDateString } from '../shared/date';
 import { ForexService } from '../shared/forex/forex.service';
 import { Context } from '../shared/types/context';
 import { isAccountActive } from './account-active';
@@ -20,10 +22,25 @@ export class AccountsService {
     private accountsRepository: Repository<Account>,
     @InjectRepository(AccountGroup)
     private accountGroupsRepository: Repository<AccountGroup>,
+    @InjectRepository(Ledger)
+    private ledgersRepository: Repository<Ledger>,
     private forexService: ForexService,
     private ledgersService: LedgersService,
     private dataSource: DataSource,
   ) {}
+
+  /**
+   * An account referenced by a ledger setting (currently just retained earnings) is
+   * "in use" and may not be deactivated. Changing the ledger reference releases the lock.
+   */
+  private async assertNotReferencedByLedger(accountId: string, ledgerId: string): Promise<void> {
+    const ledger = await this.ledgersRepository.findOneBy({ id: ledgerId });
+    if (ledger?.retainedEarningsAccountId === accountId) {
+      throw new BadRequestException(
+        'This account is set as the ledger Retained Earnings account. Change the Retained Earnings account in Ledger settings first.',
+      );
+    }
+  }
 
   /** Reject a group reference that belongs to another ledger (cross-tenant FK). */
   private async assertGroupInLedger(groupId: string, ledgerId: string): Promise<void> {
@@ -64,16 +81,17 @@ export class AccountsService {
    */
   private async fetchBalancesByLedger(
     ledgerId: string,
-    options?: { filter?: { from?: Date; to?: Date }; restrictDateForTypes?: AccountType[] },
+    options?: { filter?: { from?: Date; to?: Date }; restrictDateForTypes?: AccountType[]; excludeClosingEntries?: boolean },
   ): Promise<Map<string, { debit: number; credit: number }>> {
-    const from = options?.filter?.from ?? new Date('1970-01-01');
-    const to = options?.filter?.to
-      ? new Date(new Date(options.filter.to).setUTCHours(23, 59, 59, 999))
-      : new Date('2100-12-31');
+    const from = toDateString(options?.filter?.from ?? new Date('1970-01-01'));
+    const to = toDateString(options?.filter?.to ?? new Date('2100-12-31'));
     const restrictedTypes = options?.restrictDateForTypes ?? [];
+    const excludeClosing = options?.excludeClosingEntries ?? false;
 
     // For EXPENSE / INCOME accounts the period applies; for balance-sheet accounts (assets/liabilities/equity),
     // sum the entries up to the period end so balances reflect everything through `to`.
+    // `excludeClosing` drops year-end closing entries (and their reversals) — used by the income statement so a
+    // closed year still shows the revenue/expense it earned rather than the zeroed-out post-close balances.
     const rows = await this.dataSource.query(
       `SELECT
          a.id AS "accountId",
@@ -85,14 +103,15 @@ export class AccountsService {
        WHERE a.ledger_id = $1
          AND (e.id IS NULL OR (
            t.posted_at IS NOT NULL
+           AND ($5 = false OR (NOT t.closing AND NOT EXISTS (SELECT 1 FROM transactions c WHERE c.id = t.reverses_transaction_id AND c.closing = true)))
            AND (
-             a.type::text = ANY($2::text[]) AND t.transaction_date BETWEEN $3::timestamptz AND $4::timestamptz
+             a.type::text = ANY($2::text[]) AND t.transaction_date BETWEEN $3::date AND $4::date
              OR NOT (a.type::text = ANY($2::text[]))
-             AND t.transaction_date <= $4::timestamptz
+             AND t.transaction_date <= $4::date
            )
          ))
        GROUP BY a.id`,
-      [ledgerId, restrictedTypes, from.toISOString(), to.toISOString()],
+      [ledgerId, restrictedTypes, from, to, excludeClosing],
     );
     const map = new Map<string, { debit: number; credit: number }>();
     for (const row of rows as { accountId: string; debitTotal: string; creditTotal: string }[]) {
@@ -126,6 +145,38 @@ export class AccountsService {
       return debit - credit;
     }
     return credit - debit;
+  }
+
+  /**
+   * Net result (income − expense, in base currency) of every posted entry strictly before
+   * `beforeDate`. Used by reports to virtually roll un-closed prior-period income/expense
+   * into retained earnings — a "soft close" that keeps the balance sheet balanced even when
+   * the user never ran an explicit year-end close.
+   */
+  async getPriorPeriodNetResult(ledgerId: string, beforeDate: Date | string): Promise<number> {
+    const rows = await this.dataSource.query(
+      `SELECT a.type AS "type",
+              e.direction AS "direction",
+              COALESCE(SUM(e.base_amount), 0)::numeric AS "amount"
+         FROM entries e
+         JOIN accounts a ON a.id = e.account_id
+         JOIN transactions t ON t.id = e.transaction_id
+        WHERE a.ledger_id = $1
+          AND a.type IN ('INCOME', 'EXPENSE')
+          AND t.posted_at IS NOT NULL
+          AND t.transaction_date < $2::date
+        GROUP BY a.type, e.direction`,
+      [ledgerId, toDateString(beforeDate)],
+    );
+
+    let net = 0;
+    for (const row of rows as { type: AccountType; direction: 'DEBIT' | 'CREDIT'; amount: string }[]) {
+      const amount = parseFloat(row.amount);
+      // INCOME is credit-positive; EXPENSE is debit-positive; signed net = +income − +expense.
+      const sign = row.type === AccountType.INCOME ? (row.direction === 'CREDIT' ? 1 : -1) : row.direction === 'DEBIT' ? -1 : 1;
+      net += sign * amount;
+    }
+    return net;
   }
 
   async mapAccountsToGrouped(accounts: AccountWithBalance[], accountType: AccountType, baseCurrency: Currency) {
@@ -173,6 +224,7 @@ export class AccountsService {
     context: Context,
     options?: {
       filter: { from?: Date; to?: Date };
+      excludeClosingEntries?: boolean;
     },
   ) {
     const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
@@ -184,21 +236,20 @@ export class AccountsService {
     const balances = await this.fetchBalancesByLedger(ledger.id, {
       filter: options?.filter,
       restrictDateForTypes: [AccountType.EXPENSE, AccountType.INCOME],
+      excludeClosingEntries: options?.excludeClosingEntries,
     });
 
     // Accounts with at least one posted transaction inside the selected period.
-    const from = options?.filter?.from ?? new Date('1970-01-01');
-    const to = options?.filter?.to
-      ? new Date(new Date(options.filter.to).setUTCHours(23, 59, 59, 999))
-      : new Date('2100-12-31');
+    const from = toDateString(options?.filter?.from ?? new Date('1970-01-01'));
+    const to = toDateString(options?.filter?.to ?? new Date('2100-12-31'));
     const periodRows = await this.dataSource.query(
       `SELECT DISTINCT e.account_id AS id
          FROM entries e
          JOIN transactions t ON t.id = e.transaction_id
         WHERE t.ledger_id = $1
           AND t.posted_at IS NOT NULL
-          AND t.transaction_date BETWEEN $2::timestamptz AND $3::timestamptz`,
-      [ledger.id, from.toISOString(), to.toISOString()],
+          AND t.transaction_date BETWEEN $2::date AND $3::date`,
+      [ledger.id, from, to],
     );
     const hasPeriodActivity = new Set<string>((periodRows as { id: string }[]).map((r) => r.id));
 
@@ -292,16 +343,24 @@ export class AccountsService {
     if (options.code !== undefined) {
       account.code = options.code;
     }
-    if (options.activeFrom !== undefined) {
-      account.activeFrom = options.activeFrom ? new Date(options.activeFrom) : null;
-    }
-    if (options.activeUntil !== undefined) {
-      account.activeUntil = options.activeUntil ? new Date(options.activeUntil) : null;
+    if (options.activeFrom !== undefined || options.activeUntil !== undefined) {
+      const hasActivityBound =
+        (options.activeFrom !== undefined && options.activeFrom !== null) ||
+        (options.activeUntil !== undefined && options.activeUntil !== null);
+      if (hasActivityBound) {
+        await this.assertNotReferencedByLedger(account.id, ledger.id);
+      }
+      if (options.activeFrom !== undefined) {
+        account.activeFrom = options.activeFrom ? toDateString(options.activeFrom) : null;
+      }
+      if (options.activeUntil !== undefined) {
+        account.activeUntil = options.activeUntil ? toDateString(options.activeUntil) : null;
+      }
     }
     return this.accountsRepository.save(account);
   }
 
-  async getAccount(context: Context, accountId: string) {
+  async getAccount(context: Context, accountId: string, filter?: { from?: Date | string; to?: Date | string }) {
     const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
     const account = await this.accountsRepository.findOne({
       where: { id: accountId, ledgerId: ledger.id },
@@ -312,8 +371,9 @@ export class AccountsService {
       throw new NotFoundException();
     }
 
-    // Load entries on this account, joined with the parent transaction header and the other side
-    // (the counter-account) so we can render the per-account transaction list with counter info.
+    // One row per entry ON THIS account. The other legs of each transaction are aggregated into a JSON
+    // array (correlated subquery) — never row-multiplied — so split (>2-leg) transactions like year-end
+    // closings appear once and don't inflate the totals below.
     const entries = await this.dataSource.query(
       `SELECT
          e.id            AS "entryId",
@@ -321,16 +381,18 @@ export class AccountsService {
          e.amount        AS "amount",
          t.id            AS "transactionId",
          t.description   AS "description",
-         t.transaction_date AS "transactionDate",
-         counter.id      AS "counterAccountId",
-         counter.name    AS "counterAccountName"
+         t.transaction_date::text AS "transactionDate",
+         COALESCE(
+           (SELECT json_agg(json_build_object('id', ca.id, 'name', ca.name) ORDER BY ca.name)
+              FROM entries ce
+              JOIN accounts ca ON ca.id = ce.account_id
+             WHERE ce.transaction_id = t.id AND ce.id <> e.id),
+           '[]'::json
+         ) AS "counterAccounts"
        FROM entries e
        JOIN transactions t ON t.id = e.transaction_id
-       LEFT JOIN entries counter_entry
-         ON counter_entry.transaction_id = t.id AND counter_entry.id <> e.id
-       LEFT JOIN accounts counter ON counter.id = counter_entry.account_id
        WHERE e.account_id = $1 AND t.posted_at IS NOT NULL
-       ORDER BY t.transaction_date ASC`,
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
       [account.id],
     );
 
@@ -341,9 +403,8 @@ export class AccountsService {
         amount: string;
         transactionId: string;
         description: string;
-        transactionDate: Date;
-        counterAccountId: string | null;
-        counterAccountName: string | null;
+        transactionDate: string;
+        counterAccounts: { id: string; name: string }[] | string | null;
       }[]
     ).map((row) => {
       // Signed amount from the user's perspective on THIS account.
@@ -356,12 +417,19 @@ export class AccountsService {
           : row.direction === 'CREDIT'
             ? amount
             : -amount;
+      const counters = (
+        typeof row.counterAccounts === 'string' ? JSON.parse(row.counterAccounts) : (row.counterAccounts ?? [])
+      ) as { id: string; name: string }[];
       return {
         id: row.transactionId,
+        // Selected as `::text` so it's a calendar-date string ('YYYY-MM-DD'). Reading the raw `date`
+        // would have pg build a local-midnight Date that shifts a day when normalised to UTC.
         transactionDate: row.transactionDate,
         description: row.description,
         amount: signed,
-        counterAccount: row.counterAccountId ? { id: row.counterAccountId, name: row.counterAccountName ?? '' } : null,
+        // Exactly one other leg → show it; several (a split, e.g. a closing) → flag `split`.
+        counterAccount: counters.length === 1 ? counters[0] : null,
+        split: counters.length > 1,
       };
     });
 
@@ -372,6 +440,15 @@ export class AccountsService {
       .filter((e) => e.direction === 'CREDIT')
       .reduce((s, e) => s + Number(e.amount), 0);
     const balance = this.computeBalance(account.type, debitTotal, creditTotal);
+
+    // Stats (balance/credit/debit/count) stay lifetime — "Current Balance" must be the true running
+    // balance. Only the transaction LIST is scoped to the requested period.
+    const from = filter?.from ? toDateString(filter.from) : null;
+    const to = filter?.to ? toDateString(filter.to) : null;
+    const periodTransactions =
+      from || to
+        ? transactions.filter((t) => (!from || t.transactionDate >= from) && (!to || t.transactionDate <= to))
+        : transactions;
 
     return {
       id: account.id,
@@ -389,7 +466,7 @@ export class AccountsService {
       totalTransactions: transactions.length,
       totalCredit: creditTotal,
       totalDebit: debitTotal,
-      transactions,
+      transactions: periodTransactions,
     };
   }
 }

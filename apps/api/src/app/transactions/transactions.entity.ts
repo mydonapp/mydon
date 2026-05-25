@@ -29,8 +29,9 @@ export class Transaction {
   @Column({ type: 'varchar', nullable: true })
   declare reference: string | null;
 
-  @Column({ name: 'transaction_date', type: 'timestamptz' })
-  declare transactionDate: Date;
+  /** Accounting date (calendar day, no time/zone) — 'YYYY-MM-DD'. */
+  @Column({ name: 'transaction_date', type: 'date' })
+  declare transactionDate: string;
 
   /**
    * When `postedAt IS NULL` the transaction is a draft and may be patched freely.
@@ -45,6 +46,10 @@ export class Transaction {
   @ManyToOne(() => Transaction, { nullable: true })
   @JoinColumn({ name: 'reverses_transaction_id' })
   declare reverses: Transaction | null;
+
+  /** Year-end closing entry. Structural marker so reports/locking don't depend on the (localized) description. */
+  @Column({ type: 'boolean', default: false })
+  declare closing: boolean;
 
   @Column({ type: 'varchar', nullable: true })
   declare raw: string | null;

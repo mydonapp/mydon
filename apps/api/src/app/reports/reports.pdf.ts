@@ -27,9 +27,25 @@ interface BalanceSheetData {
   liabilities: BalanceSheetSection;
   equity: BalanceSheetSection;
   netResult: number;
+  priorPeriodResult: number;
   totalEquity: number;
   totalLiabilitiesAndEquity: number;
   balanced: boolean;
+}
+
+interface IncomeStatementRow {
+  code: string;
+  name: string;
+  current: number;
+  previous: number;
+}
+
+interface IncomeStatementData {
+  income: { rows: IncomeStatementRow[]; currentTotal: number; previousTotal: number };
+  expense: { rows: IncomeStatementRow[]; currentTotal: number; previousTotal: number };
+  netResult: { current: number; previous: number };
+  currentLabel: string | null;
+  previousLabel: string | null;
 }
 
 const MARGIN = 50;
@@ -173,6 +189,87 @@ export function buildTrialBalancePdf(meta: Meta, data: TrialBalanceData): Promis
   return done;
 }
 
+export function buildIncomeStatementPdf(meta: Meta, data: IncomeStatementData): Promise<Buffer> {
+  const doc = new PDFDocument({ size: 'A4', margin: MARGIN, bufferPages: true });
+  const done = collect(doc);
+
+  const cols = {
+    name: { x: MARGIN, w: 255 },
+    current: { x: MARGIN + 255, w: 120 },
+    previous: { x: MARGIN + 375, w: doc.page.width - MARGIN - (MARGIN + 375) },
+  };
+  const cur = data.currentLabel ?? 'Current';
+  const prev = data.previousLabel ?? 'Previous';
+  const named = (code: string, name: string) => (code ? `${code}  ${name}` : name);
+
+  const columnHeader = () => {
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#333333');
+    const y = doc.y;
+    doc.text('Account', cols.name.x, y, { width: cols.name.w });
+    doc.text(cur, cols.current.x, y, { width: cols.current.w, align: 'right' });
+    doc.text(prev, cols.previous.x, y, { width: cols.previous.w, align: 'right' });
+    doc.moveDown(0.5);
+    doc
+      .strokeColor('#dddddd')
+      .lineWidth(0.5)
+      .moveTo(MARGIN, doc.y)
+      .lineTo(doc.page.width - MARGIN, doc.y)
+      .stroke();
+    doc.moveDown(0.3);
+  };
+
+  const line = (label: string, current: number, previous: number, bold = false) => {
+    ensureSpace(doc, ROW_H, () => {
+      header(doc, meta, 'Income Statement');
+      columnHeader();
+    });
+    doc
+      .font(bold ? 'Helvetica-Bold' : 'Helvetica')
+      .fontSize(9)
+      .fillColor('#111111');
+    const y = doc.y;
+    doc.text(label, cols.name.x, y, { width: cols.name.w, lineBreak: false, ellipsis: true });
+    doc.text(money(current, meta.baseCurrency), cols.current.x, y, { width: cols.current.w, align: 'right' });
+    doc.text(money(previous, meta.baseCurrency), cols.previous.x, y, { width: cols.previous.w, align: 'right' });
+    doc.y = y + ROW_H;
+  };
+
+  const sectionLabel = (title: string) => {
+    doc.moveDown(0.3);
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#333333').text(title, MARGIN, doc.y);
+    doc.moveDown(0.2);
+  };
+
+  header(doc, meta, 'Income Statement');
+  columnHeader();
+
+  sectionLabel('Revenue');
+  for (const r of data.income.rows) {
+    line(named(r.code, r.name), r.current, r.previous);
+  }
+  line('Total revenue', data.income.currentTotal, data.income.previousTotal, true);
+
+  sectionLabel('Expenses');
+  for (const r of data.expense.rows) {
+    line(named(r.code, r.name), r.current, r.previous);
+  }
+  line('Total expenses', data.expense.currentTotal, data.expense.previousTotal, true);
+
+  doc.moveDown(0.3);
+  doc
+    .strokeColor('#333333')
+    .lineWidth(1)
+    .moveTo(MARGIN, doc.y)
+    .lineTo(doc.page.width - MARGIN, doc.y)
+    .stroke();
+  doc.moveDown(0.3);
+  line('Net result', data.netResult.current, data.netResult.previous, true);
+
+  footer(doc);
+  doc.end();
+  return done;
+}
+
 export function buildBalanceSheetPdf(meta: Meta, data: BalanceSheetData): Promise<Buffer> {
   const doc = new PDFDocument({ size: 'A4', margin: MARGIN, bufferPages: true });
   const done = collect(doc);
@@ -238,6 +335,9 @@ export function buildBalanceSheetPdf(meta: Meta, data: BalanceSheetData): Promis
   ry = sectionTitle(rightX, ry, 'Equity');
   for (const a of data.equity.accounts) {
     ry = row(rightX, ry, named(a.code, a.name), a.amount);
+  }
+  if (Math.abs(data.priorPeriodResult) > 0.005) {
+    ry = row(rightX, ry, 'Retained earnings (prior periods)', data.priorPeriodResult);
   }
   ry = row(rightX, ry, 'Net result (period)', data.netResult);
   ry = totalRow(rightX, ry, 'Total Equity', data.totalEquity);

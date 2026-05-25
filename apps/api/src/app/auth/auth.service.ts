@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as argon2 from 'argon2';
 import { randomBytes } from 'crypto';
 import { Raw, Repository } from 'typeorm';
-import { AccountGroup } from '../account-groups/account-group.entity';
-import { Account, AccountType } from '../accounts/accounts.entity';
+import { ChartSeederService } from '../ledgers/chart-seeder.service';
 import { LedgersService } from '../ledgers/ledgers.service';
+import { OrganizationKind } from '../organizations/organization.entity';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { AccessToken } from './accessToken.entity';
 import { WrongCredentialsError } from './auth.errors';
@@ -25,12 +25,9 @@ export class AuthService {
     private accessTokenRepository: Repository<AccessToken>,
     @InjectRepository(RefreshToken)
     private refreshTokenRepository: Repository<RefreshToken>,
-    @InjectRepository(Account)
-    private accountRepository: Repository<Account>,
-    @InjectRepository(AccountGroup)
-    private accountGroupRepository: Repository<AccountGroup>,
     private organizationsService: OrganizationsService,
     private ledgersService: LedgersService,
+    private chartSeederService: ChartSeederService,
   ) {}
 
   async userById(id: string): Promise<User | null> {
@@ -53,47 +50,23 @@ export class AuthService {
     });
   }
 
-  async createUser(data: { email: string; password: string; name: string }): Promise<void> {
+  async createUser(data: { email: string; password: string; name: string; language?: string }): Promise<void> {
     data.password = await argon2.hash(data.password);
 
+    const language = data.language ?? 'en';
     const user = new User();
     user.email = data.email;
     user.name = data.name;
     user.password = data.password;
+    user.language = language;
 
     await this.userRepository.save(user);
 
-    // Provision personal organization + default ledger for the new user.
-    // Phase 1/2 model: every user gets one PERSONAL org with an OWNER membership and one "Main" ledger.
+    // Every signup provisions a PERSONAL org + OWNER membership + "Main" ledger
+    // seeded with the personal chart of accounts (in the user's language). Business orgs added later.
     const organization = await this.organizationsService.createPersonalOrganization(user);
-    const ledger = await this.ledgersService.createDefaultLedger(organization.id);
-
-    // Create default account groups (scoped to the new ledger)
-    const groupNames = ['Banking', 'Income', 'Food', 'Housing'];
-    const groups: Record<string, AccountGroup> = {};
-    for (const name of groupNames) {
-      const group = new AccountGroup();
-      group.name = name;
-      group.ledgerId = ledger.id;
-      groups[name] = await this.accountGroupRepository.save(group);
-    }
-
-    // Create default accounts
-    const defaultAccounts = [
-      { name: 'Bank', type: AccountType.ASSETS, group: groups['Banking'] },
-      { name: 'Income', type: AccountType.INCOME, group: groups['Income'] },
-      { name: 'Food', type: AccountType.EXPENSE, group: groups['Food'] },
-      { name: 'Rent', type: AccountType.EXPENSE, group: groups['Housing'] },
-    ];
-
-    for (const accountData of defaultAccounts) {
-      const account = new Account();
-      account.name = accountData.name;
-      account.type = accountData.type;
-      account.group = accountData.group;
-      account.ledgerId = ledger.id;
-      await this.accountRepository.save(account);
-    }
+    const ledger = await this.ledgersService.createDefaultLedger(organization.id, { kind: OrganizationKind.PERSONAL });
+    await this.chartSeederService.seedChart(ledger, OrganizationKind.PERSONAL, language);
   }
 
   async logout(refreshToken: string): Promise<void> {

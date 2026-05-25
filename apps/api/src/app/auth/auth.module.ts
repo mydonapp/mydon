@@ -1,7 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AccountGroup } from '../account-groups/account-group.entity';
-import { Account } from '../accounts/accounts.entity';
 import { LedgersModule } from '../ledgers/ledgers.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { AccessToken } from './accessToken.entity';
@@ -13,7 +11,7 @@ import { User } from './user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AccessToken, RefreshToken, User, Account, AccountGroup]),
+    TypeOrmModule.forFeature([AccessToken, RefreshToken, User]),
     OrganizationsModule,
     forwardRef(() => LedgersModule),
   ],

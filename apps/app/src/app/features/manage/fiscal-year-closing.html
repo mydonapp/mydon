@@ -1,0 +1,168 @@
+<p class="page-section-label mb-1">{{ 'views.manage.closing.title' | translate }}</p>
+<p class="text-sm text-on-surface-variant mb-3">{{ 'views.manage.closing.subtitle' | translate }}</p>
+
+@if (loading()) {
+  <div class="page-group">
+    @for (i of [1, 2, 3]; track i) {
+      <div class="page-item">
+        <app-skeleton class="h-4 w-24 flex-1" />
+        <app-skeleton class="h-6 w-20" />
+      </div>
+    }
+  </div>
+} @else if (candidates().length === 0) {
+  <p class="text-on-surface-variant text-sm text-center py-8">{{ 'views.manage.closing.empty' | translate }}</p>
+} @else {
+  <div class="page-group">
+    @for (c of candidates(); track c.fiscalYearStartYear) {
+      <div class="page-item">
+        <span class="flex-1 text-sm font-medium text-on-surface tabular-nums">{{ c.label }}</span>
+        @if (c.closed) {
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-success-bg text-success">
+            <app-icon
+              name="lock"
+              [size]="13"
+            />
+            {{ 'views.manage.closing.statusClosed' | translate }}
+          </span>
+        } @else if (c.state === 'CLOSING') {
+          <span class="text-xs px-2 py-0.5 rounded-md bg-warning-bg text-warning">
+            {{ 'views.manage.closing.statusClosing' | translate }}
+          </span>
+          <button
+            appBtn
+            variant="ghost"
+            size="xs"
+            class="text-error"
+            [loading]="submitting()"
+            (click)="cancel(c)"
+          >
+            {{ 'views.manage.closing.cancelButton' | translate }}
+          </button>
+          <button
+            appBtn
+            variant="primary"
+            size="xs"
+            [loading]="submitting()"
+            (click)="seal(c)"
+          >
+            {{ 'views.manage.closing.sealButton' | translate }}
+          </button>
+        } @else {
+          <button
+            appBtn
+            variant="secondary"
+            size="xs"
+            (click)="openClose(c.fiscalYearStartYear)"
+          >
+            {{
+              (closingMode() === 'ADVANCED'
+                ? 'views.manage.closing.initiateButton'
+                : 'views.manage.closing.closeButton'
+              ) | translate
+            }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+}
+
+<app-modal
+  [open]="modalOpen()"
+  (closed)="modalOpen.set(false)"
+>
+  <div class="modal-header">
+    <h3 class="modal-title">
+      {{ 'views.manage.closing.modalTitle' | translate: { year: selectedCandidate()?.label ?? selectedYear() } }}
+    </h3>
+  </div>
+
+  <div class="py-2 space-y-4 text-sm">
+    <p class="text-on-surface-variant">{{ 'views.manage.closing.description' | translate }}</p>
+
+    @if (previewLoading()) {
+      <div class="py-1 space-y-2">
+        <app-skeleton class="h-4 w-full" />
+        <app-skeleton class="h-4 w-4/5" />
+        <app-skeleton class="h-4 w-3/5" />
+      </div>
+    } @else if (preview(); as p) {
+      @if (p.alreadyClosed) {
+        <div class="rounded-lg px-3 py-2 bg-warning-bg text-warning inline-flex items-center gap-1.5">
+          <app-icon
+            name="alert-triangle"
+            [size]="14"
+          />
+          <span>{{ 'views.manage.closing.alreadyClosedWarning' | translate }}</span>
+        </div>
+      }
+      @if (!p.alreadyClosed && p.entries.length === 0) {
+        <div class="rounded-lg px-3 py-2 bg-warning-bg text-warning inline-flex items-center gap-1.5">
+          <app-icon
+            name="alert-triangle"
+            [size]="14"
+          />
+          <span>{{ 'views.manage.closing.noActivityWarning' | translate }}</span>
+        </div>
+      }
+
+      <div class="flex items-center justify-between">
+        <span class="text-on-surface-variant">{{ 'views.manage.closing.netResult' | translate }}</span>
+        <span class="tabular-nums font-medium">{{ format(p.netResult, p.baseCurrency) }}</span>
+      </div>
+
+      @if (p.entries.length > 0) {
+        <div>
+          <p class="page-section-label mb-1.5">{{ 'views.manage.closing.entries' | translate }}</p>
+          <div class="page-group">
+            @for (entry of p.entries; track entry.accountId + entry.direction) {
+              <div class="page-item page-item--compact">
+                <span class="flex-1 min-w-0 truncate text-on-surface">{{ entry.accountName }}</span>
+                <span class="text-xs uppercase font-mono w-14 text-right text-on-surface-variant">
+                  {{ entry.direction }}
+                </span>
+                <span class="text-sm tabular-nums w-28 text-right text-on-surface">
+                  {{ format(entry.amount, entry.currency) }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (p.skipped.length > 0) {
+        <div class="rounded-lg px-3 py-2 bg-warning-bg text-warning text-xs">
+          <p class="mb-1">{{ 'views.manage.closing.skippedWarning' | translate: { count: p.skipped.length } }}</p>
+          <ul class="list-disc pl-4">
+            @for (s of p.skipped; track s.accountId) {
+              <li>{{ s.accountName }} ({{ s.currency }})</li>
+            }
+          </ul>
+        </div>
+      }
+    }
+  </div>
+
+  <div class="modal-footer mt-4">
+    <button
+      appBtn
+      variant="ghost"
+      (click)="modalOpen.set(false)"
+    >
+      {{ 'common.close' | translate }}
+    </button>
+    <button
+      appBtn
+      variant="primary"
+      [loading]="submitting()"
+      [disabled]="previewLoading() || !preview() || selectedCandidate()?.closed || (preview()?.entries?.length ?? 0) === 0"
+      (click)="confirmClose()"
+    >
+      {{
+        (closingMode() === 'ADVANCED' ? 'views.manage.closing.initiateConfirm' : 'views.manage.closing.confirm')
+          | translate
+      }}
+    </button>
+  </div>
+</app-modal>

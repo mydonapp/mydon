@@ -83,9 +83,16 @@ export class AccountsController {
     status: 200,
     description: 'Account details retrieved successfully',
   })
+  @ApiQuery({ name: 'from', type: Date, required: false })
+  @ApiQuery({ name: 'to', type: Date, required: false })
   @ApiResponse({ status: 404, description: 'Account not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getAccountTransactions(@Req() req: Request, @Param('accountId') accountId: string) {
-    return this.accountsService.getAccount(req['context'], accountId);
+  getAccountTransactions(
+    @Req() req: Request,
+    @Param('accountId') accountId: string,
+    @Query('from', new ParseDatePipe({ optional: true })) from?: Date,
+    @Query('to', new ParseDatePipe({ optional: true })) to?: Date,
+  ) {
+    return this.accountsService.getAccount(req['context'], accountId, { from, to });
   }
 }

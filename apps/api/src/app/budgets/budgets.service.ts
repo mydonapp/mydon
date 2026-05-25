@@ -4,6 +4,7 @@ import { DataSource, In, Repository } from 'typeorm';
 import { AccountGroup } from '../account-groups/account-group.entity';
 import { Account, AccountType } from '../accounts/accounts.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
+import { toDateString } from '../shared/date';
 import { Context } from '../shared/types/context';
 import { BudgetFrequency, BudgetItem } from './budget-item.entity';
 import { Budget } from './budgets.entity';
@@ -283,8 +284,8 @@ export class BudgetsService {
        WHERE e.account_id = $1
          AND t.ledger_id = $4
          AND t.posted_at IS NOT NULL
-         AND t.transaction_date BETWEEN $2::timestamptz AND $3::timestamptz`,
-      [account.id, from.toISOString(), to.toISOString(), ledgerId],
+         AND t.transaction_date BETWEEN $2::date AND $3::date`,
+      [account.id, toDateString(from), toDateString(to), ledgerId],
     );
 
     const credit = parseFloat(rows[0]?.creditBalance ?? '0');
@@ -312,13 +313,13 @@ export class BudgetsService {
         COALESCE(SUM(
           CASE WHEN e.direction = 'CREDIT'
                 AND t.posted_at IS NOT NULL
-                AND t.transaction_date BETWEEN $3::timestamptz AND $4::timestamptz
+                AND t.transaction_date BETWEEN $3::date AND $4::date
                THEN e.amount ELSE 0 END
         ), 0)::numeric AS "creditBalance",
         COALESCE(SUM(
           CASE WHEN e.direction = 'DEBIT'
                 AND t.posted_at IS NOT NULL
-                AND t.transaction_date BETWEEN $3::timestamptz AND $4::timestamptz
+                AND t.transaction_date BETWEEN $3::date AND $4::date
                THEN e.amount ELSE 0 END
         ), 0)::numeric AS "debitBalance"
        FROM accounts a
@@ -327,7 +328,7 @@ export class BudgetsService {
        WHERE a."group_id" = $1
          AND a."ledger_id" = $2
        GROUP BY a.id, a.name, a.type`,
-      [groupId, ledgerId, from.toISOString(), to.toISOString()],
+      [groupId, ledgerId, toDateString(from), toDateString(to)],
     );
 
     const accounts = (

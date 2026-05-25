@@ -1,4 +1,5 @@
 import { parse } from 'csv-parse/sync';
+import { ymdToDateString } from '../../shared/date';
 import { MappedTransaction, StatementMapper } from './base-statement.mapper';
 
 export interface YuhStatement {
@@ -37,7 +38,7 @@ export class YuhStatementMapper extends StatementMapper<YuhStatement> {
         creditAmount: transaction.CREDIT ? Math.abs(transaction.CREDIT) : Math.abs(transaction.DEBIT),
         debitAmount: transaction.CREDIT ? Math.abs(transaction.CREDIT) : Math.abs(transaction.DEBIT),
         description: transaction['ACTIVITY NAME'].substring(1, transaction['ACTIVITY NAME'].length - 1),
-        transactionDate: new Date(parseInt(dmy[2]), parseInt(dmy[1]) - 1, parseInt(dmy[0])),
+        transactionDate: ymdToDateString(parseInt(dmy[2]), parseInt(dmy[1]), parseInt(dmy[0])),
         raw: {
           ...transaction,
           issuer: 'YUH',

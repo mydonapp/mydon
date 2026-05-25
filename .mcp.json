@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "angular-cli": {
+      "command": "pnpm",
+      "args": ["dlx", "@angular/cli@21", "mcp"]
+    }
+  }
+}

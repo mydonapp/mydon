@@ -6,6 +6,7 @@ import { AccountGroupsModule } from './account-groups/account-groups.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { AuthModule } from './auth/auth.module';
 import { BudgetsModule } from './budgets/budgets.module';
+import { ClosingsModule } from './closings/closings.module';
 import { ExportModule } from './export/export.module';
 import { LedgersModule } from './ledgers/ledgers.module';
 import { OrganizationsModule } from './organizations/organizations.module';
@@ -22,6 +23,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     AuthModule,
     AccountGroupsModule,
     BudgetsModule,
+    ClosingsModule,
     ExportModule,
     OrganizationsModule,
     ReportsModule,

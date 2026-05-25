@@ -41,6 +41,40 @@ export class ReportsController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('income-statement')
+  @ApiOperation({ summary: 'Income statement (P&L) for the period with a year-over-year comparison' })
+  @ApiQuery({ name: 'from', type: Date, required: false })
+  @ApiQuery({ name: 'to', type: Date, required: false })
+  @ApiResponse({ status: 200, description: 'Income statement' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  incomeStatement(
+    @Req() req: Request,
+    @Query('from', new ParseDatePipe({ optional: true })) from?: Date,
+    @Query('to', new ParseDatePipe({ optional: true })) to?: Date,
+  ) {
+    return this.reportsService.getIncomeStatement(req['context'], { from, to });
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('income-statement/pdf')
+  @ApiOperation({ summary: 'Income statement as a formatted PDF report' })
+  @ApiQuery({ name: 'from', type: Date, required: false })
+  @ApiQuery({ name: 'to', type: Date, required: false })
+  @ApiResponse({ status: 200, description: 'PDF document' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async incomeStatementPdf(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Query('from', new ParseDatePipe({ optional: true })) from?: Date,
+    @Query('to', new ParseDatePipe({ optional: true })) to?: Date,
+  ) {
+    const pdf = await this.reportsService.buildIncomeStatementPdf(req['context'], { from, to });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${this.filename('income-statement', from)}"`);
+    res.send(pdf);
+  }
+
+  @UseGuards(AuthGuard)
   @Get('trial-balance/pdf')
   @ApiOperation({ summary: 'Trial balance as a formatted PDF report' })
   @ApiQuery({ name: 'from', type: Date, required: false })

@@ -100,7 +100,7 @@ pnpm migration:revert
 pnpm migration:show
 ```
 
-Every entity change (new column, new table, renamed column, etc.) requires a `migration:generate` + commit of the resulting `.ts` file. Never use `synchronize: true`.
+**Always generate migrations — never hand-write them.** Make the entity change first, then run `pnpm migration:generate apps/api/src/migrations/DescriptiveName` to produce the initial migration from the entity-vs-DB diff. Review the generated SQL and add anything the diff can't infer by hand (data backfills, `ALTER COLUMN ... TYPE ... USING (...)` conversions, enum value changes), then commit the resulting `.ts` file. Every entity change (new column, new table, renamed column, type change, etc.) requires this generate-review-commit cycle. Never use `synchronize: true`.
 
 **Entity column convention**: Always specify `type` explicitly in every `@Column()` decorator (e.g. `@Column({ type: 'varchar' })`). Self-documenting and decoupled from `emitDecoratorMetadata` if we ever swap toolchains again.
 

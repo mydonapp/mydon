@@ -57,7 +57,7 @@ export class TransactionsController {
     return this.transactionsService.createTransaction(req['context'], {
       description: dto.description,
       reference: dto.reference,
-      transactionDate: new Date(dto.transactionDate),
+      transactionDate: dto.transactionDate,
       entries: dto.entries,
       post: dto.post,
     });
@@ -69,7 +69,7 @@ export class TransactionsController {
     return this.transactionsService.patchTransaction(req['context'], id, {
       description: dto.description,
       reference: dto.reference,
-      transactionDate: dto.transactionDate ? new Date(dto.transactionDate) : undefined,
+      transactionDate: dto.transactionDate,
       entries: dto.entries,
     });
   }

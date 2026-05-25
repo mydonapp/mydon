@@ -30,6 +30,28 @@
         />
         {{ 'views.manage.accountGroups.title' | translate }}
       </button>
+      <button
+        class="manage-nav-item"
+        [class.manage-nav-item--active]="activeSection() === 'ledger'"
+        (click)="activeSection.set('ledger')"
+      >
+        <app-icon
+          name="scale"
+          [size]="16"
+        />
+        {{ 'views.manage.ledger.title' | translate }}
+      </button>
+      <button
+        class="manage-nav-item"
+        [class.manage-nav-item--active]="activeSection() === 'closing'"
+        (click)="activeSection.set('closing')"
+      >
+        <app-icon
+          name="archive"
+          [size]="16"
+        />
+        {{ 'views.manage.closing.title' | translate }}
+      </button>
     </nav>
 
     <!-- ── Content area ───────────────────────────────────────────────── -->
@@ -164,6 +186,66 @@
         }
       </div>
       } }
+
+      <!-- Ledger section -->
+      @if (activeSection() === 'ledger') {
+      <p class="page-section-label mb-3">{{ 'views.manage.ledger.title' | translate }}</p>
+      @if (ledgerService.ledger(); as ledger) {
+      <div class="page-group">
+        <div class="page-item">
+          <div>
+            <p class="settings-item-label">{{ 'views.manage.ledger.closingMode' | translate }}</p>
+            <p class="settings-item-description">{{ 'views.manage.ledger.closingModeDescription' | translate }}</p>
+          </div>
+          <div class="segmented-control">
+            @for (opt of closingModeOptions; track opt.value) {
+            <button
+              class="segmented-btn"
+              [class.segmented-btn--active]="ledger.closingMode === opt.value"
+              (click)="onClosingModeChange(opt.value)"
+            >
+              {{ opt.label | translate }}
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="page-group p-4 mt-3 space-y-4">
+        <app-field [label]="'views.manage.ledger.fiscalYearStartMonth' | translate">
+          <select
+            appSelect
+            name="fiscalYearStartMonth"
+            [ngModel]="ledger.fiscalYearStartMonth.toString()"
+            (ngModelChange)="onFiscalYearStartMonthChange($event)"
+          >
+            @for (opt of monthOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </app-field>
+        <app-field
+          [label]="'views.manage.ledger.retainedEarningsAccount' | translate"
+          [helpText]="'views.manage.ledger.retainedEarningsAccountHelp' | translate"
+        >
+          <select
+            appSelect
+            name="retainedEarningsAccount"
+            [ngModel]="ledger.retainedEarningsAccountId"
+            (ngModelChange)="onRetainedEarningsAccountChange($event)"
+          >
+            @for (opt of equityAccountOptions(); track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </app-field>
+      </div>
+      }
+      }
+
+      <!-- Year-end closing section -->
+      @if (activeSection() === 'closing') {
+      <app-fiscal-year-closing />
+      }
     </div>
   </div>
 </div>
