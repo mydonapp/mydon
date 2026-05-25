@@ -402,6 +402,7 @@
           "yearly": "Annuel"
         },
         "subItems": {
+          "title": "Détail",
           "addSubItem": "Ajouter un sous-élément",
           "namePlaceholder": "p. ex. Netflix",
           "computedHint": "Calculé à partir du détail ci-dessous"

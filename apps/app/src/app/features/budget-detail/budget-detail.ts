@@ -55,6 +55,8 @@ export class BudgetDetailComponent implements OnInit {
   editMode = signal(false);
   editName = signal('');
   editYear = signal(0);
+  /** Edit rows whose sub-item breakdown is expanded — keyed by the row object, which stays stable across signal updates. */
+  expandedItems = signal(new Set<Omit<BudgetItem, 'id'>>());
 
   months = Array.from({ length: 12 }, (_, i) => ({
     value: i + 1,
@@ -192,6 +194,22 @@ export class BudgetDetailComponent implements OnInit {
 
   removeItem(index: number) {
     this.editItems.update((items) => items.filter((_, i) => i !== index));
+  }
+
+  isExpanded(item: Omit<BudgetItem, 'id'>): boolean {
+    return this.expandedItems().has(item);
+  }
+
+  toggleExpanded(item: Omit<BudgetItem, 'id'>) {
+    this.expandedItems.update((set) => {
+      const next = new Set(set);
+      if (next.has(item)) {
+        next.delete(item);
+      } else {
+        next.add(item);
+      }
+      return next;
+    });
   }
 
   isComputed(item: Omit<BudgetItem, 'id'>): boolean {

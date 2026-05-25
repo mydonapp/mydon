@@ -402,6 +402,7 @@
           "yearly": "Yearly"
         },
         "subItems": {
+          "title": "Breakdown",
           "addSubItem": "Add sub-item",
           "namePlaceholder": "e.g. Netflix",
           "computedHint": "Calculated from the breakdown below"

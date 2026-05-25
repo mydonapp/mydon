@@ -402,6 +402,7 @@
           "yearly": "Jährlich"
         },
         "subItems": {
+          "title": "Aufschlüsselung",
           "addSubItem": "Unterposten hinzufügen",
           "namePlaceholder": "z. B. Netflix",
           "computedHint": "Aus der Aufschlüsselung unten berechnet"

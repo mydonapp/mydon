@@ -258,117 +258,151 @@
   <div class="space-y-2 mb-3">
     @for (item of editItems(); track $index; let i = $index) {
     <div class="page-group p-3">
-      <div class="flex flex-wrap items-center gap-2">
-        <select
-          appSelect
-          class="w-28 shrink-0"
-          [ngModel]="item.type"
-          (ngModelChange)="item.type = $event; item.groupId = undefined; item.accountId = undefined"
-        >
-          <option value="group">{{ 'views.budgets.budgetItems.type.group' | translate }}</option>
-          <option value="account">{{ 'views.budgets.budgetItems.type.account' | translate }}</option>
-        </select>
+      <!-- Main row: stacks on mobile, single row on desktop. Each control sits in a sized wrapper so the
+           global .input/.select width:100% fills the cell instead of forcing the row to wrap. -->
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div class="sm:w-32 sm:shrink-0">
+          <select
+            appSelect
+            [ngModel]="item.type"
+            (ngModelChange)="item.type = $event; item.groupId = undefined; item.accountId = undefined"
+          >
+            <option value="group">{{ 'views.budgets.budgetItems.type.group' | translate }}</option>
+            <option value="account">{{ 'views.budgets.budgetItems.type.account' | translate }}</option>
+          </select>
+        </div>
 
-        @if (item.type === 'group') {
-        <app-combobox
-          class="flex-1 min-w-0 block"
-          [options]="groupOptions()"
-          [value]="item.groupId ?? ''"
-          [placeholder]="item.groupName || ('views.budgets.budgetItems.selectGroup' | translate)"
-          (valueChange)="item.groupId = $event; item.groupName = undefined"
-        />
-        } @else {
-        <app-combobox
-          class="flex-1 min-w-0 block"
-          [options]="accountOptions()"
-          [value]="item.accountId ?? ''"
-          [placeholder]="item.accountName || ('views.budgets.budgetItems.selectAccount' | translate)"
-          (valueChange)="item.accountId = $event; item.accountName = undefined"
-        />
-        } @if (isComputed(item)) {
-        <input
-          appInput
-          type="number"
-          class="w-28 shrink-0"
-          [ngModel]="computeLineAmount(item)"
-          [disabled]="true"
-          [title]="'views.budgets.budgetItems.subItems.computedHint' | translate"
-        />
-        } @else {
-        <input
-          appInput
-          type="number"
-          class="w-28 shrink-0"
-          [ngModel]="item.amount"
-          (ngModelChange)="item.amount = +$event"
-          placeholder="0.00"
-        />
-        }
-
-        <select
-          appSelect
-          class="w-28 shrink-0"
-          [ngModel]="item.frequency"
-          (ngModelChange)="item.frequency = $event; onLineFrequencyChange(i)"
-        >
-          <option value="monthly">{{ 'views.budgets.budgetItems.frequency.monthly' | translate }}</option>
-          <option value="yearly">{{ 'views.budgets.budgetItems.frequency.yearly' | translate }}</option>
-        </select>
-
-        <button
-          appBtn
-          variant="ghost"
-          size="xs"
-          class="text-error shrink-0"
-          (click)="removeItem(i)"
-        >
-          <app-icon
-            name="trash-2"
-            [size]="16"
+        <div class="flex-1 min-w-0">
+          @if (item.type === 'group') {
+          <app-combobox
+            class="block w-full min-w-0"
+            [options]="groupOptions()"
+            [value]="item.groupId ?? ''"
+            [placeholder]="item.groupName || ('views.budgets.budgetItems.selectGroup' | translate)"
+            (valueChange)="item.groupId = $event; item.groupName = undefined"
           />
-        </button>
-      </div>
-
-      <div class="mt-3 space-y-2 border-t border-outline-variant pt-3">
-        @for (sub of item.subItems ?? []; track $index; let subIdx = $index) {
-        <div class="flex flex-wrap items-center gap-2">
-          <input
-            appInput
-            type="text"
-            class="flex-1 min-w-0"
-            [ngModel]="sub.name"
-            (ngModelChange)="sub.name = $event; onSubItemChange(i)"
-            [placeholder]="'views.budgets.budgetItems.subItems.namePlaceholder' | translate"
+          } @else {
+          <app-combobox
+            class="block w-full min-w-0"
+            [options]="accountOptions()"
+            [value]="item.accountId ?? ''"
+            [placeholder]="item.accountName || ('views.budgets.budgetItems.selectAccount' | translate)"
+            (valueChange)="item.accountId = $event; item.accountName = undefined"
           />
+          }
+        </div>
+
+        <div class="sm:w-28 sm:shrink-0">
+          @if (isComputed(item)) {
           <input
             appInput
             type="number"
-            class="w-24 shrink-0"
-            [ngModel]="sub.amount"
-            (ngModelChange)="sub.amount = +$event; onSubItemChange(i)"
+            [ngModel]="computeLineAmount(item)"
+            [disabled]="true"
+            [title]="'views.budgets.budgetItems.subItems.computedHint' | translate"
+          />
+          } @else {
+          <input
+            appInput
+            type="number"
+            [ngModel]="item.amount"
+            (ngModelChange)="item.amount = +$event"
             placeholder="0.00"
           />
+          }
+        </div>
+
+        <div class="sm:w-32 sm:shrink-0">
           <select
             appSelect
-            class="w-28 shrink-0"
-            [ngModel]="sub.frequency"
-            (ngModelChange)="sub.frequency = $event; onSubItemChange(i)"
+            [ngModel]="item.frequency"
+            (ngModelChange)="item.frequency = $event; onLineFrequencyChange(i)"
           >
             <option value="monthly">{{ 'views.budgets.budgetItems.frequency.monthly' | translate }}</option>
             <option value="yearly">{{ 'views.budgets.budgetItems.frequency.yearly' | translate }}</option>
           </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-1 sm:shrink-0">
           <button
             appBtn
             variant="ghost"
             size="xs"
-            class="text-error shrink-0"
-            (click)="removeSubItem(i, subIdx)"
+            (click)="toggleExpanded(item)"
+            [attr.aria-expanded]="isExpanded(item)"
+            [attr.aria-label]="'views.budgets.budgetItems.subItems.title' | translate"
+            [title]="'views.budgets.budgetItems.subItems.title' | translate"
+          >
+            <app-icon
+              [name]="isExpanded(item) ? 'chevron-down' : 'chevron-right'"
+              [size]="16"
+            />
+            <!-- Always reserve the count slot so the toggle (and the actions cell) keep a constant
+                 width — otherwise rows with a badge shrink the combobox and the inputs fall out of line. -->
+            <span class="ml-0.5 w-4 shrink-0 text-center text-xs tabular-nums">{{ item.subItems?.length || '' }}</span>
+          </button>
+          <button
+            appBtn
+            variant="ghost"
+            size="xs"
+            class="text-error"
+            (click)="removeItem(i)"
           >
             <app-icon
               name="trash-2"
               [size]="16"
             />
           </button>
+        </div>
+      </div>
+
+      <!-- Collapsible breakdown — sub-items sum into the line amount. Editor-only; hidden in the overview. -->
+      @if (isExpanded(item)) {
+      <div class="mt-3 space-y-2 border-t border-outline-variant pt-3">
+        @for (sub of item.subItems ?? []; track $index; let subIdx = $index) {
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div class="flex-1 min-w-0">
+            <input
+              appInput
+              type="text"
+              [ngModel]="sub.name"
+              (ngModelChange)="sub.name = $event; onSubItemChange(i)"
+              [placeholder]="'views.budgets.budgetItems.subItems.namePlaceholder' | translate"
+            />
+          </div>
+          <div class="sm:w-28 sm:shrink-0">
+            <input
+              appInput
+              type="number"
+              [ngModel]="sub.amount"
+              (ngModelChange)="sub.amount = +$event; onSubItemChange(i)"
+              placeholder="0.00"
+            />
+          </div>
+          <div class="sm:w-32 sm:shrink-0">
+            <select
+              appSelect
+              [ngModel]="sub.frequency"
+              (ngModelChange)="sub.frequency = $event; onSubItemChange(i)"
+            >
+              <option value="monthly">{{ 'views.budgets.budgetItems.frequency.monthly' | translate }}</option>
+              <option value="yearly">{{ 'views.budgets.budgetItems.frequency.yearly' | translate }}</option>
+            </select>
+          </div>
+          <div class="flex justify-end sm:shrink-0">
+            <button
+              appBtn
+              variant="ghost"
+              size="xs"
+              class="text-error"
+              (click)="removeSubItem(i, subIdx)"
+            >
+              <app-icon
+                name="trash-2"
+                [size]="16"
+              />
+            </button>
+          </div>
         </div>
         }
         <button
@@ -384,6 +418,7 @@
           {{ 'views.budgets.budgetItems.subItems.addSubItem' | translate }}
         </button>
       </div>
+      }
     </div>
     }
   </div>
