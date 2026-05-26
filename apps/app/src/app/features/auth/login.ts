@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -11,6 +11,7 @@ import { IconComponent } from '../../shared/components/icon/icon';
 import { InputDirective } from '../../shared/directives/input.directive';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-login',
   imports: [FormsModule, RouterLink, TranslateModule, BtnDirective, InputDirective, FieldComponent, IconComponent],
   templateUrl: './login.html',

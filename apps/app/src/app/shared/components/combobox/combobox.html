@@ -1,92 +1,73 @@
-<div class="combobox-wrap">
-  <!-- Trigger -->
-  <button
-    #trigger
-    type="button"
-    class="combobox-trigger"
-    [class.combobox-trigger--open]="isOpen()"
-    [disabled]="disabled()"
-    [attr.aria-expanded]="isOpen()"
-    [attr.aria-controls]="listboxId"
-    aria-haspopup="listbox"
-    (click)="toggle()"
-    (keydown)="onTriggerKeydown($event)"
+<div
+  ngCombobox
+  #cb="ngCombobox"
+  class="combobox-wrap"
+  filterMode="manual"
+  [disabled]="disabled()"
+>
+  <div
+    #origin
+    class="combobox-anchor"
   >
-    <span
-      class="combobox-value"
-      [class.combobox-value--placeholder]="!selectedLabel()"
-    >
-      {{ selectedLabel() || placeholder() }}
-    </span>
+    <input
+      ngComboboxInput
+      type="text"
+      class="combobox-trigger"
+      [value]="query()"
+      (valueChange)="query.set($event)"
+      [placeholder]="placeholder()"
+      [attr.aria-label]="placeholder()"
+      [disabled]="disabled()"
+      autocomplete="off"
+    />
     <app-icon
       name="chevron-down"
       [size]="15"
       class="combobox-chevron"
-      [class.combobox-chevron--open]="isOpen()"
-    />
-  </button>
-</div>
-
-<!-- Dropdown — rendered fixed so it escapes any overflow:hidden ancestor -->
-@if (isOpen() && dropdownPos()) {
-<div
-  class="combobox-dropdown"
-  [id]="listboxId"
-  role="listbox"
-  [style.top.px]="dropdownPos()!.top"
-  [style.left.px]="dropdownPos()!.left"
-  [style.width.px]="dropdownPos()!.width"
->
-  <!-- Search -->
-  <div class="combobox-search-row">
-    <app-icon
-      name="search"
-      [size]="13"
-      class="combobox-search-icon"
-    />
-    <input
-      #searchInput
-      type="text"
-      class="combobox-search"
-      [ngModel]="query()"
-      (ngModelChange)="query.set($event); activeIndex.set(-1)"
-      (keydown)="onKeydown($event)"
-      placeholder="Search…"
-      autocomplete="off"
+      [class.combobox-chevron--open]="cb.expanded()"
+      aria-hidden="true"
     />
   </div>
 
-  <!-- Options -->
-  <div class="combobox-list">
-    @if (filtered().length === 0) {
-    <p class="combobox-empty">No results</p>
-    } @else { @for (opt of filtered(); track opt.value; let i = $index) {
-    <div
-      role="option"
-      tabindex="-1"
-      [attr.aria-selected]="opt.value === value()"
-      class="combobox-option"
-      [class.combobox-option--active]="i === activeIndex()"
-      [class.combobox-option--selected]="opt.value === value()"
-      (mousedown)="$event.preventDefault()"
-      (click)="select(opt)"
-      (keydown.enter)="select(opt)"
+  <ng-template ngComboboxPopupContainer>
+    <ng-template
+      [cdkConnectedOverlay]="{ origin, usePopover: 'inline', matchWidth: true }"
+      [cdkConnectedOverlayOpen]="true"
     >
-      <div class="combobox-option-body">
-        <span class="combobox-option-label">{{ opt.label }}</span>
-        @if (opt.subtitle) {
-        <span class="combobox-option-subtitle">{{ opt.subtitle }}</span>
-        }
+      <div class="combobox-dropdown">
+        <div
+          ngListbox
+          class="combobox-list"
+          [values]="selectedValues()"
+          (valuesChange)="onValuesChange($event); cb.close()"
+        >
+          @for (opt of filtered(); track opt.value) {
+          <div
+            ngOption
+            [value]="opt.value"
+            [label]="opt.label"
+            class="combobox-option"
+          >
+            <div class="combobox-option-body">
+              <span class="combobox-option-label">{{ opt.label }}</span>
+              @if (opt.subtitle) {
+              <span class="combobox-option-subtitle">{{ opt.subtitle }}</span>
+              }
+            </div>
+            @if (opt.value === value()) {
+            <app-icon
+              name="check"
+              [size]="14"
+              class="combobox-check"
+            />
+            }
+          </div>
+          }
+          @if (filtered().length === 0) {
+          <p class="combobox-empty">No results</p>
+          }
+        </div>
       </div>
-      @if (opt.value === value()) {
-      <app-icon
-        name="check"
-        [size]="14"
-        class="combobox-check"
-      />
-      }
-    </div>
-    } }
-  </div>
+    </ng-template>
+  </ng-template>
 </div>
-}

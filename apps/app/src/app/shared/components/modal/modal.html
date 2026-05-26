@@ -12,6 +12,9 @@
     [class]="boxClass()"
     role="dialog"
     aria-modal="true"
+    tabindex="-1"
+    appFocusTrap
+    (escape)="closed.emit()"
     (click)="$event.stopPropagation()"
     (keydown)="$event.stopPropagation()"
   >

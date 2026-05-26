@@ -1,0 +1,77 @@
+.agc-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* Overlay origin for the popup. */
+.agc-anchor {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Popup panel (positioned by the CDK overlay; matchWidth = input width) ── */
+.agc-popup {
+  background-color: var(--sys-surface);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.12),
+    0 2px 8px rgb(0 0 0 / 0.06),
+    0 0 0 1px var(--sys-outline-variant);
+}
+
+/* Aria toggles `aria-expanded` on the input — hide the popup while collapsed. */
+.agc-wrap:has(input[aria-expanded='false']) .agc-popup {
+  display: none;
+}
+
+.agc-list {
+  max-height: 12rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sys-outline-variant) transparent;
+}
+
+.agc-option {
+  padding: 0.4375rem 0.625rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Aria moves DOM focus to the active option (roving tabindex). */
+.agc-option:hover,
+.agc-option:focus,
+.agc-option:focus-visible {
+  outline: none;
+  background-color: var(--sys-surface-variant);
+}
+
+.agc-option[aria-selected='true'] {
+  color: var(--sys-primary);
+  font-weight: 500;
+}
+
+/* ── Inline "create new group" action below the list ─────────────────────── */
+.agc-create {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.625rem;
+  border-top: 1px solid var(--sys-outline-variant);
+  font-size: 0.875rem;
+  color: var(--sys-on-surface);
+  background: none;
+  cursor: pointer;
+}
+
+.agc-create:hover,
+.agc-create:focus-visible {
+  outline: none;
+  background-color: var(--sys-surface-variant);
+}

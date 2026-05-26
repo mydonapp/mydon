@@ -2,6 +2,7 @@
   type="button"
   role="switch"
   [attr.aria-checked]="value()"
+  [attr.aria-label]="ariaLabel() || null"
   [disabled]="disabled() || null"
   class="toggle"
   [class.toggle--on]="value()"

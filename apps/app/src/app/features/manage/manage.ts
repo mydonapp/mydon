@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountGroup, AccountGroupsService } from '../../services/account-groups.service';
@@ -21,6 +21,7 @@ import { SelectDirective, SelectOption } from '../../shared/directives/select.di
 type Section = 'accounts' | 'accountGroups' | 'ledger' | 'closing';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-manage',
   templateUrl: './manage.html',
   styleUrl: './manage.css',

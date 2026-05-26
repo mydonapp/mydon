@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { APP_VERSION } from '../../../version';
@@ -18,6 +18,7 @@ import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective, SelectOption } from '../../shared/directives/select.directive';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-settings',
   templateUrl: './settings.html',
   styleUrl: './settings.css',

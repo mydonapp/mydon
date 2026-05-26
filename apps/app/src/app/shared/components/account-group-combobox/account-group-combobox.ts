@@ -1,108 +1,94 @@
-import { Component, input, output, signal, inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Combobox, ComboboxInput, ComboboxPopupContainer } from '@angular/aria/combobox';
+import { Listbox, Option } from '@angular/aria/listbox';
+import { OverlayModule } from '@angular/cdk/overlay';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  afterRenderEffect,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  output,
+  signal,
+  viewChild,
+  viewChildren,
+} from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountGroup, AccountGroupsService } from '../../../services/account-groups.service';
 
-let comboboxCounter = 0;
+let counter = 0;
 
 @Component({
   selector: 'app-account-group-combobox',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './account-group-combobox.html',
-  imports: [FormsModule, TranslateModule],
+  styleUrl: './account-group-combobox.css',
+  imports: [TranslateModule, Combobox, ComboboxInput, ComboboxPopupContainer, Listbox, Option, OverlayModule],
 })
-export class AccountGroupComboboxComponent implements OnInit {
-  value = input<string>('');
-  label = input<string>('');
-  placeholder = input<string>('');
+export class AccountGroupComboboxComponent {
+  private readonly accountGroupsService = inject(AccountGroupsService);
 
-  valueChange = output<string>();
-  accountGroupCreated = output<AccountGroup>();
+  readonly value = input<string>('');
+  readonly label = input<string>('');
+  readonly placeholder = input<string>('');
 
-  private accountGroupsService = inject(AccountGroupsService);
+  readonly valueChange = output<string>();
+  readonly accountGroupCreated = output<AccountGroup>();
 
-  readonly id = ++comboboxCounter;
-  readonly inputId = `combobox-input-${this.id}`;
-  readonly listboxId = `combobox-list-${this.id}`;
+  readonly inputId = `agc-input-${++counter}`;
 
-  searchText = '';
-  showDropdown = signal(false);
-  filtered = signal<AccountGroup[]>([]);
-  creating = signal(false);
-  activeIndex = signal(-1);
+  private readonly groups = this.accountGroupsService.accountGroups;
+  private readonly selectedName = computed(() => this.groups().find((g) => g.id === this.value())?.name ?? '');
 
-  get canCreate(): boolean {
-    return (
-      !!this.searchText &&
-      !this.accountGroupsService.accountGroups().some((g) => g.name.toLowerCase() === this.searchText.toLowerCase())
-    );
-  }
+  readonly query = linkedSignal(() => this.selectedName());
+  readonly creating = signal(false);
 
-  ngOnInit(): void {
-    if (this.value()) {
-      const group = this.accountGroupsService.accountGroups().find((g) => g.id === this.value());
-      if (group) {
-        this.searchText = group.name;
+  readonly filtered = computed(() => {
+    const q = this.query().trim().toLowerCase();
+    return q ? this.groups().filter((g) => g.name.toLowerCase().includes(q)) : this.groups();
+  });
+
+  readonly selectedValues = computed(() => (this.value() ? [this.value()] : []));
+
+  readonly canCreate = computed(() => {
+    const q = this.query().trim();
+    return !!q && !this.groups().some((g) => g.name.toLowerCase() === q.toLowerCase());
+  });
+
+  private readonly comboboxRef = viewChild(Combobox);
+  private readonly listboxRef = viewChild(Listbox);
+  private readonly optionRefs = viewChildren(Option);
+
+  constructor() {
+    afterRenderEffect(() => {
+      const active = this.optionRefs().find((o) => o.active());
+      active?.element.scrollIntoView({ block: 'nearest' });
+    });
+    afterRenderEffect(() => {
+      if (!this.comboboxRef()?.expanded()) {
+        this.listboxRef()?.element.scrollTo(0, 0);
       }
+    });
+  }
+
+  onValuesChange(values: string[]): void {
+    const next = values.at(-1) ?? '';
+    if (next && next !== this.value()) {
+      this.valueChange.emit(next);
     }
-    this.filtered.set(this.accountGroupsService.accountGroups());
-  }
-
-  onSearch(text: string): void {
-    const lower = text.toLowerCase();
-    this.filtered.set(this.accountGroupsService.accountGroups().filter((g) => g.name.toLowerCase().includes(lower)));
-    this.activeIndex.set(-1);
-    this.showDropdown.set(true);
-  }
-
-  open(): void {
-    this.showDropdown.set(true);
-  }
-
-  close(): void {
-    setTimeout(() => this.showDropdown.set(false), 150);
-  }
-
-  onKeydown(event: KeyboardEvent): void {
-    if (!this.showDropdown()) {
-      return;
-    }
-    const groups = this.filtered();
-
-    if (event.key === 'Escape') {
-      this.showDropdown.set(false);
-      event.preventDefault();
-    } else if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      this.activeIndex.update((i) => Math.min(i + 1, groups.length - 1));
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.activeIndex.update((i) => Math.max(i - 1, 0));
-    } else if (event.key === 'Enter') {
-      event.preventDefault();
-      const idx = this.activeIndex();
-      if (idx >= 0 && idx < groups.length) {
-        this.selectAccountGroup(groups[idx]);
-      } else if (this.canCreate) {
-        this.createAccountGroup();
-      }
-    }
-  }
-
-  selectAccountGroup(group: AccountGroup): void {
-    this.searchText = group.name;
-    this.showDropdown.set(false);
-    this.valueChange.emit(group.id);
   }
 
   async createAccountGroup(): Promise<void> {
-    if (!this.searchText || this.creating()) {
+    const name = this.query().trim();
+    if (!name || this.creating()) {
       return;
     }
     this.creating.set(true);
     try {
-      const group = await this.accountGroupsService.createAccountGroup({ name: this.searchText });
+      const group = await this.accountGroupsService.createAccountGroup({ name });
       this.accountGroupCreated.emit(group);
-      this.selectAccountGroup(group);
+      this.valueChange.emit(group.id);
     } finally {
       this.creating.set(false);
     }

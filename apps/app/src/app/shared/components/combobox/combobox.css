@@ -1,33 +1,32 @@
-/* ── Wrapper ─────────────────────────────────────────────────────────────── */
+/* ── Wrapper (the ngCombobox host) ───────────────────────────────────────── */
 .combobox-wrap {
   position: relative;
   width: 100%;
 }
 
-/* ── Trigger button ──────────────────────────────────────────────────────── */
-.combobox-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+/* Overlay origin: holds the input + chevron so the popup anchors to this row. */
+.combobox-anchor {
+  position: relative;
   width: 100%;
-  padding: 0.5rem 0.75rem;
+}
+
+/* ── Trigger input ───────────────────────────────────────────────────────── */
+.combobox-trigger {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
   border-radius: 0.5rem;
   border: 1px solid var(--sys-outline-variant);
   background-color: var(--sys-surface);
   color: var(--sys-on-surface);
   font-size: 0.875rem;
   font-family: inherit;
-  cursor: pointer;
-  text-align: left;
+  min-height: 2.375rem;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
-  min-height: 2.375rem;
 }
 
-.combobox-trigger:focus-visible,
-.combobox-trigger--open {
+.combobox-trigger:focus-visible {
   outline: none;
   border-color: var(--sys-primary);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--sys-primary) 20%, transparent);
@@ -38,34 +37,28 @@
   cursor: not-allowed;
 }
 
-/* ── Value / placeholder ─────────────────────────────────────────────────── */
-.combobox-value {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.combobox-value--placeholder {
+.combobox-trigger::placeholder {
   color: var(--sys-on-surface-variant);
 }
 
-/* ── Chevron ─────────────────────────────────────────────────────────────── */
+/* ── Chevron (decorative, overlaid on the input) ─────────────────────────── */
 .combobox-chevron {
-  flex-shrink: 0;
+  position: absolute;
+  top: 50%;
+  right: 0.625rem;
+  transform: translateY(-50%);
+  pointer-events: none;
   color: var(--sys-on-surface-variant);
   transition: transform 0.15s ease;
 }
 
 .combobox-chevron--open {
-  transform: rotate(180deg);
+  transform: translateY(-50%) rotate(180deg);
 }
 
-/* ── Dropdown panel ──────────────────────────────────────────────────────── */
+/* ── Dropdown panel (positioned by the CDK overlay; matchWidth = origin width) ── */
 .combobox-dropdown {
-  position: fixed;
-  z-index: 200;
+  width: 100%;
   background-color: var(--sys-surface);
   border-radius: 10px;
   overflow: hidden;
@@ -75,32 +68,9 @@
     0 0 0 1px var(--sys-outline-variant);
 }
 
-/* ── Search row ──────────────────────────────────────────────────────────── */
-.combobox-search-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.625rem;
-  border-bottom: 1px solid var(--sys-outline-variant);
-}
-
-.combobox-search-icon {
-  flex-shrink: 0;
-  color: var(--sys-on-surface-variant);
-}
-
-.combobox-search {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.8125rem;
-  color: var(--sys-on-surface);
-  font-family: inherit;
-}
-
-.combobox-search::placeholder {
-  color: var(--sys-on-surface-variant);
+/* Aria toggles `aria-expanded` on the input — hide the popup while collapsed. */
+.combobox-wrap:has(.combobox-trigger[aria-expanded='false']) .combobox-dropdown {
+  display: none;
 }
 
 /* ── Option list ─────────────────────────────────────────────────────────── */
@@ -124,12 +94,15 @@
   transition: background-color 0.1s;
 }
 
+/* Aria moves DOM focus to the active option (roving tabindex). */
 .combobox-option:hover,
-.combobox-option--active {
+.combobox-option:focus,
+.combobox-option:focus-visible {
+  outline: none;
   background-color: var(--sys-surface-variant);
 }
 
-.combobox-option--selected .combobox-option-label {
+.combobox-option[aria-selected='true'] .combobox-option-label {
   color: var(--sys-primary);
   font-weight: 500;
 }

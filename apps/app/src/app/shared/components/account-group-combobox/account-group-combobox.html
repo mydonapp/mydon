@@ -6,58 +6,68 @@
     >{{ label() }}</label
   >
   }
-  <div class="relative">
-    <input
-      [id]="inputId"
-      type="text"
-      class="input w-full"
-      role="combobox"
-      aria-haspopup="listbox"
-      [attr.aria-expanded]="showDropdown()"
-      [attr.aria-controls]="listboxId"
-      [placeholder]="placeholder() || ('components.accountGroupCombobox.newGroupPlaceholder' | translate)"
-      [(ngModel)]="searchText"
-      (ngModelChange)="onSearch($event)"
-      (focus)="open()"
-      (blur)="close()"
-      (keydown)="onKeydown($event)"
-    />
-    @if (showDropdown() && (filtered().length > 0 || canCreate)) {
-    <ul
-      [id]="listboxId"
-      role="listbox"
-      class="absolute z-50 mt-1 w-full surface-elevated rounded-lg border border-outline-variant max-h-48 overflow-y-auto py-1"
-      style="box-shadow: var(--shadow-elevated)"
+
+  <div
+    ngCombobox
+    #cb="ngCombobox"
+    class="agc-wrap"
+    filterMode="manual"
+  >
+    <div
+      #origin
+      class="agc-anchor"
     >
-      @for (group of filtered(); track group.id; let i = $index) {
-      <li
-        role="option"
-        tabindex="-1"
-        [attr.aria-selected]="group.id === value()"
-        class="px-3 py-2 text-sm cursor-pointer hover:bg-surface-variant text-on-surface"
-        [class.bg-surface-variant]="i === activeIndex()"
-        (mousedown)="$event.preventDefault()"
-        (click)="selectAccountGroup(group)"
-        (keydown.enter)="selectAccountGroup(group)"
+      <input
+        [id]="inputId"
+        ngComboboxInput
+        type="text"
+        class="input w-full"
+        [value]="query()"
+        (valueChange)="query.set($event)"
+        [placeholder]="placeholder() || ('components.accountGroupCombobox.newGroupPlaceholder' | translate)"
+        [attr.aria-label]="label() || placeholder()"
+        autocomplete="off"
+      />
+    </div>
+
+    <ng-template ngComboboxPopupContainer>
+      <ng-template
+        [cdkConnectedOverlay]="{ origin, usePopover: 'inline', matchWidth: true }"
+        [cdkConnectedOverlayOpen]="true"
       >
-        {{ group.name }}
-      </li>
-      } @if (canCreate) {
-      <li
-        role="option"
-        tabindex="-1"
-        aria-selected="false"
-        class="px-3 py-2 text-sm cursor-pointer hover:bg-surface-variant text-on-surface border-t border-outline-variant"
-        (mousedown)="$event.preventDefault()"
-        (click)="createAccountGroup()"
-        (keydown.enter)="createAccountGroup()"
-      >
-        @if (creating()) {
-        <span class="text-on-surface-variant">{{ 'components.accountGroupCombobox.creating' | translate }}</span>
-        } @else { {{ 'components.accountGroupCombobox.createNew' | translate }}: "{{ searchText }}" }
-      </li>
-      }
-    </ul>
-    }
+        <div class="agc-popup">
+          <div
+            ngListbox
+            class="agc-list"
+            [values]="selectedValues()"
+            (valuesChange)="onValuesChange($event); cb.close()"
+          >
+            @for (group of filtered(); track group.id) {
+            <div
+              ngOption
+              [value]="group.id"
+              [label]="group.name"
+              class="agc-option"
+            >
+              {{ group.name }}
+            </div>
+            }
+          </div>
+          @if (canCreate()) {
+          <button
+            type="button"
+            class="agc-create"
+            (click)="createAccountGroup(); cb.close()"
+          >
+            @if (creating()) {
+            {{ 'components.accountGroupCombobox.creating' | translate }}
+            } @else {
+            {{ 'components.accountGroupCombobox.createNew' | translate }}: "{{ query() }}"
+            }
+          </button>
+          }
+        </div>
+      </ng-template>
+    </ng-template>
   </div>
 </div>

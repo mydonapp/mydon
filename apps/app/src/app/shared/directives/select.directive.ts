@@ -12,6 +12,9 @@ export interface SelectOption {
   host: {
     class: 'select',
     '[class.input-error]': 'field?.hasError() ?? false',
+    '[attr.aria-invalid]': 'field?.hasError() ? true : null',
+    '[attr.aria-required]': 'field?.required() ? true : null',
+    '[attr.aria-describedby]': 'field?.describedById() || null',
   },
 })
 export class SelectDirective {

@@ -1,14 +1,16 @@
+import { Location } from '@angular/common';
 import {
   afterNextRender,
+  ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
-  HostListener,
   inject,
+  Renderer2,
   signal,
   viewChild,
 } from '@angular/core';
-import { Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
@@ -43,6 +45,7 @@ const STACK_MAX = 5;
  * the template is a **signal** — getter bindings caused NG0100 last time.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-page-stage',
   templateUrl: './page-stage.html',
   styleUrl: './page-stage.css',
@@ -51,6 +54,8 @@ export class PageStageComponent {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly backNavigator = inject(BackNavigator);
+  private readonly renderer = inject(Renderer2);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly stageRef = viewChild<ElementRef<HTMLElement>>('stage');
   private readonly prevRef = viewChild<ElementRef<HTMLElement>>('prev');
@@ -65,9 +70,7 @@ export class PageStageComponent {
   private readonly enabledSig = signal(this.computeEnabled());
   private readonly stackLen = signal(0);
 
-  protected readonly armed = computed(
-    () => this.enabledSig() && this.stackLen() > 0 && !this.finishing(),
-  );
+  protected readonly armed = computed(() => this.enabledSig() && this.stackLen() > 0 && !this.finishing());
 
   // ── Snapshot stack + settle ────────────────────────────────────────────────
   private stack: PageSnapshot[] = [];
@@ -102,11 +105,8 @@ export class PageStageComponent {
 
     this.backNavigator.register(() => this.animatedBack());
     afterNextRender(() => this.refreshEnabled());
-  }
 
-  @HostListener('window:resize')
-  onResize(): void {
-    this.refreshEnabled();
+    this.destroyRef.onDestroy(this.renderer.listen('window', 'resize', () => this.refreshEnabled()));
   }
 
   // ── Navigation lifecycle ───────────────────────────────────────────────────
@@ -116,8 +116,7 @@ export class PageStageComponent {
     const leavingUrl = this.router.url;
     // Prefer the settled (content) snapshot of the page being left; fall back
     // to a live capture only if we never got a settled one (left too fast).
-    this.pendingSnapshot =
-      this.settled && this.settled.url === leavingUrl ? this.settled : this.captureCurrent();
+    this.pendingSnapshot = this.settled && this.settled.url === leavingUrl ? this.settled : this.captureCurrent();
   }
 
   private onNavigationEnd(): void {

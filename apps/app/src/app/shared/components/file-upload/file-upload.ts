@@ -1,11 +1,17 @@
-import { Component, input, output, signal, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal, ViewChild, ElementRef, inject } from '@angular/core';
 import { IconComponent } from '../icon/icon';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-file-upload',
   templateUrl: './file-upload.html',
   styleUrl: './file-upload.css',
   imports: [IconComponent],
+  host: {
+    '(dragover)': 'onDragOver($event)',
+    '(dragleave)': 'onDragLeave($event)',
+    '(drop)': 'onDrop($event)',
+  },
 })
 export class FileUploadComponent {
   private elementRef = inject(ElementRef);
@@ -43,20 +49,17 @@ export class FileUploadComponent {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  @HostListener('dragover', ['$event'])
   onDragOver(e: DragEvent) {
     e.preventDefault();
     this.isDragging.set(true);
   }
 
-  @HostListener('dragleave', ['$event'])
   onDragLeave(e: DragEvent) {
     if (!(this.elementRef.nativeElement as HTMLElement).contains(e.relatedTarget as Node)) {
       this.isDragging.set(false);
     }
   }
 
-  @HostListener('drop', ['$event'])
   onDrop(e: DragEvent) {
     e.preventDefault();
     this.isDragging.set(false);

@@ -10,7 +10,17 @@
 }
 <ng-content />
 @if (error()) {
-<p class="mt-1 text-xs text-error">{{ error() }}</p>
+<p
+  [id]="fieldId + '-error'"
+  class="mt-1 text-xs text-error"
+>
+  {{ error() }}
+</p>
 } @else if (helpText()) {
-<p class="mt-1 text-xs text-muted">{{ helpText() }}</p>
+<p
+  [id]="fieldId + '-help'"
+  class="mt-1 text-xs text-muted"
+>
+  {{ helpText() }}
+</p>
 }

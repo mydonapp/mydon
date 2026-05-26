@@ -9,6 +9,7 @@
         type="button"
         class="flex items-center justify-center w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors"
         (click)="toggleListStyle()"
+        aria-label="Toggle list density"
         [title]="listStyleService.listStyle() === 'compact' ? 'Switch to normal view' : 'Switch to compact view'"
       >
         <app-icon

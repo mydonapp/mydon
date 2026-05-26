@@ -1,11 +1,13 @@
 import {
+  ChangeDetectionStrategy,
   AfterViewInit,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
-  HostListener,
   inject,
   OnInit,
+  Renderer2,
   signal,
   viewChild,
   viewChildren,
@@ -25,6 +27,9 @@ import { PageStageComponent } from '../shared/components/page-stage/page-stage';
 import { ToastContainerComponent } from '../shared/components/toast-container/toast-container';
 import { ToggleComponent } from '../shared/components/toggle/toggle';
 import { BtnDirective } from '../shared/directives/btn.directive';
+import { Menu, MenuItem as NgMenuItem, MenuTrigger } from '@angular/aria/menu';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { FocusTrapDirective } from '../shared/directives/focus-trap.directive';
 
 interface MenuItem {
   label: string;
@@ -41,6 +46,7 @@ interface MenuItem {
 const DRAG_THRESHOLD = 8;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-layout',
   imports: [
     RouterOutlet,
@@ -52,6 +58,11 @@ const DRAG_THRESHOLD = 8;
     ToggleComponent,
     BtnDirective,
     IconComponent,
+    Menu,
+    NgMenuItem,
+    MenuTrigger,
+    OverlayModule,
+    FocusTrapDirective,
   ],
   templateUrl: './app-layout.html',
   styleUrl: './app-layout.css',
@@ -64,8 +75,9 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
   private readonly ledgerService = inject(LedgerService);
   protected readonly organizationsService = inject(OrganizationsService);
   private readonly router = inject(Router);
+  private readonly renderer = inject(Renderer2);
+  private readonly destroyRef = inject(DestroyRef);
 
-  orgMenuOpen = signal(false);
   readonly organizations = this.organizationsService.organizations;
   readonly activeLedgerId = computed(() => this.userService.user()?.activeLedgerId ?? null);
   readonly activeOrg = computed(
@@ -90,6 +102,10 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
     () => this.organizations().reduce((n, o) => n + o.ledgers.length, 0) > 1,
   );
 
+  /** Aria menu instances, referenced by their triggers via `[menu]`. */
+  readonly orgMenu = viewChild<Menu<string>>('orgMenu');
+  readonly userMenu = viewChild<Menu<string>>('userMenu');
+
   private readonly bottomNav = viewChild<ElementRef<HTMLElement>>('bottomNav');
   private readonly navSlots = viewChildren<ElementRef<HTMLElement>>('navSlot');
 
@@ -97,8 +113,6 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
      Driving the pill from real rects (not calc) kills the sub-pixel drift that
      made the highlight creep off the icon further to the right. */
   private readonly slotRects = signal<{ left: number; width: number }[]>([]);
-
-  userMenuOpen = signal(false);
 
   menu: MenuItem[] = [
     {
@@ -189,6 +203,9 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
         takeUntilDestroyed(),
       )
       .subscribe(() => this.syncActiveFromUrl());
+
+    // The window resize listener can't live in the host object (it targets window); torn down on destroy.
+    this.destroyRef.onDestroy(this.renderer.listen('window', 'resize', () => this.measureSlots()));
   }
 
   ngOnInit() {
@@ -198,13 +215,8 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
     this.syncActiveFromUrl();
   }
 
-  toggleOrgMenu(event: Event) {
-    event.stopPropagation();
-    this.orgMenuOpen.update((v) => !v);
-  }
-
   async switchLedger(ledgerId: string | undefined) {
-    this.orgMenuOpen.set(false);
+    this.orgMenu()?.close();
     if (!ledgerId || ledgerId === this.activeLedgerId()) {
       return;
     }
@@ -214,11 +226,6 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     // Measure once the bar has laid out (and after web fonts settle the labels).
     requestAnimationFrame(() => this.measureSlots());
-  }
-
-  @HostListener('window:resize')
-  onResize() {
-    this.measureSlots();
   }
 
   /** Cache each tab's real position/size so the pill can track it exactly. */
@@ -416,11 +423,6 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
     return Math.min(count - 1, Math.max(0, pos));
   }
 
-  toggleUserMenu(event: Event) {
-    event.stopPropagation();
-    this.userMenuOpen.update((v) => !v);
-  }
-
   // ── Mobile "More" sheet ─────────────────────────────────────────────────────
   private moreCloseTimer?: ReturnType<typeof setTimeout>;
 
@@ -498,19 +500,16 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
   }
 
   goTo(route: string) {
-    this.userMenuOpen.set(false);
     this.closeMore();
     this.router.navigate([route]);
   }
 
   goToSettings() {
-    this.userMenuOpen.set(false);
     this.closeMore();
     this.router.navigate(['/app/settings']);
   }
 
   goToManage() {
-    this.userMenuOpen.set(false);
     this.closeMore();
     this.router.navigate(['/app/manage']);
   }
@@ -525,21 +524,26 @@ export class AppLayoutComponent implements OnInit, AfterViewInit {
   }
 
   async logout() {
-    this.userMenuOpen.set(false);
     this.closeMore();
     await this.authService.logout();
   }
 
-  @HostListener('document:click')
-  onDocumentClick() {
-    this.userMenuOpen.set(false);
-    this.orgMenuOpen.set(false);
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape() {
-    this.userMenuOpen.set(false);
-    this.orgMenuOpen.set(false);
-    this.closeMore();
+  /** Route a user-menu selection (the Aria menu emits the chosen item's value). */
+  onUserMenuSelect(value: string) {
+    this.userMenu()?.close();
+    switch (value) {
+      case 'privacy':
+        this.togglePrivacy();
+        break;
+      case 'settings':
+        this.goToSettings();
+        break;
+      case 'manage':
+        this.goToManage();
+        break;
+      case 'logout':
+        this.logout();
+        break;
+    }
   }
 }

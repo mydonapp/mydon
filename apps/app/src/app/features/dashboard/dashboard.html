@@ -56,6 +56,7 @@
         type="button"
         class="md:hidden flex items-center justify-center w-7 h-7 rounded-md text-on-surface-variant hover:bg-surface-variant transition-colors"
         (click)="onPrivacyToggle()"
+        aria-label="Toggle privacy mode"
       >
         <app-icon
           [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'"

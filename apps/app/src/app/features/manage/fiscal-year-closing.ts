@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService } from '../../services/accounts.service';
 import { ClosableYear, ClosingPreview, ClosingsService } from '../../services/closings.service';
@@ -19,6 +19,7 @@ import { BtnDirective } from '../../shared/directives/btn.directive';
  * in-progress years expose Seal / Cancel inline.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-fiscal-year-closing',
   templateUrl: './fiscal-year-closing.html',
   imports: [TranslateModule, BtnDirective, IconComponent, ModalComponent, SkeletonComponent],

@@ -24,10 +24,11 @@
     @if (canSwitchWorkspace()) {
     <div class="org-switcher">
       <button
+        ngMenuTrigger
+        #orgOrigin
+        #orgTrig="ngMenuTrigger"
+        [menu]="orgMenu()"
         class="org-switcher-btn"
-        (click)="toggleOrgMenu($event)"
-        [attr.aria-expanded]="orgMenuOpen()"
-        aria-haspopup="menu"
       >
         <app-icon
           name="building"
@@ -46,54 +47,60 @@
           class="sidebar-label flex-shrink-0"
         />
       </button>
-      @if (orgMenuOpen()) {
-      <div
-        class="org-menu"
-        role="menu"
-        tabindex="-1"
-        (click)="$event.stopPropagation()"
-        (keydown)="$event.stopPropagation()"
+
+      <ng-template
+        [cdkConnectedOverlayOpen]="orgTrig.expanded()"
+        [cdkConnectedOverlay]="{ origin: orgOrigin, usePopover: 'inline', matchWidth: true }"
+        [cdkConnectedOverlayPositions]="[
+          { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
+        ]"
+        cdkAttachPopoverAsChild
       >
-        @for (org of organizations(); track org.id) {
-        @if (org.ledgers.length <= 1) {
-        <button
-          class="user-menu-item"
-          role="menuitem"
-          (click)="switchLedger(org.ledgers[0].id)"
+        <div
+          ngMenu
+          #orgMenu="ngMenu"
+          class="org-menu"
+          (itemSelected)="switchLedger($any($event))"
         >
-          <app-icon
-            name="building"
-            [size]="15"
-          />
-          <span class="flex-1 truncate">{{ org.name }}</span>
-          @if (org.ledgers[0].id === activeLedgerId()) {
-          <app-icon
-            name="check"
-            [size]="14"
-          />
-          }
-        </button>
-        } @else {
-        <p class="org-menu-label">{{ org.name }}</p>
-        @for (l of org.ledgers; track l.id) {
-        <button
-          class="user-menu-item org-menu-ledger"
-          role="menuitem"
-          (click)="switchLedger(l.id)"
-        >
-          <span class="flex-1 truncate">{{ l.name }}</span>
-          @if (l.id === activeLedgerId()) {
-          <app-icon
-            name="check"
-            [size]="14"
-          />
-          }
-        </button>
-        }
-        }
-        }
-      </div>
-      }
+          @for (org of organizations(); track org.id) { @if (org.ledgers.length <= 1) {
+          <div
+            ngMenuItem
+            [value]="org.ledgers[0].id"
+            class="user-menu-item"
+            [attr.aria-current]="org.ledgers[0].id === activeLedgerId() ? 'true' : null"
+          >
+            <app-icon
+              name="building"
+              [size]="15"
+            />
+            <span class="flex-1 truncate">{{ org.name }}</span>
+            @if (org.ledgers[0].id === activeLedgerId()) {
+            <app-icon
+              name="check"
+              [size]="14"
+            />
+            }
+          </div>
+          } @else {
+          <p class="org-menu-label">{{ org.name }}</p>
+          @for (l of org.ledgers; track l.id) {
+          <div
+            ngMenuItem
+            [value]="l.id"
+            class="user-menu-item org-menu-ledger"
+            [attr.aria-current]="l.id === activeLedgerId() ? 'true' : null"
+          >
+            <span class="flex-1 truncate">{{ l.name }}</span>
+            @if (l.id === activeLedgerId()) {
+            <app-icon
+              name="check"
+              [size]="14"
+            />
+            }
+          </div>
+          } } }
+        </div>
+      </ng-template>
     </div>
     }
 
@@ -129,72 +136,12 @@
     <div class="sidebar-footer">
       <!-- User profile + dropdown -->
       <div class="sidebar-user-wrap">
-        @if (userMenuOpen()) {
-        <div
-          class="user-menu"
-          role="menu"
-          tabindex="-1"
-          (click)="$event.stopPropagation()"
-          (keydown)="$event.stopPropagation()"
-        >
-          <div
-            class="user-menu-item user-menu-item--toggle"
-            role="menuitem"
-            tabindex="0"
-            (click)="togglePrivacy()"
-            (keydown.enter)="togglePrivacy()"
-            (keydown.space)="togglePrivacy(); $event.preventDefault()"
-          >
-            <app-icon
-              [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'"
-              [size]="15"
-            />
-            <span class="flex-1">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</span>
-            <app-toggle
-              [value]="privacyService.isPrivate()"
-              class="pointer-events-none flex-shrink-0"
-            />
-          </div>
-          <div class="user-menu-separator"></div>
-          <button
-            class="user-menu-item"
-            (click)="goToSettings()"
-          >
-            <app-icon
-              name="settings"
-              [size]="15"
-            />
-            <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
-          </button>
-          <button
-            class="user-menu-item"
-            (click)="goToManage()"
-          >
-            <app-icon
-              name="settings-2"
-              [size]="15"
-            />
-            <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
-          </button>
-          <div class="user-menu-separator"></div>
-          <button
-            class="user-menu-item user-menu-item--danger"
-            (click)="logout()"
-          >
-            <app-icon
-              name="log-out"
-              [size]="15"
-            />
-            <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
-          </button>
-        </div>
-        }
-
         <button
+          ngMenuTrigger
+          #userOrigin
+          #userTrig="ngMenuTrigger"
+          [menu]="userMenu()"
           class="sidebar-user"
-          (click)="toggleUserMenu($event)"
-          [attr.aria-expanded]="userMenuOpen()"
-          aria-haspopup="menu"
         >
           <div class="sidebar-avatar">{{ userInitial() }}</div>
           <div class="sidebar-label sidebar-user-info">
@@ -205,9 +152,76 @@
             name="chevron-up"
             [size]="14"
             class="sidebar-label sidebar-chevron"
-            [class.sidebar-chevron--closed]="!userMenuOpen()"
+            [class.sidebar-chevron--closed]="!userTrig.expanded()"
           />
         </button>
+
+        <ng-template
+          [cdkConnectedOverlayOpen]="userTrig.expanded()"
+          [cdkConnectedOverlay]="{ origin: userOrigin, usePopover: 'inline', matchWidth: true }"
+          [cdkConnectedOverlayPositions]="[
+            { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
+          ]"
+          cdkAttachPopoverAsChild
+        >
+          <div
+            ngMenu
+            #userMenu="ngMenu"
+            class="user-menu"
+            (itemSelected)="onUserMenuSelect($any($event))"
+          >
+            <div
+              ngMenuItem
+              value="privacy"
+              class="user-menu-item user-menu-item--toggle"
+            >
+              <app-icon
+                [name]="privacyService.isPrivate() ? 'eye-off' : 'eye'"
+                [size]="15"
+              />
+              <span class="flex-1">{{ 'views.settings.sections.privacy.privacyMode' | translate }}</span>
+              <app-toggle
+                [value]="privacyService.isPrivate()"
+                class="pointer-events-none shrink-0"
+              />
+            </div>
+            <div class="user-menu-separator"></div>
+            <div
+              ngMenuItem
+              value="settings"
+              class="user-menu-item"
+            >
+              <app-icon
+                name="settings"
+                [size]="15"
+              />
+              <span>{{ 'components.sidebar.menu.settings' | translate }}</span>
+            </div>
+            <div
+              ngMenuItem
+              value="manage"
+              class="user-menu-item"
+            >
+              <app-icon
+                name="settings-2"
+                [size]="15"
+              />
+              <span>{{ 'components.sidebar.menu.manage' | translate }}</span>
+            </div>
+            <div class="user-menu-separator"></div>
+            <div
+              ngMenuItem
+              value="logout"
+              class="user-menu-item user-menu-item--danger"
+            >
+              <app-icon
+                name="log-out"
+                [size]="15"
+              />
+              <span>{{ 'components.sidebar.menu.logout' | translate }}</span>
+            </div>
+          </div>
+        </ng-template>
       </div>
 
       <!-- Collapse toggle -->
@@ -322,6 +336,9 @@
     class="more-sheet md:hidden"
     role="dialog"
     aria-modal="true"
+    tabindex="-1"
+    appFocusTrap
+    (escape)="closeMore()"
     [attr.aria-label]="'components.sidebar.menu.more' | translate"
     [class.is-shown]="moreShown()"
     [class.is-dragging]="sheetDragging()"

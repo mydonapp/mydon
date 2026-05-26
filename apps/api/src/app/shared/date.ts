@@ -4,6 +4,8 @@
  * reinterpreted across timezones the way a `timestamptz` instant would.
  */
 
+const MS_PER_DAY = 86_400_000;
+
 /** Normalise a Date (by its UTC calendar day) or an ISO/date string to 'YYYY-MM-DD'. */
 export function toDateString(value: Date | string): string {
   if (typeof value === 'string') {
@@ -36,6 +38,6 @@ export function fiscalYearPeriod(startYear: number, startMonth: number): FiscalY
   const start = ymdToDateString(startYear, startMonth, 1);
   const endExclusive = ymdToDateString(startYear + 1, startMonth, 1);
   // One day before the exclusive end; Date.UTC keeps the arithmetic in UTC so the day can't drift.
-  const end = new Date(Date.UTC(startYear + 1, startMonth - 1, 1) - 86_400_000).toISOString().slice(0, 10);
+  const end = new Date(Date.UTC(startYear + 1, startMonth - 1, 1) - MS_PER_DAY).toISOString().slice(0, 10);
   return { start, endExclusive, end };
 }

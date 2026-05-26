@@ -1,9 +1,10 @@
-import { Component, HostListener, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Renderer2, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { BackNavigator } from '../../back-navigator';
 import { IconComponent } from '../icon/icon';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-detail-header',
   templateUrl: './detail-header.html',
   styleUrl: './detail-header.css',
@@ -16,6 +17,8 @@ export class DetailHeaderComponent {
 
   private readonly backNavigator = inject(BackNavigator);
   private readonly router = inject(Router);
+  private readonly renderer = inject(Renderer2);
+  private readonly destroyRef = inject(DestroyRef);
 
   /** Hand off to the animated back when PageStage can take over; otherwise do
      the navigation programmatically. We own the click entirely so there's no
@@ -40,8 +43,8 @@ export class DetailHeaderComponent {
   readonly isScrolled = computed(() => this.scrollY() > 20);
   readonly isScrolling = computed(() => this.scrollY() > 5);
 
-  @HostListener('window:scroll')
-  onScroll(): void {
-    this.scrollY.set(window.scrollY);
+  constructor() {
+    // window scroll → reactive scrollY; torn down on destroy (the host object can't target window).
+    this.destroyRef.onDestroy(this.renderer.listen('window', 'scroll', () => this.scrollY.set(window.scrollY)));
   }
 }

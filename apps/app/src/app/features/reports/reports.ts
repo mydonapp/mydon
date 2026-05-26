@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { CurrencyService } from '../../services/currency.service';
@@ -16,6 +16,7 @@ import { SelectDirective } from '../../shared/directives/select.directive';
 type Tab = 'trialBalance' | 'balanceSheet' | 'incomeStatement';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-reports',
   templateUrl: './reports.html',
   imports: [

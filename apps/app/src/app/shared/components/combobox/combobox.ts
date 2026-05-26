@@ -1,5 +1,17 @@
-import { Component, ElementRef, HostListener, ViewChild, computed, inject, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Combobox, ComboboxInput, ComboboxPopupContainer } from '@angular/aria/combobox';
+import { Listbox, Option } from '@angular/aria/listbox';
+import { OverlayModule } from '@angular/cdk/overlay';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  afterRenderEffect,
+  computed,
+  input,
+  linkedSignal,
+  output,
+  viewChild,
+  viewChildren,
+} from '@angular/core';
 import { IconComponent } from '../icon/icon';
 
 export interface ComboboxOption {
@@ -8,120 +20,57 @@ export interface ComboboxOption {
   subtitle?: string;
 }
 
-let counter = 0;
-
 @Component({
   selector: 'app-combobox',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './combobox.html',
   styleUrl: './combobox.css',
-  imports: [FormsModule, IconComponent],
+  imports: [Combobox, ComboboxInput, ComboboxPopupContainer, Listbox, Option, OverlayModule, IconComponent],
 })
 export class ComboboxComponent {
-  private el = inject(ElementRef);
+  readonly options = input<ComboboxOption[]>([]);
+  readonly value = input<string>('');
+  readonly placeholder = input<string>('Select…');
+  readonly disabled = input<boolean>(false);
 
-  options = input<ComboboxOption[]>([]);
-  value = input<string>('');
-  placeholder = input<string>('Select…');
-  disabled = input<boolean>(false);
+  readonly valueChange = output<string>();
 
-  valueChange = output<string>();
+  private readonly selectedLabel = computed(() => this.options().find((o) => o.value === this.value())?.label ?? '');
 
-  readonly listboxId = `combobox-list-${++counter}`;
+  /** Input text: tracks the selected label, but the user can overwrite it to filter — and it resets
+   *  to the label whenever the selection changes (linkedSignal). */
+  readonly query = linkedSignal(() => this.selectedLabel());
 
-  isOpen = signal(false);
-  query = signal('');
-  activeIndex = signal(-1);
-  dropdownPos = signal<{ top: number; left: number; width: number } | null>(null);
+  /** Aria's listbox works in arrays; a single selection carries 0 or 1 value. */
+  readonly selectedValues = computed(() => (this.value() ? [this.value()] : []));
 
-  @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>;
-  @ViewChild('trigger') triggerRef!: ElementRef<HTMLButtonElement>;
-
-  selectedLabel = computed(() => this.options().find((o) => o.value === this.value())?.label ?? '');
-
-  filtered = computed(() => {
-    const q = this.query().toLowerCase().trim();
+  readonly filtered = computed(() => {
+    const q = this.query().trim().toLowerCase();
     return q ? this.options().filter((o) => o.label.toLowerCase().includes(q)) : this.options();
   });
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(e: MouseEvent) {
-    if (!this.el.nativeElement.contains(e.target)) {
-      this.close();
-    }
-  }
+  private readonly comboboxRef = viewChild(Combobox);
+  private readonly listboxRef = viewChild(Listbox);
+  private readonly optionRefs = viewChildren(Option);
 
-  @HostListener('window:scroll')
-  @HostListener('window:resize')
-  onScrollOrResize() {
-    if (this.isOpen()) {
-      this.close();
-    }
-  }
-
-  toggle() {
-    if (this.disabled()) {
-      return;
-    }
-    if (this.isOpen()) {
-      this.close();
-    } else {
-      this.open();
-    }
-  }
-
-  open() {
-    const rect = this.triggerRef.nativeElement.getBoundingClientRect();
-    this.dropdownPos.set({ top: rect.bottom + 5, left: rect.left, width: rect.width });
-    this.isOpen.set(true);
-    this.query.set('');
-    this.activeIndex.set(-1);
-    setTimeout(() => this.searchInputRef?.nativeElement.focus(), 0);
-  }
-
-  close() {
-    this.isOpen.set(false);
-    this.dropdownPos.set(null);
-    this.query.set('');
-    this.activeIndex.set(-1);
-  }
-
-  onKeydown(e: KeyboardEvent) {
-    const opts = this.filtered();
-    switch (e.key) {
-      case 'Escape':
-        e.preventDefault();
-        this.close();
-        break;
-      case 'ArrowDown':
-        e.preventDefault();
-        this.activeIndex.update((i) => Math.min(i + 1, opts.length - 1));
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        this.activeIndex.update((i) => Math.max(i - 1, 0));
-        break;
-      case 'Enter': {
-        e.preventDefault();
-        const idx = this.activeIndex();
-        if (idx >= 0 && idx < opts.length) {
-          this.select(opts[idx]);
-        }
-        break;
+  constructor() {
+    // Keep the keyboard-active option scrolled into view, and reset the list to the top when it closes
+    // (per the Angular Aria autocomplete guidance).
+    afterRenderEffect(() => {
+      const active = this.optionRefs().find((o) => o.active());
+      active?.element.scrollIntoView({ block: 'nearest' });
+    });
+    afterRenderEffect(() => {
+      if (!this.comboboxRef()?.expanded()) {
+        this.listboxRef()?.element.scrollTo(0, 0);
       }
-    }
+    });
   }
 
-  onTriggerKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (!this.isOpen()) {
-        this.open();
-      }
+  onValuesChange(values: string[]) {
+    const next = values.at(-1) ?? '';
+    if (next && next !== this.value()) {
+      this.valueChange.emit(next);
     }
-  }
-
-  select(opt: ComboboxOption) {
-    this.valueChange.emit(opt.value);
-    this.close();
   }
 }

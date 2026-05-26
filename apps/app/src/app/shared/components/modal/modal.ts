@@ -1,9 +1,12 @@
-import { Component, DestroyRef, HostListener, effect, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, output } from '@angular/core';
+import { FocusTrapDirective } from '../../directives/focus-trap.directive';
 
 @Component({
   selector: 'app-modal',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './modal.html',
   styleUrl: './modal.css',
+  imports: [FocusTrapDirective],
 })
 export class ModalComponent {
   open = input(false);
@@ -22,13 +25,6 @@ export class ModalComponent {
     });
 
     this.destroyRef.onDestroy(() => this.unlockScroll());
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.open()) {
-      this.closed.emit();
-    }
   }
 
   private lockScroll(): void {

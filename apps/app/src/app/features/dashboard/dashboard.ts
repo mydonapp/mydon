@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountsService, TransactionRecord } from '../../services/accounts.service';
@@ -23,6 +23,7 @@ interface DashboardStats {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-dashboard',
   imports: [RouterLink, DatePipe, TranslateModule, PageHeaderComponent, BtnDirective, SkeletonComponent, IconComponent],
   templateUrl: './dashboard.html',

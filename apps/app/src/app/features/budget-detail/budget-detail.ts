@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -18,6 +18,7 @@ import { InputDirective } from '../../shared/directives/input.directive';
 import { SelectDirective } from '../../shared/directives/select.directive';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-budget-detail',
   templateUrl: './budget-detail.html',
   imports: [

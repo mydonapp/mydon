@@ -6,6 +6,9 @@ import { FIELD_TOKEN } from './field.token';
   host: {
     class: 'input',
     '[class.input-error]': 'field?.hasError() ?? false',
+    '[attr.aria-invalid]': 'field?.hasError() ? true : null',
+    '[attr.aria-required]': 'field?.required() ? true : null',
+    '[attr.aria-describedby]': 'field?.describedById() || null',
   },
 })
 export class InputDirective {

@@ -1,4 +1,4 @@
-import { Component, AfterContentInit, input, computed, contentChild } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, computed, contentChild, input } from '@angular/core';
 import { FIELD_TOKEN } from '../../directives/field.token';
 import { InputDirective } from '../../directives/input.directive';
 import { SelectDirective } from '../../directives/select.directive';
@@ -6,6 +6,7 @@ import { SelectDirective } from '../../directives/select.directive';
 let fieldCounter = 0;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-field',
   templateUrl: './field.html',
   providers: [{ provide: FIELD_TOKEN, useExisting: FieldComponent }],
@@ -19,6 +20,10 @@ export class FieldComponent implements AfterContentInit {
   required = input(false);
 
   readonly hasError = computed(() => !!this.error());
+
+  readonly describedById = computed(() =>
+    this.error() ? `${this.fieldId}-error` : this.helpText() ? `${this.fieldId}-help` : null,
+  );
 
   private readonly inputDir = contentChild(InputDirective);
   private readonly selectDir = contentChild(SelectDirective);
