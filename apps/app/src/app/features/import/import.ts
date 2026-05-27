@@ -8,7 +8,6 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 import { ComboboxComponent, ComboboxOption } from '../../shared/components/combobox/combobox';
 import { FileUploadComponent } from '../../shared/components/file-upload/file-upload';
 import { BtnDirective } from '../../shared/directives/btn.directive';
-import { SelectDirective } from '../../shared/directives/select.directive';
 import { FieldComponent } from '../../shared/components/field/field';
 import { SkeletonComponent } from '../../shared/components/skeleton/skeleton';
 import { IconComponent } from '../../shared/components/icon/icon';
@@ -26,7 +25,6 @@ import { IconComponent } from '../../shared/components/icon/icon';
     ComboboxComponent,
     FileUploadComponent,
     BtnDirective,
-    SelectDirective,
     FieldComponent,
     SkeletonComponent,
     IconComponent,
@@ -152,16 +150,9 @@ export class ImportComponent implements OnInit {
     ];
     try {
       await this.accountsService.updateDraftTransaction(draftId, { entries });
-      this.draftTransactions.update((drafts) =>
-        drafts.map((d) =>
-          d.id === draftId
-            ? {
-                ...d,
-                entries: d.entries.map((e) => (e.direction === direction ? { ...e, accountId } : e)),
-              }
-            : d,
-        ),
-      );
+      // Refetch (the update busted the cache): a newly-assigned side has no local entry to patch,
+      // so an in-place map wouldn't surface it until a reload.
+      this.draftTransactions.set(await this.accountsService.fetchDraftTransactions());
     } catch {
       this.toastService.error('views.importTransactions.toasts.updateError');
     }

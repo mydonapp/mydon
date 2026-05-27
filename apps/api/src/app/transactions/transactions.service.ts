@@ -47,7 +47,7 @@ export class TransactionsService {
         ...(filter === 'posted' ? { postedAt: Not(IsNull()) } : {}),
       },
       relations: ['entries', 'entries.account'],
-      order: { transactionDate: 'DESC' },
+      order: { transactionDate: 'DESC', createdAt: 'ASC', id: 'ASC' },
     });
     return txs.map((tx) => this.serialize(tx));
   }
@@ -401,9 +401,15 @@ export class TransactionsService {
       baseAmount: Number(e.baseAmount),
       aiSuggested: e.aiSuggested,
     }));
-    const amount = entries
+    // A balanced (posted) transaction has equal debit/credit totals; an import draft may carry only
+    // one side, so take the larger — single-entry drafts still show their real amount instead of 0.
+    const debitTotal = entries
       .filter((e) => e.direction === EntryDirection.DEBIT)
       .reduce((sum, e) => sum + e.baseAmount, 0);
+    const creditTotal = entries
+      .filter((e) => e.direction === EntryDirection.CREDIT)
+      .reduce((sum, e) => sum + e.baseAmount, 0);
+    const amount = Math.max(debitTotal, creditTotal);
     return {
       id: tx.id,
       ledgerId: tx.ledgerId,

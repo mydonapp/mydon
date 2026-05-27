@@ -281,9 +281,9 @@ export class AccountsService {
   async importTransactions(accountId: string, issuerId: string, file: File): Promise<void> {
     const formData = new FormData();
     formData.append('accountId', accountId);
-    formData.append('issuerId', issuerId);
+    formData.append('statementIssuer', issuerId);
     formData.append('file', file);
-    await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/transactions/import`, formData));
+    await firstValueFrom(this.http.post(`${this.appConfig.apiUrl}/v1/statements/import`, formData));
     this.invalidateTransactions();
   }
 

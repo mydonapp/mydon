@@ -295,7 +295,10 @@
           <span class="w-28 text-right">{{ is.previousLabel }}</span>
         </div>
 
-        <div class="page-item bg-surface-variant/30">
+        <div
+          class="page-item bg-surface-variant/30"
+          [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+        >
           <span class="flex-1 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
             {{ 'views.reports.incomeStatement.income' | translate }}
           </span>
@@ -324,7 +327,10 @@
           <span class="w-28 text-right text-sm tabular-nums text-on-surface-variant">{{ format(is.income.previousTotal, is.baseCurrency) }}</span>
         </div>
 
-        <div class="page-item bg-surface-variant/30">
+        <div
+          class="page-item bg-surface-variant/30"
+          [class.page-item--compact]="listStyleService.listStyle() === 'compact'"
+        >
           <span class="flex-1 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
             {{ 'views.reports.incomeStatement.expenses' | translate }}
           </span>

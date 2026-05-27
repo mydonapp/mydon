@@ -96,6 +96,14 @@ export class BudgetsService {
     return created;
   }
 
+  async duplicateBudget(id: string, data: { name: string; year: number }): Promise<BudgetSummary> {
+    const created = await firstValueFrom(
+      this.http.post<BudgetSummary>(`${this.appConfig.apiUrl}/v1/budgets/${id}/duplicate`, data),
+    );
+    this.invalidate();
+    return created;
+  }
+
   async updateBudget(id: string, data: { name?: string; year?: number }): Promise<void> {
     await firstValueFrom(this.http.patch(`${this.appConfig.apiUrl}/v1/budgets/${id}`, data));
     this.invalidate();

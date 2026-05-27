@@ -378,6 +378,12 @@
         "success": "Budget creato!",
         "error": "Creazione del budget non riuscita."
       },
+      "duplicate": {
+        "title": "Duplica budget",
+        "submit": "Duplica",
+        "success": "Budget duplicato!",
+        "error": "Impossibile duplicare il budget."
+      },
       "budgetItems": {
         "title": "Voci del budget",
         "noItems": "Nessuna voce di budget definita.",

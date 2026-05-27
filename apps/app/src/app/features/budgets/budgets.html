@@ -64,6 +64,19 @@
         appBtn
         variant="ghost"
         size="xs"
+        class="text-on-surface-variant shrink-0"
+        (click)="$event.preventDefault(); $event.stopPropagation(); startDuplicate(budget)"
+        aria-label="Duplicate budget"
+      >
+        <app-icon
+          name="copy"
+          [size]="16"
+        />
+      </button>
+      <button
+        appBtn
+        variant="ghost"
+        size="xs"
         class="text-error shrink-0"
         (click)="$event.preventDefault(); $event.stopPropagation(); confirmDelete(budget)"
         aria-label="Delete budget"
@@ -162,4 +175,56 @@
     </button>
   </div>
   }
+</app-modal>
+
+<!-- Duplicate Budget Modal -->
+<app-modal
+  [open]="!!budgetToDuplicate()"
+  (closed)="budgetToDuplicate.set(null)"
+>
+  <form (ngSubmit)="submitDuplicate()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ 'views.budgets.duplicate.title' | translate }}</h3>
+    </div>
+    <div class="space-y-4 py-1">
+      <app-field
+        [label]="'views.budgets.addBudgetForm.name.label' | translate"
+        [required]="true"
+      >
+        <input
+          appInput
+          name="duplicateName"
+          [(ngModel)]="duplicateForm.name"
+        />
+      </app-field>
+      <app-field
+        [label]="'views.budgets.addBudgetForm.year.label' | translate"
+        [required]="true"
+      >
+        <input
+          appInput
+          type="number"
+          name="duplicateYear"
+          [(ngModel)]="duplicateForm.year"
+        />
+      </app-field>
+    </div>
+    <div class="modal-footer mt-6">
+      <button
+        appBtn
+        variant="ghost"
+        type="button"
+        (click)="budgetToDuplicate.set(null)"
+      >
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button
+        appBtn
+        type="submit"
+        [loading]="submitting()"
+      >
+        {{ 'views.budgets.duplicate.submit' | translate }}
+      </button>
+    </div>
+  </form>
 </app-modal>

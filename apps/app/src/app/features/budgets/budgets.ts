@@ -39,10 +39,16 @@ export class BudgetsComponent implements OnInit {
   showCreate = signal(false);
   budgets = signal<BudgetSummary[]>([]);
   budgetToDelete = signal<BudgetSummary | null>(null);
+  budgetToDuplicate = signal<BudgetSummary | null>(null);
 
   newBudget = {
     name: '',
     year: String(new Date().getFullYear()),
+  };
+
+  duplicateForm = {
+    name: '',
+    year: '',
   };
 
   ngOnInit() {
@@ -96,6 +102,32 @@ export class BudgetsComponent implements OnInit {
       this.router.navigate(['/app/budgets', created.id]);
     } catch {
       this.toastService.error('views.budgets.addBudgetForm.error');
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
+  startDuplicate(budget: BudgetSummary) {
+    this.duplicateForm = { name: budget.name, year: String(budget.year + 1) };
+    this.budgetToDuplicate.set(budget);
+  }
+
+  async submitDuplicate() {
+    const source = this.budgetToDuplicate();
+    if (!source || !this.duplicateForm.name || !this.duplicateForm.year) {
+      return;
+    }
+    this.submitting.set(true);
+    try {
+      const created = await this.budgetsService.duplicateBudget(source.id, {
+        name: this.duplicateForm.name,
+        year: Number(this.duplicateForm.year),
+      });
+      this.toastService.success('views.budgets.duplicate.success');
+      this.budgetToDuplicate.set(null);
+      this.router.navigate(['/app/budgets', created.id]);
+    } catch {
+      this.toastService.error('views.budgets.duplicate.error');
     } finally {
       this.submitting.set(false);
     }

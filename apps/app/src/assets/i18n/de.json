@@ -378,6 +378,12 @@
         "success": "Budget erstellt!",
         "error": "Budget konnte nicht erstellt werden."
       },
+      "duplicate": {
+        "title": "Budget duplizieren",
+        "submit": "Duplizieren",
+        "success": "Budget dupliziert!",
+        "error": "Budget konnte nicht dupliziert werden."
+      },
       "budgetItems": {
         "title": "Budgeteinträge",
         "noItems": "Keine Budgeteinträge definiert.",

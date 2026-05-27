@@ -200,41 +200,34 @@
               }
               <p class="text-sm text-on-surface font-medium truncate">{{ draft.description }}</p>
             </div>
-            <div class="flex items-center gap-2">
-              <select
-                appSelect
-                class="flex-1 text-xs"
-                [ngModel]="accountIdFor(draft, 'CREDIT')"
-                (ngModelChange)="setDraftAccount(draft.id, 'CREDIT', $event)"
-              >
-                <option value="">
-                  {{ 'views.importTransactions.draftTransactions.table.selectAccount' | translate }}
-                </option>
-                @for (acc of accountsService.accounts(); track acc.id) {
-                <option [value]="acc.id">{{ acc.name }}</option>
-                }
-              </select>
-              <app-icon
-                name="arrow-left-right"
-                [size]="14"
-                class="text-on-surface-variant flex-shrink-0"
-              />
-              <select
-                appSelect
-                class="flex-1 text-xs"
-                [ngModel]="accountIdFor(draft, 'DEBIT')"
-                (ngModelChange)="setDraftAccount(draft.id, 'DEBIT', $event)"
-              >
-                <option value="">
-                  {{ 'views.importTransactions.draftTransactions.table.selectAccount' | translate }}
-                </option>
-                @for (acc of accountsService.accounts(); track acc.id) {
-                <option [value]="acc.id">{{ acc.name }}</option>
-                }
-              </select>
+            <div class="flex items-end gap-2">
+              <div class="flex-1 min-w-0">
+                <span class="block text-[10px] font-medium uppercase tracking-wide text-on-surface-variant mb-0.5">
+                  {{ 'views.reports.trialBalance.debit' | translate }}
+                </span>
+                <app-combobox
+                  class="block w-full min-w-0"
+                  [options]="accountOptions()"
+                  [value]="accountIdFor(draft, 'DEBIT')"
+                  (valueChange)="setDraftAccount(draft.id, 'DEBIT', $event)"
+                  [placeholder]="'views.importTransactions.draftTransactions.table.selectAccount' | translate"
+                />
+              </div>
+              <div class="flex-1 min-w-0">
+                <span class="block text-[10px] font-medium uppercase tracking-wide text-on-surface-variant mb-0.5">
+                  {{ 'views.reports.trialBalance.credit' | translate }}
+                </span>
+                <app-combobox
+                  class="block w-full min-w-0"
+                  [options]="accountOptions()"
+                  [value]="accountIdFor(draft, 'CREDIT')"
+                  (valueChange)="setDraftAccount(draft.id, 'CREDIT', $event)"
+                  [placeholder]="'views.importTransactions.draftTransactions.table.selectAccount' | translate"
+                />
+              </div>
             </div>
           </div>
-          <div class="flex items-center gap-3 flex-shrink-0 mt-0.5">
+          <div class="flex items-center gap-3 flexshrink-0 mt-0.5">
             <span class="font-bold text-sm text-on-surface tabular-nums">{{ draft.amount | number:'1.2-2' }}</span>
             <button
               appBtn

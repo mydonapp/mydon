@@ -42,6 +42,15 @@ export class BudgetsController {
   }
 
   @UseGuards(AuthGuard)
+  @Post(':id/duplicate')
+  @ApiOperation({ summary: 'Duplicate a budget (with its items) into a new name/year' })
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiBody({ type: CreateBudgetDto })
+  duplicate(@Req() req: Request, @Param('id') id: string, @Body() dto: CreateBudgetDto) {
+    return this.budgetsService.duplicate(id, req['context'], dto.name, dto.year);
+  }
+
+  @UseGuards(AuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Get a budget with its items' })
   @ApiParam({ name: 'id', type: 'string' })

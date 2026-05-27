@@ -30,6 +30,7 @@ export class AuthService {
   private accessToken: string | null = null;
   private accessTokenExpiry: Date | null = null;
   private initialized = false;
+  private refreshInFlight: Promise<void> | null = null;
 
   private get apiUrl() {
     return this.appConfig.apiUrl;
@@ -67,12 +68,35 @@ export class AuthService {
     }
   }
 
+  /** Refresh the token, sharing one in-flight request so concurrent callers don't each fire a refresh. */
+  private refresh(): Promise<void> {
+    this.refreshInFlight ??= this.fetchAccessToken().finally(() => {
+      this.refreshInFlight = null;
+    });
+    return this.refreshInFlight;
+  }
+
+  /**
+   * Returns an access token to attach to an outgoing request, refreshing first if it's missing,
+   * expired, or about to expire (a small skew covers in-flight latency). Returns null when no session
+   * can be re-established — the caller then proceeds unauthenticated / redirects to login.
+   */
+  async ensureValidToken(): Promise<string | null> {
+    const skewMs = 10_000;
+    const stillValid =
+      !!this.accessToken && !!this.accessTokenExpiry && Date.now() + skewMs < this.accessTokenExpiry.getTime();
+    if (!stillValid) {
+      await this.refresh();
+    }
+    return this.accessToken;
+  }
+
   async init(): Promise<void> {
     if (this.initialized) {
       return;
     }
     this.initialized = true;
-    await this.fetchAccessToken();
+    await this.refresh();
   }
 
   async login(email: string, password: string): Promise<void> {

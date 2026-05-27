@@ -58,7 +58,7 @@ export class BudgetsService {
       id: budget.id,
       name: budget.name,
       year: budget.year,
-      items: budget.items.map((item) => ({
+      items: [...budget.items].sort((a, b) => this.byChartOrder(a, b)).map((item) => ({
         id: item.id,
         type: item.group ? 'group' : 'account',
         groupId: item.group?.id ?? null,
@@ -82,6 +82,49 @@ export class BudgetsService {
     budget.ledgerId = ledger.id;
     const saved = await this.budgetsRepository.save(budget);
     return { id: saved.id, name: saved.name, year: saved.year, itemCount: 0 };
+  }
+
+  /** Deep-copy a budget — its items and their sub-items — into a new name/year. */
+  async duplicate(id: string, context: Context, name: string, year: number) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const source = await this.budgetsRepository.findOne({
+      where: { id, ledgerId: ledger.id },
+      relations: ['items', 'items.account', 'items.group', 'items.subItems'],
+    });
+    if (!source) {
+      throw new NotFoundException();
+    }
+
+    const budget = new Budget();
+    budget.name = name;
+    budget.year = year;
+    budget.ledgerId = ledger.id;
+    const saved = await this.budgetsRepository.save(budget);
+
+    const items = source.items.map((src) => {
+      const item = new BudgetItem();
+      item.budget = { id: saved.id } as Budget;
+      item.amount = src.amount;
+      item.frequency = src.frequency;
+      item.account = src.account ? ({ id: src.account.id } as Account) : null;
+      item.group = src.group ? ({ id: src.group.id } as AccountGroup) : null;
+      item.subItems = [...(src.subItems ?? [])]
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((s) => {
+          const sub = new BudgetSubItem();
+          sub.name = s.name;
+          sub.amount = s.amount;
+          sub.frequency = s.frequency;
+          sub.sortOrder = s.sortOrder;
+          return sub;
+        });
+      return item;
+    });
+    if (items.length > 0) {
+      await this.budgetItemsRepository.save(items);
+    }
+
+    return { id: saved.id, name: saved.name, year: saved.year, itemCount: items.length };
   }
 
   async update(id: string, context: Context, data: { name?: string; year?: number }) {
@@ -169,30 +212,33 @@ export class BudgetsService {
 
     const isMonthly = month !== undefined && month !== null;
     const now = new Date();
-    const isCurrentYear = year === now.getFullYear();
+    const isCurrentYear = year === now.getUTCFullYear();
 
-    const from = isMonthly ? new Date(year, month - 1, 1) : new Date(year, 0, 1);
+    // Period bounds are built in UTC so toDateString (which formats by the UTC day) yields the intended
+    // calendar dates. Local Date constructors here shift across timezones and would pull the previous
+    // period's last day into the range — inflating the monthly actuals.
+    const from = isMonthly ? new Date(Date.UTC(year, month - 1, 1)) : new Date(Date.UTC(year, 0, 1));
     const to = isMonthly
-      ? new Date(year, month, 0, 23, 59, 59, 999)
+      ? new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
       : isCurrentYear
-        ? new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
-        : new Date(year, 11, 31, 23, 59, 59, 999);
+        ? new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999))
+        : new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999));
 
     const prevFrom = isMonthly
       ? month === 1
-        ? new Date(year - 1, 11, 1)
-        : new Date(year, month - 2, 1)
-      : new Date(year - 1, 0, 1);
+        ? new Date(Date.UTC(year - 1, 11, 1))
+        : new Date(Date.UTC(year, month - 2, 1))
+      : new Date(Date.UTC(year - 1, 0, 1));
     const prevTo = isMonthly
       ? month === 1
-        ? new Date(year - 1, 11, 31, 23, 59, 59)
-        : new Date(year, month - 1, 0, 23, 59, 59)
-      : new Date(year - 1, 11, 31, 23, 59, 59);
+        ? new Date(Date.UTC(year - 1, 11, 31, 23, 59, 59))
+        : new Date(Date.UTC(year, month - 1, 0, 23, 59, 59))
+      : new Date(Date.UTC(year - 1, 11, 31, 23, 59, 59));
 
-    const monthsElapsed = isCurrentYear ? now.getMonth() + 1 : year < now.getFullYear() ? 12 : 0;
+    const monthsElapsed = isCurrentYear ? now.getUTCMonth() + 1 : year < now.getUTCFullYear() ? 12 : 0;
 
     const progressItems = await Promise.all(
-      budget.items.map(async (item) => {
+      [...budget.items].sort((a, b) => this.byChartOrder(a, b)).map(async (item) => {
         const monthlyBudget = item.frequency === BudgetFrequency.MONTHLY ? item.amount : item.amount / 12;
         const yearlyBudget = item.frequency === BudgetFrequency.YEARLY ? item.amount : item.amount * 12;
         const displayBudget = isMonthly ? monthlyBudget : yearlyBudget;
@@ -273,6 +319,25 @@ export class BudgetsService {
       return acc + contribution;
     }, 0);
     return Math.round(sum * 100) / 100;
+  }
+
+  /** Chart-of-accounts order by the item's account (or group) code: coded first numerically,
+   *  uncoded last by name (mirrors AccountsService.byCode). */
+  private byChartOrder(a: BudgetItem, b: BudgetItem): number {
+    const aCode = a.account?.code ?? a.group?.code ?? '';
+    const bCode = b.account?.code ?? b.group?.code ?? '';
+    if (aCode !== '' && bCode !== '') {
+      return aCode.localeCompare(bCode, undefined, { numeric: true });
+    }
+    if (aCode !== '') {
+      return -1;
+    }
+    if (bCode !== '') {
+      return 1;
+    }
+    const aName = a.account?.name ?? a.group?.name ?? '';
+    const bName = b.account?.name ?? b.group?.name ?? '';
+    return aName.localeCompare(bName);
   }
 
   /**

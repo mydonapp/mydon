@@ -147,31 +147,7 @@
         ></textarea>
       </app-field>
 
-      <!-- Accounts — credit → debit flow -->
       <div class="flex flex-col sm:flex-row sm:items-end gap-3">
-        <app-field
-          class="flex-1 min-w-0 block"
-          [label]="'views.accounts.createTransactionForm.creditAccount.label' | translate"
-        >
-          <app-combobox
-            [options]="accountOptions()"
-            [value]="newTransaction.creditAccountId"
-            (valueChange)="onCreditAccountChange($event)"
-            [placeholder]="'views.accounts.createTransactionForm.creditAccount.placeholder' | translate"
-          />
-        </app-field>
-        <div class="flex justify-center text-on-surface-variant sm:pb-2 sm:flex-shrink-0">
-          <span class="sm:hidden"
-            ><app-icon
-              name="arrow-down"
-              [size]="16"
-          /></span>
-          <span class="hidden sm:inline-flex"
-            ><app-icon
-              name="arrow-right"
-              [size]="16"
-          /></span>
-        </div>
         <app-field
           class="flex-1 min-w-0 block"
           [label]="'views.accounts.createTransactionForm.debitAccount.label' | translate"
@@ -181,6 +157,17 @@
             [value]="newTransaction.debitAccountId"
             (valueChange)="onDebitAccountChange($event)"
             [placeholder]="'views.accounts.createTransactionForm.debitAccount.placeholder' | translate"
+          />
+        </app-field>
+        <app-field
+          class="flex-1 min-w-0 block"
+          [label]="'views.accounts.createTransactionForm.creditAccount.label' | translate"
+        >
+          <app-combobox
+            [options]="accountOptions()"
+            [value]="newTransaction.creditAccountId"
+            (valueChange)="onCreditAccountChange($event)"
+            [placeholder]="'views.accounts.createTransactionForm.creditAccount.placeholder' | translate"
           />
         </app-field>
       </div>
