@@ -200,6 +200,21 @@
               }
               <p class="text-sm text-on-surface font-medium truncate">{{ draft.description }}</p>
             </div>
+            @if (isSplit(draft)) {
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+              <span class="badge badge--primary badge--xs">{{ 'views.importTransactions.split.label' | translate }}</span>
+              @for (e of draft.entries; track e.id) {
+              <span class="text-on-surface-variant">
+                <span class="uppercase text-[9px] tracking-wide mr-1">{{
+                  (e.direction === 'DEBIT' ? 'views.reports.trialBalance.debit' : 'views.reports.trialBalance.credit')
+                    | translate
+                }}</span>
+                {{ e.accountName || ('views.importTransactions.draftTransactions.table.selectAccount' | translate) }}
+                <span class="tabular-nums text-on-surface ml-0.5">{{ e.amount | number: '1.2-2' }}</span>
+              </span>
+              }
+            </div>
+            } @else {
             <div class="flex items-end gap-2">
               <div class="flex-1 min-w-0">
                 <span class="block text-[10px] font-medium uppercase tracking-wide text-on-surface-variant mb-0.5">
@@ -226,9 +241,36 @@
                 />
               </div>
             </div>
+            }
           </div>
-          <div class="flex items-center gap-3 flexshrink-0 mt-0.5">
-            <span class="font-bold text-sm text-on-surface tabular-nums">{{ draft.amount | number:'1.2-2' }}</span>
+          <div class="flex items-center gap-2 shrink-0 mt-0.5">
+            @if (draftIsForeign(draft)) {
+            <div class="text-right">
+              <span class="block font-bold text-sm text-on-surface tabular-nums">
+                {{ baseCurrency() }} {{ draftBaseTotal(draft) | number: '1.2-2' }}
+              </span>
+              @if (draftForeignAmount(draft); as f) {
+              <span class="block text-[11px] text-on-surface-variant tabular-nums">
+                {{ f.currency }} {{ f.amount | number: '1.2-2' }}
+              </span>
+              }
+            </div>
+            } @else {
+            <span class="font-bold text-sm text-on-surface tabular-nums">{{ draft.amount | number: '1.2-2' }}</span>
+            }
+            <button
+              appBtn
+              variant="ghost"
+              size="xs"
+              (click)="openSplit(draft)"
+              [attr.aria-label]="'views.importTransactions.split.title' | translate"
+              [title]="'views.importTransactions.split.title' | translate"
+            >
+              <app-icon
+                name="split"
+                [size]="15"
+              />
+            </button>
             <button
               appBtn
               variant="ghost"
@@ -250,3 +292,208 @@
     </div>
   </div>
 </div>
+
+<!-- Split transaction modal -->
+<app-modal
+  [open]="!!splitDraft()"
+  (closed)="closeSplit()"
+>
+  @if (splitDraft(); as draft) {
+  <div class="modal-header">
+    <h3 class="modal-title">{{ 'views.importTransactions.split.title' | translate }}</h3>
+  </div>
+
+  <div class="mb-3">
+    <p class="text-sm text-on-surface font-medium">{{ draft.description }}</p>
+    <p class="text-xs text-on-surface-variant">
+      {{ draft.transactionDate | date: 'shortDate' }} · {{ draft.amount | number: '1.2-2' }}
+    </p>
+  </div>
+  <p class="text-xs text-on-surface-variant mb-4">{{ 'views.importTransactions.split.help' | translate }}</p>
+
+  <!-- Debit lines -->
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-1.5">
+      <span class="page-section-label !mb-0">{{ 'views.reports.trialBalance.debit' | translate }}</span>
+      <button
+        appBtn
+        variant="ghost"
+        size="xs"
+        (click)="addSplitLine('DEBIT')"
+      >
+        <app-icon
+          name="plus"
+          [size]="14"
+          class="mr-1"
+        />
+        {{ 'views.importTransactions.split.addLine' | translate }}
+      </button>
+    </div>
+    <div class="space-y-2">
+      @for (line of splitLines(); track $index; let i = $index) { @if (line.direction === 'DEBIT') {
+      <div>
+        <div class="flex items-center gap-2">
+          <app-combobox
+            class="flex-1 min-w-0"
+            [options]="accountOptions()"
+            [value]="line.accountId"
+            (valueChange)="onSplitAccountChange(line, $event)"
+            [placeholder]="'views.importTransactions.draftTransactions.table.selectAccount' | translate"
+          />
+          <div class="w-24 shrink-0">
+            <input
+              appInput
+              type="number"
+              [ngModel]="line.amount"
+              (ngModelChange)="line.amount = +$event; onSplitChange()"
+              placeholder="0.00"
+            />
+          </div>
+          <span class="w-10 shrink-0 text-center text-xs text-on-surface-variant">{{ lineCurrency(line) }}</span>
+          <button
+            appBtn
+            variant="ghost"
+            size="xs"
+            class="text-error"
+            (click)="removeSplitLine(i)"
+            aria-label="Remove line"
+          >
+            <app-icon
+              name="trash-2"
+              [size]="14"
+            />
+          </button>
+        </div>
+        @if (lineNeedsRate(line)) {
+        <div class="flex items-center gap-2 mt-1 pl-1 text-xs text-on-surface-variant">
+          <span class="shrink-0">1 {{ lineCurrency(line) }} =</span>
+          <div class="w-24 shrink-0">
+            <input
+              appInput
+              type="number"
+              step="0.0001"
+              [ngModel]="line.fxRate"
+              (ngModelChange)="line.fxRate = +$event; onSplitChange()"
+              [disabled]="splitRateLoading()"
+            />
+          </div>
+          <span class="shrink-0 tabular-nums">{{ baseCurrency() }} · {{ lineBase(line) | number: '1.2-2' }}</span>
+        </div>
+        }
+      </div>
+      } }
+    </div>
+  </div>
+
+  <!-- Credit lines -->
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-1.5">
+      <span class="page-section-label !mb-0">{{ 'views.reports.trialBalance.credit' | translate }}</span>
+      <button
+        appBtn
+        variant="ghost"
+        size="xs"
+        (click)="addSplitLine('CREDIT')"
+      >
+        <app-icon
+          name="plus"
+          [size]="14"
+          class="mr-1"
+        />
+        {{ 'views.importTransactions.split.addLine' | translate }}
+      </button>
+    </div>
+    <div class="space-y-2">
+      @for (line of splitLines(); track $index; let i = $index) { @if (line.direction === 'CREDIT') {
+      <div>
+        <div class="flex items-center gap-2">
+          <app-combobox
+            class="flex-1 min-w-0"
+            [options]="accountOptions()"
+            [value]="line.accountId"
+            (valueChange)="onSplitAccountChange(line, $event)"
+            [placeholder]="'views.importTransactions.draftTransactions.table.selectAccount' | translate"
+          />
+          <div class="w-24 shrink-0">
+            <input
+              appInput
+              type="number"
+              [ngModel]="line.amount"
+              (ngModelChange)="line.amount = +$event; onSplitChange()"
+              placeholder="0.00"
+            />
+          </div>
+          <span class="w-10 shrink-0 text-center text-xs text-on-surface-variant">{{ lineCurrency(line) }}</span>
+          <button
+            appBtn
+            variant="ghost"
+            size="xs"
+            class="text-error"
+            (click)="removeSplitLine(i)"
+            aria-label="Remove line"
+          >
+            <app-icon
+              name="trash-2"
+              [size]="14"
+            />
+          </button>
+        </div>
+        @if (lineNeedsRate(line)) {
+        <div class="flex items-center gap-2 mt-1 pl-1 text-xs text-on-surface-variant">
+          <span class="shrink-0">1 {{ lineCurrency(line) }} =</span>
+          <div class="w-24 shrink-0">
+            <input
+              appInput
+              type="number"
+              step="0.0001"
+              [ngModel]="line.fxRate"
+              (ngModelChange)="line.fxRate = +$event; onSplitChange()"
+              [disabled]="splitRateLoading()"
+            />
+          </div>
+          <span class="shrink-0 tabular-nums">{{ baseCurrency() }} · {{ lineBase(line) | number: '1.2-2' }}</span>
+        </div>
+        }
+      </div>
+      } }
+    </div>
+  </div>
+
+  <div
+    class="flex items-center justify-between rounded-lg px-3 py-2 text-sm"
+    [class]="splitBalanced() ? 'bg-success-bg text-success' : 'bg-warning-bg text-warning'"
+  >
+    <span class="inline-flex items-center gap-1.5">
+      <app-icon
+        [name]="splitBalanced() ? 'check' : 'alert-triangle'"
+        [size]="14"
+      />
+      {{ (splitBalanced() ? 'views.importTransactions.split.balanced' : 'views.importTransactions.split.notBalanced') |
+      translate }}
+    </span>
+    <span class="tabular-nums">
+      {{ splitDebitTotal() | number: '1.2-2' }} / {{ splitCreditTotal() | number: '1.2-2' }} {{ baseCurrency() }}
+    </span>
+  </div>
+
+  <div class="modal-footer mt-6">
+    <button
+      appBtn
+      variant="ghost"
+      type="button"
+      (click)="closeSplit()"
+    >
+      {{ 'common.cancel' | translate }}
+    </button>
+    <button
+      appBtn
+      type="button"
+      [disabled]="!splitBalanced()"
+      [loading]="splitSaving()"
+      (click)="saveSplit()"
+    >
+      {{ 'views.importTransactions.split.save' | translate }}
+    </button>
+  </div>
+  }
+</app-modal>

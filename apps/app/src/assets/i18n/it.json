@@ -280,6 +280,18 @@
         "deleteError": "Eliminazione della transazione non riuscita.",
         "approveSuccess": "Transazioni approvate!",
         "approveError": "Approvazione delle transazioni non riuscita."
+      },
+      "split": {
+        "title": "Dividi transazione",
+        "help": "Suddividi questa transazione in più registrazioni. Dare e avere devono essere in pareggio.",
+        "label": "Divisione",
+        "addLine": "Aggiungi riga",
+        "balanced": "In pareggio",
+        "notBalanced": "Non in pareggio",
+        "save": "Salva",
+        "success": "Transazione divisa.",
+        "unbalanced": "Dare e avere devono essere in pareggio.",
+        "rateError": "Impossibile caricare il tasso di cambio."
       }
     },
     "settings": {
@@ -357,6 +369,12 @@
       "income": "Entrate",
       "expenses": "Spese",
       "net": "Netto",
+      "ofYear": "dell'anno",
+      "throughMonth": "Fino a {{month}}",
+      "projected": "Proiettato",
+      "overBy": "Superato di",
+      "budgetMonthly": "Budget/mese",
+      "monthlyAvg": "Media/mese",
       "editBudget": "Modifica budget",
       "saveChanges": "Salva modifiche",
       "budgetName": "Nome budget",
@@ -538,7 +556,10 @@
         "expenses": "Costi",
         "totalIncome": "Totale ricavi",
         "totalExpenses": "Totale costi",
-        "netResult": "Risultato del periodo"
+        "netResult": "Risultato del periodo",
+        "yearlyView": "Annuale",
+        "monthlyView": "Mensile",
+        "avg": "Media/mese"
       },
       "download": "Scarica PDF",
       "downloadError": "Download del report non riuscito."

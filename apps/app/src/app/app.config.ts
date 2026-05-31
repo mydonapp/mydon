@@ -48,6 +48,7 @@ import {
   LucideSearch,
   LucideSettings,
   LucideSettings2,
+  LucideSplit,
   LucideTag,
   LucideTrash2,
   LucideUpload,
@@ -68,7 +69,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideTranslateService({ defaultLanguage: 'en' }),
+    provideTranslateService({ fallbackLang: 'en' }),
     ...provideTranslateHttpLoader({ prefix: './assets/i18n/', suffix: '.json' }),
     provideAppInitializer(async () => {
       const appConfig = inject(AppConfigService);
@@ -122,6 +123,7 @@ export const appConfig: ApplicationConfig = {
       LucideLayoutList,
       LucideLock,
       LucideTag,
+      LucideSplit,
     ),
   ],
 };

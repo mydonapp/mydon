@@ -1,0 +1,11 @@
+.budget-matrix td,
+.budget-matrix th {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.budget-matrix.is-compact td,
+.budget-matrix.is-compact th {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}

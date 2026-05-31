@@ -1,6 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { from, switchMap } from 'rxjs';
+import { AppConfigService } from '../../services/app-config.service';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service';
 
@@ -11,6 +12,17 @@ import { LanguageService } from '../../services/language.service';
 const AUTH_BYPASS = ['/v1/auth/refresh', '/v1/auth/login', '/v1/auth/signup'];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const appConfig = inject(AppConfigService);
+
+  // Only requests to our API carry auth + language. Static assets (config.json, i18n bundles) and any
+  // third-party URL pass through untouched — otherwise they'd needlessly trigger a token refresh.
+  // Inject LanguageService only past this point: it pulls in TranslateService, whose fallback-language
+  // load fires its own asset request through this interceptor, so injecting it here would recurse.
+  const apiUrl = appConfig.apiUrl;
+  if (!apiUrl || !req.url.startsWith(apiUrl)) {
+    return next(req);
+  }
+
   const authService = inject(AuthService);
   const languageService = inject(LanguageService);
   const lang = languageService.currentLanguage();

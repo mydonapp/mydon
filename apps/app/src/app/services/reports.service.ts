@@ -70,6 +70,29 @@ export interface IncomeStatement {
   netResult: { current: number; previous: number };
 }
 
+export interface IncomeStatementMonthlyRow {
+  id: string;
+  code: string;
+  name: string;
+  months: number[];
+  total: number;
+}
+
+export interface IncomeStatementMonthlySection {
+  rows: IncomeStatementMonthlyRow[];
+  monthlyTotals: number[];
+  total: number;
+}
+
+export interface IncomeStatementMonthly {
+  baseCurrency: string;
+  year: number;
+  income: IncomeStatementMonthlySection;
+  expense: IncomeStatementMonthlySection;
+  netMonthly: number[];
+  netTotal: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
   private http = inject(HttpClient);
@@ -78,6 +101,7 @@ export class ReportsService {
   private trialBalanceByYear = new Map<string, TrialBalance>();
   private balanceSheetByYear = new Map<string, BalanceSheet>();
   private incomeStatementByYear = new Map<string, IncomeStatement>();
+  private incomeStatementMonthlyByYear = new Map<string, IncomeStatementMonthly>();
 
   private range(year: string): string {
     return new URLSearchParams({ from: `${year}-01-01`, to: `${year}-12-31` }).toString();
@@ -119,6 +143,20 @@ export class ReportsService {
     return data;
   }
 
+  async fetchIncomeStatementMonthly(year: string): Promise<IncomeStatementMonthly> {
+    const cached = this.incomeStatementMonthlyByYear.get(year);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(
+      this.http.get<IncomeStatementMonthly>(
+        `${this.appConfig.apiUrl}/v1/reports/income-statement/monthly?year=${year}`,
+      ),
+    );
+    this.incomeStatementMonthlyByYear.set(year, data);
+    return data;
+  }
+
   async downloadPdf(report: 'trial-balance' | 'balance-sheet' | 'income-statement', year: string): Promise<void> {
     const blob = await firstValueFrom(
       this.http.get(`${this.appConfig.apiUrl}/v1/reports/${report}/pdf?${this.range(year)}`, {
@@ -139,6 +177,7 @@ export class ReportsService {
     this.trialBalanceByYear.clear();
     this.balanceSheetByYear.clear();
     this.incomeStatementByYear.clear();
+    this.incomeStatementMonthlyByYear.clear();
   }
 
   clearCache(): void {

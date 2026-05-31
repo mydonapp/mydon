@@ -285,6 +285,26 @@
       </div>
     }
     @if (activeTab() === 'incomeStatement' && incomeStatement(); as is) {
+      <div class="flex justify-end mb-3">
+        <div class="segmented-control">
+          <button
+            class="segmented-btn"
+            [class.segmented-btn--active]="incomeView() === 'yearly'"
+            (click)="setIncomeView('yearly')"
+          >
+            {{ 'views.reports.incomeStatement.yearlyView' | translate }}
+          </button>
+          <button
+            class="segmented-btn"
+            [class.segmented-btn--active]="incomeView() === 'monthly'"
+            (click)="setIncomeView('monthly')"
+          >
+            {{ 'views.reports.incomeStatement.monthlyView' | translate }}
+          </button>
+        </div>
+      </div>
+
+      @if (incomeView() === 'yearly') {
       <div class="page-group">
         <div
           class="page-item text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
@@ -370,6 +390,126 @@
           <span class="w-28 text-right text-sm tabular-nums text-on-surface-variant">{{ format(is.netResult.previous, is.baseCurrency) }}</span>
         </div>
       </div>
+      } @else if (incomeStatementMonthly(); as ism) {
+      <!-- Monthly P&L matrix: rows = accounts (grouped income/expense), columns = months -->
+      <div class="page-group p-0 overflow-x-auto">
+        <table
+          class="statement-matrix w-full border-collapse text-sm"
+          [class.is-compact]="listStyleService.listStyle() === 'compact'"
+        >
+          <thead>
+            <tr class="border-b border-outline-variant">
+              <th
+                class="sticky left-0 z-20 bg-surface text-left font-medium text-on-surface-variant px-3 whitespace-nowrap"
+              >
+                {{ 'views.reports.incomeStatement.account' | translate }}
+              </th>
+              @for (label of monthLabels; track $index) {
+              <th class="text-right font-medium text-on-surface-variant px-2 whitespace-nowrap">{{ label }}</th>
+              }
+              <th class="text-right font-medium text-on-surface px-3 whitespace-nowrap">
+                {{ 'views.reports.total' | translate }}
+              </th>
+              <th class="text-right font-medium text-on-surface px-3 whitespace-nowrap">
+                {{ 'views.reports.incomeStatement.avg' | translate }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th
+                colspan="15"
+                class="sticky left-0 bg-surface-variant/40 text-left px-3 text-xs font-semibold uppercase tracking-wide text-on-surface-variant"
+              >
+                {{ 'views.reports.incomeStatement.income' | translate }}
+              </th>
+            </tr>
+            @for (row of ism.income.rows; track row.id) {
+            <tr class="border-b border-outline-variant/50">
+              <td class="sticky left-0 z-10 bg-surface px-3 whitespace-nowrap text-on-surface">
+                @if (row.code) {
+                <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ row.code }}</span>
+                } {{ row.name }}
+              </td>
+              @for (m of row.months; track $index) {
+              <td class="text-right px-2 tabular-nums text-on-surface">{{ num(m) }}</td>
+              }
+              <td class="text-right px-3 tabular-nums text-on-surface font-medium">{{ num(row.total, 0, false) }}</td>
+              <td class="text-right px-3 tabular-nums text-on-surface-variant">{{ num(monthlyAvg(row.months), 2, false) }}</td>
+            </tr>
+            }
+            <tr class="border-b-2 border-outline-variant font-medium">
+              <td class="sticky left-0 z-10 bg-surface px-3 text-on-surface">
+                {{ 'views.reports.incomeStatement.totalIncome' | translate }}
+              </td>
+              @for (t of ism.income.monthlyTotals; track $index) {
+              <td class="text-right px-2 tabular-nums text-on-surface">{{ num(t) }}</td>
+              }
+              <td class="text-right px-3 tabular-nums text-on-surface">{{ num(ism.income.total, 0, false) }}</td>
+              <td class="text-right px-3 tabular-nums text-on-surface">
+                {{ num(monthlyAvg(ism.income.monthlyTotals), 2, false) }}
+              </td>
+            </tr>
+            <tr>
+              <th
+                colspan="15"
+                class="sticky left-0 bg-surface-variant/40 text-left px-3 text-xs font-semibold uppercase tracking-wide text-on-surface-variant"
+              >
+                {{ 'views.reports.incomeStatement.expenses' | translate }}
+              </th>
+            </tr>
+            @for (row of ism.expense.rows; track row.id) {
+            <tr class="border-b border-outline-variant/50">
+              <td class="sticky left-0 z-10 bg-surface px-3 whitespace-nowrap text-on-surface">
+                @if (row.code) {
+                <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ row.code }}</span>
+                } {{ row.name }}
+              </td>
+              @for (m of row.months; track $index) {
+              <td class="text-right px-2 tabular-nums text-on-surface">{{ num(m) }}</td>
+              }
+              <td class="text-right px-3 tabular-nums text-on-surface font-medium">{{ num(row.total, 0, false) }}</td>
+              <td class="text-right px-3 tabular-nums text-on-surface-variant">{{ num(monthlyAvg(row.months), 2, false) }}</td>
+            </tr>
+            }
+            <tr class="border-b-2 border-outline-variant font-medium">
+              <td class="sticky left-0 z-10 bg-surface px-3 text-on-surface">
+                {{ 'views.reports.incomeStatement.totalExpenses' | translate }}
+              </td>
+              @for (t of ism.expense.monthlyTotals; track $index) {
+              <td class="text-right px-2 tabular-nums text-on-surface">{{ num(t) }}</td>
+              }
+              <td class="text-right px-3 tabular-nums text-on-surface">{{ num(ism.expense.total, 0, false) }}</td>
+              <td class="text-right px-3 tabular-nums text-on-surface">
+                {{ num(monthlyAvg(ism.expense.monthlyTotals), 2, false) }}
+              </td>
+            </tr>
+            <tr class="font-semibold">
+              <td class="sticky left-0 z-10 bg-surface px-3 text-on-surface">
+                {{ 'views.reports.incomeStatement.netResult' | translate }}
+              </td>
+              @for (t of ism.netMonthly; track $index) {
+              <td
+                class="text-right px-2 tabular-nums"
+                [class.text-income]="t > 0"
+                [class.text-error]="t < 0"
+              >
+                {{ num(t, 0, false) }}
+              </td>
+              }
+              <td
+                class="text-right px-3 tabular-nums"
+                [class.text-income]="ism.netTotal > 0"
+                [class.text-error]="ism.netTotal < 0"
+              >
+                {{ num(ism.netTotal, 0, false) }}
+              </td>
+              <td class="text-right px-3 tabular-nums text-on-surface">{{ num(monthlyAvg(ism.netMonthly), 2, false) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      }
     }
   }
 </div>

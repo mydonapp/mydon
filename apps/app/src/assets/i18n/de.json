@@ -280,6 +280,18 @@
         "deleteError": "Transaktion konnte nicht gelöscht werden.",
         "approveSuccess": "Transaktionen genehmigt!",
         "approveError": "Transaktionen konnten nicht genehmigt werden."
+      },
+      "split": {
+        "title": "Transaktion aufteilen",
+        "help": "Teile diese Transaktion in mehrere Buchungen auf. Soll und Haben müssen sich ausgleichen.",
+        "label": "Aufteilung",
+        "addLine": "Zeile hinzufügen",
+        "balanced": "Ausgeglichen",
+        "notBalanced": "Nicht ausgeglichen",
+        "save": "Aufteilung speichern",
+        "success": "Transaktion aufgeteilt.",
+        "unbalanced": "Soll und Haben müssen sich ausgleichen.",
+        "rateError": "Wechselkurs konnte nicht geladen werden."
       }
     },
     "settings": {
@@ -357,6 +369,12 @@
       "income": "Einnahmen",
       "expenses": "Ausgaben",
       "net": "Netto",
+      "ofYear": "des Jahres",
+      "throughMonth": "Bis {{month}}",
+      "projected": "Hochgerechnet",
+      "overBy": "Überschritten um",
+      "budgetMonthly": "Budget/Mt.",
+      "monthlyAvg": "Ø/Mt.",
       "editBudget": "Budget bearbeiten",
       "saveChanges": "Änderungen speichern",
       "budgetName": "Budgetname",
@@ -538,7 +556,10 @@
         "expenses": "Aufwand",
         "totalIncome": "Total Ertrag",
         "totalExpenses": "Total Aufwand",
-        "netResult": "Periodenergebnis"
+        "netResult": "Periodenergebnis",
+        "yearlyView": "Jährlich",
+        "monthlyView": "Monatlich",
+        "avg": "Ø/Mt."
       },
       "download": "PDF herunterladen",
       "downloadError": "Bericht konnte nicht heruntergeladen werden."

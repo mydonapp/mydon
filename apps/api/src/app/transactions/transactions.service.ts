@@ -8,6 +8,7 @@ import { Ledger } from '../ledgers/ledger.entity';
 import { LedgersService } from '../ledgers/ledgers.service';
 import { Currency } from '../shared/currency';
 import { todayDateString } from '../shared/date';
+import { CENT, roundBaseAmount } from '../shared/money';
 import { Context } from '../shared/types/context';
 import { Entry, EntryDirection } from './entry.entity';
 import { StatementMapperFactory } from './statementMapper/statment-mapper.factory';
@@ -270,7 +271,7 @@ export class TransactionsService {
               amount: d.creditAmount ?? 0,
               currency: creditAccount.currency,
               fxRate: 1,
-              baseAmount: d.creditAmount ?? 0,
+              baseAmount: roundBaseAmount(d.creditAmount ?? 0),
               aiSuggested: d.creditAccountAISuggested ?? false,
             }),
           );
@@ -284,7 +285,7 @@ export class TransactionsService {
               amount: d.debitAmount ?? 0,
               currency: debitAccount.currency,
               fxRate: 1,
-              baseAmount: d.debitAmount ?? 0,
+              baseAmount: roundBaseAmount(d.debitAmount ?? 0),
               aiSuggested: d.debitAccountAISuggested ?? false,
             }),
           );
@@ -305,14 +306,14 @@ export class TransactionsService {
    * by the client — the server never silently invents an FX rate, because that would
    * overwrite whatever the user typed.
    *
-   * Returns the resolved entries (with `currency` and `fxRate` guaranteed set) for the
-   * caller to persist.
+   * Returns the resolved entries (with `currency`, `fxRate` and the persisted cent-scale `baseAmount`
+   * guaranteed set) for the caller to persist.
    */
   private async validateEntries(
     entries: EntryInput[],
     txDate: string,
     ledger: Ledger,
-  ): Promise<(EntryInput & { currency: Currency; fxRate: number })[]> {
+  ): Promise<(EntryInput & { currency: Currency; fxRate: number; baseAmount: number })[]> {
     if (entries.length < 2) {
       throw new BadRequestException('A transaction must have at least two entries (one debit, one credit)');
     }
@@ -323,9 +324,10 @@ export class TransactionsService {
     }
     const accountById = new Map(accounts.map((a) => [a.id, a]));
 
-    const resolved: (EntryInput & { currency: Currency; fxRate: number })[] = [];
+    const resolved: (EntryInput & { currency: Currency; fxRate: number; baseAmount: number })[] = [];
     let debitTotal = 0;
     let creditTotal = 0;
+    let fxLegCount = 0;
 
     for (const e of entries) {
       const account = accountById.get(e.accountId);
@@ -352,25 +354,45 @@ export class TransactionsService {
         fxRate = e.fxRate;
       }
 
-      const base = e.amount * fxRate;
-      if (e.direction === EntryDirection.DEBIT) {
-        debitTotal += base;
-      } else {
-        creditTotal += base;
+      // Balance on the cent-rounded base amount (what actually persists), not the raw product.
+      const baseAmount = roundBaseAmount(e.amount * fxRate);
+      if (fxRate !== 1) {
+        fxLegCount += 1;
       }
-      resolved.push({ ...e, currency, fxRate });
+      if (e.direction === EntryDirection.DEBIT) {
+        debitTotal += baseAmount;
+      } else {
+        creditTotal += baseAmount;
+      }
+      resolved.push({ ...e, currency, fxRate, baseAmount });
     }
 
-    const diff = Math.abs(debitTotal - creditTotal);
-    if (diff > 0.005) {
+    // Each FX leg's base is independently rounded to the cent, and the client sizes the balancing leg
+    // with its own rounding — so a sound cross-currency transaction can still differ by up to a cent per
+    // FX leg (e.g. 14500 KRW × 0.00053 → 7.68 vs a 7.69 counter-leg). Same-currency entries have no such
+    // slack and must balance exactly. Anything beyond the rounding band is a real imbalance → reject.
+    const residual = roundBaseAmount(debitTotal - creditTotal);
+    const tolerance = fxLegCount > 0 ? CENT * fxLegCount : 0.005;
+    if (Math.abs(residual) > tolerance + 1e-9) {
       throw new BadRequestException(
         `Entries are not balanced: debit total ${debitTotal} vs credit total ${creditTotal}`,
       );
     }
+
+    // Absorb the rounding residual on the largest leg of the heavier side so the *persisted* entries
+    // balance to the cent — otherwise the residual would accumulate and drift the trial balance.
+    if (residual !== 0) {
+      const heavierSide = residual > 0 ? EntryDirection.DEBIT : EntryDirection.CREDIT;
+      const target = resolved
+        .filter((r) => r.direction === heavierSide)
+        .reduce((max, r) => (r.baseAmount > max.baseAmount ? r : max));
+      target.baseAmount = roundBaseAmount(target.baseAmount - Math.abs(residual));
+    }
+
     return resolved;
   }
 
-  private buildEntry(transactionId: string, input: EntryInput): Entry {
+  private buildEntry(transactionId: string, input: EntryInput & { baseAmount?: number }): Entry {
     const e = new Entry();
     e.transactionId = transactionId;
     e.accountId = input.accountId;
@@ -378,7 +400,9 @@ export class TransactionsService {
     e.amount = input.amount;
     e.currency = input.currency ?? Currency.CHF;
     e.fxRate = input.fxRate ?? 1;
-    e.baseAmount = input.amount * (input.fxRate ?? 1);
+    // Prefer the balanced base amount resolved by validateEntries (rounding residual already absorbed);
+    // fall back to a fresh cent-rounded product for any direct caller.
+    e.baseAmount = input.baseAmount ?? roundBaseAmount(input.amount * (input.fxRate ?? 1));
     e.aiSuggested = input.aiSuggested ?? false;
     return e;
   }

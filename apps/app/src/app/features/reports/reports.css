@@ -1,0 +1,11 @@
+.statement-matrix td,
+.statement-matrix th {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.statement-matrix.is-compact td,
+.statement-matrix.is-compact th {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}

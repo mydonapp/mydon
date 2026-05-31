@@ -56,6 +56,16 @@ export class ReportsController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('income-statement/monthly')
+  @ApiOperation({ summary: 'Income statement broken out by month for the given year' })
+  @ApiQuery({ name: 'year', type: Number, required: true })
+  @ApiResponse({ status: 200, description: 'Monthly income statement' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  incomeStatementMonthly(@Req() req: Request, @Query('year') year: string) {
+    return this.reportsService.getIncomeStatementMonthly(req['context'], parseInt(year, 10));
+  }
+
+  @UseGuards(AuthGuard)
   @Get('income-statement/pdf')
   @ApiOperation({ summary: 'Income statement as a formatted PDF report' })
   @ApiQuery({ name: 'from', type: Date, required: false })

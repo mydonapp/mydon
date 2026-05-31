@@ -280,6 +280,18 @@
         "deleteError": "Failed to delete transaction.",
         "approveSuccess": "Transactions approved!",
         "approveError": "Failed to approve transactions."
+      },
+      "split": {
+        "title": "Split transaction",
+        "help": "Break this transaction into multiple bookings. Debit and credit must balance.",
+        "label": "Split",
+        "addLine": "Add line",
+        "balanced": "Balanced",
+        "notBalanced": "Not balanced",
+        "save": "Save split",
+        "success": "Transaction split.",
+        "unbalanced": "Debit and credit must balance.",
+        "rateError": "Could not load the exchange rate."
       }
     },
     "settings": {
@@ -357,6 +369,12 @@
       "income": "Income",
       "expenses": "Expenses",
       "net": "Net",
+      "ofYear": "of year",
+      "throughMonth": "Through {{month}}",
+      "projected": "Projected",
+      "overBy": "Over by",
+      "budgetMonthly": "Budget/mo",
+      "monthlyAvg": "Avg/mo",
       "editBudget": "Edit Budget",
       "saveChanges": "Save Changes",
       "budgetName": "Budget Name",
@@ -538,7 +556,10 @@
         "expenses": "Expenses",
         "totalIncome": "Total income",
         "totalExpenses": "Total expenses",
-        "netResult": "Net result"
+        "netResult": "Net result",
+        "yearlyView": "Yearly",
+        "monthlyView": "Monthly",
+        "avg": "Avg/mo"
       },
       "download": "Download PDF",
       "downloadError": "Failed to download the report."

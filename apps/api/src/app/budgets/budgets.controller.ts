@@ -103,4 +103,13 @@ export class BudgetsController {
       month ? parseInt(month, 10) : undefined,
     );
   }
+
+  @UseGuards(AuthGuard)
+  @Get(':id/monthly')
+  @ApiOperation({ summary: 'Get a per-item × 12-month actuals matrix for the year' })
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiQuery({ name: 'year', type: Number, required: true })
+  getMonthlyBreakdown(@Req() req: Request, @Param('id') id: string, @Query('year') year: string) {
+    return this.budgetsService.getMonthlyBreakdown(id, req['context'], parseInt(year, 10));
+  }
 }

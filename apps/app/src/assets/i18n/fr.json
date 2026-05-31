@@ -280,6 +280,18 @@
         "deleteError": "Échec de la suppression de la transaction.",
         "approveSuccess": "Transactions approuvées !",
         "approveError": "Échec de l'approbation des transactions."
+      },
+      "split": {
+        "title": "Diviser la transaction",
+        "help": "Répartissez cette transaction sur plusieurs écritures. Le débit et le crédit doivent s'équilibrer.",
+        "label": "Répartition",
+        "addLine": "Ajouter une ligne",
+        "balanced": "Équilibré",
+        "notBalanced": "Non équilibré",
+        "save": "Enregistrer",
+        "success": "Transaction divisée.",
+        "unbalanced": "Le débit et le crédit doivent s'équilibrer.",
+        "rateError": "Impossible de charger le taux de change."
       }
     },
     "settings": {
@@ -357,6 +369,12 @@
       "income": "Revenus",
       "expenses": "Dépenses",
       "net": "Net",
+      "ofYear": "de l'année",
+      "throughMonth": "Jusqu'à {{month}}",
+      "projected": "Projeté",
+      "overBy": "Dépassement de",
+      "budgetMonthly": "Budget/mois",
+      "monthlyAvg": "Moy./mois",
       "editBudget": "Modifier le budget",
       "saveChanges": "Enregistrer",
       "budgetName": "Nom du budget",
@@ -538,7 +556,10 @@
         "expenses": "Charges",
         "totalIncome": "Total des produits",
         "totalExpenses": "Total des charges",
-        "netResult": "Résultat de la période"
+        "netResult": "Résultat de la période",
+        "yearlyView": "Annuel",
+        "monthlyView": "Mensuel",
+        "avg": "Moy./mois"
       },
       "download": "Télécharger le PDF",
       "downloadError": "Échec du téléchargement du rapport."

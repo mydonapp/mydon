@@ -48,7 +48,7 @@ export interface BudgetProgressItem {
   yearlyBudget: number;
   actual: number;
   percentage: number;
-  projectedYearly: number;
+  projectedYearly: number | null;
   prevActual: number;
   monthOverMonthChange: number | null;
   accounts?: { id: string; name: string; actual: number }[];
@@ -62,6 +62,21 @@ export interface BudgetProgress {
   items: BudgetProgressItem[];
 }
 
+export interface MonthlyBreakdownItem {
+  id: string;
+  name: string;
+  type: 'group' | 'account';
+  accountType: string | null;
+  accountCode: string | null;
+  monthlyBudget: number;
+  months: number[];
+}
+
+export interface MonthlyBreakdown {
+  year: number;
+  items: MonthlyBreakdownItem[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class BudgetsService {
   private http = inject(HttpClient);
@@ -70,6 +85,7 @@ export class BudgetsService {
   private budgetsCache: BudgetSummary[] | null = null;
   private budgetByKey = new Map<string, BudgetDetail>();
   private progressByKey = new Map<string, BudgetProgress>();
+  private monthlyByKey = new Map<string, MonthlyBreakdown>();
 
   async fetchBudgets(): Promise<BudgetSummary[]> {
     if (this.budgetsCache) {
@@ -140,10 +156,24 @@ export class BudgetsService {
     return data;
   }
 
+  async fetchMonthlyBreakdown(budgetId: string, year: number): Promise<MonthlyBreakdown> {
+    const key = `${budgetId}|${year}`;
+    const cached = this.monthlyByKey.get(key);
+    if (cached) {
+      return cached;
+    }
+    const data = await firstValueFrom(
+      this.http.get<MonthlyBreakdown>(`${this.appConfig.apiUrl}/v1/budgets/${budgetId}/monthly?year=${year}`),
+    );
+    this.monthlyByKey.set(key, data);
+    return data;
+  }
+
   invalidate(): void {
     this.budgetsCache = null;
     this.budgetByKey.clear();
     this.progressByKey.clear();
+    this.monthlyByKey.clear();
   }
 
   clearCache(): void {

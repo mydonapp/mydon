@@ -179,6 +179,60 @@ export class AccountsService {
     return net;
   }
 
+  /**
+   * Per income/expense account, the net base-currency actual for each month of `year` (index 0 = Jan),
+   * using the same posted-only + closing-exclusion rules as the income statement. Powers the monthly
+   * P&L comparison matrix. Summing `base_amount` keeps it in the ledger base currency without per-row
+   * FX conversion (income/expense accounts are normally booked in the base currency).
+   */
+  async getMonthlyIncomeExpenseActuals(
+    ledgerId: string,
+    year: number,
+  ): Promise<{ id: string; code: string; name: string; type: AccountType; months: number[] }[]> {
+    const rows = await this.dataSource.query(
+      `SELECT
+          a.id AS "id",
+          a.code AS "code",
+          a.name AS "name",
+          a.type AS "type",
+          EXTRACT(MONTH FROM t.transaction_date)::int AS "month",
+          COALESCE(SUM(CASE WHEN e.direction = 'DEBIT' THEN e.base_amount ELSE 0 END), 0)::numeric AS "debit",
+          COALESCE(SUM(CASE WHEN e.direction = 'CREDIT' THEN e.base_amount ELSE 0 END), 0)::numeric AS "credit"
+       FROM accounts a
+       JOIN entries e ON e.account_id = a.id
+       JOIN transactions t ON t.id = e.transaction_id
+       WHERE a.ledger_id = $1
+         AND a.type IN ('INCOME', 'EXPENSE')
+         AND t.posted_at IS NOT NULL
+         AND NOT t.closing
+         AND NOT EXISTS (SELECT 1 FROM transactions c WHERE c.id = t.reverses_transaction_id AND c.closing = true)
+         AND EXTRACT(YEAR FROM t.transaction_date)::int = $2
+       GROUP BY a.id, a.code, a.name, a.type, month`,
+      [ledgerId, year],
+    );
+
+    const byAccount = new Map<string, { id: string; code: string; name: string; type: AccountType; months: number[] }>();
+    for (const row of rows as {
+      id: string;
+      code: string | null;
+      name: string;
+      type: AccountType;
+      month: number;
+      debit: string;
+      credit: string;
+    }[]) {
+      let acc = byAccount.get(row.id);
+      if (!acc) {
+        acc = { id: row.id, code: row.code ?? '', name: row.name, type: row.type, months: new Array<number>(12).fill(0) };
+        byAccount.set(row.id, acc);
+      }
+      const balance = this.computeBalance(row.type, parseFloat(row.debit), parseFloat(row.credit));
+      acc.months[row.month - 1] = Math.round(balance * 100) / 100;
+    }
+
+    return [...byAccount.values()].sort((a, b) => this.byCode(a, b));
+  }
+
   async mapAccountsToGrouped(accounts: AccountWithBalance[], accountType: AccountType, baseCurrency: Currency) {
     const result = (
       await Promise.all(

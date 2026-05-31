@@ -78,7 +78,15 @@
   } } @else { @if (!editMode()) {
   <!-- ===== VIEW MODE ===== -->
   <div class="flex items-end justify-between mt-5 mb-3">
-    <p class="page-section-label !-mb-1">{{ 'views.budgets.overview' | translate }}</p>
+    <div class="min-w-0">
+      <p class="page-section-label !mb-0">{{ 'views.budgets.overview' | translate }}</p>
+      @if (throughMonthLabel()) {
+      <p class="text-xs text-on-surface-variant mt-0.5">
+        {{ 'views.budgets.throughMonth' | translate: { month: throughMonthLabel() } }} · {{ yearProgressPct() }}%
+        {{ 'views.budgets.ofYear' | translate }}
+      </p>
+      }
+    </div>
     <div class="segmented-control">
       <button
         class="segmented-btn"
@@ -109,6 +117,11 @@
       <p class="text-xs text-on-surface-variant mt-1">
         {{ 'views.budgets.totalBudgeted' | translate }}: {{ currencyService.format(incomeBudgeted(), 'CHF') }}
       </p>
+      @if (incomeProjected() !== null) {
+      <p class="text-xs text-on-surface-variant">
+        {{ 'views.budgets.projected' | translate }}: {{ currencyService.format(incomeProjected()!, 'CHF') }}
+      </p>
+      }
     </div>
     } @if (expenseItems().length > 0) {
     <div class="page-group p-3">
@@ -119,6 +132,11 @@
       <p class="text-xs text-on-surface-variant mt-1">
         {{ 'views.budgets.totalBudgeted' | translate }}: {{ currencyService.format(expenseBudgeted(), 'CHF') }}
       </p>
+      @if (expenseProjected() !== null) {
+      <p class="text-xs text-on-surface-variant">
+        {{ 'views.budgets.projected' | translate }}: {{ currencyService.format(expenseProjected()!, 'CHF') }}
+      </p>
+      }
     </div>
     } @if (incomeItems().length > 0 && expenseItems().length > 0) {
     <div class="page-group p-3 col-span-2 md:col-span-1">
@@ -133,24 +151,13 @@
       <p class="text-xs text-on-surface-variant mt-1">
         {{ 'views.budgets.totalBudgeted' | translate }}: {{ currencyService.format(netBudgeted(), 'CHF') }}
       </p>
+      @if (netProjected() !== null) {
+      <p class="text-xs text-on-surface-variant">
+        {{ 'views.budgets.projected' | translate }}: {{ currencyService.format(netProjected()!, 'CHF') }}
+      </p>
+      }
     </div>
     }
-  </div>
-  }
-
-  <!-- Month selector -->
-  @if (viewType() === 'monthly') {
-  <div class="flex items-center gap-2 mb-4">
-    <select
-      appSelect
-      class="w-auto"
-      [ngModel]="selectedMonth()"
-      (ngModelChange)="selectedMonth.set(+$event); loadProgress()"
-    >
-      @for (m of months; track m.value) {
-      <option [value]="m.value">{{ m.label }}</option>
-      }
-    </select>
   </div>
   }
 
@@ -165,7 +172,20 @@
     </div>
     <app-skeleton class="h-2 w-full" />
   </div>
-  } } @else {
+  } } @else if (progressItems().length === 0) {
+  <div class="page-group p-8 text-center">
+    <p class="text-on-surface-variant mb-4">{{ 'views.budgets.budgetItems.noItems' | translate }}</p>
+    <button
+      appBtn
+      variant="secondary"
+      size="sm"
+      (click)="enterEditMode()"
+    >
+      {{ 'views.budgets.editBudget' | translate }}
+    </button>
+  </div>
+  } @else if (viewType() === 'yearly') {
+  <!-- Yearly: per-item pace bars (fill = spent, marker = time elapsed) -->
   <div class="space-y-4">
     @for (item of progressItems(); track item.id) {
     <div class="page-group p-4">
@@ -177,49 +197,168 @@
         </h3>
         <div class="text-right">
           <span
-            class="text-sm font-bold"
+            class="text-sm font-bold tabular-nums"
             [class]="item.percentage > 100 ? 'text-error' : 'text-on-surface'"
           >
             {{ currencyService.format(item.actual, 'CHF') }}
           </span>
-          <span class="text-on-surface-variant text-xs ml-1">
-            {{ 'views.budgets.progress.of' | translate }} {{ currencyService.format(viewType() === 'monthly' ?
-            item.monthlyBudget : item.yearlyBudget, 'CHF') }}
+          <span class="text-on-surface-variant text-xs ml-1 tabular-nums">
+            / {{ currencyService.format(item.yearlyBudget, 'CHF') }}
           </span>
         </div>
       </div>
       <app-progress-bar
         [value]="Math.min(item.percentage, 100)"
-        [variant]="item.percentage > 100 ? 'error' : item.percentage > 80 ? 'warning' : 'success'"
+        [marker]="yearProgressPct()"
+        [variant]="paceVariant(item)"
       />
-      <div class="flex items-center justify-between mt-1">
-        <span class="text-xs text-on-surface-variant">{{ item.percentage.toFixed(0) }}%</span>
-        @if (viewType() === 'monthly' && item.projectedYearly !== null) {
-        <span class="text-xs text-on-surface-variant">
-          {{ 'views.budgets.progress.projectedYearly' | translate }} {{ currencyService.format(item.projectedYearly,
-          'CHF') }}
-        </span>
-        }
+      <div class="flex items-center justify-between mt-1.5 text-xs text-on-surface-variant">
+        <span class="tabular-nums">{{ item.percentage.toFixed(0) }}%</span>
+        <div class="flex items-center gap-3 tabular-nums">
+          @if (remaining(item) >= 0) {
+          <span>{{ 'views.budgets.remaining' | translate }} {{ currencyService.format(remaining(item), 'CHF') }}</span>
+          } @else {
+          <span class="text-error">
+            {{ 'views.budgets.overBy' | translate }} {{ currencyService.format(-remaining(item), 'CHF') }}
+          </span>
+          }
+          @if (projected(item) !== null) {
+          <span>
+            {{ 'views.budgets.progress.projectedYearly' | translate }}
+            {{ currencyService.format(projected(item)!, 'CHF') }}
+          </span>
+          }
+        </div>
       </div>
-      @if (item.percentage > 100) {
-      <span class="badge badge--error badge--sm mt-1">
-        {{ 'views.budgets.progress.recommendations.over_budget' | translate }}
-      </span>
-      }
-    </div>
-    } @if (progressItems().length === 0) {
-    <div class="page-group p-8 text-center">
-      <p class="text-on-surface-variant mb-4">{{ 'views.budgets.budgetItems.noItems' | translate }}</p>
-      <button
-        appBtn
-        variant="secondary"
-        size="sm"
-        (click)="enterEditMode()"
-      >
-        {{ 'views.budgets.editBudget' | translate }}
-      </button>
     </div>
     }
+  </div>
+  } @else {
+  <!-- Monthly: 12-month comparison matrix (rows = items, columns = months) -->
+  <div class="page-group p-0 overflow-x-auto">
+    <table
+      class="budget-matrix w-full border-collapse text-sm"
+      [class.is-compact]="listStyleService.listStyle() === 'compact'"
+    >
+      <thead>
+        <tr class="border-b border-outline-variant">
+          <th class="sticky left-0 z-20 bg-surface text-left font-medium text-on-surface-variant px-3 whitespace-nowrap">
+            {{ 'views.budgets.budgetItems.title' | translate }}
+          </th>
+          @for (label of monthLabels; track $index) {
+          <th class="text-right font-medium text-on-surface-variant px-2 whitespace-nowrap">{{ label }}</th>
+          }
+          <th class="text-right font-medium text-on-surface px-3 whitespace-nowrap">
+            {{ 'views.budgets.budgetMonthly' | translate }}
+          </th>
+          <th class="text-right font-medium text-on-surface px-3 whitespace-nowrap">
+            {{ 'views.budgets.monthlyAvg' | translate }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (monthlyIncomeItems().length > 0) {
+        <tr>
+          <th
+            colspan="15"
+            class="sticky left-0 bg-surface-variant/40 text-left px-3 text-xs font-semibold uppercase tracking-wide text-on-surface-variant"
+          >
+            {{ 'views.budgets.income' | translate }}
+          </th>
+        </tr>
+        @for (item of monthlyIncomeItems(); track item.id) {
+        <tr class="border-b border-outline-variant/50">
+          <td class="sticky left-0 z-10 bg-surface px-3 whitespace-nowrap text-on-surface">
+            @if (accountCodesService.show() && item.accountCode) {
+            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ item.accountCode }}</span>
+            } {{ item.name }}
+          </td>
+          @for (m of item.months; track $index) {
+          <td
+            class="text-right px-2 tabular-nums"
+            [class]="cellClass(m, item.monthlyBudget, item.accountType)"
+          >
+            {{ num(m) }}
+          </td>
+          }
+          <td class="text-right px-3 tabular-nums text-on-surface-variant">
+            {{ num(item.monthlyBudget, 2, false) }}
+          </td>
+          <td class="text-right px-3 tabular-nums text-on-surface">{{ num(monthlyAvg(item.months), 2, false) }}</td>
+        </tr>
+        }
+        <tr class="border-b-2 border-outline-variant font-medium">
+          <td class="sticky left-0 z-10 bg-surface px-3 text-on-surface">{{ 'views.budgets.income' | translate }}</td>
+          @for (t of monthlyIncomeTotals(); track $index) {
+          <td class="text-right px-2 tabular-nums text-on-surface">{{ num(t) }}</td>
+          }
+          <td class="px-3"></td>
+          <td class="text-right px-3 tabular-nums text-on-surface">
+            {{ num(monthlyAvg(monthlyIncomeTotals()), 2, false) }}
+          </td>
+        </tr>
+        }
+        @if (monthlyExpenseItems().length > 0) {
+        <tr>
+          <th
+            colspan="15"
+            class="sticky left-0 bg-surface-variant/40 text-left px-3 text-xs font-semibold uppercase tracking-wide text-on-surface-variant"
+          >
+            {{ 'views.budgets.expenses' | translate }}
+          </th>
+        </tr>
+        @for (item of monthlyExpenseItems(); track item.id) {
+        <tr class="border-b border-outline-variant/50">
+          <td class="sticky left-0 z-10 bg-surface px-3 whitespace-nowrap text-on-surface">
+            @if (accountCodesService.show() && item.accountCode) {
+            <span class="text-xs font-mono text-on-surface-variant mr-1.5">{{ item.accountCode }}</span>
+            } {{ item.name }}
+          </td>
+          @for (m of item.months; track $index) {
+          <td
+            class="text-right px-2 tabular-nums"
+            [class]="cellClass(m, item.monthlyBudget, item.accountType)"
+          >
+            {{ num(m) }}
+          </td>
+          }
+          <td class="text-right px-3 tabular-nums text-on-surface-variant">
+            {{ num(item.monthlyBudget, 2, false) }}
+          </td>
+          <td class="text-right px-3 tabular-nums text-on-surface">{{ num(monthlyAvg(item.months), 2, false) }}</td>
+        </tr>
+        }
+        <tr class="border-b-2 border-outline-variant font-medium">
+          <td class="sticky left-0 z-10 bg-surface px-3 text-on-surface">{{ 'views.budgets.expenses' | translate }}</td>
+          @for (t of monthlyExpenseTotals(); track $index) {
+          <td class="text-right px-2 tabular-nums text-on-surface">{{ num(t) }}</td>
+          }
+          <td class="px-3"></td>
+          <td class="text-right px-3 tabular-nums text-on-surface">
+            {{ num(monthlyAvg(monthlyExpenseTotals()), 2, false) }}
+          </td>
+        </tr>
+        }
+        @if (monthlyIncomeItems().length > 0 && monthlyExpenseItems().length > 0) {
+        <tr class="font-semibold">
+          <td class="sticky left-0 z-10 bg-surface px-3 text-on-surface">{{ 'views.budgets.net' | translate }}</td>
+          @for (t of monthlyNetTotals(); track $index) {
+          <td
+            class="text-right px-2 tabular-nums"
+            [class.text-income]="t > 0"
+            [class.text-error]="t < 0"
+          >
+            {{ num(t, 0, false) }}
+          </td>
+          }
+          <td class="px-3"></td>
+          <td class="text-right px-3 tabular-nums text-on-surface">
+            {{ num(monthlyAvg(monthlyNetTotals()), 2, false) }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
   </div>
   } } @else {
   <!-- ===== EDIT MODE ===== -->
@@ -294,16 +433,19 @@
           }
         </div>
 
-        <div class="sm:w-28 sm:shrink-0">
-          @if (isComputed(item)) {
-          <input
-            appInput
-            type="number"
-            [ngModel]="computeLineAmount(item)"
-            [disabled]="true"
+        @if (isComputed(item)) {
+        <!-- Sub-items define the line: its amount/frequency are derived (yearly), not editable here. -->
+        <div class="sm:w-60 sm:shrink-0">
+          <div
+            class="input flex items-center justify-between gap-1.5 !bg-surface-variant/40 text-on-surface-variant tabular-nums"
             [title]="'views.budgets.budgetItems.subItems.computedHint' | translate"
-          />
-          } @else {
+          >
+            <span>{{ computeLineAmount(item) }}</span>
+            <span class="text-xs">{{ 'views.budgets.budgetItems.frequency.yearly' | translate }}</span>
+          </div>
+        </div>
+        } @else {
+        <div class="sm:w-28 sm:shrink-0">
           <input
             appInput
             type="number"
@@ -311,19 +453,19 @@
             (ngModelChange)="item.amount = +$event"
             placeholder="0.00"
           />
-          }
         </div>
 
         <div class="sm:w-32 sm:shrink-0">
           <select
             appSelect
             [ngModel]="item.frequency"
-            (ngModelChange)="item.frequency = $event; onLineFrequencyChange(i)"
+            (ngModelChange)="item.frequency = $event"
           >
             <option value="monthly">{{ 'views.budgets.budgetItems.frequency.monthly' | translate }}</option>
             <option value="yearly">{{ 'views.budgets.budgetItems.frequency.yearly' | translate }}</option>
           </select>
         </div>
+        }
 
         <div class="flex items-center justify-end gap-1 sm:shrink-0">
           <button

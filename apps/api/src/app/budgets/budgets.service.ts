@@ -173,14 +173,16 @@ export class BudgetsService {
     const newItems = items.map((dto) => {
       const item = new BudgetItem();
       item.budget = { id: budgetId } as Budget;
-      item.frequency = dto.frequency;
       item.account = dto.accountId ? ({ id: dto.accountId } as Account) : null;
       item.group = dto.groupId ? ({ id: dto.groupId } as AccountGroup) : null;
 
       const subItems = dto.subItems ?? [];
       if (subItems.length > 0) {
-        // Sub-items drive the amount: store the normalized sum so getProgress stays untouched.
-        item.amount = this.computeAmountFromSubItems(dto.frequency, subItems);
+        // A line with sub-items is defined entirely by them, so it has no frequency/amount of its own:
+        // store the exact YEARLY sum so the yearly overview reconciles. Deriving a monthly amount and
+        // ×12-ing it in getProgress would drop cents when monthly and yearly sub-items are mixed.
+        item.frequency = BudgetFrequency.YEARLY;
+        item.amount = this.computeAmountFromSubItems(BudgetFrequency.YEARLY, subItems);
         item.subItems = subItems.map((sub, index) => {
           const subItem = new BudgetSubItem();
           subItem.name = sub.name;
@@ -190,6 +192,7 @@ export class BudgetsService {
           return subItem;
         });
       } else {
+        item.frequency = dto.frequency;
         item.amount = dto.amount;
         item.subItems = [];
       }
@@ -286,7 +289,7 @@ export class BudgetsService {
           groupName: item.group?.name ?? null,
           accountId: item.account?.id ?? null,
           accountName: item.account?.name ?? null,
-          accountCode: item.account?.code ?? null,
+          accountCode: item.account?.code ?? item.group?.code ?? null,
           frequency: item.frequency,
           amount: item.amount,
           monthlyBudget: Math.round(monthlyBudget * 100) / 100,
@@ -310,6 +313,48 @@ export class BudgetsService {
       monthsElapsed,
       items: progressItems,
     };
+  }
+
+  /** Per-item actuals for each month (Jan–Dec) of `year` vs the item's monthly budget — powers the
+   *  month-by-month comparison view. */
+  async getMonthlyBreakdown(budgetId: string, context: Context, year: number) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const budget = await this.budgetsRepository.findOne({
+      where: { id: budgetId, ledgerId: ledger.id },
+      relations: ['items', 'items.account', 'items.group'],
+    });
+    if (!budget) {
+      throw new NotFoundException();
+    }
+
+    const items = await Promise.all(
+      [...budget.items].sort((a, b) => this.byChartOrder(a, b)).map(async (item) => {
+        const monthlyBudget = item.frequency === BudgetFrequency.MONTHLY ? item.amount : item.amount / 12;
+        let months = new Array<number>(12).fill(0);
+        let accountType: string | null = null;
+
+        if (item.group) {
+          const res = await this.getGroupMonthlyActuals(item.group.id, ledger.id, year);
+          months = res.months;
+          accountType = res.accountType;
+        } else if (item.account) {
+          months = await this.getAccountMonthlyActuals(item.account, ledger.id, year);
+          accountType = item.account.type;
+        }
+
+        return {
+          id: item.id,
+          name: item.group?.name ?? item.account?.name ?? '',
+          type: item.group ? 'group' : 'account',
+          accountType,
+          accountCode: item.account?.code ?? item.group?.code ?? null,
+          monthlyBudget: Math.round(monthlyBudget * 100) / 100,
+          months,
+        };
+      }),
+    );
+
+    return { year, items };
   }
 
   private computeAmountFromSubItems(lineFrequency: BudgetFrequency, subItems: BudgetSubItemDto[]): number {
@@ -437,5 +482,57 @@ export class BudgetsService {
     const total = accounts.reduce((sum: number, a: { actual: number }) => sum + a.actual, 0);
     const accountType: string | null = rows[0]?.type ?? null;
     return { total, accountType, accounts };
+  }
+
+  /** Posted actuals per month (index 0 = Jan) for an account in `year`, normal-balance, never negative. */
+  private async getAccountMonthlyActuals(account: Account, ledgerId: string, year: number): Promise<number[]> {
+    const rows = await this.dataSource.query(
+      `SELECT
+        EXTRACT(MONTH FROM t.transaction_date)::int AS month,
+        COALESCE(SUM(CASE WHEN e.direction = 'CREDIT' THEN e.amount ELSE 0 END), 0)::numeric AS "creditBalance",
+        COALESCE(SUM(CASE WHEN e.direction = 'DEBIT'  THEN e.amount ELSE 0 END), 0)::numeric AS "debitBalance"
+       FROM entries e
+       JOIN transactions t ON t.id = e.transaction_id
+       WHERE e.account_id = $1
+         AND t.ledger_id = $2
+         AND t.posted_at IS NOT NULL
+         AND EXTRACT(YEAR FROM t.transaction_date)::int = $3
+       GROUP BY month`,
+      [account.id, ledgerId, year],
+    );
+    const debitPositive = account.type === AccountType.ASSETS || account.type === AccountType.EXPENSE;
+    const months = new Array<number>(12).fill(0);
+    for (const row of rows as { month: number; creditBalance: string; debitBalance: string }[]) {
+      const credit = parseFloat(row.creditBalance);
+      const debit = parseFloat(row.debitBalance);
+      const balance = debitPositive ? debit - credit : credit - debit;
+      months[row.month - 1] = Math.round(Math.max(0, balance) * 100) / 100;
+    }
+    return months;
+  }
+
+  /** Posted actuals per month (index 0 = Jan) for a group, summing each member account's monthly
+   *  actuals (reuses the per-account query so the group + account paths stay identical). The group's
+   *  type comes from its first account, captured even when no account has activity in `year`. */
+  private async getGroupMonthlyActuals(
+    groupId: string,
+    ledgerId: string,
+    year: number,
+  ): Promise<{ months: number[]; accountType: string | null }> {
+    const accounts = (await this.dataSource.query(
+      `SELECT id, type FROM accounts WHERE group_id = $1 AND ledger_id = $2`,
+      [groupId, ledgerId],
+    )) as { id: string; type: AccountType }[];
+
+    const months = new Array<number>(12).fill(0);
+    let accountType: string | null = null;
+    for (const account of accounts) {
+      accountType ??= account.type;
+      const accMonths = await this.getAccountMonthlyActuals(account as Account, ledgerId, year);
+      for (let i = 0; i < 12; i++) {
+        months[i] += accMonths[i];
+      }
+    }
+    return { months: months.map((m) => Math.round(m * 100) / 100), accountType };
   }
 }

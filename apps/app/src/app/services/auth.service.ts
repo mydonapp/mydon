@@ -51,9 +51,12 @@ export class AuthService {
     return this.isTokenValid();
   }
 
-  private setToken(token: string, expiresIn: number) {
+  private setToken(token: string, expiryEpochSeconds: number) {
     this.accessToken = token;
-    this.accessTokenExpiry = new Date(Date.now() + expiresIn * 1000);
+    // The API returns `expiry` as an absolute epoch timestamp in seconds (not a duration), so convert
+    // straight to ms. Treating it as a relative TTL pushed the expiry decades out, so ensureValidToken
+    // never refreshed and requests went out with a server-side-expired token.
+    this.accessTokenExpiry = new Date(expiryEpochSeconds * 1000);
   }
 
   async fetchAccessToken(): Promise<void> {

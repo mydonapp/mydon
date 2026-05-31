@@ -175,6 +175,49 @@ export class ReportsService {
     };
   }
 
+  /**
+   * Income statement broken out by month (Jan–Dec) for `year`: each income/expense account's monthly
+   * base-currency actual, with per-month section totals and a monthly net result. Single-month columns
+   * reconcile with {@link getIncomeStatement} for the same period (base-currency income/expense accounts).
+   */
+  async getIncomeStatementMonthly(context: Context, year: number) {
+    const ledger = await this.ledgersService.getDefaultLedgerForUser(context.user.id);
+    const accounts = await this.accountsService.getMonthlyIncomeExpenseActuals(ledger.id, year);
+
+    const section = (rows: { id: string; code: string; name: string; type: AccountType; months: number[] }[]) => {
+      const monthlyTotals = new Array<number>(12).fill(0);
+      for (const r of rows) {
+        for (let i = 0; i < 12; i++) {
+          monthlyTotals[i] += r.months[i];
+        }
+      }
+      return {
+        rows: rows.map((r) => ({
+          id: r.id,
+          code: r.code,
+          name: r.name,
+          months: r.months,
+          total: Math.round(r.months.reduce((s, m) => s + m, 0) * 100) / 100,
+        })),
+        monthlyTotals: monthlyTotals.map((v) => Math.round(v * 100) / 100),
+        total: Math.round(monthlyTotals.reduce((s, v) => s + v, 0) * 100) / 100,
+      };
+    };
+
+    const income = section(accounts.filter((a) => a.type === AccountType.INCOME));
+    const expense = section(accounts.filter((a) => a.type === AccountType.EXPENSE));
+    const netMonthly = income.monthlyTotals.map((v, i) => Math.round((v - expense.monthlyTotals[i]) * 100) / 100);
+
+    return {
+      baseCurrency: ledger.baseCurrency,
+      year,
+      income,
+      expense,
+      netMonthly,
+      netTotal: Math.round((income.total - expense.total) * 100) / 100,
+    };
+  }
+
   private shiftBackOneYear(d?: Date): Date | undefined {
     if (!d) {
       return undefined;

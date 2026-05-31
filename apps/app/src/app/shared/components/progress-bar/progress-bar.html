@@ -14,4 +14,10 @@
     class="progress-bar__fill"
     [style.width.%]="clamped()"
   ></div>
+  @if (clampedMarker() !== null) {
+  <div
+    class="progress-bar__marker"
+    [style.left.%]="clampedMarker()"
+  ></div>
+  }
 </div>
